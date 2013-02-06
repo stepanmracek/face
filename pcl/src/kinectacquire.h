@@ -4,6 +4,8 @@
 #include <pcl/point_cloud.h>
 #include <pcl/visualization/cloud_viewer.h>
 
+#include "common.h"
+
 class KinectAcquire
 {
 private:
@@ -11,7 +13,7 @@ private:
 public:
     pcl::visualization::CloudViewer viewer;
 
-    void displayCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr &cloud);
+    void displayCallback(const PointCloud::ConstPtr &cloud);
 
     KinectAcquire() : viewer("Kinect") //, filtered(new pcl::PointCloud<pcl::PointXYZRGBA>)
     {

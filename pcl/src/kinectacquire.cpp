@@ -9,7 +9,7 @@ void KinectAcquire::run()
 {
     pcl::OpenNIGrabber *interface = new pcl::OpenNIGrabber();
 
-    boost::function<void (const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&)> f =
+    boost::function<void (const PointCloud::ConstPtr&)> f =
             boost::bind (&KinectAcquire::displayCallback, this, _1);
 
     interface->registerCallback (f);
@@ -23,12 +23,12 @@ void KinectAcquire::run()
     interface->stop ();
 }
 
-void KinectAcquire::displayCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr &cloud)
+void KinectAcquire::displayCallback(const PointCloud::ConstPtr &cloud)
 {
     if (!viewer.wasStopped())
     {
-        pcl::PassThrough<pcl::PointXYZ> filter;
-        pcl::PointCloud<pcl::PointXYZ>::Ptr filtered(new pcl::PointCloud<pcl::PointXYZ>);
+        pcl::PassThrough<Point> filter;
+        PointCloud::Ptr filtered(new PointCloud);
         filter.setFilterFieldName("z");
         filter.setFilterLimits(0.6, 0.8);
         filter.setInputCloud(cloud);
