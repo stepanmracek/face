@@ -203,12 +203,11 @@ void Align::runBruteForce()
         PointCloud::Ptr result(new PointCloud);
         alignment.setInputCloud(source.cloud);
         alignment.setSourceFeatures(sourceDescriptors);
-        alignment.align(source.cloud);
-        //alignment.align(*result);
+        alignment.align(*result);
 
         pcl::visualization::PCLVisualizer viz;
         viz.addPointCloud(target.cloud, "target");
-        viz.addPointCloud(source.cloud, "result");
+        viz.addPointCloud(result, "result");
         viz.spin();
     }
 }
