@@ -1,3 +1,6 @@
+debug/
+release/
+
 *.pro.user
 *.pro.user*
 
