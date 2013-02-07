@@ -24,7 +24,7 @@ Data::Data(const char *path) :
        std::cout << "loading " << path << std::endl;
        pcl::io::loadPCDFile(path, *cloud);
 
-       const float voxel_grid_size = 0.002f;
+       const float voxel_grid_size = 0.005f;
        pcl::VoxelGrid<Point> vox_grid;
        vox_grid.setInputCloud (cloud);
        vox_grid.setLeafSize (voxel_grid_size, voxel_grid_size, voxel_grid_size);
