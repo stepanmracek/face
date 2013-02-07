@@ -191,9 +191,8 @@ void Align::runBruteForce()
     alignment.setMaximumIterations(5000);
     alignment.setInputTarget(target.cloud);
     alignment.setTargetFeatures(targetDescriptors);
-
     int n = sources.size();
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < n; i++)
     {
         Data &source = sources[i];
         Descriptors::Ptr sourceDescriptors(new Descriptors);
