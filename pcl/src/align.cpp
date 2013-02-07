@@ -203,6 +203,7 @@ void Align::runBruteForce()
         PointCloud::Ptr result(new PointCloud);
         alignment.setInputCloud(source.cloud);
         alignment.setSourceFeatures(sourceDescriptors);
+        alignment.align(source.cloud);
         //alignment.align(*result);
 
         pcl::visualization::PCLVisualizer viz;
