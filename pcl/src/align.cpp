@@ -188,7 +188,7 @@ void Align::runBruteForce()
     pcl::SampleConsensusInitialAlignment<Point, Point, Descriptor> alignment;
     alignment.setMinSampleDistance(0.005);
     alignment.setMaxCorrespondenceDistance(0.01*0.01);
-    alignment.setMaximumIterations(20);
+    alignment.setMaximumIterations(500);
     alignment.setInputTarget(target.cloud);
     alignment.setTargetFeatures(targetDescriptors);
 
