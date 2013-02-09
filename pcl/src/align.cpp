@@ -70,7 +70,7 @@ Eigen::Matrix4f calcAlignTransform(PointCloud::Ptr &targetCloud, Descriptors::Pt
 
 void alignRansac(std::string targetPath, std::vector<std::string> &sourcePaths)
 {
-    float voxelSize = 0.025f;
+    float voxelSize = 0.01f;
     int normalsK = 10;
     int descriptorsK = 15;
 
