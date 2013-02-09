@@ -1,25 +1,15 @@
 #include "align.h"
 
-#include <pcl/registration/ia_ransac.h>
-#include <pcl/keypoints/sift_keypoint.h>
-#include <pcl/visualization/pcl_visualizer.h>
-#include <pcl/filters/voxel_grid.h>
-#include <pcl/features/normal_3d.h>
-#include <pcl/features/normal_3d.h>
-#include <pcl/features/fpfh.h>
-
-
-void downSample(PointCloud::ConstPtr &input, float gridSize, PointCloud::Ptr &output)
+void downSample(PointCloud::Ptr &input, float gridSize, PointCloud::Ptr &output)
 {
     //const float gridSize = 0.01f;
     pcl::VoxelGrid<Point> voxGrid;
     voxGrid.setInputCloud (input);
     voxGrid.setLeafSize (gridSize, gridSize, gridSize);
-    PointCloud::Ptr tempCloud (new PointCloud);
     voxGrid.filter(*output);
 }
 
-void calcNormals(PointCloud::ConstPtr &input, int kSearch, PointCloud::Ptr &output)
+void calcNormals(PointCloud::Ptr &input, int kSearch, Normals::Ptr &output)
 {
     //const int kSearch = 10;
     pcl::NormalEstimation<Point, Normal> ne;
@@ -29,7 +19,7 @@ void calcNormals(PointCloud::ConstPtr &input, int kSearch, PointCloud::Ptr &outp
     ne.compute(*output);
 }
 
-void calcDescriptors(PointCloud::ConstPtr &inputCloud, Normals::ConstPtr &inputNormals,
+void calcDescriptors(PointCloud::Ptr &inputCloud, Normals::Ptr &inputNormals,
                      int kSearch, Descriptors::Ptr &outputDescriptors)
 {
     //const int kSearch = 20;
@@ -41,8 +31,22 @@ void calcDescriptors(PointCloud::ConstPtr &inputCloud, Normals::ConstPtr &inputN
     featuresEstimation.compute (*outputDescriptors);
 }
 
-Eigen::Matrix4f calcAlignTransform(PointCloud::ConstPtr &targetCloud, Descriptors::ConstPtr &targetDescriptors,
-                                   PointCloud::ConstPtr &sourceCloud, Descriptors::ConstPtr &sourceDescriptors,
+void createPointNormalsCloud(PointCloud::Ptr &cloud, Normals::Ptr &normals, PointNormalCloud::Ptr &result)
+{
+    int n = cloud->size();
+    for (int i = 0; i < n; i++)
+    {
+        const Point &p = cloud->at(i);
+        const Normal &n = normals->at(i);
+        PointNormal pn;
+        pn.x = p.x; pn.y = p.y; pn.z = p.z;
+        pn.normal_x = n.normal_x; pn.normal_y = n.normal_y; pn.normal_z = n.normal_z;
+        result->push_back(pn);
+    }
+}
+
+Eigen::Matrix4f calcAlignTransform(PointCloud::Ptr &targetCloud, Descriptors::Ptr &targetDescriptors,
+                                   PointCloud::Ptr &sourceCloud, Descriptors::Ptr &sourceDescriptors,
                                    float minSampleDistance, float maxCorDistance, int maxIterations)
 {
     //minSampleDistance = 0.01;
@@ -64,40 +68,98 @@ Eigen::Matrix4f calcAlignTransform(PointCloud::ConstPtr &targetCloud, Descriptor
     return alignment.getFinalTransformation();
 }
 
-
-/*void runBruteForce()
+void alignRansac(std::string targetPath, std::vector<std::string> &sourcePaths)
 {
-    Descriptors::Ptr targetDescriptors(new Descriptors);
-    detect(target.cloud, target.normals, targetDescriptors);
+    float voxelSize = 0.025f;
+    int normalsK = 10;
+    int descriptorsK = 15;
 
-    pcl::SampleConsensusInitialAlignment<Point, Point, Descriptor> alignment;
-    alignment.setMinSampleDistance(0.01);
-    alignment.setMaxCorrespondenceDistance(0.01*0.01);
-    alignment.setMaximumIterations(5000);
-    alignment.setInputTarget(target.cloud);
-    alignment.setTargetFeatures(targetDescriptors);
-    int n = sources.size();
-    for (int i = 0; i < n; i++)
-    {
-        Data &source = sources[i];
-        Descriptors::Ptr sourceDescriptors(new Descriptors);
-        detect(source.cloud, source.normals, sourceDescriptors);
-
-        std::cout << "aligning " << (i+1) << std::endl;
-        PointCloud::Ptr result(new PointCloud);
-        alignment.setInputCloud(source.cloud);
-        alignment.setSourceFeatures(sourceDescriptors);
-        alignment.align(*result);
-
-        pcl::visualization::PCLVisualizer viz;
-        viz.addPointCloud(target.cloud, "target");
-        viz.addPointCloud(result, "result");
-        viz.spin();
-    }
-}*/
-
-void align(string targetPath, std::vector<string> &sourcePaths)
-{
     PointCloud::Ptr target(new PointCloud);
-    pcl::io::loadPCDFile(targetPath, target);
+    pcl::io::loadPCDFile(targetPath, *target);
+
+    PointCloud::Ptr targetDownSampled(new PointCloud);
+    Normals::Ptr targetNormals(new Normals);
+    Descriptors::Ptr targetDescriptors(new Descriptors);
+
+    downSample(target, voxelSize, targetDownSampled);
+    calcNormals(targetDownSampled, normalsK, targetNormals);
+    calcDescriptors(targetDownSampled, targetNormals, descriptorsK, targetDescriptors);
+
+    std::vector<string>::iterator it;
+    for (it = sourcePaths.begin(); it != sourcePaths.end(); ++it)
+    {
+        std::cout << (*it) << std::endl;
+        PointCloud::Ptr source(new PointCloud);
+        pcl::io::loadPCDFile(*it, *source);
+
+        PointCloud::Ptr sourceDownSampled(new PointCloud);
+        Normals::Ptr sourceNormals(new Normals);
+        Descriptors::Ptr sourceDescriptors(new Descriptors);
+
+        downSample(source, voxelSize, sourceDownSampled);
+        calcNormals(sourceDownSampled, normalsK, sourceNormals);
+        calcDescriptors(sourceDownSampled, sourceNormals, descriptorsK, sourceDescriptors);
+
+        Eigen::Matrix4f transform = calcAlignTransform(targetDownSampled, targetDescriptors,
+                                                       sourceDownSampled, sourceDescriptors,
+                                                       0.1, 0.01, 50000);
+
+        PointCloud transformedSource;
+        pcl::transformPointCloud(*source, transformedSource, transform);
+
+        (*target) += transformedSource;
+    }
+
+    pcl::io::savePCDFileBinary("../test/result.pcd", *target);
+}
+
+void alignICP(std::string targetPath, std::vector<std::string> &sourcePaths)
+{
+    float voxelSize = 0.02f;
+    int normalsK = 10;
+
+    PointCloud::Ptr targetCloud(new PointCloud);
+    pcl::io::loadPCDFile(targetPath, *targetCloud);
+
+    PointCloud::Ptr targetCloudDownSampled(new PointCloud);
+    Normals::Ptr targetNormals(new Normals);
+    PointNormalCloud::Ptr target(new PointNormalCloud);
+
+    downSample(targetCloud, voxelSize, targetCloudDownSampled);
+    calcNormals(targetCloudDownSampled, normalsK, targetNormals);
+    createPointNormalsCloud(targetCloudDownSampled, targetNormals, target);
+
+    std::vector<string>::iterator it;
+    for (it = sourcePaths.begin(); it != sourcePaths.end(); ++it)
+    {
+        std::cout << (*it) << std::endl;
+        PointCloud::Ptr sourceCloud(new PointCloud);
+        pcl::io::loadPCDFile(*it, *sourceCloud);
+
+        PointCloud::Ptr sourceCloudDownSampled(new PointCloud);
+        Normals::Ptr sourceNormals(new Normals);
+        PointNormalCloud::Ptr source(new PointNormalCloud);
+
+        downSample(sourceCloud, voxelSize, sourceCloudDownSampled);
+        calcNormals(sourceCloudDownSampled, normalsK, sourceNormals);
+        createPointNormalsCloud(sourceCloudDownSampled, sourceNormals, source);
+
+        pcl::IterativeClosestPointNonLinear<PointNormal, PointNormal> icp;
+        icp.setTransformationEpsilon(1e-6);
+        icp.setMaxCorrespondenceDistance(0.2);
+        icp.setInputTarget(target);
+        icp.setInputCloud(source);
+        icp.setMaximumIterations(10000);
+        PointNormalCloud result;
+        icp.align(result);
+
+        Eigen::Matrix4f transform = icp.getFinalTransformation();
+
+        PointCloud transformedSource;
+        pcl::transformPointCloud(*sourceCloud, transformedSource, transform);
+
+        (*targetCloud) += transformedSource;
+    }
+
+    pcl::io::savePCDFileBinary("../test/result.pcd", *targetCloud);
 }

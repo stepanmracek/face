@@ -2,19 +2,11 @@
 #define ALIGN_H
 
 #include <vector>
+#include <string>
 
 #include "common.h"
 
-class Align
-{
-public:
-    Data &target;
-    std::vector<Data> sources;
-
-    Align(Data &target, std::vector<Data> &sources);
-
-    void runSIFT();
-    void runBruteForce();
-};
+void alignRansac(std::string targetPath, std::vector<std::string> &sourcePaths);
+void alignICP(std::string targetPath, std::vector<std::string> &sourcePaths);
 
 #endif // ALIGN_H

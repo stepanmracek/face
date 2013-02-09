@@ -9,21 +9,13 @@ int main(int argc, char *argv[])
 {
     //KinectAcquire kinect;
     //kinect.run();
-
     //loadTransformAndSave("../test/pointcloud0.pcd", "../test/pointcloud0_.pcd", 1/1000.0, -1/1000.0, 1/1000.0, 0.5);
 
-    Data target("../test/pointcloud0.pcd");
-    Data source1("../test/pointcloud1.pcd");
-    Data source2("../test/pointcloud2.pcd");
-    Data source3("../test/pointcloud3.pcd");
-    Data source4("../test/pointcloud4.pcd");
-
-    std::vector<Data> sources;
-    sources.push_back(source1);
-    sources.push_back(source2);
-    sources.push_back(source3);
-    sources.push_back(source4);
-
-    Align align(target, sources);
-    align.runBruteForce();
+    std::vector<std::string> sources;
+    sources.push_back("../test/pointcloud1.pcd");
+    sources.push_back("../test/pointcloud2.pcd");
+    sources.push_back("../test/pointcloud3.pcd");
+    sources.push_back("../test/pointcloud4.pcd");
+    alignRansac("../test/pointcloud0.pcd", sources);
+    //alignICP("../test/pointcloud0.pcd", sources);
 }
