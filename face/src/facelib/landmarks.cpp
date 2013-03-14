@@ -28,9 +28,14 @@ void Landmarks::serialize(const QString &path)
     writeStorage.release();
 }
 
+void Landmarks::exportPTS(const QString &path)
+{
+
+}
+
 bool Landmarks::check()
 {
-    if (points.count() != 8) return false;
+    if (points.count() < 8) return false;
     //qDebug() << "  passed count check";
 
     // check x-coordinates of the eye-line
