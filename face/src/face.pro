@@ -52,7 +52,8 @@ SOURCES += \
     facelib/facefeaturesanotation.cpp \
     facelib/landmarks.cpp \
     facelib/morphable3dfacemodel.cpp \
-    facelib/morphable3dfacemodelwidget.cpp
+    facelib/morphable3dfacemodelwidget.cpp \
+    facelib/widgetmeshselect.cpp
 
 HEADERS += \
     kinect/kinnect.h \
@@ -139,10 +140,14 @@ HEADERS += \
     facelib/morphable3dfacemodelwidget.h \
     test/testglwidget.h \
     test/testmesh.h \
-    test/testlandmarks.h
+    test/testlandmarks.h \
+    facelib/widgetmeshselect.h
 
-INCLUDEPATH += /usr/include/libfreenect /usr/include/pcl-1.6/ /usr/include/eigen3/ /usr/include/ni/ /usr/include/vtk-5.10/
-LIBS += `pkg-config --libs opencv` -lGL -lGLU -lfreenect -lfreenect_sync -lpcl_visualization -lpcl_io -lpcl_common -lboost_system -lboost_thread -lOpenNI
+INCLUDEPATH += /usr/include/libfreenect
+#INCLUDEPATH += /usr/include/pcl-1.6/ /usr/include/eigen3/ /usr/include/ni/ /usr/include/vtk-5.10/
+LIBS += `pkg-config --libs opencv` -lGL -lGLU -lfreenect -lfreenect_sync
+#LIBS += -lpcl_visualization -lpcl_io -lpcl_common -lboost_system -lboost_thread -lOpenNI
 
 FORMS += \
-    facelib/morphable3dfacemodelwidget.ui
+    facelib/morphable3dfacemodelwidget.ui \
+    facelib/widgetmeshselect.ui

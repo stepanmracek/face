@@ -17,7 +17,7 @@ public:
         points << cv::Point3d(4,5,6);
         points << cv::Point3d(7,8,9);
 
-        cv::FileStorage writeStorage("test/landmarksWrite.xml", cv::FileStorage::WRITE);
+        cv::FileStorage writeStorage("../test/landmarksWrite.xml", cv::FileStorage::WRITE);
         writeStorage << "landmarks" << "[";
         foreach (const cv::Point3d &p, points)
         {
@@ -26,24 +26,13 @@ public:
         writeStorage << "]";
         writeStorage.release();
 
-        cv::FileStorage readStorage("test/landmarksWrite.xml", cv::FileStorage::READ);
+        cv::FileStorage readStorage("../test/landmarksWrite.xml", cv::FileStorage::READ);
         cv::FileNode landmarksNode = readStorage["landmarks"];
         for (cv::FileNodeIterator it = landmarksNode.begin(); it != landmarksNode.end(); ++it)
         {
             std::vector<double> tmp;
             (*it) >> tmp;
             qDebug() << tmp.size() <<  tmp[0] << tmp[1] << tmp[2];
-        }
-    }
-
-    static void transfer(const QString& dirPath)
-    {
-        QDir dir(dirPath, "*.xml");
-        QFileInfoList entries = dir.entryInfoList();
-        foreach (const QFileInfo &fileInfo, entries)
-        {
-            Landmarks landmarks(fileInfo.absoluteFilePath());
-            landmarks.serialize(fileInfo.absoluteFilePath());
         }
     }
 };

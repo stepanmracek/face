@@ -108,7 +108,7 @@ void Map::erode(int kernelSize)
     }
 }
 
-double Map::minValue()
+double Map::minValue() const
 {
     double min = 1e300;
     int n = w*h;
@@ -122,7 +122,7 @@ double Map::minValue()
     return min;
 }
 
-double Map::maxValue()
+double Map::maxValue() const
 {
     double max = -1e300;
     int n = w*h;
@@ -166,7 +166,7 @@ void Map::linearTransform(double multiply, double add)
     }
 }
 
-MaskedVector Map::horizontalProfile(int y)
+MaskedVector Map::horizontalProfile(int y) const
 {
     MaskedVector profile(w, 0.0, false);
 
@@ -180,7 +180,7 @@ MaskedVector Map::horizontalProfile(int y)
     return profile;
 }
 
-MaskedVector Map::verticalProfile(int x)
+MaskedVector Map::verticalProfile(int x) const
 {
     MaskedVector profile(h, 0.0, false);
 
@@ -194,7 +194,7 @@ MaskedVector Map::verticalProfile(int x)
     return profile;
 }
 
-MaskedVector Map::meanVerticalProfile()
+MaskedVector Map::meanVerticalProfile() const
 {
     MaskedVector profile(h, 0.0, false);
 
@@ -210,7 +210,7 @@ MaskedVector Map::meanVerticalProfile()
     return profile;
 }
 
-MaskedVector Map::maxVerticalProfile()
+MaskedVector Map::maxVerticalProfile() const
 {
     MaskedVector profile(h, 0.0, false);
 
@@ -226,7 +226,7 @@ MaskedVector Map::maxVerticalProfile()
     return profile;
 }
 
-MaskedVector Map::medianVerticalProfile()
+MaskedVector Map::medianVerticalProfile() const
 {
     MaskedVector profile(h, 0.0, false);
 
@@ -242,7 +242,7 @@ MaskedVector Map::medianVerticalProfile()
     return profile;
 }
 
-MaskedVector Map::horizontalPointDensity(int y, int stripeWidth)
+MaskedVector Map::horizontalPointDensity(int y, int stripeWidth) const
 {
     MaskedVector curve(w, 0.0, true);
 
@@ -262,7 +262,7 @@ MaskedVector Map::horizontalPointDensity(int y, int stripeWidth)
     return curve;
 }
 
-Map Map::densityMap(int windowSize, bool fromCenter)
+Map Map::densityMap(int windowSize, bool fromCenter) const
 {
     Map density(this->w, this->h);
     double windowCount = (windowSize*2+1)*(windowSize*2+1);
@@ -299,7 +299,7 @@ Map Map::densityMap(int windowSize, bool fromCenter)
     return density;
 }
 
-int Map::maxIndex()
+int Map::maxIndex() const
 {
     double max = -1e300;
     int index = -1;
@@ -316,7 +316,7 @@ int Map::maxIndex()
     return index;
 }
 
-Matrix Map::toMatrix(double voidValue, double min, double max)
+Matrix Map::toMatrix(double voidValue, double min, double max) const
 {
     Matrix result(h, w);
     if (min == 0 && max == 0)
@@ -360,7 +360,37 @@ Map Map::fromMatrix(Matrix &matrix, double voidValue)
     return result;
 }
 
-Map Map::reshape(int startx, int width, int starty, int height)
+void Map::getCropParams(int &startx, int &width, int &starty, int &height) const
+{
+    startx = w;
+    starty = h;
+    int endx = 0;
+    int endy = 0;
+    width = 0;
+    height = 0;
+    for (int x = 0; x < w; x++)
+    {
+        for (int y = 0; y < h; y++)
+        {
+            if (isSet(x,y))
+            {
+                if (x < startx) startx = x;
+                if (y < starty) starty = y;
+
+                if (x > endx) endx = x;
+                if (y > endy) endy = y;
+            }
+        }
+    }
+
+    assert(endx > startx);
+    assert(endy > starty);
+    qDebug() << startx << starty << endx << endy;
+    width = endx - startx;
+    height = endy - starty;
+}
+
+Map Map::subMap(int startx, int width, int starty, int height) const
 {
     Map newmap(width, height);
     for (int y = 0; y < height; y++)
@@ -380,7 +410,7 @@ Map Map::reshape(int startx, int width, int starty, int height)
     return newmap;
 }
 
-QVector<double> Map::getUsedValues()
+QVector<double> Map::getUsedValues() const
 {
     QVector<double> result;
 

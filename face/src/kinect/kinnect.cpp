@@ -217,11 +217,11 @@ Mesh Kinect::scanFace()
     bool mask[640*480];
     uint8_t rgb[640*480*3];
     ImageGrayscale grayScaleImg;
-    ImageBGR colorImage;
+    //ImageBGR colorImage;
     cv::Rect faceRect;
 
     bool iterate = true;
-    char *testWinName = "Test Scan";
+    const char *testWinName = "Test Scan";
     cv::namedWindow(testWinName);
     while (iterate)
     {

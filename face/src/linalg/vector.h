@@ -44,6 +44,8 @@ public:
 
     static int maxIndex(Matrix &vector);
 
+    static int maxIndex(Matrix &vector, int from, int to);
+
     static double minValue(Matrix &vector);
 
     static int minIndex(Matrix &vector);
@@ -73,6 +75,8 @@ public:
     static Matrix meanVector(QVector<Matrix> &vectors);
 
     static double stdDeviation(QVector<double> &vector);
+
+    static Matrix smooth(Matrix &vector, int kernelSize);
 };
 
 #endif // VECTORN_H

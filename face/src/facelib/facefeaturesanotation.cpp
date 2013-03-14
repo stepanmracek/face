@@ -32,6 +32,29 @@ void FaceFeaturesAnotationShowFace(FaceFeaturesAnotationStruct &anotationStruct)
         cv::circle(mixMatrix, cv::Point(p.x, p.y), 3, cv::Scalar(1));
     }
 
+    QVector<cv::Point2d> &pts = anotationStruct.points;
+    if (anotationStruct.points.count() == 15)
+    {
+        cv::line(mixMatrix, pts[0], pts[1], 0);
+        cv::line(mixMatrix, pts[1], pts[2], 0);
+        cv::line(mixMatrix, pts[2], pts[3], 0);
+        cv::line(mixMatrix, pts[3], pts[4], 0);
+        cv::line(mixMatrix, pts[0], pts[11], 0);
+        cv::line(mixMatrix, pts[11], pts[12], 0);
+        cv::line(mixMatrix, pts[12], pts[13], 0);
+        cv::line(mixMatrix, pts[13], pts[14], 0);
+        cv::line(mixMatrix, pts[14], pts[4], 0);
+        cv::line(mixMatrix, pts[2], pts[6], 0);
+        cv::line(mixMatrix, pts[6], pts[8], 0);
+        cv::line(mixMatrix, pts[5], pts[6], 0);
+        cv::line(mixMatrix, pts[6], pts[7], 0);
+        cv::line(mixMatrix, pts[5], pts[8], 0);
+        cv::line(mixMatrix, pts[8], pts[7], 0);
+        cv::line(mixMatrix, pts[8], pts[9], 0);
+        cv::line(mixMatrix, pts[8], pts[10], 0);
+        cv::line(mixMatrix, pts[9], pts[10], 0);
+    }
+
     cv::imshow(anotationStruct.windowName, mixMatrix);
 }
 
@@ -146,10 +169,12 @@ void FaceFeaturesAnotation::anotateOBJ(const QString &dirPath, bool uniqueIDsOnl
         char key = cv::waitKey(0);
         cv::destroyWindow(windowName);
 
-        if (anotationStruct.points.count() == 8)
+        Landmarks l;
+        int lCount = l.points.size();
+        qDebug() << "Count info" << lCount << anotationStruct.points.count();
+        if (anotationStruct.points.count() == lCount)
         {
-            Landmarks l;
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < lCount; i++)
             {
                 l.points[i] = converter.MapToMeshCoords(depth, anotationStruct.points[i]);
             }

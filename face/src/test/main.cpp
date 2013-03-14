@@ -22,6 +22,11 @@
 #include "test/testmesh.h"
 #include "test/testlandmarks.h"
 
+QString frgcPath()
+{
+    return "/run/media/stepo/frgc/";
+}
+
 int main(int argc, char *argv[])
 {
     //TestProcrustes::testRotateAndScale();
@@ -71,23 +76,27 @@ int main(int argc, char *argv[])
     //TestKinect::testFaceDetect(argc, argv);
     //TestKinect::testScan(argc, argv);
     //TestKinect::testPCL();
-    TestKinect::testPCLMerge(argc, argv);
+    //TestKinect::testPCLMerge(argc, argv);
 
-    //TestFaceFeatuesDetection::testDepthmapProcessing(argc, argv);
-    //TestFaceFeatuesDetection::testNosetipDetection(argc, argv);
+    //TestFaceFeatuesDetection::testDepthmapProcessing(argc, argv,
+    //                                                 frgcPath() + "frgc-spring2004-obj-centralized/02463d652.obj");
+    //TestFaceFeatuesDetection::testLandmarkDetection(argc, argv, frgcPath() +
+    //                                                "frgc-spring2004-obj-centralized/04202d566.obj");
+    //TestFaceFeatuesDetection::testBatchLandmarkDetection(argc, argv, frgcPath() + "frgc-spring2004-obj-centralized");
+    //TestFaceFeatuesDetection::testSuccessBatchLandmarkDetection(frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::testIsoGeodeticCurves(argc, argv);
     //TestFaceFeatuesDetection::testIsoGeodeticCurvesAlign(argc, argv);
     //TestFaceFeatuesDetection::testHorizontalProfileLines(argc, argv);
     //TestFaceFeatuesDetection::testCombine();
-    //bool uniqueIDs = true;
-    //TestFaceFeatuesDetection::testAnotation("/media/data/frgc/obj-centralized/Spring2004", uniqueIDs);
+    //bool uniqueIDs = false;
+    //TestFaceFeatuesDetection::testAnotation(frgcPath() + "frgc-spring2004-obj-centralized", uniqueIDs);
     //TestFaceFeatuesDetection::testGoodAnotation("/media/data/frgc/obj-centralized/Spring2004");
     //TestFaceFeatuesDetection::testAlign("test/align-simple-mean.png", "test/align-simple-pca.xml", "test/align-simple-flags", simple);
     //TestFaceFeatuesDetection::testAlign("test/align-triangle-mean.png", "test/align-triangle-pca.xml", "test/align-triangle-flags", triangle);
 
     //TestMorphableFaceModel::testCreate("/media/data/frgc/obj-centralized/Spring2004",
     //                                   "test/align-landmarks.xml", "test/align-pca.xml", "test/align-flags");
-    //TestMorphableFaceModel::testModel(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml");
+    //TestMorphableFaceModel::testModel(argc, argv, "../test/align-pca.xml", "../test/align-flags", "../test/align-landmarks.xml");
     //TestMorphableFaceModel::testMorph(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml",
     //                                  "/run/media/stepo/frgc/frgc-spring2004-obj-centralized/04200d74.obj");
     //TestMorphableFaceModel::testMorphFromKinect(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml");
@@ -97,7 +106,6 @@ int main(int argc, char *argv[])
     //TestMesh::testXYZLodaderOBJWriter("/media/data/frgc/xyz/Spring2004", "/media/data/frgc/obj-centralized/Spring2004");
 
     //TestLandmarks::testReadWrite();
-    //TestLandmarks::transfer("/run/media/stepo/frgc/frgc-spring2004-obj-centralized/");
 
 	return 0;
 }

@@ -232,8 +232,8 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    int x = event->y();
-    int y = event->x();
+    //int x = event->y();
+    //int y = event->x();
 
     if (event->button() == Qt::LeftButton) {             /* leve tlacitko aktivuje rotaci */
         stav = 0;                                 /* normalni stav */

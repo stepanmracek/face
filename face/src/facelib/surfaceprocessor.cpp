@@ -313,11 +313,11 @@ CurvatureStruct SurfaceProcessor::calculateCurvatures(Map &depthmap)
             c.curvatureK2.unset(x, y);
             if (depthmap.isSet(x,y) && depthmap.has8neigbours(x,y))
             {
-                double point[] = {x, y, depthmap.get(x, y)};
+                double point[] = {(double)x, (double)y, depthmap.get(x, y)};
 
                 // left - right direction
-                double first[] = {x-1, y, depthmap.get(x-1, y)};
-                double second[] = {x+1, y, depthmap.get(x+1, y)};
+                double first[] = {(double)(x-1), (double)y, depthmap.get(x-1, y)};
+                double second[] = {(double)(x+1), (double)y, depthmap.get(x+1, y)};
 
                 double vec1[] = {first[0]-point[0], first[1]-point[1], first[2]-point[2]};
                 double vec2[] = {second[0]-point[0], second[1]-point[1], second[2]-point[2]};
@@ -394,11 +394,11 @@ CurvatureStruct SurfaceProcessor::calculateCurvatures(Map &depthmap)
                 }
 
                 //if (gauss > 0.002 && mean < -0.006)
-                if (gauss > 0.0005 && mean < -0.0005)
+                if (gauss > 0.002 && mean < -0.005)
                 {
                     c.peaks.set(x, y, 1);
                 }
-                if (gauss > 0.001 && mean > 0.004)
+                if (gauss > 0.002 && mean > 0.004)
                     c.pits.set(x, y, 1);
                 if (gauss < -0.002)
                     c.saddles.set(x, y, 1);

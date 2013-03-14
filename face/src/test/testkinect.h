@@ -4,8 +4,8 @@
 #include <QApplication>
 #include <iostream>
 
-#include <pcl/point_cloud.h>
-#include <pcl/io/pcd_io.h>
+//#include <pcl/point_cloud.h>
+//#include <pcl/io/pcd_io.h>
 
 #include "kinect/kinnect.h"
 #include "facelib/map.h"
@@ -201,17 +201,17 @@ public:
         }
     }
 
-    static void testPCL()
+    /*static void testPCL()
     {
         SimpleOpenNIViewer v;
         v.run();
-    }
+    }*/
 
-    static int testPCLMerge(int argc, char *argv[])
+    /*static int testPCLMerge(int argc, char *argv[])
     {
-        /*QApplication app(argc, argv);
-        GLWidget widget;
-        widget.setWindowTitle("GL Widget");*/
+        //QApplication app(argc, argv);
+        //GLWidget widget;
+        //widget.setWindowTitle("GL Widget");
 
         QVector<Mesh> meshes(5);
         for (int i = 0; i < 5; i++)
@@ -239,9 +239,9 @@ public:
             pcl::io::savePCDFileBinary(fileName.toStdString(), pointcloud);
         }
 
-        /*widget.show();
-        app.exec();*/
-    }
+        //widget.show();
+        //app.exec();
+    }*/
 };
 
 #endif // TESTKINECT_H

@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QApplication>
 #include <opencv/cv.h>
+#include <QDir>
+#include <QFileInfoList>
 
 #include "facelib/glwidget.h"
 #include "facelib/mesh.h"
@@ -17,6 +19,7 @@
 #include "facelib/facefeaturesanotation.h"
 #include "facelib/landmarks.h"
 #include "linalg/pca.h"
+#include "facelib/widgetmeshselect.h"
 
 enum AlignType
 {
@@ -26,9 +29,9 @@ enum AlignType
 class TestFaceFeatuesDetection
 {
 public:
-    static int testDepthmapProcessing(int argc, char *argv[])
+    static int testDepthmapProcessing(int argc, char *argv[], QString pathToOBJ)
     {
-        Mesh face = Mesh::fromOBJ("face.obj");
+        Mesh face = Mesh::fromOBJ(pathToOBJ);
         SurfaceProcessor::smooth(face, 0.5, 5);
 
         MapConverter converter;
@@ -67,11 +70,67 @@ public:
         return app.exec();
     }
 
-    static int  testNosetipDetection(int argc, char *argv[])
+    static int  testBatchLandmarkDetection(int argc, char *argv[], QString dirPath)
     {
-        Mesh face = Mesh::fromXYZFile("02463d652.abs.xyz", true); // fromOBJ("face.obj");
+        /*QApplication app(argc, argv);
+        WidgetMeshSelect widget;
+        QStringList filter; filter << "*.obj";
+        widget.setPath(dirPath, filter);
+        widget.show();
+        return app.exec();*/
 
-        Landmarks landmarks = LandmarkDetector::Detect(face);
+        QDir dir(dirPath);
+        QStringList filter; filter << "*.obj";
+        QFileInfoList list = dir.entryInfoList(filter, QDir::Files);
+        foreach (const QFileInfo &info, list)
+        {
+            Mesh m = Mesh::fromOBJ(info.absoluteFilePath());
+            LandmarkDetector detector(m);
+            Landmarks l = detector.Detect();
+            QString lPath = dirPath + QDir::separator() + info.baseName() + "_auto.xml";
+            l.serialize(lPath);
+        }
+    }
+
+    static int  testSuccessBatchLandmarkDetection(QString dirPath)
+    {
+        QDir dir(dirPath);
+        QStringList filter; filter << "*.obj";
+        QFileInfoList list = dir.entryInfoList(filter, QDir::Files);
+        foreach (const QFileInfo &info, list)
+        {
+            Mesh m = Mesh::fromOBJ(info.absoluteFilePath());
+            QString lPath = dirPath + QDir::separator() + info.baseName() + ".xml";
+            Landmarks l(lPath);
+
+            MapConverter converter;
+            Map depth = SurfaceProcessor::depthmap(m, converter, 1.0);
+            Matrix img = depth.toMatrix() * 255;
+
+            for (int i = 0; i < l.points.size(); i++)
+            {
+                const cv::Point3d &p = l.points[i];
+                cv::Point2d mapPoint = converter.MeshToMapCoords(depth, p);
+                cv::circle(img, cv::Point(mapPoint.x, mapPoint.y), 2, 0);
+
+                if (i > 0)
+                {
+                    cv::Point2d prevPoint = converter.MeshToMapCoords(depth, l.points[i-1]);
+                    cv::line(img, prevPoint, mapPoint, 0);
+                }
+            }
+
+            QString imgPath = dirPath + QDir::separator() + info.baseName() + ".png";
+            cv::imwrite(imgPath.toStdString(), img);
+        }
+    }
+
+    static int  testLandmarkDetection(int argc, char *argv[], QString pathToOBJ)
+    {
+        Mesh face = Mesh::fromOBJ(pathToOBJ);
+        LandmarkDetector detector(face);
+        Landmarks landmarks = detector.Detect();
+
 
         QApplication app(argc, argv);
         GLWidget widget;

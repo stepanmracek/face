@@ -74,6 +74,15 @@ public:
     cv::Point2d meshStart;
     cv::Point2d meshSize;
 
+    cv::Point2d MeshToMapCoords(Map &map, cv::Point3d meshCoords)
+    {
+        double x = ( (meshCoords.x-meshStart.x) / meshSize.x) * map.w;
+        double y = ( (meshCoords.y-meshStart.y) / meshSize.y) * map.h;
+        y = (map.h - 1) - y;
+
+        return cv::Point2d(x, y);
+    }
+
     cv::Point2d MeshToMapCoords(Map &map, cv::Point2d meshCoords)
     {
         double x = ( (meshCoords.x-meshStart.x) / meshSize.x) * map.w;

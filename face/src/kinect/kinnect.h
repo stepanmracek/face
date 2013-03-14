@@ -4,8 +4,8 @@
 #include <libfreenect/libfreenect.h>
 #include <libfreenect/libfreenect_sync.h>
 
-#include <pcl/io/openni_grabber.h>
-#include <pcl/visualization/cloud_viewer.h>
+//#include <pcl/io/openni_grabber.h>
+//#include <pcl/visualization/cloud_viewer.h>
 
 #include "linalg/common.h"
 #include "facelib/mesh.h"
@@ -43,7 +43,7 @@ public:
     }
 };
 
-class SimpleOpenNIViewer
+/*class SimpleOpenNIViewer
 {
 public:
     SimpleOpenNIViewer () : viewer ("PCL OpenNI Viewer") {}
@@ -74,7 +74,7 @@ public:
     }
 
     pcl::visualization::CloudViewer viewer;
-};
+};*/
 
 
 #endif /* KINECT_H_ */

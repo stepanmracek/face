@@ -250,6 +250,25 @@ int Vector::maxIndex(Matrix &vector)
     return index;
 }
 
+int Vector::maxIndex(Matrix &vector, int from, int to)
+{
+    double max = -1e300;
+    int index = -1;
+    for (int i = from; i <= to; i++)
+    {
+        if (i < 0 || i >= vector.rows) continue;
+
+        double v = vector(i);
+        if (v > max)
+        {
+            index = i;
+            max = v;
+        }
+    }
+
+    return index;
+}
+
 int Vector::maxIndex(QVector<double> &vector)
 {
     double max = -1e300;
@@ -439,5 +458,32 @@ Matrix Vector::meanVector(QVector<Matrix> &vectors)
         result += vectors[i];
 
     result = result / ((double)n);
+    return result;
+}
+
+Matrix Vector::smooth(Matrix &vector, int kernelSize)
+{
+    assert(kernelSize > 1);
+    assert(kernelSize % 2 == 1);
+
+    int n = vector.rows;
+    Matrix result = Matrix::zeros(n, 1);
+    for (int i = 0; i < n; i++)
+    {
+        double sum = 0;
+        for (int j = i - kernelSize/2; j <= i + kernelSize/2; j++)
+        {
+            if (j < 0 || j >= n)
+            {
+                sum += 0;
+            }
+            else
+            {
+                sum += vector(j);
+            }
+        }
+        result(i) = sum/kernelSize;
+    }
+
     return result;
 }
