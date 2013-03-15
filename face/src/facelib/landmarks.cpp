@@ -1,6 +1,8 @@
 #include "landmarks.h"
 
-//#include <QDebug>
+#include <QDebug>
+#include <QFile>
+#include <QTextStream>
 
 Landmarks::Landmarks(const QString &path)
 {
@@ -26,11 +28,6 @@ void Landmarks::serialize(const QString &path)
     }
     writeStorage << "]";
     writeStorage.release();
-}
-
-void Landmarks::exportPTS(const QString &path)
-{
-
 }
 
 bool Landmarks::check()

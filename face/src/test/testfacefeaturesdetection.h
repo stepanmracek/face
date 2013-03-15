@@ -125,6 +125,71 @@ public:
         }
     }
 
+    static void exportInitialEstimationsForVOSM(QString dirPath)
+    {
+        QDir dir(dirPath);
+        QStringList filter; filter << "*.obj";
+        QFileInfoList list = dir.entryInfoList(filter, QDir::Files);
+        foreach (const QFileInfo &info, list)
+        {
+            Mesh m = Mesh::fromOBJ(info.absoluteFilePath());
+            QString lPath = dirPath + QDir::separator() + info.baseName() + "_auto.xml";
+            Landmarks l(lPath);
+
+            MapConverter converter;
+            Map depthmap = SurfaceProcessor::depthmap(m, converter, 1.0);
+
+            QString ptsPath = dirPath + QDir::separator() + info.baseName() + ".pts";
+            QFile ptsFile(ptsPath);
+            ptsFile.open(QFile::WriteOnly);
+            QTextStream ptsStream(&ptsFile);
+            ptsStream << "version: 1\nn_points: 3\n{\n";
+
+            cv::Point2d p2d;
+            p2d = converter.MeshToMapCoords(depthmap, l.points[Landmarks::LeftInnerEye]);
+            ptsStream << p2d.x << " " << p2d.y << "\n";
+            p2d = converter.MeshToMapCoords(depthmap, l.points[Landmarks::RightInnerEye]);
+            ptsStream << p2d.x << " " << p2d.y << "\n";
+            p2d = converter.MeshToMapCoords(depthmap, l.points[Landmarks::Nosetip]);
+            ptsStream << p2d.x << " " << p2d.y << "\n";
+
+            ptsStream << "}\n";
+        }
+    }
+
+    static void exportForVOSM(QString dirPath)
+    {
+        QDir dir(dirPath);
+        QStringList filter; filter << "*.obj";
+        QFileInfoList list = dir.entryInfoList(filter, QDir::Files);
+        foreach (const QFileInfo &info, list)
+        {
+            Mesh m = Mesh::fromOBJ(info.absoluteFilePath());
+            QString lPath = dirPath + QDir::separator() + info.baseName() + ".xml";
+            Landmarks l(lPath);
+
+            MapConverter converter;
+            Map depthmap = SurfaceProcessor::depthmap(m, converter, 1.0);
+            SurfaceProcessor::smooth(depthmap, 1, 10);
+            CurvatureStruct curvature = SurfaceProcessor::calculateCurvatures(depthmap);
+
+            QString imgPath = dirPath + QDir::separator() + info.baseName() + ".png";
+            cv::imwrite(imgPath.toStdString(), curvature.curvatureIndex.toMatrix() * 255);
+
+            QString ptsPath = dirPath + QDir::separator() + info.baseName() + ".pts";
+            QFile ptsFile(ptsPath);
+            ptsFile.open(QFile::WriteOnly);
+            QTextStream ptsStream(&ptsFile);
+            ptsStream << "version: 1\nn_points: " << l.points.size() << "\n{\n";
+            foreach (const cv::Point3d &p, l.points)
+            {
+                cv::Point2d p2d = converter.MeshToMapCoords(depthmap, p);
+                ptsStream << p2d.x << " " << p2d.y << "\n";
+            }
+            ptsStream << "}\n";
+        }
+    }
+
     static int  testLandmarkDetection(int argc, char *argv[], QString pathToOBJ)
     {
         Mesh face = Mesh::fromOBJ(pathToOBJ);

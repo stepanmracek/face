@@ -90,6 +90,8 @@ int main(int argc, char *argv[])
     //TestFaceFeatuesDetection::testCombine();
     //bool uniqueIDs = false;
     //TestFaceFeatuesDetection::testAnotation(frgcPath() + "frgc-spring2004-obj-centralized", uniqueIDs);
+    //TestFaceFeatuesDetection::exportForVOSM(frgcPath() + "frgc-spring2004-obj-centralized");
+    TestFaceFeatuesDetection::exportInitialEstimationsForVOSM(frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::testGoodAnotation("/media/data/frgc/obj-centralized/Spring2004");
     //TestFaceFeatuesDetection::testAlign("test/align-simple-mean.png", "test/align-simple-pca.xml", "test/align-simple-flags", simple);
     //TestFaceFeatuesDetection::testAlign("test/align-triangle-mean.png", "test/align-triangle-pca.xml", "test/align-triangle-flags", triangle);
