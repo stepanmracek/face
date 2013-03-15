@@ -1,0 +1,8 @@
+m_iNbOfAppearance
+92
+m_iNbOfEigenAppearanceAtMost
+92
+m_iNbOfAppearanceEigens
+13
+m_fTruncatedPercent_Appearance
+0.95
