@@ -20,22 +20,13 @@ Vector::Vector(Matrix &m) : Matrix(m.rows, 1)
     }
 }
 
-/*Vector::Vector(Matrix m) : Matrix(m.rows, 1)
+Vector::Vector(Vector &src) : Matrix(src.rows, 1)
 {
-    for (int i = 0; i < m.rows; i++)
+    for (int i = 0; i < src.rows; i++)
     {
-        (*this)(i) = m(i, 0);
+        (*this)(i) = src(i, 0);
     }
-}*/
-
-/*Vector::Vector(cv::MatExpr &expr)
-{
-    cv::Mat m = expr;
-    for (int i = 0; i < m.rows; i++)
-    {
-        (*this)(i) = m.at<double>(i, 0);
-    }
-}*/
+}
 
 Vector::Vector(QVector<double> &vec) : Matrix(vec.count(), 1)
 {
