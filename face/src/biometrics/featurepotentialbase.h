@@ -4,16 +4,17 @@
 #include <QVector>
 
 #include "linalg/common.h"
+#include "linalg/vector.h"
 
 class FeaturePotentialBase
 {
 public:
-    QVector<double> scores;
+    Vector scores;
     double minScore;
     double maxScore;
 
-    Matrix createSelectionWeights(double threshold);
-    Matrix createWeights();
+    Vector createSelectionWeights(double threshold);
+    Vector createWeights();
 };
 
 #endif // FEATUREPOTENTIALBASE_H

@@ -4,7 +4,49 @@
 
 #include <cassert>
 
-Matrix Vector::fromFile(const QString &path)
+Vector::Vector(int size) : Matrix(size, 1)
+{
+    for(int i = 0; i < size; i++)
+    {
+        (*this)(i) = 0.0;
+    }
+}
+
+Vector::Vector(Matrix &m) : Matrix(m.rows, 1)
+{
+    for (int i = 0; i < m.rows; i++)
+    {
+        (*this)(i) = m(i, 0);
+    }
+}
+
+/*Vector::Vector(Matrix m) : Matrix(m.rows, 1)
+{
+    for (int i = 0; i < m.rows; i++)
+    {
+        (*this)(i) = m(i, 0);
+    }
+}*/
+
+/*Vector::Vector(cv::MatExpr &expr)
+{
+    cv::Mat m = expr;
+    for (int i = 0; i < m.rows; i++)
+    {
+        (*this)(i) = m.at<double>(i, 0);
+    }
+}*/
+
+Vector::Vector(QVector<double> &vec) : Matrix(vec.count(), 1)
+{
+    int r = vec.count();
+    for (int i = 0; i < r; i++)
+    {
+        (*this)(i) = vec.at(i);
+    }
+}
+
+Vector Vector::fromFile(const QString &path)
 {
 	assert(QFile::exists(path));
     QFile f(path);
@@ -26,10 +68,10 @@ Matrix Vector::fromFile(const QString &path)
     f.close();
 
     int r = data.count();
-    Matrix vector(r, 1, CV_64F);
+    Vector vector(r);
     for (int i = 0; i < r; i++)
     {
-        vector(i, 0) = data.at(i);
+        vector(i) = data.at(i);
     }
 
     if(Common::matrixContainsNan(vector))
@@ -39,87 +81,99 @@ Matrix Vector::fromFile(const QString &path)
     return vector;
 }
 
-double Vector::sqrMagnitude(Matrix &vector)
+double Vector::sqrMagnitude()
 {
-    int n = vector.rows;
+    int n = this->rows;
     double sum = 0;
     for (int i = 0; i < n; i++)
     {
-        double v = vector(i, 0);
+        double v = (*this)(i);
         sum +=  (v * v);
     }
     return sum;
 }
 
-double Vector::magnitude(Matrix &vector)
+double Vector::magnitude()
 {
-    return sqrt(sqrMagnitude(vector));
+    return sqrt(sqrMagnitude());
 }
 
-double Vector::dot(Matrix &v1, Matrix &v2)
+double Vector::dot(Vector &v1, Vector &v2)
 {
     int n = v1.rows;
     assert(n == v2.rows);
     double sum = 0.0;
     for (int i = 0; i < n; i++)
     {
-        sum += (v1(i, 0) * v2(i, 0));
+        sum += (v1(i) * v2(i));
     }
     return sum;
 }
 
-Matrix & Vector::normalize(Matrix &vector)
+Vector &Vector::normalize()
 {
-    int n = vector.rows;
+    int n = this->rows;
 
-    double mag = magnitude(vector);
+    double mag = magnitude();
     for (int i = 0; i < n; i++)
     {
-        double v = vector(i, 0);
-        vector(i, 0) = v/mag;
+        double v = (*this)(i);
+        (*this)(i, 0) = v/mag;
     }
 
-    return vector;
+    return (*this);
 }
 
-Matrix Vector::normalized(Matrix &vector)
+Vector Vector::normalized()
 {
-    int n = vector.rows;
-    double mag = magnitude(vector);
-    Matrix newVector(vector.rows, vector.cols, CV_64F);
+    int n = this->rows;
+    double mag = magnitude();
+    Vector newVector(n);
     for (int i = 0; i < n; i++)
     {
-        double v = vector(i, 0);
-        newVector(i, 0) = v/mag;
+        double v = (*this)(i);
+        newVector(i) = v/mag;
     }
 
     return newVector;
 }
 
-Matrix & Vector::mul(Matrix &vector, double value)
+Vector &Vector::mul(double value)
 {
-    int n = vector.rows;
+    int n = this->rows;
 
     for (int i = 0; i < n; i++)
     {
-        double v = vector(i ,0);
-        vector(i, 0) = v*value;
+        (*this)(i) = (*this)(i) * value;
     }
 
-    return vector;
+    return (*this);
 }
 
-bool Vector::isZero(Matrix &vector)
+Vector &Vector::mul(Vector &other)
 {
-    int n = vector.rows;
+    int r = this->rows;
+    assert(r == other.rows);
+
+    for (int i = 0; i < r; i++)
+    {
+        (*this)(i) = (*this)(i) * other(i);
+    }
+
+    return (*this);
+}
+
+bool Vector::isZero()
+{
+    int n = this->rows;
     for (int i = 0; i < n; i++)
     {
-        if (vector(i) != 0) return false;
+        if ((*this)(i) != 0) return false;
     }
     return true;
 }
 
-void Vector::toFile(const Matrix &vector, const QString &path, bool append)
+void Vector::toFile(const QString &path, bool append)
 {
     QFile f(path);
     if (append)
@@ -128,10 +182,10 @@ void Vector::toFile(const Matrix &vector, const QString &path, bool append)
         f.open(QIODevice::WriteOnly);
     QTextStream out(&f);
 
-    int n = vector.rows;
+    int n = this->rows;
     for (int i = 0; i < n; i++)
     {
-        out << vector(i);
+        out << (*this)(i);
         out << '\n';
     }
     out << '\n';
@@ -140,7 +194,7 @@ void Vector::toFile(const Matrix &vector, const QString &path, bool append)
     f.close();
 }
 
-void Vector::toFileWithIndicies(const Matrix &vector, const QString &path, bool append)
+void Vector::toFileWithIndicies(const QString &path, bool append)
 {
     QFile f(path);
     if (append)
@@ -149,10 +203,10 @@ void Vector::toFileWithIndicies(const Matrix &vector, const QString &path, bool 
         f.open(QIODevice::WriteOnly);
     QTextStream out(&f);
 
-    int n = vector.rows;
+    int n = this->rows;
     for (int i = 0; i < n; i++)
     {
-        out << i << ' ' << vector(i) << '\n';
+        out << i << ' ' << (*this)(i) << '\n';
     }
     out << '\n';
 
@@ -160,9 +214,9 @@ void Vector::toFileWithIndicies(const Matrix &vector, const QString &path, bool 
     f.close();
 }
 
-void Vector::toFileTwoCols(Matrix &vector,const QString &path, bool append)
+void Vector::toFileTwoCols(const QString &path, bool append)
 {
-    int n = vector.rows;
+    int n = this->rows;
     assert(n % 2 == 0);
     n = n/2;
 
@@ -175,7 +229,7 @@ void Vector::toFileTwoCols(Matrix &vector,const QString &path, bool append)
 
     for (int i = 0; i < n; i++)
     {
-        out <<vector(i, 0) << ' ' <<  vector(i+n, 0) << '\n';
+        out << (*this)(i) << ' ' <<  (*this)(i+n) << '\n';
     }
     out << '\n';
 
@@ -183,7 +237,7 @@ void Vector::toFileTwoCols(Matrix &vector,const QString &path, bool append)
     f.close();
 }
 
-Matrix Vector::fromTwoColsFile(const QString &path)
+Vector Vector::fromTwoColsFile(const QString &path)
 {
 	assert(QFile::exists(path));
     QFile f(path);
@@ -218,29 +272,29 @@ Matrix Vector::fromTwoColsFile(const QString &path)
     f.close();
 
     int r = x.count() + y.count();
-    Matrix vector(r, 1, CV_64F);
+    Vector vector(r);
 
     for (int i = 0; i < x.count(); i++)
     {
-        vector(i, 0) = x[i];
+        vector(i) = x[i];
     }
     for (int i = 0; i < y.count(); i++)
     {
-        vector(x.count()+i, 0) = y[i];
+        vector(x.count()+i) = y[i];
     }
 
     return vector;
 }
 
-int Vector::maxIndex(Matrix &vector)
+int Vector::maxIndex()
 {
     double max = -1e300;
     int index = -1;
-    int r = vector.rows;
+    int r = this->rows;
     assert(r > 0);
     for (int i = 0; i < r; i++)
     {
-        double v = vector(i);
+        double v = (*this)(i);
         if (v > max)
         {
             index = i;
@@ -250,15 +304,15 @@ int Vector::maxIndex(Matrix &vector)
     return index;
 }
 
-int Vector::maxIndex(Matrix &vector, int from, int to)
+int Vector::maxIndex(int from, int to)
 {
     double max = -1e300;
     int index = -1;
     for (int i = from; i <= to; i++)
     {
-        if (i < 0 || i >= vector.rows) continue;
+        if (i < 0 || i >= this->rows) continue;
 
-        double v = vector(i);
+        double v = (*this)(i);
         if (v > max)
         {
             index = i;
@@ -269,7 +323,7 @@ int Vector::maxIndex(Matrix &vector, int from, int to)
     return index;
 }
 
-int Vector::maxIndex(QVector<double> &vector)
+/*int Vector::maxIndex(QVector<double> &vector)
 {
     double max = -1e300;
     int index = -1;
@@ -289,27 +343,27 @@ int Vector::maxIndex(QVector<double> &vector)
     	qDebug() << vector;
     }
     return index;
-}
+}*/
 
-double Vector::maxValue(Matrix &vector)
+double Vector::maxValue()
 {
-    return vector(maxIndex(vector));
+    return (*this)(maxIndex());
 }
 
-double Vector::maxValue(QVector<double> &vector)
+/*double Vector::maxValue(QVector<double> &vector)
 {
     return vector.at(maxIndex(vector));
-}
+}*/
 
-int Vector::minIndex(Matrix &vector)
+int Vector::minIndex()
 {
     double min = 1e300;
     int index = -1;
-    int r = vector.rows;
+    int r = this->rows;
     assert(r > 0);
     for (int i = 0; i < r; i++)
     {
-        double v = vector(i);
+        double v = (*this)(i);
         if (v < min)
         {
             min = v;
@@ -319,7 +373,7 @@ int Vector::minIndex(Matrix &vector)
     return index;
 }
 
-int Vector::minIndex(QVector<double> &vector)
+/*int Vector::minIndex(QVector<double> &vector)
 {
     double min = 1e300;
     int index = -1;
@@ -339,32 +393,32 @@ int Vector::minIndex(QVector<double> &vector)
     	qDebug() << vector;
     }
     return index;
-}
+}*/
 
-double Vector::minValue(Matrix &vector)
+double Vector::minValue()
 {
-    return vector(minIndex(vector));
+    return (*this)(minIndex());
 }
 
-double Vector::minValue(QVector<double> &vector)
+/*double Vector::minValue(QVector<double> &vector)
 {
 	int i = minIndex(vector);
     return vector.at(i);
-}
+}*/
 
-double Vector::meanValue(Matrix &vector)
+double Vector::meanValue()
 {
     double sum = 0;
-    int r = vector.rows;
+    int r = this->rows;
     for (int i = 0; i < r; i++)
     {
-        sum += vector(i);
+        sum += (*this)(i);
     }
 
     return sum/r;
 }
 
-double Vector::meanValue(QVector<double> &vector)
+/*double Vector::meanValue(QVector<double> &vector)
 {
     double sum = 0;
     int r = vector.count();
@@ -374,22 +428,22 @@ double Vector::meanValue(QVector<double> &vector)
     }
 
     return sum/r;
-}
+}*/
 
-double Vector::stdDeviation(Matrix &vector)
+double Vector::stdDeviation()
 {
-    double mean = meanValue(vector);
+    double mean = meanValue();
     double sum = 0;
-    int r = vector.rows;
+    int r = this->rows;
     for (int i = 0; i < r; i++)
     {
-        sum += ((vector(i) - mean)*(vector(i) - mean));
+        sum += (((*this)(i) - mean)*((*this)(i) - mean));
     }
 
     return sqrt((1.0/(r - 1.0)) * sum);
 }
 
-double Vector::stdDeviation(QVector<double> &vector)
+/*ouble Vector::stdDeviation(QVector<double> &vector)
 {
     double mean = meanValue(vector);
     double sum = 0;
@@ -400,34 +454,23 @@ double Vector::stdDeviation(QVector<double> &vector)
     }
 
     return sqrt((1.0/(r - 1.0)) * sum);
-}
+}*/
 
-Matrix Vector::fromQVector(QVector<double> &vec)
-{
-    int r = vec.count();
-    Matrix result = Matrix::zeros(r, 1);
-    for (int i = 0; i < r; i++)
-    {
-        result(i) = vec.at(i);
-    }
-    return result;
-}
-
-QVector<double> Vector::toQVector(Matrix &vector)
+QVector<double> Vector::toQVector()
 {
     QVector<double> result;
-    for (int i = 0; i < vector.rows; i++)
-        result << vector(i);
+    for (int i = 0; i < this->rows; i++)
+        result << (*this)(i);
     return result;
 }
 
-Matrix Vector::normalizeComponents(Matrix &vector, QVector<double> &minValues, QVector<double> &maxValues, bool fixedBounds)
+Vector Vector::normalizeComponents(QVector<double> &minValues, QVector<double> &maxValues, bool fixedBounds)
 {
-    int r = vector.rows;
-    Matrix result = Matrix::zeros(r, 1);
+    int r = this->rows;
+    Vector result(r);
     for (int i = 0; i < r; i++)
     {
-        double val = vector(i);
+        double val = (*this)(i);
 
         if (fixedBounds)
         {
@@ -441,33 +484,35 @@ Matrix Vector::normalizeComponents(Matrix &vector, QVector<double> &minValues, Q
     return result;
 }
 
-Matrix Vector::normalizeComponents(Matrix &vector)
+Vector Vector::normalizeComponents()
 {
-    double min = minValue(vector);
-    double max = maxValue(vector);
+    double min = minValue();
+    double max = maxValue();
 
-    Matrix result = (vector-min)/(max-min);
+    Matrix m = ((*this)-min)/(max-min);
+    Vector result = m;
     return result;
 }
 
-Matrix Vector::meanVector(QVector<Matrix> &vectors)
+Vector Vector::meanVector(QVector<Vector> &vectors)
 {
-    Matrix result = Matrix::zeros(vectors[0].rows, vectors[0].cols);
+    Vector result(vectors[0].rows);
     int n = vectors.count();
     for (int i = 0; i < n; i++)
         result += vectors[i];
 
-    result = result / ((double)n);
+    Matrix m = result / ((double)n);
+    result = m;
     return result;
 }
 
-Matrix Vector::smooth(Matrix &vector, int kernelSize)
+Vector Vector::smooth(int kernelSize)
 {
     assert(kernelSize > 1);
     assert(kernelSize % 2 == 1);
 
-    int n = vector.rows;
-    Matrix result = Matrix::zeros(n, 1);
+    int n = this->rows;
+    Vector result(n);
     for (int i = 0; i < n; i++)
     {
         double sum = 0;
@@ -479,7 +524,7 @@ Matrix Vector::smooth(Matrix &vector, int kernelSize)
             }
             else
             {
-                sum += vector(j);
+                sum += (*this)(j);
             }
         }
         result(i) = sum/kernelSize;

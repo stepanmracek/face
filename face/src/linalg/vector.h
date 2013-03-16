@@ -12,57 +12,69 @@
 
 #include "common.h"
 
-class Vector
+class Vector : public Matrix
 {
 public:
 
-    static Matrix fromFile(const QString &path);
+    Vector() { }
 
-    static double sqrMagnitude(Matrix &vector);
+    Vector(int size);
 
-    static double magnitude(Matrix &vector);
+    //Vector(Matrix m);
 
-    static double dot(Matrix &v1, Matrix &v2);
+    Vector(Matrix &m);
 
-    static Matrix &normalize(Matrix &vector);
+    //Vector(cv::MatExpr &expr);
 
-    static Matrix normalized(Matrix &vector);
+    Vector(QVector<double> &vec);
 
-    static Matrix &mul(Matrix &vector, double value);
+    static Vector fromFile(const QString &path);
 
-    static bool isZero(Matrix &vector);
+    double sqrMagnitude();
 
-    static void toFile(const Matrix &vector, const QString &path, bool append = false);
+    double magnitude();
 
-    static void toFileWithIndicies(const Matrix &vector, const QString &path, bool append = false);
+    static double dot(Vector &v1, Vector &v2);
 
-    static void toFileTwoCols(Matrix &vector,const QString &path, bool append = false);
+    Vector &normalize();
 
-    static Matrix fromTwoColsFile(const QString &path);
+    Vector normalized();
 
-    static double maxValue(Matrix &vector);
+    Vector &mul(double value);
 
-    static int maxIndex(Matrix &vector);
+    Vector &mul(Vector &other);
 
-    static int maxIndex(Matrix &vector, int from, int to);
+    bool isZero();
 
-    static double minValue(Matrix &vector);
+    void toFile(const QString &path, bool append = false);
 
-    static int minIndex(Matrix &vector);
+    void toFileWithIndicies(const QString &path, bool append = false);
 
-    static double meanValue(Matrix &vector);
+    void toFileTwoCols(const QString &path, bool append = false);
 
-    static double stdDeviation(Matrix &vector);
+    static Vector fromTwoColsFile(const QString &path);
 
-    static Matrix fromQVector(QVector<double> &vec);
+    double maxValue();
 
-    static QVector<double> toQVector(Matrix &vector);
+    int maxIndex();
 
-    static Matrix normalizeComponents(Matrix &vector, QVector<double> &minValues, QVector<double> &maxValues, bool fixedBounds = true);
+    int maxIndex(int from, int to);
 
-    static Matrix normalizeComponents(Matrix &vector);
+    double minValue();
 
-    static int maxIndex(QVector<double> &vector);
+    int minIndex();
+
+    double meanValue();
+
+    double stdDeviation();
+
+    QVector<double> toQVector();
+
+    Vector normalizeComponents(QVector<double> &minValues, QVector<double> &maxValues, bool fixedBounds = true);
+
+    Vector normalizeComponents();
+
+    /*static int maxIndex(QVector<double> &vector);
 
     static int minIndex(QVector<double> &vector);
 
@@ -70,13 +82,13 @@ public:
 
     static double minValue(QVector<double> &vector);
 
-    static double meanValue(QVector<double> &vector);
+    static double meanValue(QVector<double> &vector);*/
 
-    static Matrix meanVector(QVector<Matrix> &vectors);
+    static Vector meanVector(QVector<Vector> &vectors);
 
-    static double stdDeviation(QVector<double> &vector);
+    /*static double stdDeviation(QVector<double> &vector);*/
 
-    static Matrix smooth(Matrix &vector, int kernelSize);
+    Vector smooth(int kernelSize);
 };
 
 #endif // VECTORN_H

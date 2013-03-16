@@ -1,8 +1,8 @@
 #include "loader.h"
 
-QVector<Matrix> Loader::loadShapes(const QString &dirPath)
+QVector<Vector> Loader::loadShapes(const QString &dirPath)
 {
-    QVector<Matrix> shapes;
+    QVector<Vector> shapes;
     QDir dir(dirPath);
     dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
     QStringList nameFilter;
@@ -14,7 +14,7 @@ QVector<Matrix> Loader::loadShapes(const QString &dirPath)
     for (int i = 0; i < filenames.count(); i++)
     {
         qDebug() << "loading" << filenames[i];
-        Matrix v = Vector::fromTwoColsFile(dirPath + QDir::separator() + filenames[i]);
+        Vector v = Vector::fromTwoColsFile(dirPath + QDir::separator() + filenames[i]);
         shapes.append(v);
     }
 
@@ -44,9 +44,8 @@ QVector<Matrix> Loader::loadImages(const QString &dirPath)
     return images;
 }
 
-void Loader::loadImages(const QString &dirPath, QVector<Matrix> &images, QVector<int> *classes,
-                        const char *extensionFilter, bool convertToColumnVectors,
-                        const char *classSeparator, bool qdebug)
+void Loader::loadImages(const QString &dirPath, QVector<Vector> &vectors, QVector<int> *classes,
+                        const char *extensionFilter, const char *classSeparator, bool qdebug)
 {
     qDebug() << "loading files from" << dirPath;
 
@@ -65,13 +64,8 @@ void Loader::loadImages(const QString &dirPath, QVector<Matrix> &images, QVector
 
         QString imgPath(dirPath + QDir::separator() + filenames[i]);
         Matrix img = MatrixConverter::imageToMatrix(imgPath);
-        if (!convertToColumnVectors)
-            images.append(img);
-        else
-        {
-            Matrix img2 = MatrixConverter::matrixToColumnVector(img);
-            images.append(img2);
-        }
+        Vector vec = MatrixConverter::matrixToColumnVector(img);
+        vectors.append(vec);
 
         if (classes)
         {
@@ -83,7 +77,39 @@ void Loader::loadImages(const QString &dirPath, QVector<Matrix> &images, QVector
     }
 }
 
-void Loader::loadVectors(const QString &dirPath, QVector<Matrix> &vectors,
+void Loader::loadImages(const QString &dirPath, QVector<Matrix> &images, QVector<int> *classes,
+                        const char *extensionFilter, const char *classSeparator, bool qdebug)
+{
+    qDebug() << "loading files from" << dirPath;
+
+    QDir dir(dirPath);
+    dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
+    QStringList nameFilter;
+    nameFilter << extensionFilter;
+    dir.setNameFilters(nameFilter);
+    QStringList filenames = dir.entryList();
+    filenames.sort();
+
+    for (int i = 0; i < filenames.count(); i++)
+    {
+        if (qdebug)
+            qDebug() << "loading" << filenames[i];
+
+        QString imgPath(dirPath + QDir::separator() + filenames[i]);
+        Matrix img = MatrixConverter::imageToMatrix(imgPath);
+        images.append(img);
+
+        if (classes)
+        {
+            int indexOfSeparator = filenames.at(i).indexOf(classSeparator);
+            QString classString = filenames.at(i).left(indexOfSeparator);
+            int classNumber = classString.toInt();
+            classes->append(classNumber);
+        }
+    }
+}
+
+void Loader::loadVectors(const QString &dirPath, QVector<Vector> &vectors,
                          QVector<int> &classes, const char *classSeparator, const char *nameFilter)
 {
     //qDebug() << "loading vectors from" << dirPath;
@@ -94,7 +120,7 @@ void Loader::loadVectors(const QString &dirPath, QVector<Matrix> &vectors,
     for (int i = 0; i < filenames.count(); i++)
     {
         QString fullpath(dirPath + QDir::separator() + filenames[i]);
-        Matrix vec = Vector::fromFile(fullpath);
+        Vector vec = Vector::fromFile(fullpath);
         vectors.append(vec);
 
         int indexOfSeparator = filenames.at(i).indexOf(classSeparator);

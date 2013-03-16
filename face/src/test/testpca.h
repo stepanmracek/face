@@ -21,14 +21,14 @@ public:
     static void testPCASimple()
     {
         // load vectors
-        QVector<Matrix> vectors;
+        QVector<Vector> vectors;
         QDir dir("vectorsToAlign");
         dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
         QStringList filenames = dir.entryList();
 
         for (int i = 0; i < filenames.count(); i++)
         {
-            Matrix v = Vector::fromTwoColsFile("vectorsToAlign/" + filenames[i]);
+            Vector v = Vector::fromTwoColsFile("vectorsToAlign/" + filenames[i]);
             vectors.append(v);
         }
 
@@ -38,24 +38,25 @@ public:
         PCA pca(vectors);
         for (int i = 0; i < vectors.count(); i++)
         {
-            Matrix projected = pca.project(vectors[i]);
-            Matrix backProjected = pca.backProject(projected);
-            Matrix diff = vectors[i] - backProjected;
-            qDebug() << i<< Vector::magnitude(diff);
+            Vector projected = pca.project(vectors[i]);
+            Vector backProjected = pca.backProject(projected);
+            Matrix diffMat = vectors[i] - backProjected;
+            Vector diff(diffMat);
+            qDebug() << i<< diff.magnitude();
         }
     }
 
     static void testPCAStorage()
     {
         // load vectors
-        QVector<Matrix> vectors;
+        QVector<Vector> vectors;
         QDir dir("vectorsToAlign");
         dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
         QStringList filenames = dir.entryList();
 
         for (int i = 0; i < filenames.count(); i++)
         {
-            Matrix v = Vector::fromTwoColsFile("vectorsToAlign/" + filenames[i]);
+            Vector v = Vector::fromTwoColsFile("vectorsToAlign/" + filenames[i]);
             vectors.append(v);
         }
 
@@ -70,33 +71,34 @@ public:
         {
             Matrix projected = pca2.project(vectors[i]);
             Matrix backProjected = pca2.backProject(projected);
-            Matrix diff = vectors[i] - backProjected;
-            qDebug() << i<< Vector::magnitude(diff);
+            Matrix diffMat = vectors[i] - backProjected;
+            Vector diff = diffMat;
+            qDebug() << i<< diff.magnitude();
         }
     }
 
     char * winname;
     int trackbarValues[10];
-    Matrix parameters;
+    Vector parameters;
     PCA pca;
     int imWidth;
 
     void testPCACreateFaceSpace()
     {
-        QVector<Matrix> input;
+        QVector<Vector> input;
         //QString path("/home/stepo/SVN/disp-stepan-mracek/databases/orl");
         QString path("/media/frgc/frgc-norm-iterative/big-index");
-        Loader::loadImages(path, input, 0, "*.png", true);
-        QVector<Matrix> reduced = input.mid(0,196);
+        Loader::loadImages(path, input, 0, "*.png");
+        QVector<Vector> reduced = input.mid(0,196);
 
         pca.learn(reduced);
         pca.modesSelectionThreshold();
         qDebug() << "modes:" << pca.getModes();
 
         imWidth = 121;
-        parameters = Matrix::zeros(pca.getModes(), 1);
-        Matrix image = pca.backProject(parameters);
-        image = MatrixConverter::columnVectorToMatrix(image, imWidth);
+        parameters = Vector(pca.getModes());
+        Vector vec = pca.backProject(parameters);
+        Matrix image = MatrixConverter::columnVectorToMatrix(vec, imWidth);
 
         winname = "PCA FaceSpace";
         cv::namedWindow(winname);
@@ -123,8 +125,8 @@ void onChange(int, void* userData)
         test->parameters(i) = value;
     }
 
-    Matrix image = test->pca.backProject(test->parameters);
-    image = MatrixConverter::columnVectorToMatrix(image, test->imWidth);
+    Vector vec = test->pca.backProject(test->parameters);
+    Matrix image = MatrixConverter::columnVectorToMatrix(vec, test->imWidth);
     cv::imshow(test->winname, image);
 }
 

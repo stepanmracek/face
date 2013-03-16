@@ -15,7 +15,7 @@ class Template
 {
 public:
     int subjectID;
-    Matrix featureVector;
+    Vector featureVector;
 
     static QVector<Template> loadTemplates(const QString &dirPath, const QString& classSeparator);
 
@@ -23,10 +23,10 @@ public:
                                                  QVector<double> &minValues, QVector<double> &maxValues);
 
     static void splitVectorsAndClasses(QVector<Template> &templates,
-                                       QVector<Matrix> &featureVectors,
+                                       QVector<Vector> &featureVectors,
                                        QVector<int> &classMemberships);
 
-    static QVector<Template> joinVectorsAndClasses(QVector<Matrix> &featureVectors,
+    static QVector<Template> joinVectorsAndClasses(QVector<Vector> &featureVectors,
                                                    QVector<int> &classMemberships);
 
     static void saveTemplates(QList<QVector<Template> > &clusters, const QString &path,
@@ -36,11 +36,11 @@ public:
 
     static void zScoreNorm(QVector<Template> &templates, ZScoreNormalizationResult &normParams);
 
-    static QVector<Matrix> getVectors(QVector<Template> &templates);
+    static QVector<Vector> getVectors(QVector<Template> &templates);
 
     static void stats(QVector<Template> &templates, const QString &outPath);
 
-    static QVector<Template> createTemplates(QVector<Matrix> &rawData,
+    static QVector<Template> createTemplates(QVector<Vector> &rawData,
                                              QVector<int> &IDs,
                                              FeatureExtractor &extractor);
 

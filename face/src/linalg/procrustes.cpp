@@ -6,7 +6,7 @@
 /***
  * Procrustes analysis
  */
-void Procrustes::procrustesAnalysis(QVector<Matrix> &vectors, bool scale, double eps, int maxIterations)
+void Procrustes::procrustesAnalysis(QVector<Vector> &vectors, bool scale, double eps, int maxIterations)
 {
     qDebug() << "Procrustes analysis";
 
@@ -22,8 +22,8 @@ void Procrustes::procrustesAnalysis(QVector<Matrix> &vectors, bool scale, double
     centralize(vectors);
 
     // Choose one example as an initial estimate of the mean shape and scale so that |x| = 1.
-    Matrix mean = scale ? Vector::normalized(vectors[0]) : vectors[0];
-    Matrix oldMean = mean.clone();
+    Vector mean = scale ? vectors[0].normalized() : vectors[0];
+    Vector oldMean(mean);
     double oldDelta = 1e300;
 
     int iteration = 1;
@@ -57,16 +57,17 @@ void Procrustes::procrustesAnalysis(QVector<Matrix> &vectors, bool scale, double
 
         // Apply constraints on the current estimate of the mean
         if (scale)
-            Vector::normalize(mean);
+            mean.normalize();
 
         // If not converged, iterate
-        Matrix diff = mean-oldMean;
-        double delta = Vector::sqrMagnitude(diff);
+        Matrix diffMat = mean-oldMean;
+        Vector diff = diffMat;
+        double delta = diff.sqrMagnitude();
 
         if (delta <= eps || iteration > maxIterations)
             end = true;
 
-        oldMean = mean.clone();
+        oldMean = Vector(mean);
         oldDelta = delta;
 
         if (iteration % 100 == 0)
@@ -76,7 +77,7 @@ void Procrustes::procrustesAnalysis(QVector<Matrix> &vectors, bool scale, double
     }
 }
 
-void Procrustes::translate(Matrix &vector, TranslationCoefs &coefs)
+void Procrustes::translate(Vector &vector, TranslationCoefs &coefs)
 {
     int n = vector.rows/2;
     for (int i = 0; i < n; i++)
@@ -86,7 +87,7 @@ void Procrustes::translate(Matrix &vector, TranslationCoefs &coefs)
     }
 }
 
-TranslationCoefs Procrustes::centralizedTranslation(Matrix &vector)
+TranslationCoefs Procrustes::centralizedTranslation(Vector &vector)
 {
     double meanx = 0.0;
     double meany = 0.0;
@@ -106,20 +107,20 @@ TranslationCoefs Procrustes::centralizedTranslation(Matrix &vector)
     return c;
 }
 
-void Procrustes::centralize(Matrix &vector)
+void Procrustes::centralize(Vector &vector)
 {
     TranslationCoefs c = centralizedTranslation(vector);
     translate(vector, c);
 }
 
-void Procrustes::centralize(QVector<Matrix> &vectors)
+void Procrustes::centralize(QVector<Vector> &vectors)
 {
 	int n = vectors.count();
 	for (int i = 0; i < n; i++)
 		centralize(vectors[i]);
 }
 
-void Procrustes::rotateAndScale(Matrix &vector, RotateAndScaleCoefs &coefs)
+void Procrustes::rotateAndScale(Vector &vector, RotateAndScaleCoefs &coefs)
 {
     double sint = coefs.s * sin(coefs.theta);
     double cost = coefs.s * cos(coefs.theta);
@@ -137,7 +138,7 @@ void Procrustes::rotateAndScale(Matrix &vector, RotateAndScaleCoefs &coefs)
     }
 }
 
-void Procrustes::transformate(Matrix &vector, TransformationCoefs &coefs)
+void Procrustes::transformate(Vector &vector, TransformationCoefs &coefs)
 {
     int n = vector.rows/2;
     for (int i = 0; i < n; i++)
@@ -166,15 +167,15 @@ double Procrustes::getOptimalRotation(Matrix &from, Matrix &to)
     return atan(numerator/denumerator);
 }
 
-RotateAndScaleCoefs Procrustes::align(Matrix &from, Matrix &to)
+RotateAndScaleCoefs Procrustes::align(Vector &from, Vector &to)
 {
-    Matrix reference = to.clone();
-    double referenceScale = 1.0/Vector::magnitude(reference);
-    Vector::mul(reference, referenceScale);
+    Vector reference(to);
+    double referenceScale = 1.0/reference.magnitude();
+    reference.mul(referenceScale);
 
-    Matrix vector = from.clone();
-    double vectorScale = 1.0/Vector::magnitude(vector);
-    Vector::mul(vector, vectorScale);
+    Vector vector(from);
+    double vectorScale = 1.0/vector.magnitude();
+    vector.mul(vectorScale);
 
     /*int n = vector.rows/2;
     double numerator = 0.0;
@@ -196,16 +197,16 @@ RotateAndScaleCoefs Procrustes::align(Matrix &from, Matrix &to)
     return c;
 }
 
-Matrix Procrustes::getMeanShape(QVector<Matrix> &vectors)
+Vector Procrustes::getMeanShape(QVector<Vector> &vectors)
 {
 	int n = vectors.count();
-    Matrix mean = Matrix::zeros(vectors[0].rows, 1);
+    Vector mean(vectors[0].rows);
 	for (int i = 0; i < n; i++)
 	{
 		mean += vectors[0];
 	}
-	mean = mean / ((double)n);
-
+    Matrix m = mean / ((double)n);
+    mean = m;
 	return mean;
 }
 

@@ -2,7 +2,7 @@
 
 #include <ctime>
 
-void mutateForTrainWeights(Matrix &vec)
+void mutateForTrainWeights(Vector &vec)
 {
     for (int j = 0; j < vec.rows; j++)
     {
@@ -11,7 +11,7 @@ void mutateForTrainWeights(Matrix &vec)
     WeightedMetric::normalizeWeights(vec);
 }
 
-void mutateForFeatureSelection(Matrix &vec)
+void mutateForFeatureSelection(Vector &vec)
 {
     for (int j = 0; j < vec.rows; j++)
     {
@@ -24,18 +24,18 @@ void mutateForFeatureSelection(Matrix &vec)
     }
 }
 
-Matrix createForTrainWeights(int len)
+Vector createForTrainWeights(int len)
 {
-    Matrix result = Matrix::zeros(len, 1);
+    Vector result(len);
     for (int j = 0; j < len; j++)
         result(j) = 1 + (((double)rand())/RAND_MAX - 0.5);
     WeightedMetric::normalizeWeights(result);
     return result;
 }
 
-Matrix createForFeatureSelection(int len)
+Vector createForFeatureSelection(int len)
 {
-    Matrix result = Matrix::zeros(len, 1);
+    Vector result(len);
     for (int j = 0; j < len; j++)
     {
         double p = ((double)rand())/RAND_MAX;
@@ -47,10 +47,10 @@ Matrix createForFeatureSelection(int len)
     return result;
 }
 
-Matrix combineForTrainWeights(Matrix &first, Matrix &second, int crosspoint)
+Vector combineForTrainWeights(Vector &first, Vector &second, int crosspoint)
 {
     int len = first.rows;
-    Matrix result = Matrix::zeros(len, 1);
+    Vector result(len);
 
     for (int j = 0; j < len; j++)
     {
@@ -71,10 +71,10 @@ Matrix combineForTrainWeights(Matrix &first, Matrix &second, int crosspoint)
     return result;
 }
 
-Matrix combineForFeatureSelection(Matrix &first, Matrix &second, int crosspoint)
+Vector combineForFeatureSelection(Vector &first, Vector &second, int crosspoint)
 {
     int len = first.rows;
-    Matrix result = Matrix::zeros(len, 1);
+    Vector result(len);
 
     for (int j = 0; j < len; j++)
     {
@@ -93,9 +93,9 @@ Matrix combineForFeatureSelection(Matrix &first, Matrix &second, int crosspoint)
 }
 
 GeneticWeightOptimizationResult GeneticWeightOptimization::trainCommon(
-        void (*mutate)(Matrix &vec),
-        Matrix (*create)(int len),
-        Matrix (*combine)(Matrix &, Matrix &, int))
+        void (*mutate)(Vector &),
+        Vector (*create)(int len),
+        Vector (*combine)(Vector &, Vector &, int))
 {
     assert(trainSet.count() > 0);
 
@@ -107,7 +107,7 @@ GeneticWeightOptimizationResult GeneticWeightOptimization::trainCommon(
 
     // init population
     int fvLen = trainSet.at(0).featureVector.rows;
-    QVector<Matrix> population(settings.populationSize);
+    QVector<Vector> population(settings.populationSize);
     QVector<double> eer(settings.populationSize);
     QVector<bool> selected(settings.populationSize);
     int selectedCount = settings.populationSize - settings.newGenerationSize;
@@ -142,7 +142,7 @@ GeneticWeightOptimizationResult GeneticWeightOptimization::trainCommon(
             if (eer[i] < result.bestEERonTrain)
             {
                 result.bestEERonTrain = eer[i];
-                result.bestWeightsOnTrain = population[i].clone();
+                result.bestWeightsOnTrain = Vector(population[i]);
                 iterationsWithoutImprovement = 0;
             }
 
@@ -175,7 +175,7 @@ GeneticWeightOptimizationResult GeneticWeightOptimization::trainCommon(
             if (validationEER < result.bestEERonValidation)
             {
                 result.bestEERonValidation = validationEER;
-                result.bestWeightsOnValidation = metric.w.clone();
+                result.bestWeightsOnValidation = Vector(metric.w);
             }
         //}
         result.validationEER.append(validationEER);

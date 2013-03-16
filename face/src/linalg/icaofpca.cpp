@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-void ICAofPCA::learn(QVector<Matrix> &vectors, double pcaSelectionThreshold, int independentComponentCount, double epsICA, bool debug)
+void ICAofPCA::learn(QVector<Vector> &vectors, double pcaSelectionThreshold, int independentComponentCount, double epsICA, bool debug)
 {
     pca = PCA(vectors);
     //pca.setModes(20);
@@ -11,10 +11,10 @@ void ICAofPCA::learn(QVector<Matrix> &vectors, double pcaSelectionThreshold, int
 
     if (debug)
         qDebug() << "Projecting vectors to PCA space...";
-    QVector<Matrix> pcaProjected;
+    QVector<Vector> pcaProjected;
     for (int i = 0; i < vectors.count(); i++)
     {
-        Matrix projected = pca.project(vectors[i]);
+        Vector projected = pca.project(vectors[i]);
         pcaProjected.append(projected);
     }
     if (debug)
@@ -23,7 +23,7 @@ void ICAofPCA::learn(QVector<Matrix> &vectors, double pcaSelectionThreshold, int
     ica = ICA(pcaProjected, independentComponentCount, epsICA, debug);
 }
 
-ICAofPCA::ICAofPCA(QVector<Matrix> &vectors,
+ICAofPCA::ICAofPCA(QVector<Vector> &vectors,
                    double pcaSelectionThreshold,
                    int independentComponentCount,
                    double epsICA, bool debug)
@@ -31,34 +31,34 @@ ICAofPCA::ICAofPCA(QVector<Matrix> &vectors,
     learn(vectors, pcaSelectionThreshold, independentComponentCount, epsICA, debug);
 }
 
-Matrix ICAofPCA::project(const Matrix &vector)
+Vector ICAofPCA::project(const Vector &vector)
 {
-    Matrix projected = pca.project(vector);
-    Matrix result = ica.project(projected);
+    Vector projected = pca.project(vector);
+    Vector result = ica.project(projected);
     return result;
 }
 
-QVector<Matrix> ICAofPCA::project(const QVector<Matrix> &vectors)
+QVector<Vector> ICAofPCA::project(const QVector<Vector> &vectors)
 {
-    QVector<Matrix> result;
+    QVector<Vector> result;
     for (int i = 0; i < vectors.count(); i++)
     {
-        Matrix out = project(vectors[i]);
+        Vector out = project(vectors[i]);
         result.append(out);
     }
     return result;
 }
 
-Matrix ICAofPCA::whiten(const Matrix &vector)
+Vector ICAofPCA::whiten(const Vector &vector)
 {
-    Matrix pcaProjected = pca.project(vector);
-    Matrix result = ica.whiten(pcaProjected);
+    Vector pcaProjected = pca.project(vector);
+    Vector result = ica.whiten(pcaProjected);
     return result;
 }
 
-QVector<Matrix> ICAofPCA::whiten(const QVector<Matrix> &vectors)
+QVector<Vector> ICAofPCA::whiten(const QVector<Vector> &vectors)
 {
-    QVector<Matrix> result;
+    QVector<Vector> result;
     for (int i = 0; i < vectors.count(); i++)
     {
         Matrix out = whiten(vectors[i]);
@@ -67,9 +67,9 @@ QVector<Matrix> ICAofPCA::whiten(const QVector<Matrix> &vectors)
     return result;
 }
 
-Matrix ICAofPCA::backProject(const Matrix &vector)
+Vector ICAofPCA::backProject(const Vector &vector)
 {
-    Matrix backProjected = ica.backProject(vector);
-    Matrix result = pca.backProject(backProjected);
+    Vector backProjected = ica.backProject(vector);
+    Vector result = pca.backProject(backProjected);
     return result;
 }

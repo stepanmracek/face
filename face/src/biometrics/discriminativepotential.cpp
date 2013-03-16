@@ -100,11 +100,15 @@ DiscriminativePotential::DiscriminativePotential(QVector<Template> &templates)
         	{
         		qDebug() << "Warning, subject" << subjID << "has only one scan!";
         	}
-        	classMeans << Vector::meanValue(valuesForSubj[subjID]);
-        	stdDeviationForClass << Vector::stdDeviation(valuesForSubj[subjID]);
+
+            Vector valuesForSubjVec(valuesForSubj[subjID]);
+            classMeans << valuesForSubjVec.meanValue();
+            stdDeviationForClass << valuesForSubjVec.stdDeviation();
         }
 
-        double s = Vector::stdDeviation(classMeans) - Vector::meanValue(stdDeviationForClass);
+        Vector classMeansVec(classMeans);
+        Vector stdDeviationForClassVec(stdDeviationForClass);
+        double s = classMeansVec.stdDeviation() - stdDeviationForClassVec.meanValue();
         scores << s;
 
         /*QList<QVector<double> > values = valuesForSubj.values();
@@ -148,8 +152,8 @@ DiscriminativePotential::DiscriminativePotential(QVector<Template> &templates)
         scores.append(score);*/
     }
 
-    minScore = Vector::minValue(scores);
-    maxScore = Vector::maxValue(scores);
+    minScore = scores.minValue();
+    maxScore = scores.maxValue();
 
     //qDebug() << "...done";
 }

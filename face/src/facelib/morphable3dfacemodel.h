@@ -21,7 +21,7 @@ public:
 
     Morphable3DFaceModel(const QString &pcaPath, const QString &maskPath, const QString &landmarksPath, int width);
 
-    void setModelParams(Matrix &params);
+    void setModelParams(Vector &params);
 
     void align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations);
 

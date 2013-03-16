@@ -36,13 +36,12 @@ void Template::normalizeFeatureVectorComponents(QVector<Template> &templates,
 {
     for (int i = 0; i < templates.count(); i++)
     {
-        templates[i].featureVector = Vector::normalizeComponents(templates[i].featureVector,
-                                                                 minValues, maxValues);
+        templates[i].featureVector = templates[i].featureVector.normalizeComponents(minValues, maxValues);
     }
 }
 
 void Template::splitVectorsAndClasses(QVector<Template> &templates,
-                                      QVector<Matrix> &featureVectors,
+                                      QVector<Vector> &featureVectors,
                                       QVector<int> &classMemberships)
 {
     featureVectors.clear();
@@ -55,7 +54,7 @@ void Template::splitVectorsAndClasses(QVector<Template> &templates,
     }
 }
 
-QVector<Template> Template::joinVectorsAndClasses(QVector<Matrix> &featureVectors,
+QVector<Template> Template::joinVectorsAndClasses(QVector<Vector> &featureVectors,
                                                   QVector<int> &classMemberships)
 {
     int n = featureVectors.count();
@@ -89,14 +88,14 @@ void Template::saveTemplates(QList<QVector<Template> > &clusters, const QString 
             QString filePath = path + QDir::separator() +
                     QString::number(t.subjectID) + classSeparator + QString::number(classUsage[t.subjectID]);
 
-            Vector::toFile(t.featureVector, filePath);
+            t.featureVector.toFile(filePath);
         }
     }
 }
 
 ZScoreNormalizationResult Template::zScoreNorm(QVector<Template> &templates)
 {
-    QVector<Matrix> vectors = getVectors(templates);
+    QVector<Vector> vectors = getVectors(templates);
     ZScoreNormalizationResult result = Normalization::zScoreNormalization(vectors);
     //zScoreNorm(templates, result);
     return result;
@@ -108,9 +107,9 @@ void Template::zScoreNorm(QVector<Template> &templates, ZScoreNormalizationResul
         Normalization::zScoreNormalization(templates[templateIndex].featureVector, normParams);
 }
 
-QVector<Matrix> Template::getVectors(QVector<Template> &templates)
+QVector<Vector> Template::getVectors(QVector<Template> &templates)
 {
-    QVector<Matrix> result;
+    QVector<Vector> result;
     for (int i = 0; i < templates.count(); i++)
     {
         result.append(templates[i].featureVector);
@@ -132,8 +131,9 @@ void Template::stats(QVector<Template> &templates, const QString &outPath)
             values.append(templates[templateIndex].featureVector(featureIndex));
         }
 
-        double min = Vector::minValue(values);
-        double max = Vector::maxValue(values);
+        Vector valuesVec(values);
+        double min = valuesVec.minValue();
+        double max = valuesVec.maxValue();
 
         QVector<double> histogram(10);
         for (int i = 0; i < n; i++)
@@ -164,7 +164,7 @@ void Template::stats(QVector<Template> &templates, const QString &outPath)
     }
 }
 
-QVector<Template> Template::createTemplates(QVector<Matrix> &rawData, QVector<int> &IDs, FeatureExtractor &extractor)
+QVector<Template> Template::createTemplates(QVector<Vector> &rawData, QVector<int> &IDs, FeatureExtractor &extractor)
 {
     int n = rawData.count();
     assert (n == IDs.count());
@@ -189,7 +189,8 @@ QVector<Template> Template::clone(QVector<Template> &src)
 	{
 		Template t;
 		t.subjectID = src[i].subjectID;
-		t.featureVector = src[i].featureVector.clone();
+        Matrix cloned = src[i].featureVector.clone();
+        t.featureVector = cloned;
 		result << t;
 	}
 	return result;

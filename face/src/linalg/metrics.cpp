@@ -5,12 +5,12 @@
 #include "common.h"
 #include "matrixconverter.h"
 
-MahalanobisMetric::MahalanobisMetric(QVector<Matrix> &samples)
+MahalanobisMetric::MahalanobisMetric(QVector<Vector> &samples)
 {
     learn(samples);
 }
 
-void MahalanobisMetric::learn(QVector<Matrix> &samples)
+void MahalanobisMetric::learn(QVector<Vector> &samples)
 {
     cv::Mat data = MatrixConverter::columnVectorsToDataMatrix(samples);
     cv::Mat covar;
@@ -18,7 +18,7 @@ void MahalanobisMetric::learn(QVector<Matrix> &samples)
     cv::invert(covar, invCov, cv::DECOMP_SVD);
 }
 
-MahalanobisWeightedMetric::MahalanobisWeightedMetric(QVector<Matrix> &samples)
+MahalanobisWeightedMetric::MahalanobisWeightedMetric(QVector<Vector> &samples)
 {
     cv::Mat data = MatrixConverter::columnVectorsToDataMatrix(samples);
     cv::Mat covar;

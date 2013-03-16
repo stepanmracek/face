@@ -31,46 +31,46 @@ public:
         QVector<double> mean1; mean1 << -3 << 0;
         QVector<double> mean2; mean2 << 3 << 0;
         QVector<double> sigma; sigma << 1 << 10;
-        QVector<Matrix> class1 = Random::gauss(mean1, sigma, 500);
-        QVector<Matrix> class2 = Random::gauss(mean2, sigma, 500);
+        QVector<Vector> class1 = Random::gauss(mean1, sigma, 500);
+        QVector<Vector> class2 = Random::gauss(mean2, sigma, 500);
 
         class1 << class2; // copy second class to first one
         ICA ica(class1, 2);
         ica.setModes(1);
 
-        Matrix test = Matrix::ones(2, 1);
+        Vector test(2);
         test(0) = -3; test(1) = 0;
-        Matrix projected = ica.project(test);
-        qDebug() << Vector::toQVector(test) <<  Vector::toQVector(projected);
+        Vector projected = ica.project(test);
+        qDebug() << test.toQVector() << projected.toQVector();
 
         test(0) = -3; test(1) = 5;
         projected = ica.project(test);
-        qDebug() << Vector::toQVector(test) <<  Vector::toQVector(projected);
+        qDebug() << test.toQVector() << projected.toQVector();
 
         test(0) = -3; test(1) = -5;
         projected = ica.project(test);
-        qDebug() << Vector::toQVector(test) <<  Vector::toQVector(projected);
+        qDebug() << test.toQVector() << projected.toQVector();
 
         test(0) = 3; test(1) = 0;
         projected = ica.project(test);
-        qDebug() << Vector::toQVector(test) <<  Vector::toQVector(projected);
+        qDebug() << test.toQVector() << projected.toQVector();
 
         test(0) = 3; test(1) = 5;
         projected = ica.project(test);
-        qDebug() << Vector::toQVector(test) <<  Vector::toQVector(projected);
+        qDebug() << test.toQVector() << projected.toQVector();
 
         test(0) = 3; test(1) = -5;
         projected = ica.project(test);
-        qDebug() << Vector::toQVector(test) <<  Vector::toQVector(projected);
+        qDebug() << test.toQVector() << projected.toQVector();
     }
 
-    static void saveVec(Matrix &m, int id, int scan, const QString& suffix)
+    static void saveVec(Vector &vec, int id, int scan, const QString& suffix)
     {
         QString idS = ((id < 10)?"0":"")+QString::number(id);
         QString scanS = ((scan < 10)?"0":"")+QString::number(scan);
         QString path = "ica/" + idS + "-" + scanS + suffix;
 
-        Vector::toFile(m, path);
+        vec.toFile(path);
     }
 
     ICAofPCA ica;
@@ -80,15 +80,15 @@ public:
     int trackbarValues[10];
     void DeprojectGermanyThermoImages()
     {
-        QVector<Matrix> allImages;
+        QVector<Vector> allImages;
         QVector<int> allClasses;
-        Loader::loadImages("/home/stepo/SVN/disp-stepan-mracek/databases/thermo/germany", allImages, &allClasses, "*.png", true, "-", false);
+        Loader::loadImages("/home/stepo/SVN/disp-stepan-mracek/databases/thermo/germany", allImages, &allClasses, "*.png", "-", false);
         imgWidth = 50;
         winname = "ICA Facespace";
         cv::namedWindow(winname);
 
         // Divide data
-        QList<QVector<Matrix> > images;
+        QList<QVector<Vector> > images;
         QList<QVector<int> > classes;
         BioDataProcessing::divide(allImages, allClasses, 15, images, classes);
 
@@ -99,15 +99,16 @@ public:
         {
             Matrix in = ica.ica.W.row(i);
             in = in.t();
-            Matrix out = ica.pca.backProject(in);
-            out = out - ica.pca.cvPca.mean;
-            out = MatrixConverter::columnVectorToMatrix(out, imgWidth);
-            out = Vector::normalizeComponents(out);
-            out = out*255;
+            Vector out = ica.pca.backProject(in);
+            Matrix diff = out - ica.pca.cvPca.mean;
+            out = diff;
+            out.normalizeComponents();
+            Matrix img = MatrixConverter::columnVectorToMatrix(out, imgWidth);
+            img = img*255;
 
-            cv::resize(out, out, size);
+            cv::resize(img, img, size);
             QString filename("icaVector"+QString::number(i)+".png");
-            cv::imwrite(filename.toStdString(), out);
+            cv::imwrite(filename.toStdString(), img);
         }
 
         for (int i = 0; i < 10; i++)
@@ -118,22 +119,22 @@ public:
         }
 
         parameters = Matrix::zeros(20, 1);
-        Matrix backProjected = ica.backProject(parameters);
-        backProjected = MatrixConverter::columnVectorToMatrix(backProjected, imgWidth);
-        cv::resize(backProjected, backProjected, size);
+        Vector backProjected = ica.backProject(parameters);
+        Matrix image = MatrixConverter::columnVectorToMatrix(backProjected, imgWidth);
+        cv::resize(image, image, size);
 
-        cv::imshow(winname, backProjected);
+        cv::imshow(winname, image);
         cv::waitKey(0);
     }
 
     static void ConvertGermanyThermoImages()
     {
-        QVector<Matrix> allImages;
+        QVector<Vector> allImages;
         QVector<int> allClasses;
-        Loader::loadImages("/home/stepo/SVN/disp-stepan-mracek/databases/thermo/germany", allImages, &allClasses, "*.png", true, "-", true);
+        Loader::loadImages("/home/stepo/SVN/disp-stepan-mracek/databases/thermo/germany", allImages, &allClasses, "*.png", "-", true);
 
         // Divide data
-        QList<QVector<Matrix> > images;
+        QList<QVector<Vector> > images;
         QList<QVector<int> > classes;
         BioDataProcessing::divide(allImages, allClasses, 15, images, classes);
 
@@ -146,8 +147,8 @@ public:
             for (int i = 0; i < images[c].count(); i++)
             {
                 int id = classes[c][i];
-                Matrix in = ica.pca.project(images[c][i]);
-                Matrix out = ica.ica.project(in);
+                Vector in = ica.pca.project(images[c][i]);
+                Vector out = ica.ica.project(in);
 
                 saveVec(in, id, scan, "-in");
                 saveVec(out, id, scan, "-out");
@@ -173,8 +174,8 @@ void onTestICAChange(int, void* userData)
         test->parameters(i) = value;
     }
 
-    Matrix image = test->ica.backProject(test->parameters);
-    image = MatrixConverter::columnVectorToMatrix(image, test->imgWidth);
+    Vector vec = test->ica.backProject(test->parameters);
+    Matrix image = MatrixConverter::columnVectorToMatrix(vec, test->imgWidth);
     cv::Size size(image.rows*4, image.cols*4);
     cv::resize(image, image, size);
     cv::imshow(test->winname, image);

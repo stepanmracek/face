@@ -4,7 +4,7 @@
 
 #include "linalg/vector.h"
 
-LinearNormalizationResult Normalization::linearNormalization(QVector<Matrix> &vectors)
+LinearNormalizationResult Normalization::linearNormalization(QVector<Vector> &vectors)
 {
     int n = vectors.count();
     assert(n > 0);
@@ -31,7 +31,7 @@ LinearNormalizationResult Normalization::linearNormalization(QVector<Matrix> &ve
     return res;
 }
 
-void Normalization::linearNormalization(QVector<Matrix> &vectors, LinearNormalizationResult &params)
+void Normalization::linearNormalization(QVector<Vector> &vectors, LinearNormalizationResult &params)
 {
     int n = vectors.count();
     assert(n > 0);
@@ -42,12 +42,12 @@ void Normalization::linearNormalization(QVector<Matrix> &vectors, LinearNormaliz
 
     for (int i = 0; i < n; i++)
     {
-        vectors[i] = Vector::normalizeComponents(vectors[i], params.minValues, params.maxValues);
+        vectors[i] = vectors[i].normalizeComponents(params.minValues, params.maxValues);
     }
 }
 
 
-ZScoreNormalizationResult Normalization::zScoreNormalization(QVector<Matrix> &vectors)
+ZScoreNormalizationResult Normalization::zScoreNormalization(QVector<Vector> &vectors)
 {
     int n = vectors.count();
     assert(n > 0);
@@ -63,8 +63,9 @@ ZScoreNormalizationResult Normalization::zScoreNormalization(QVector<Matrix> &ve
             values.append(vectors[vectorIndex](componentIndex));
         }
 
-        result.mean.append(Vector::meanValue(values));
-        result.stdDev.append(Vector::stdDeviation(values));
+        Vector valuesVec(values);
+        result.mean.append(valuesVec.meanValue());
+        result.stdDev.append(valuesVec.stdDeviation());
     }
 
     // normalize
@@ -72,7 +73,7 @@ ZScoreNormalizationResult Normalization::zScoreNormalization(QVector<Matrix> &ve
     return result;
 }
 
-void Normalization::zScoreNormalization(Matrix &vector, ZScoreNormalizationResult &params)
+void Normalization::zScoreNormalization(Vector &vector, ZScoreNormalizationResult &params)
 {
     for (int componentIndex = 0; componentIndex < vector.rows; componentIndex++)
     {
@@ -86,7 +87,7 @@ void Normalization::zScoreNormalization(Matrix &vector, ZScoreNormalizationResul
     }
 }
 
-void Normalization::zScoreNormalization(QVector<Matrix> &vectors, ZScoreNormalizationResult &params)
+void Normalization::zScoreNormalization(QVector<Vector> &vectors, ZScoreNormalizationResult &params)
 {
     for (int vectorIndex = 0; vectorIndex < vectors.count(); vectorIndex++)
     {

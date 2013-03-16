@@ -10,11 +10,10 @@
 
 #include "linalg/vector.h"
 
-FeatureVectorFusionBase & FeatureVectorFusionBase::addComponent(
-		QVector<Matrix> &trainRawData,
-		QVector<int> &trainClasses,
-		ZScoreFeatureExtractor &featureExtractor,
-		Metrics &metrics)
+FeatureVectorFusionBase & FeatureVectorFusionBase::addComponent(QVector<Vector> &trainRawData,
+        QVector<int> &trainClasses,
+        ZScoreFeatureExtractor &featureExtractor,
+        Metrics &metrics)
 {
 	this->extractors << (&featureExtractor);
 	this->metrics << (&metrics);
@@ -30,7 +29,7 @@ void FeatureVectorFusionBase::learn()
 	learned = true;
 }
 
-QVector<Matrix> FeatureVectorFusionBase::batchFuse(QList<QVector<Matrix> > inputMatricies)
+QVector<Vector> FeatureVectorFusionBase::batchFuse(QList<QVector<Vector> > inputMatricies)
 {
 	assert(learned);
 	int unitsCount = inputMatricies.count();
@@ -38,15 +37,15 @@ QVector<Matrix> FeatureVectorFusionBase::batchFuse(QList<QVector<Matrix> > input
 
 	int matriciesPerUnitCount = inputMatricies[0].count();
 
-	QVector<Matrix> resultVector;
+    QVector<Vector> resultVector;
 	for (int i = 0; i < matriciesPerUnitCount; i++)
 	{
-		QVector<Matrix> input;
+        QVector<Vector> input;
 		for (int j = 0; j < unitsCount; j++)
 		{
 			input << inputMatricies[j][i];
 		}
-		Matrix result = fuse(input);
+        Vector result = fuse(input);
 		resultVector << result;
 	}
 	return resultVector;
@@ -54,7 +53,7 @@ QVector<Matrix> FeatureVectorFusionBase::batchFuse(QList<QVector<Matrix> > input
 
 // --- Concatenation ---
 
-Matrix FeatureVectorFusionConcatenation::fuse(QVector<Matrix> &inputMatricies)
+Vector FeatureVectorFusionConcatenation::fuse(QVector<Vector> &inputMatricies)
 {
 	int n = inputMatricies.count();
 	QVector<double> vec;
@@ -67,7 +66,7 @@ Matrix FeatureVectorFusionConcatenation::fuse(QVector<Matrix> &inputMatricies)
 		}
 	}
 
-	Matrix result = Vector::fromQVector(vec);
+    Vector result(vec);
 	return result;
 }
 

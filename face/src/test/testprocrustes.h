@@ -21,34 +21,35 @@ public:
 
     static void testRotateAndScale()
     {
-        Matrix v = Vector::fromTwoColsFile("vectorsToAlign/vec01");
+        Vector v = Vector::fromTwoColsFile("vectorsToAlign/vec01");
         Procrustes::centralize(v);
         double sum = 0.0;
         for (int i = 0; i < v.rows; i++)
             sum += v(i, 0);
         qDebug() << sum;
-        Vector::toFileTwoCols(v, "original");
+        v.toFileTwoCols("original");
 
         RotateAndScaleCoefs rs(1.2, 0.75);
         Procrustes::rotateAndScale(v, rs);
-        Vector::toFileTwoCols(v, "rotatedAndScaled");
+        v.toFileTwoCols("rotatedAndScaled");
     }
 
     static void testAlign()
     {
         // Load vectors
-        Matrix from = Vector::fromTwoColsFile("vectorsToAlign/vec01");
+        Vector from = Vector::fromTwoColsFile("vectorsToAlign/vec01");
         Procrustes::centralize(from);
-        Matrix to = from.clone();
+        Vector to(from);
 
         // Rotate first one
         RotateAndScaleCoefs testCoefs(1.2, -0.95);
         Procrustes::rotateAndScale(to, testCoefs);
 
-        Matrix diff = from - to;
-        qDebug() << "before:" << Vector::sqrMagnitude(diff);
-        Vector::toFileTwoCols(from, "before");
-        Vector::toFileTwoCols(to, "before", true);
+        Matrix diffMat = from - to;
+        Vector diff = diffMat;
+        qDebug() << "before:" << diff.sqrMagnitude();
+        from.toFileTwoCols("before");
+        to.toFileTwoCols("before", true);
 
         // Estimate needed rotation of second one
         //TransformationCoefs gainedCoefs = Procrustes::AlignAlt(from, to);
@@ -56,24 +57,25 @@ public:
         //Procrustes::Transformate(from, gainedCoefs);
         Procrustes::rotateAndScale(from, gainedCoefs);
         qDebug() << "coefs:" << gainedCoefs.s << gainedCoefs.theta;
-        diff = from - to;
-        qDebug() << "after:" << Vector::sqrMagnitude(diff);
+        diffMat = from - to;
+        diff = diffMat;
+        qDebug() << "after:" << diff.sqrMagnitude();
 
-        Vector::toFileTwoCols(from, "after");
-        Vector::toFileTwoCols(to, "after", true);
+        from.toFileTwoCols("after");
+        to.toFileTwoCols("after", true);
     }
 
     static void testProcrustes()
     {
         // load vectors
-        QVector<Matrix> vectors;
+        QVector<Vector> vectors;
         QDir dir("vectorsToAlign");
         dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
         QStringList filenames = dir.entryList();
 
         for (int i = 0; i < filenames.count(); i++)
         {
-            Matrix v = Vector::fromTwoColsFile("vectorsToAlign/" + filenames[i]);
+            Vector v = Vector::fromTwoColsFile("vectorsToAlign/" + filenames[i]);
             RotateAndScaleCoefs c;
             c.s = 1;
             c.theta = ((double)qrand())/RAND_MAX - 0.5;
@@ -86,7 +88,7 @@ public:
 
         for (int i = 0; i < vectors.count(); i++)
         {
-            Vector::toFileTwoCols(vectors[i], "unaligned", true);
+            vectors[i].toFileTwoCols("unaligned", true);
         }
 
         // align them
@@ -98,7 +100,7 @@ public:
 
         for (int i = 0; i < vectors.count(); i++)
         {
-            Vector::toFileTwoCols(vectors[i], "aligned", true);
+            vectors[i].toFileTwoCols("aligned", true);
         }
     }
 };

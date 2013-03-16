@@ -6,6 +6,7 @@
 #include "linalg/metrics.h"
 #include "evaluation.h"
 #include "template.h"
+#include "linalg/vector.h"
 
 class GeneticWeightOptimizationSettings
 {
@@ -46,8 +47,8 @@ public:
     QVector<double> trainEER;
     QVector<double> validationEER;
     QVector<double> diversity;
-    Matrix bestWeightsOnTrain;
-    Matrix bestWeightsOnValidation;
+    Vector bestWeightsOnTrain;
+    Vector bestWeightsOnValidation;
     double bestEERonTrain;
     double bestEERonValidation;
 };
@@ -68,9 +69,9 @@ public:
     GeneticWeightOptimizationResult trainFeatureSelection();
 
 private:
-    GeneticWeightOptimizationResult trainCommon(void (*mutate)(Matrix &vec),
-                                                Matrix (*create)(int len),
-                                                Matrix (*combine)(Matrix &first, Matrix &second, int crossPoint));
+    GeneticWeightOptimizationResult trainCommon(void (*mutate)(Vector &vec),
+                                                Vector (*create)(int len),
+                                                Vector (*combine)(Vector &first, Vector &second, int crossPoint));
 };
 
 #endif // GENETICWEIGHTOPTIMIZATION_H

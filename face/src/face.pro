@@ -33,11 +33,6 @@ SOURCES += \
     facetrack/realtimetrack.cpp \
     facetrack/bioidprocess.cpp \
     test/main.cpp \
-    amlib/annotation.cpp \
-    amlib/lineprocessing.cpp \
-    amlib/activeappearancemodel.cpp \
-    amlib/activeshapemodel.cpp \
-    amlib/texturewarper.cpp \
     facelib/map.cpp \
     facelib/util.cpp \
     facelib/landmarkdetector.cpp \
@@ -93,10 +88,7 @@ HEADERS += \
     facetrack/bioidprocess.h \
     facetrack/realtimetrack.h \
     test/testvector.h \
-    test/testactiveshapemodel.h \
-    test/testtexturewarper.h \
     test/testica.h \
-    test/testaam.h \
     test/testbiodataprocessing.h \
     test/testdelaunay.h \
     test/testprocrustes.h \
@@ -107,15 +99,7 @@ HEADERS += \
     test/testsvd.h \
     test/testmetrics.h \
     test/testgaoptimization.h \
-    test/testlineprocessing.h \
     test/testsvm.h \
-    amlib/activeappearancemodel.h \
-    amlib/amlibTypedefs.h \
-    amlib/activeshapemodel.h \
-    amlib/texturewarper.h \
-    amlib/activeshapemodelpoints.h \
-    amlib/lineprocessing.h \
-    amlib/annotation.h \
     evaluation/evaluateICA.h \
     evaluation/evaluate3dfrgc.h \
     evaluation/evaluatefeaturestability.h \

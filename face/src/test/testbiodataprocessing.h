@@ -14,13 +14,13 @@ class TestBioDataProcessing
 public:
     static void testDivideVectors()
     {
-        QVector<Matrix> allVectors;
+        QVector<Vector> allVectors;
         QVector<int> allClasses;
         QString path("/media/frgc/frgc-norm-iterative/big-index");
-        Loader::loadImages(path, allVectors, &allClasses, "*.png", true);
+        Loader::loadImages(path, allVectors, &allClasses, "*.png");
 
         QList<QVector<int> > classesInClusters;
-        QList<QVector<Matrix> > vectorsInClusters;
+        QList<QVector<Vector> > vectorsInClusters;
         BioDataProcessing::divide(allVectors, allClasses, 25, vectorsInClusters, classesInClusters);
 
         int n = classesInClusters.count();

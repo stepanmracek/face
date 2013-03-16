@@ -9,6 +9,7 @@
 #include "linalg/common.h"
 #include "biometrics/template.h"
 #include "linalg/metrics.h"
+#include "linalg/vector.h"
 
 class Evaluation;
 class BatchEvaluationResult;
@@ -46,7 +47,7 @@ public:
 
     Evaluation(QHash<QPair<int, int>, double> &distances, bool debugOutput = false);
 
-    Evaluation(QVector<Matrix> &rawData, QVector<int> &classes,
+    Evaluation(QVector<Vector> &rawData, QVector<int> &classes,
                FeatureExtractor &extractor, Metrics &metric, bool debugOutput = false);
 
     double fnmrAtFmr(double fmr);
@@ -58,7 +59,7 @@ public:
 
     static BatchEvaluationResult batch(QList<QVector<Template> > &templates, Metrics &metrics, int startIndex = 0);
 
-    static BatchEvaluationResult batch(QList<QVector<Matrix> > &images, QList<QVector<int> > &classes,
+    static BatchEvaluationResult batch(QList<QVector<Vector> > &images, QList<QVector<int> > &classes,
     		FeatureExtractor &extractor, Metrics &metrics, int startIndex = 0);
 };
 

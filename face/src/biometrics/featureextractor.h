@@ -6,19 +6,20 @@
 #include "linalg/icaofpca.h"
 #include "linalg/ldaofpca.h"
 #include "linalg/normalization.h"
+#include "linalg/vector.h"
 
 class FeatureExtractor
 {
 public:
-    virtual Matrix extract(Matrix &rawData) = 0;
+    virtual Vector extract(Vector &rawData) = 0;
     virtual int outputLen() = 0;
 
-    QVector<Matrix> batchExtract(QVector<Matrix> &rawData)
+    QVector<Vector> batchExtract(QVector<Vector> &rawData)
     {
-        QVector<Matrix> result;
+        QVector<Vector> result;
         for (int i = 0; i < rawData.count(); i++)
         {
-            Matrix extracted = extract(rawData[i]);
+            Vector extracted = extract(rawData[i]);
             result.append(extracted);
         }
         return result;
@@ -40,7 +41,7 @@ private:
 public:
     PCAExtractor(PCA pca) : pca(pca) {}
 
-    Matrix extract(Matrix &rawData)
+    Vector extract(Vector &rawData)
     {
         return pca.project(rawData);
     }
@@ -57,16 +58,16 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
-    ZScorePCAExtractor(PCA pca, QVector<Matrix> &rawData )
+    ZScorePCAExtractor(PCA pca, QVector<Vector> &rawData )
     {
         this->pca = pca;
-        QVector<Matrix> projectedData = pca.project(rawData);
+        QVector<Vector> projectedData = pca.project(rawData);
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
-    Matrix extract(Matrix &rawData)
+    Vector extract(Vector &rawData)
     {
-        Matrix projected = pca.project(rawData);
+        Vector projected = pca.project(rawData);
         Normalization::zScoreNormalization(projected, normParams);
         return projected;
     }
@@ -84,7 +85,7 @@ private:
 public:
     NormPCAExtractor(PCA pca) : pca(pca) {}
 
-    Matrix extract(Matrix &rawData)
+    Vector extract(Vector &rawData)
     {
         return pca.scaledProject(rawData);
     }
@@ -102,7 +103,7 @@ private:
 public:
     ICAofPCAExtractor(ICAofPCA icaOfpca) : icaOfpca(icaOfpca) {}
 
-    Matrix extract(Matrix &rawData)
+    Vector extract(Vector &rawData)
     {
         return icaOfpca.project(rawData);
     }
@@ -119,16 +120,16 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
-    ZScoreICAofPCAExtractor(ICAofPCA icaOfpca, QVector<Matrix> &rawData )
+    ZScoreICAofPCAExtractor(ICAofPCA icaOfpca, QVector<Vector> &rawData )
     {
         this->icaOfpca = icaOfpca;
-        QVector<Matrix> projectedData = icaOfpca.project(rawData);
+        QVector<Vector> projectedData = icaOfpca.project(rawData);
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
-    Matrix extract(Matrix &rawData)
+    Vector extract(Vector &rawData)
     {
-        Matrix projected = icaOfpca.project(rawData);
+        Vector projected = icaOfpca.project(rawData);
         Normalization::zScoreNormalization(projected, normParams);
         return projected;
     }
@@ -146,9 +147,9 @@ private:
 public:
     ICAofPCAWhiteningExtractor(ICAofPCA icaOfpca) : icaOfpca(icaOfpca) {}
 
-    Matrix extract(Matrix &rawData)
+    Vector extract(Vector &rawData)
     {
-        Matrix pcaProjected = icaOfpca.pca.project(rawData);
+        Vector pcaProjected = icaOfpca.pca.project(rawData);
         return icaOfpca.ica.whiten(pcaProjected);
     }
 
@@ -164,16 +165,16 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
-    ZScoreICAofPCAWhiteningExtractor(ICAofPCA icaOfpca, QVector<Matrix> &rawData )
+    ZScoreICAofPCAWhiteningExtractor(ICAofPCA icaOfpca, QVector<Vector> &rawData )
     {
         this->icaOfpca = icaOfpca;
-        QVector<Matrix> projectedData = icaOfpca.whiten(rawData);
+        QVector<Vector> projectedData = icaOfpca.whiten(rawData);
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
-    Matrix extract(Matrix &rawData)
+    Vector extract(Vector &rawData)
     {
-        Matrix projected = icaOfpca.whiten(rawData);
+        Vector projected = icaOfpca.whiten(rawData);
         Normalization::zScoreNormalization(projected, normParams);
         return projected;
     }
@@ -191,7 +192,7 @@ private:
 public:
     LDAofPCAExtractor(LDAofPCA ldaOfpca) : ldaOfpca(ldaOfpca) {}
 
-    Matrix extract(Matrix &rawData)
+    Vector extract(Vector &rawData)
     {
         return ldaOfpca.project(rawData);
     }
@@ -208,16 +209,16 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
-    ZScoreLDAofPCAExtractor(LDAofPCA ldaOfpca, QVector<Matrix> &rawData )
+    ZScoreLDAofPCAExtractor(LDAofPCA ldaOfpca, QVector<Vector> &rawData )
     {
         this->ldaOfpca = ldaOfpca;
-        QVector<Matrix> projectedData = ldaOfpca.project(rawData);
+        QVector<Vector> projectedData = ldaOfpca.project(rawData);
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
-    Matrix extract(Matrix &rawData)
+    Vector extract(Vector &rawData)
     {
-        Matrix projected = ldaOfpca.project(rawData);
+        Vector projected = ldaOfpca.project(rawData);
         Normalization::zScoreNormalization(projected, normParams);
         return projected;
     }
@@ -235,7 +236,7 @@ private:
 public:
     LDAExtractor(LDA lda) : lda(lda) {}
 
-    Matrix extract(Matrix &rawData)
+    Vector extract(Vector &rawData)
     {
         return lda.project(rawData);
     }
@@ -252,16 +253,16 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
-    ZScoreLDAExtractor(LDA lda, QVector<Matrix> &rawData )
+    ZScoreLDAExtractor(LDA lda, QVector<Vector> &rawData )
     {
         this->lda = lda;
-        QVector<Matrix> projectedData = lda.project(rawData);
+        QVector<Vector> projectedData = lda.project(rawData);
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
-    Matrix extract(Matrix &rawData)
+    Vector extract(Vector &rawData)
     {
-        Matrix projected = lda.project(rawData);
+        Vector projected = lda.project(rawData);
         Normalization::zScoreNormalization(projected, normParams);
         return projected;
     }
@@ -274,7 +275,11 @@ public:
 class PassExtractor : public FeatureExtractor
 {
 public:
-    Matrix extract(Matrix &rawData) { return rawData.clone(); }
+    Vector extract(Vector &rawData)
+    {
+        Matrix m = rawData.clone();
+        return m;
+    }
 
     int outputLen() { return -1; }
 };
@@ -285,9 +290,9 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
-    ZScorePassExtractor(QVector<Matrix> &rawData )
+    ZScorePassExtractor(QVector<Vector> &rawData )
     {
-        QVector<Matrix> projectedData;
+        QVector<Vector> projectedData;
         for (int i = 0; i < rawData.count(); i++)
         {
              Matrix projected = rawData[i].clone();
@@ -296,9 +301,10 @@ public:
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
-    Matrix extract(Matrix &rawData)
+    Vector extract(Vector &rawData)
     {
-        Matrix projected = rawData.clone();
+        Matrix m = rawData.clone();
+        Vector projected = m;
         Normalization::zScoreNormalization(projected, normParams);
         return projected;
     }

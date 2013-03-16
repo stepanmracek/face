@@ -34,15 +34,15 @@ public:
 		QString anatomicalPath = commonPath + "anatomical";
 		QString histogramPath = commonPath + "histogramRectRangeSmooth-10-6";
 
-		QVector<Matrix> allShapeImages;
+        QVector<Vector> allShapeImages;
 		QVector<int> allClasses;
-		Loader::loadImages(shapeIndexPath, allShapeImages, &allClasses, "*.png", true, "d");
+        Loader::loadImages(shapeIndexPath, allShapeImages, &allClasses, "*.png", "d");
 
-		QVector<Matrix> allAnatomicalVectors;
+        QVector<Vector> allAnatomicalVectors;
 		QVector<int> allAnatomicalClasses;
 		Loader::loadVectors(anatomicalPath, allAnatomicalVectors, allAnatomicalClasses, "-", "*-*");
 
-		QVector<Matrix> allHistogramVectors;
+        QVector<Vector> allHistogramVectors;
 		QVector<int> allHistigramClasses;
 		Loader::loadVectors(histogramPath, allHistogramVectors, allHistigramClasses, "-", "*-*");
 		qDebug() << "loading done";
@@ -60,7 +60,7 @@ public:
 			qDebug() << "cross-validation run" << crossRun;
 			QList<QSet<int> > uniqueClassesInClusters = BioDataProcessing::divideToNClusters(allClasses, 3);
 
-			QList<QVector<Matrix> > shapeData;
+            QList<QVector<Vector> > shapeData;
 			QList<QVector<int> > shapeClasses;
 			BioDataProcessing::divideAccordingToUniqueClasses(allShapeImages, allClasses,
 					uniqueClassesInClusters, shapeData, shapeClasses);
@@ -164,7 +164,7 @@ public:
   			qDebug() << " fusion - preparing data";
   			//QList<QVector<int> > fusionEvalClasses;
   			//fusionEvalClasses << shapeClasses[2] << shapeClasses[2] << anatomicalClasses[2] << histogramClasses[2] << shapeClasses[2];
-  			QList<QVector<Matrix> > fusionEvalData;
+            QList<QVector<Vector> > fusionEvalData;
   			fusionEvalData << shapeData[2] << shapeData[2]; // << anatomicalData[2] << histogramData[2] << shapeData[2];
 
   			qDebug() << " fusion - evaluating";
@@ -176,29 +176,30 @@ public:
 	static void pcaSubspace()
 	{
 		QString path = "/run/media/stepo/frgc/frgc-norm-iterative/tmp";
-		QVector<Matrix> images;
-		Loader::loadImages(path, images, 0, "*.png", true, "d", true);
+        QVector<Vector> images;
+        Loader::loadImages(path, images, 0, "*.png", "d", true);
 
 		PCA pca(images, 5, true);
 
-        Matrix tmp(pca.cvPca.mean);
+        Vector tmp = pca.getMean();
         Matrix mean = MatrixConverter::columnVectorToMatrix(tmp, 200)*255;
 		cv::imwrite("mean.png", mean);
 		for (int i = 0; i < 5; i++)
 		{
 			QString fName = "eig" + QString::number(i+1)+".png";
-			Matrix eig = pca.cvPca.eigenvectors.row(i).t();
-			eig = Vector::normalizeComponents(eig);
-			eig = MatrixConverter::columnVectorToMatrix(eig, 200)*255;
-			cv::imwrite(fName.toStdString(), eig);
+            Matrix m = pca.cvPca.eigenvectors.row(i).t();
+            Vector eig = m;
+            eig = eig.normalizeComponents();
+            Matrix img = MatrixConverter::columnVectorToMatrix(eig, 200)*255;
+            cv::imwrite(fName.toStdString(), img);
 		}
 
 		Matrix projected = pca.project(images[0]);
 		Common::printMatrix(projected);
 
-		Matrix backProjected = pca.backProject(projected);
-		backProjected = MatrixConverter::columnVectorToMatrix(backProjected, 200)*255;
-		cv::imwrite("backprojected.png", backProjected);
+        Vector backProjected = pca.backProject(projected);
+        Matrix backProjectedImg = MatrixConverter::columnVectorToMatrix(backProjected, 200)*255;
+        cv::imwrite("backprojected.png", backProjectedImg);
 	}
 };
 

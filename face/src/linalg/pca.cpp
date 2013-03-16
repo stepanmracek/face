@@ -4,7 +4,7 @@
 
 #include "matrixconverter.h"
 
-PCA::PCA(QVector<Matrix> &vectors, int maxComponents, bool debug)
+PCA::PCA(QVector<Vector> &vectors, int maxComponents, bool debug)
 {
     learn(vectors, maxComponents, debug);
 }
@@ -17,7 +17,7 @@ PCA::PCA(const QString &path)
     storage["mean"] >> cvPca.mean;
 }
 
-void PCA::learn(QVector<Matrix> &vectors, int maxComponents, bool debug)
+void PCA::learn(QVector<Vector> &vectors, int maxComponents, bool debug)
 {
     if (debug) qDebug() << "PCA";
     if (debug) qDebug() << "Creating input data matrix";
@@ -35,32 +35,32 @@ void PCA::serialize(const QString &path)
     storage << "mean" << cvPca.mean;
 }
 
-Matrix PCA::project(const Matrix &in)
+Vector PCA::project(const Vector &in)
 {
     Matrix out = cvPca.project(in);
     return out;
 }
 
-QVector<Matrix> PCA::project(const QVector<Matrix> &vectors)
+QVector<Vector> PCA::project(const QVector<Vector> &vectors)
 {
-    QVector<Matrix> result;
+    QVector<Vector> result;
     for (int i = 0; i < vectors.count(); i++)
     {
-        Matrix out = project(vectors[i]);
+        Vector out = project(vectors[i]);
         result.append(out);
     }
     return result;
 }
 
-Matrix PCA::scaledProject(const Matrix &vector)
+Vector PCA::scaledProject(const Vector &vector)
 {
-    Matrix out = project(vector);
+    Vector out = project(vector);
     for (int i = 0; i < cvPca.eigenvalues.rows; i++)
         out(i) = out(i) / cvPca.eigenvalues.at<double>(i);
     return out;
 }
 
-Matrix PCA::backProject(const Matrix &in)
+Vector PCA::backProject(const Vector &in)
 {
     Matrix out = cvPca.backProject(in);
     return out;
@@ -97,16 +97,17 @@ double PCA::getVariation(int mode)
     return val;
 }
 
-Matrix PCA::getMean()
+Vector PCA::getMean()
 {
-    return (Matrix)(cvPca.mean);
+    Matrix mean = (cvPca.mean);
+    return mean;
 }
 
-Matrix PCA::normalizeParams(const Matrix &params)
+Vector PCA::normalizeParams(const Vector &params)
 {
     int n = getModes();
     assert(params.rows == n);
-    Matrix result = Matrix::zeros(n, 1);
+    Vector result(n);
 
     for (int i = 0; i < n; i++)
     {

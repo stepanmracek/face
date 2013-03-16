@@ -11,6 +11,7 @@
 #include <QList>
 
 #include "linalg/common.h"
+#include "linalg/vector.h"
 #include "linalg/lda.h"
 #include "linalg/metrics.h"
 #include "featureextractor.h"
@@ -19,7 +20,7 @@
 class FeatureVectorFusionBase
 {
 protected:
-	QList<QVector<Matrix> *> trainRawData;
+    QList<QVector<Vector> *> trainRawData;
 	QList<QVector<int> *> trainClasses;
 	QVector<ZScoreFeatureExtractor *> extractors;
 	QVector<Metrics *> metrics;
@@ -32,16 +33,16 @@ public:
 	FeatureVectorFusionBase() { learned = false; }
 
 	FeatureVectorFusionBase & addComponent(
-				QVector<Matrix> &trainRawData,
+                QVector<Vector> &trainRawData,
 				QVector<int> &trainClasses,
 				ZScoreFeatureExtractor &featureExtractor,
 				Metrics &metrics);
 
-	QVector<Matrix> batchFuse(QList<QVector<Matrix> > inputMatricies);
+    QVector<Vector> batchFuse(QList<QVector<Vector> > inputMatricies);
 
 	void learn();
 
-	virtual Matrix fuse(QVector<Matrix> &inputMatricies) = 0;
+    virtual Vector fuse(QVector<Vector> &inputMatricies) = 0;
 
 	virtual ~FeatureVectorFusionBase() {}
 };
@@ -49,7 +50,7 @@ public:
 class FeatureVectorFusionConcatenation : public FeatureVectorFusionBase
 {
 public:
-	Matrix fuse(QVector<Matrix> &inputMatricies);
+    Vector fuse(QVector<Vector> &inputMatricies);
 
 	// no nead to learn for simple concatenation
 	void learnImplementation() {}

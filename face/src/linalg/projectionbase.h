@@ -11,13 +11,14 @@
 #include <QVector>
 
 #include "common.h"
+#include "vector.h"
 
 class ProjectionBase
 {
 public:
-	virtual Matrix project(const Matrix &vector) = 0;
-	virtual QVector<Matrix> project(const QVector<Matrix> &vectors) = 0;
-    virtual Matrix normalizeParams(const Matrix &params) = 0;
+    virtual Vector project(const Vector &vector) = 0;
+    virtual QVector<Vector> project(const QVector<Vector> &vectors) = 0;
+    virtual Vector normalizeParams(const Vector &params) = 0;
 
 	virtual ~ProjectionBase() {}
 };

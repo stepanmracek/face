@@ -27,7 +27,7 @@ public:
         //for (int i = 0; i < clusters.count(); i++)
         //    Template::normalizeFeatureVectorComponents(clusters[i], dp.minValues, dp.maxValues);
 
-        QVector<Matrix> featureVectors;
+        QVector<Vector> featureVectors;
         QVector<int> classMembership;
         Template::splitVectorsAndClasses(clusters[0], featureVectors, classMembership);
         LDA lda(featureVectors, classMembership);

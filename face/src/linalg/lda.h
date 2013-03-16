@@ -16,19 +16,19 @@ public:
 
     LDA();
 
-    LDA(QVector<Matrix> &vectors, QVector<int> &classMembership, bool debug = false);
+    LDA(QVector<Vector> &vectors, QVector<int> &classMembership, bool debug = false);
 
     LDA(const char *path);
 
-    void learn(QVector<Matrix> &vectors, QVector<int> &classMembership, bool debug = false);
+    void learn(QVector<Vector> &vectors, QVector<int> &classMembership, bool debug = false);
 
-    Matrix project(const Matrix &vector);
+    Vector project(const Vector &vector);
 
-    QVector<Matrix> project(const QVector<Matrix> &vectors);
+    QVector<Vector> project(const QVector<Vector> &vectors);
 
     void serialize(const char *path);
 
-    Matrix normalizeParams(const Matrix &params) { return params; }
+    Vector normalizeParams(const Vector &params) { return params; }
 };
 
 #endif // LDA_H

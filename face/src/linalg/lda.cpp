@@ -25,12 +25,12 @@ LDA::LDA(const char *path)
     storage["mean"] >> mean;
 }
 
-LDA::LDA(QVector<Matrix> &vectors, QVector<int> &classMembership, bool debug)
+LDA::LDA(QVector<Vector> &vectors, QVector<int> &classMembership, bool debug)
 {
     learn(vectors, classMembership, debug);
 }
 
-void LDA::learn(QVector<Matrix> &vectors, QVector<int> &classMembership, bool debug)
+void LDA::learn(QVector<Vector> &vectors, QVector<int> &classMembership, bool debug)
 {
     if (debug) qDebug() << "LDA";
 
@@ -129,17 +129,18 @@ void LDA::learn(QVector<Matrix> &vectors, QVector<int> &classMembership, bool de
     if (debug) qDebug() << "  LDA done";
 }
 
-Matrix LDA::project(const Matrix &vector)
+Vector LDA::project(const Vector &vector)
 {
     assert(vector.rows == mean.rows);
     assert(vector.cols == 1);
 
-    return Wt * (vector - mean);
+    Matrix m = Wt * (vector - mean);
+    return m;
 }
 
-QVector<Matrix> LDA::project(const QVector<Matrix> &vectors)
+QVector<Vector> LDA::project(const QVector<Vector> &vectors)
 {
-    QVector<Matrix> result;
+    QVector<Vector> result;
     for (int i = 0; i < vectors.count(); i++)
     {
         Matrix out = project(vectors[i]);

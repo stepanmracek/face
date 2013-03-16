@@ -16,7 +16,7 @@ double g2(double u)
     return u*exp(-(u*u)/2.0);
 }
 
-void ICA::learn(QVector<Matrix> &vectors, int independentComponentCount, double eps, int maxIterations, bool debug)
+void ICA::learn(QVector<Vector> &vectors, int independentComponentCount, double eps, int maxIterations, bool debug)
 {
     int n = vectors.count();
     assert(n > 0);
@@ -33,7 +33,10 @@ void ICA::learn(QVector<Matrix> &vectors, int independentComponentCount, double 
     mean = mean / n;
 
     for (int i = 0; i < n; i++)
-        vectors[i]  = vectors[i] - mean;
+    {
+        Matrix m = vectors[i] - mean;
+        vectors[i] = m;
+    }
 
     // whitening; x <- E * D^(-1/2) * E^T * x
     // E - eigenvectors
@@ -51,7 +54,10 @@ void ICA::learn(QVector<Matrix> &vectors, int independentComponentCount, double 
 
     EDET = pca.cvPca.eigenvectors * eVals * pca.cvPca.eigenvectors.t();
     for (int i = 0; i < n; i++)
-        vectors[i] = EDET * vectors[i];
+    {
+        Matrix m = EDET * vectors[i];
+        vectors[i] = m;
+    }
     EDETinv = EDET.inv();
 
     // FAST ICA
@@ -62,8 +68,10 @@ void ICA::learn(QVector<Matrix> &vectors, int independentComponentCount, double 
         double sameErrCount = 0;
 
         // initicalization
-        Matrix w = W.col(p); // Matrix::ones(m, 1, CV_64F);
-        w = w/Vector::magnitude(w);
+        Matrix colMat = W.col(p);
+        Vector w = colMat; // Matrix::ones(m, 1, CV_64F);
+        Matrix mat = w/w.magnitude();
+        w = mat;
 
         int iteration = 1;
         while(1)
@@ -81,9 +89,11 @@ void ICA::learn(QVector<Matrix> &vectors, int independentComponentCount, double 
             }
             expected1 = expected1/n;
             Matrix expected2Mat = expected2/n * w;
-            Matrix wOld = w.clone();
-            w = expected1 - expected2Mat;
-            w = w/Vector::magnitude(w);
+            Vector wOld(w);
+            Matrix diffMat = expected1 - expected2Mat;
+            w = diffMat;
+            Matrix normalized = w/w.magnitude();
+            w = normalized;
 
             /*if (p > 0)
             {
@@ -158,27 +168,29 @@ void ICA::learn(QVector<Matrix> &vectors, int independentComponentCount, double 
     //Common::printMatrix(W);
 }
 
-ICA::ICA(QVector<Matrix> &vectors, int independentComponentCount, double eps, int maxIterations, bool debug)
+ICA::ICA(QVector<Vector> &vectors, int independentComponentCount, double eps, int maxIterations, bool debug)
 {
     learn(vectors, independentComponentCount, eps, maxIterations, debug);
 }
 
-Matrix ICA::whiten(const Matrix &vector)
+Vector ICA::whiten(const Vector &vector)
 {
-    Matrix result = EDET * (vector - mean);
-    return result;
+    Matrix m = EDET * (vector - mean);
+    //Vector result = m;
+    return m;
 }
 
-Matrix ICA::project(const Matrix &vector)
+Vector ICA::project(const Vector &vector)
 {
-    Matrix whitened = whiten(vector);
-    Matrix result = W * whitened;
-    return result;
+    Vector whitened = whiten(vector);
+    Matrix m = W * whitened;
+    //Vector result = m;
+    return m;
 }
 
-QVector<Matrix> ICA::project(const QVector<Matrix> &vectors)
+QVector<Vector> ICA::project(const QVector<Vector> &vectors)
 {
-    QVector<Matrix> result;
+    QVector<Vector> result;
     for (int i = 0; i < vectors.count(); i++)
     {
         Matrix out = project(vectors[i]);
@@ -187,7 +199,7 @@ QVector<Matrix> ICA::project(const QVector<Matrix> &vectors)
     return result;
 }
 
-Matrix ICA::backProject(const Matrix &vector)
+Vector ICA::backProject(const Vector &vector)
 {
     Matrix result = W.t() * vector;
     result = EDETinv * result;

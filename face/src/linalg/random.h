@@ -4,11 +4,12 @@
 #include <QVector>
 
 #include "common.h"
+#include "vector.h"
 
 class Random
 {
 public:
-    static QVector<Matrix> gauss(QVector<double> mean, QVector<double> sigma, int count);
+    static QVector<Vector> gauss(QVector<double> mean, QVector<double> sigma, int count);
 };
 
 #endif // RANDOM_H

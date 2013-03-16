@@ -19,6 +19,7 @@ EERPotential::EERPotential(QVector<Template> &templates)
 
     // Calculate EER potential
     // for each component
+    QVector<double> scoresQVec;
     for (int i = 0; i < m; i++)
     {
     	//qDebug() << i << "/" << m;;
@@ -29,18 +30,20 @@ EERPotential::EERPotential(QVector<Template> &templates)
         {
             Template t;
             t.subjectID = templates[j].subjectID;
-            t.featureVector = Matrix::zeros(1, 1);
+            t.featureVector = Vector(1);
             t.featureVector(0) = templates[j].featureVector(i);
             currentComponentTemplates.append(t);
         }
 
         Evaluation eval(currentComponentTemplates, metrics, false);
         double score = (1.0 - eval.eer);
-        scores.append(score);
+        scoresQVec.append(score);
     }
 
-    minScore = Vector::minValue(scores);
-    maxScore = Vector::maxValue(scores);
+    scores = Vector(scoresQVec);
+
+    minScore = scores.minValue();
+    maxScore = scores.maxValue();
 
     //qDebug() << "...done";
 }

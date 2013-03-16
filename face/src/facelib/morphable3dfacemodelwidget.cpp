@@ -31,7 +31,7 @@ void Morphable3DFaceModelWidget::recalculateModel()
     }
 
     int n = model->pca.getModes();
-    Matrix params = Matrix::zeros(n, 1);
+    Vector params(n);
     for (int i = 0; i < n; i++)
     {
         QSlider *slider = sliders[i];

@@ -88,7 +88,7 @@ void LandmarkDetector::InnerEyeCorners(Landmarks &l)
 
     // Y coordinate
     int h = depth.h;
-    Matrix pitsAlongY = Matrix::zeros(h, 1);
+    Vector pitsAlongY(h);
     for (int y = 0; y < h; y++)
     {
         int count = 0;
@@ -98,11 +98,10 @@ void LandmarkDetector::InnerEyeCorners(Landmarks &l)
         }
         pitsAlongY(y) = count;
     }
-    Matrix smoothedPits = Vector::smooth(pitsAlongY, pitsStripeSmoothKernel);
+    Vector smoothedPits = pitsAlongY.smooth(pitsStripeSmoothKernel);
 
-    int eyes2dY = Vector::maxIndex(smoothedPits,
-                                   nose2d.y - maxYDistanceFromNosetipToEyes,
-                                   nose2d.y - minYDistanceFromNosetipToEyes);
+    int eyes2dY = smoothedPits.maxIndex(nose2d.y - maxYDistanceFromNosetipToEyes,
+                                        nose2d.y - minYDistanceFromNosetipToEyes);
     if (eyes2dY < 0)
     {
         qDebug() << "Y coordinate of inner eye corners not found";
@@ -111,7 +110,7 @@ void LandmarkDetector::InnerEyeCorners(Landmarks &l)
 
     // X coordinate
     int w = depth.w;
-    Matrix pitsAlongX = Matrix::zeros(w, 1);
+    Vector pitsAlongX(w);
     for (int x = 0; x < w; x++)
     {
         int count = 0;
@@ -121,14 +120,13 @@ void LandmarkDetector::InnerEyeCorners(Landmarks &l)
         }
         pitsAlongX(x) = count;
     }
-    smoothedPits = Vector::smooth(pitsAlongX, pitsStripeSmoothKernel);
+    smoothedPits = pitsAlongX.smooth(pitsStripeSmoothKernel);
 
     //depth.horizontalProfile(eyes2dY).savePlot("../test/horizontalProfile");
     //Vector::toFileWithIndicies(smoothedPits, "../test/pitsAlongX");
 
-    int leftEye2dX = Vector::maxIndex(smoothedPits,
-                                      nose2d.x - maxXDistanceFromNosetipToEyes,
-                                      nose2d.x - minXDistanceFromNosetipToEyes);
+    int leftEye2dX = smoothedPits.maxIndex(nose2d.x - maxXDistanceFromNosetipToEyes,
+                                           nose2d.x - minXDistanceFromNosetipToEyes);
     if (leftEye2dX < 0)
     {
         qDebug() << "X coordinate of left inner eye corner not found";
@@ -139,9 +137,8 @@ void LandmarkDetector::InnerEyeCorners(Landmarks &l)
               converter.MapToMeshCoords(depth, cv::Point2d(leftEye2dX + cropStartX, eyes2dY + cropStartY)));
     }
 
-    int rightEye2dX = Vector::maxIndex(smoothedPits,
-                                       nose2d.x + minXDistanceFromNosetipToEyes,
-                                       nose2d.x + maxXDistanceFromNosetipToEyes);
+    int rightEye2dX = smoothedPits.maxIndex(nose2d.x + minXDistanceFromNosetipToEyes,
+                                            nose2d.x + maxXDistanceFromNosetipToEyes);
 
     if (rightEye2dX < 0)
     {

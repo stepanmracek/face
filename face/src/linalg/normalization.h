@@ -4,6 +4,7 @@
 #include <QVector>
 
 #include "linalg/common.h"
+#include "linalg/vector.h"
 
 class LinearNormalizationResult
 {
@@ -22,12 +23,12 @@ public:
 class Normalization
 {
 public:
-    static LinearNormalizationResult linearNormalization(QVector<Matrix> &vectors);
-    static void linearNormalization(QVector<Matrix> &vectors, LinearNormalizationResult &params);
+    static LinearNormalizationResult linearNormalization(QVector<Vector> &vectors);
+    static void linearNormalization(QVector<Vector> &vectors, LinearNormalizationResult &params);
 
-    static ZScoreNormalizationResult zScoreNormalization(QVector<Matrix> &vectors);
-    static void zScoreNormalization(QVector<Matrix> &vectors, ZScoreNormalizationResult &params);
-    static void zScoreNormalization(Matrix &vector, ZScoreNormalizationResult &params);
+    static ZScoreNormalizationResult zScoreNormalization(QVector<Vector> &vectors);
+    static void zScoreNormalization(QVector<Vector> &vectors, ZScoreNormalizationResult &params);
+    static void zScoreNormalization(Vector &vector, ZScoreNormalizationResult &params);
 };
 
 #endif // NORMALIZATION_H

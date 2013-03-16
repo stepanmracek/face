@@ -6,6 +6,7 @@
 
 #include "common.h"
 #include "projectionbase.h"
+#include "vector.h"
 
 class ICA : public ProjectionBase
 {
@@ -13,21 +14,21 @@ public:
 
     ICA() {}
 
-    ICA(QVector<Matrix> &vectors, int independentComponentCount = 0, double eps = 1e-10, int maxIterations = 10000, bool debug = false);
+    ICA(QVector<Vector> &vectors, int independentComponentCount = 0, double eps = 1e-10, int maxIterations = 10000, bool debug = false);
 
     ICA(const char *path);
 
-    void learn(QVector<Matrix> &vectors, int independentComponentCount = 0, double eps = 1e-10, int maxIterations = 10000, bool debug = false);
+    void learn(QVector<Vector> &vectors, int independentComponentCount = 0, double eps = 1e-10, int maxIterations = 10000, bool debug = false);
 
     void serialize(const char *path);
 
-    Matrix whiten(const Matrix &vector);
+    Vector whiten(const Vector &vector);
 
-    Matrix project(const Matrix &vector);
+    Vector project(const Vector &vector);
 
-    QVector<Matrix> project(const QVector<Matrix> &vectors);
+    QVector<Vector> project(const QVector<Vector> &vectors);
 
-    Matrix backProject(const Matrix &vector);
+    Vector backProject(const Vector &vector);
 
     int getModes() { return W.rows; }
 
@@ -36,7 +37,7 @@ public:
         W = W.rowRange(0, modes);
     }
 
-    Matrix normalizeParams(const Matrix &params) { return params; }
+    Vector normalizeParams(const Vector &params) { return params; }
 
     Matrix EDETinv;
     Matrix EDET;

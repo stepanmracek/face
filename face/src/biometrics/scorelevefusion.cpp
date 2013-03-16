@@ -5,7 +5,7 @@
 #include <cassert>
 
 ScoreLevelFusionBase & ScoreLevelFusionBase::addComponent(
-		QVector<Matrix> &trainRawData,
+		QVector<Vector> &trainRawData,
 		QVector<int> &trainClasses,
 		FeatureExtractor &featureExtractor,
 		Metrics &metrics)
@@ -33,7 +33,7 @@ void ScoreLevelFusionBase::learn()
 	learned = true;
 }
 
-Evaluation ScoreLevelFusionBase::evaluate(QList<QVector<Matrix> > &rawData, QVector<int> &classes, bool debugOutput)
+Evaluation ScoreLevelFusionBase::evaluate(QList<QVector<Vector> > &rawData, QVector<int> &classes, bool debugOutput)
 {
 	assert(learned);
 
@@ -76,7 +76,7 @@ Evaluation ScoreLevelFusionBase::evaluate(QList<QVector<Matrix> > &rawData, QVec
 }
 
 void ScoreLevelFusionBase::prepareDataForClassification(QList<Evaluation> &evaluationResults,
-                                                  QVector<Matrix> &scores, QVector<int> &classes,
+                                                  QVector<Vector> &scores, QVector<int> &classes,
                                                   int genuineLabel, int impostorLabel)
 {
     scores.clear();
@@ -92,8 +92,10 @@ void ScoreLevelFusionBase::prepareDataForClassification(QList<Evaluation> &evalu
 
     for (int unit = 0; unit < unitsCount; unit++)
     {
-        double meanGenuine = Vector::meanValue(evaluationResults[unit].genuineScores);
-        double meanImpostor = Vector::meanValue(evaluationResults[unit].impostorScores);
+        Vector genuineScoresVec(evaluationResults[unit].genuineScores);
+        double meanGenuine = genuineScoresVec.meanValue();
+        Vector impostorScoresVec(evaluationResults[unit].impostorScores);
+        double meanImpostor = impostorScoresVec.meanValue();
 
         genuineMeans << meanGenuine;
         impostorMeans << meanImpostor;
@@ -109,7 +111,7 @@ void ScoreLevelFusionBase::prepareDataForClassification(QList<Evaluation> &evalu
             scoreVec << s;
         }
 
-        Matrix score = Vector::fromQVector(scoreVec);
+        Vector score(scoreVec);
         scores << score;
         classes << genuineLabel;
     }
@@ -124,16 +126,16 @@ void ScoreLevelFusionBase::prepareDataForClassification(QList<Evaluation> &evalu
             scoreVec << s;
         }
 
-        Matrix score = Vector::fromQVector(scoreVec);
+        Vector score(scoreVec);
         scores << score;
         classes << impostorLabel;
     }
 }
 
-Matrix ScoreLevelFusionBase::normalizeScore(QVector<double> &score)
+Vector ScoreLevelFusionBase::normalizeScore(QVector<double> &score)
 {
-    Matrix m = Vector::fromQVector(score);
-    m = Vector::normalizeComponents(m, impostorMeans, genuineMeans, false);
+    Vector m(score);
+    m.normalizeComponents(impostorMeans, genuineMeans, false);
     return m;
 }
 
@@ -141,7 +143,7 @@ Matrix ScoreLevelFusionBase::normalizeScore(QVector<double> &score)
 
 void ScoreLDAFusion::learnImplementation(QList<Evaluation> &evaluationResults)
 {
-    QVector<Matrix> scores;
+    QVector<Vector> scores;
     QVector<int> classes;
     prepareDataForClassification(evaluationResults, scores, classes, 0, 1);
 
@@ -162,7 +164,7 @@ void ScoreLDAFusion::learnImplementation(QList<Evaluation> &evaluationResults)
 
 double ScoreLDAFusion::fuse(QVector<double> &scores)
 {
-    Matrix score = normalizeScore(scores);
+    Vector score = normalizeScore(scores);
 
     double s = lda.project(score)(0);
     if (s > maxScore) return 1.0;
@@ -176,7 +178,7 @@ double ScoreLDAFusion::fuse(QVector<double> &scores)
 
 void ScoreLogisticRegressionFusion::learnImplementation(QList<Evaluation> &evaluationResults)
 {
-    QVector<Matrix> scores;
+    QVector<Vector> scores;
     QVector<int> classes;
     prepareDataForClassification(evaluationResults, scores, classes, 0, 1);
 
@@ -185,7 +187,7 @@ void ScoreLogisticRegressionFusion::learnImplementation(QList<Evaluation> &evalu
 
 double ScoreLogisticRegressionFusion::fuse(QVector<double> &scores)
 {
-    Matrix score = normalizeScore(scores);
+    Vector score = normalizeScore(scores);
     double genuineProbability = logR.classify(score);
 
     // 0 ~ certainly genuine (we have to return distance)
@@ -203,8 +205,10 @@ void ScoreWeightedSumFusion::learnImplementation(QList<Evaluation> &evaluationRe
     weightDenominator = 0.0;
     for (int unit = 0; unit < unitsCount; unit++)
     {
-        double meanGenuine = Vector::meanValue(evaluationResults[unit].genuineScores);
-        double meanImpostor = Vector::meanValue(evaluationResults[unit].impostorScores);
+        Vector genuineScoresVec(evaluationResults[unit].genuineScores);
+        double meanGenuine = genuineScoresVec.meanValue();
+        Vector impostorScoresVec(evaluationResults[unit].impostorScores);
+        double meanImpostor = impostorScoresVec.meanValue();
 
         genuineMeans << meanGenuine;
         impostorMeans << meanImpostor;
@@ -235,8 +239,10 @@ void ScoreProductFusion::learnImplementation(QList<Evaluation> &evaluationResult
 
     for (int unit = 0; unit < unitsCount; unit++)
     {
-        genuineMeans << Vector::meanValue(evaluationResults[unit].genuineScores);
-        impostorMeans << Vector::meanValue(evaluationResults[unit].impostorScores);
+        Vector genuineScoresVec(evaluationResults[unit].genuineScores);
+        double meanGenuine = genuineScoresVec.meanValue();
+        Vector impostorScoresVec(evaluationResults[unit].impostorScores);
+        double meanImpostor = impostorScoresVec.meanValue();
     }
 }
 
@@ -258,7 +264,7 @@ double ScoreProductFusion::fuse(QVector<double> &scores)
 
 void ScoreSVMFusion::learnImplementation(QList<Evaluation> &evaluationResults)
 {
-    QVector<Matrix> scores;
+    QVector<Vector> scores;
     QVector<int> classes;
     prepareDataForClassification(evaluationResults, scores, classes, -1, 1);
 
@@ -307,7 +313,7 @@ cv::Mat ScoreSVMFusion::colVectorToColFPMatrix(QVector<double> &vector)
     return result;
 }
 
-cv::Mat ScoreSVMFusion::colVectorsToFPMatrix(QVector<Matrix> &vectors)
+cv::Mat ScoreSVMFusion::colVectorsToFPMatrix(QVector<Vector> &vectors)
 {
     int cols = vectors.count();
     int rows = vectors[0].rows;

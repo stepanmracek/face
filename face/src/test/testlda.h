@@ -22,32 +22,32 @@ public:
     {
         LDA lda;
 
-        QVector<Matrix> vectors;
+        QVector<Vector> vectors;
         QVector<int> classMembership;
 
         // first class
-        Matrix a1 = Matrix::zeros(2, 1); a1(0) = 0; a1(1) = 0;
+        Vector a1(2); a1(0) = 0; a1(1) = 0;
         vectors.append(a1);
         classMembership.append(1);
 
-        Matrix b1 = Matrix::zeros(2, 1); b1(0) = 0; b1(1) = 1;
+        Vector b1(2); b1(0) = 0; b1(1) = 1;
         vectors.append(b1);
         classMembership.append(1);
 
-        Matrix c1 = Matrix::zeros(2, 1); c1(0) = 1; c1(1) = 1;
+        Vector c1(2); c1(0) = 1; c1(1) = 1;
         vectors.append(c1);
         classMembership.append(1);
 
         // second class
-        Matrix a2 = Matrix::zeros(2, 1); a2(0) = 1; a2(1) = 0;
+        Vector a2(2); a2(0) = 1; a2(1) = 0;
         vectors.append(a2);
         classMembership.append(2);
 
-        Matrix b2 = Matrix::zeros(2, 1); b2(0) = 2; b2(1) = 0;
+        Vector b2(2); b2(0) = 2; b2(1) = 0;
         vectors.append(b2);
         classMembership.append(2);
 
-        Matrix c2 = Matrix::zeros(2, 1); c2(0) = 2; c2(1) = 1;
+        Vector c2(2); c2(0) = 2; c2(1) = 1;
         vectors.append(c2);
         classMembership.append(2);
 
@@ -65,16 +65,16 @@ public:
 
     static void testLDAFaces()
     {
-        QVector<Matrix> vectors;
-        QVector<Matrix> vectors2;
+        QVector<Vector> vectors;
+        QVector<Vector> vectors2;
         QVector<int> classMembership;
         QVector<int> classMembership2;
         QString path("/media/data/SVN/disp-stepan-mracek/databases/orl");
         QString path2("/media/data/SVN/disp-stepan-mracek/databases/orl2");
 
         // load images
-        Loader::loadImages(path, vectors, &classMembership, "*.pgm", true);
-        Loader::loadImages(path2, vectors2, &classMembership2, "*.pgm", true);
+        Loader::loadImages(path, vectors, &classMembership, "*.pgm");
+        Loader::loadImages(path2, vectors2, &classMembership2, "*.pgm");
 
         // train
         LDAofPCA fisher(vectors, classMembership);
@@ -86,7 +86,7 @@ public:
         QVector<Template> pcaTemplates;
         QVector<Template> ldaTemplates2;
         QVector<Template> pcaTemplates2;
-        QVector<Matrix> mahalSamples;
+        QVector<Vector> mahalSamples;
         for (int i = 0; i < n; i++)
         {
             Template ldaTemplate;

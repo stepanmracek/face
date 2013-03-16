@@ -9,7 +9,6 @@
 
 #include "linalg/delaunay.h"
 #include "linalg/matrixconverter.h"
-#include "amlib/texturewarper.h"
 
 class TestDelaunay
 {

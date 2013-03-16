@@ -8,6 +8,7 @@
 #include <opencv/highgui.h>
 
 #include "common.h"
+#include "vector.h"
 
 class MatrixConverter
 {
@@ -26,9 +27,9 @@ public:
         return out;
     }
 
-    static Matrix matrixToColumnVector(Matrix &in)
+    static Vector matrixToColumnVector(Matrix &in)
     {
-        Matrix out(in.rows * in.cols, 1, CV_64F);
+        Vector out(in.rows * in.cols);
         int i = 0;
         for (int r = 0; r < in.rows; r++)
         {
@@ -41,7 +42,7 @@ public:
         return out;
     }
 
-    static Matrix columnVectorToMatrix(Matrix &in, int cols)
+    static Matrix columnVectorToMatrix(Vector &in, int cols)
     {
         int rows = in.rows/cols;
         Matrix out(rows, cols, CV_64F);
@@ -69,7 +70,7 @@ public:
         return matrixToColumnVector(m);
     }
 
-    static Matrix columnVectorsToDataMatrix(QVector<Matrix> &vectors)
+    static Matrix columnVectorsToDataMatrix(QVector<Vector> &vectors)
     {
         int cols = vectors.count();
         int rows = vectors[0].rows;

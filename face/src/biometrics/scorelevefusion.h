@@ -10,6 +10,7 @@
 #include "evaluation.h"
 #include "linalg/lda.h"
 #include "linalg/logisticregression.h"
+#include "linalg/vector.h"
 
 /*class ScoreLevelFusionComponent
 {
@@ -34,7 +35,7 @@ public:
 class ScoreLevelFusionBase
 {
 private:
-	QList<QVector<Matrix> *> trainRawData;
+	QList<QVector<Vector> *> trainRawData;
 	QList<QVector<int> *> trainClasses;
 	QVector<FeatureExtractor *> extractors;
 	QVector<Metrics *> metrics;
@@ -46,10 +47,10 @@ protected:
     QVector<double> impostorMeans;
 
     void prepareDataForClassification(QList<Evaluation> &evaluationResults,
-                                      QVector<Matrix> &scores, QVector<int> &classes,
+                                      QVector<Vector> &scores, QVector<int> &classes,
                                       int genuineLabel, int impostorLabel);
 
-    Matrix normalizeScore(QVector<double> &score);
+    Vector normalizeScore(QVector<double> &score);
 
     virtual void learnImplementation(QList<Evaluation> &evaluationResults) = 0;
 
@@ -61,12 +62,12 @@ public:
     virtual double fuse(QVector<double> &scores) = 0;
 
     ScoreLevelFusionBase & addComponent(
-			QVector<Matrix> &trainRawData,
+			QVector<Vector> &trainRawData,
 			QVector<int> &trainClasses,
 			FeatureExtractor &featureExtractor,
 			Metrics &metrics);
 
-    Evaluation evaluate(QList<QVector<Matrix> > &rawData, QVector<int> &classes, bool debugOutput = false);
+    Evaluation evaluate(QList<QVector<Vector> > &rawData, QVector<int> &classes, bool debugOutput = false);
 
     virtual ~ScoreLevelFusionBase() {}
 };
@@ -135,7 +136,7 @@ class ScoreSVMFusion : public ScoreLevelFusionBase
 private:
     cv::SVM svm;
 
-    cv::Mat colVectorsToFPMatrix(QVector<Matrix> &vectors);
+    cv::Mat colVectorsToFPMatrix(QVector<Vector> &vectors);
     cv::Mat colVectorToColFPMatrix(QVector<int> &vector);
     cv::Mat colVectorToColFPMatrix(QVector<double> &vector);
 

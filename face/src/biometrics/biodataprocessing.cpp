@@ -46,8 +46,8 @@ QList< QVector<Template> > BioDataProcessing::divide(QVector<Template> &template
     return result;
 }
 
-void BioDataProcessing::divide(QVector<Matrix> &vectors, QVector<int> &classMembership, int subjectsInOneCluster,
-                               QList<QVector<Matrix> > &resultVectors, QList<QVector<int> > &resultClasses)
+void BioDataProcessing::divide(QVector<Vector> &vectors, QVector<int> &classMembership, int subjectsInOneCluster,
+                               QList<QVector<Vector> > &resultVectors, QList<QVector<int> > &resultClasses)
 {
     int n = vectors.count();
     assert(n == classMembership.count());
@@ -56,7 +56,7 @@ void BioDataProcessing::divide(QVector<Matrix> &vectors, QVector<int> &classMemb
     int currentResultIndex = 0;
 
     //init
-    QVector<Matrix> ms;
+    QVector<Vector> ms;
     QVector<int> cs;
     resultVectors.append(ms);
     resultClasses.append(cs);
@@ -77,7 +77,7 @@ void BioDataProcessing::divide(QVector<Matrix> &vectors, QVector<int> &classMemb
             {
                 // new cluster
                 currentClusterClasses.clear();
-                QVector<Matrix> ms;
+                QVector<Vector> ms;
                 QVector<int> cs;
                 resultVectors.append(ms);
                 resultClasses.append(cs);
@@ -198,16 +198,15 @@ QList<QSet<int> > BioDataProcessing::divideToNClusters(
     return uniqueClassesInClusters;
 }
 
-void BioDataProcessing::divideAccordingToUniqueClasses(
-		QVector<Matrix> &vectors, QVector<int> &classMembership,
-		QList<QSet<int > > &uniqueClassesInClusters,
-		QList<QVector<Matrix> > &resultVectors, QList<QVector<int> > &resultClasses)
+void BioDataProcessing::divideAccordingToUniqueClasses(QVector<Vector> &vectors, QVector<int> &classMembership,
+        QList<QSet<int > > &uniqueClassesInClusters,
+        QList<QVector<Vector> > &resultVectors, QList<QVector<int> > &resultClasses)
 {
 	int clustersCount = uniqueClassesInClusters.count();
 	for (int curCluster = 0; curCluster < clustersCount; curCluster++)
 	{
 		QVector<int> curClusterClasses;
-		QVector<Matrix> curClusterVectors;
+        QVector<Vector> curClusterVectors;
 		foreach(int subjID, uniqueClassesInClusters[curCluster])
 		{
 			for (int i = 0; i < classMembership.count(); i++)

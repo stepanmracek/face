@@ -33,7 +33,7 @@ Morphable3DFaceModel::Morphable3DFaceModel(const QString &pcaPath, const QString
     mesh = Mesh::fromMap(faceDepth, true);
 }
 
-void Morphable3DFaceModel::setModelParams(Matrix &params)
+void Morphable3DFaceModel::setModelParams(Vector &params)
 {
     Matrix newValuesMatrix = pca.backProject(params);
     int n = newValuesMatrix.rows;
@@ -86,9 +86,9 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     }
 
     QVector<double> usedValues = depthmap.getUsedValues();
-    Matrix inputValues = Vector::fromQVector(usedValues);
-    Matrix params = pca.project(inputValues);
-    Matrix normalizedParams = pca.normalizeParams(params);
+    Vector inputValues(usedValues);
+    Vector params = pca.project(inputValues);
+    Vector normalizedParams = pca.normalizeParams(params);
     setModelParams(normalizedParams);
 }
 
@@ -170,7 +170,7 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
     //Matrix resultMatrix = resultMap.toMatrix() * 255;
     //cv::imwrite(meanImageFile.toStdString(), resultMatrix);
 
-    QVector<Matrix> matrices;
+    QVector<Vector> vectors;
     for (int index = 0; index < meshes.count(); index++)
     {
         Map &depth = depthMaps[index];
@@ -178,11 +178,11 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
         depth.flags = resultMap.flags;
 
         QVector<double> values = depth.getUsedValues();
-        Matrix valuesMatrix = Vector::fromQVector(values);
-        matrices << valuesMatrix;
+        Vector vec(values);
+        vectors << vec;
     }
 
-    PCA pca(matrices);
+    PCA pca(vectors);
     pca.serialize(pcaFile);
 
     int n = resultMap.flags.count();
@@ -194,6 +194,6 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
             flags[i] = 1.0;
         }
     }
-    Matrix flagsMatrix = Vector::fromQVector(flags);
-    Vector::toFile(flagsMatrix, flagsFile);
+    Vector flagsVec(flags);
+    flagsVec.toFile(flagsFile);
 }

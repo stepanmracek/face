@@ -7,6 +7,7 @@
 #include "lda.h"
 #include "linalg/common.h"
 #include "projectionbase.h"
+#include "vector.h"
 
 class LDAofPCA : public ProjectionBase
 {
@@ -16,17 +17,17 @@ public:
 
     LDAofPCA() {}
 
-    LDAofPCA(QVector<Matrix> &vectors, QVector<int> &classMembership, double pcaSelectionThreshold = 0.98, bool debug = false);
+    LDAofPCA(QVector<Vector> &vectors, QVector<int> &classMembership, double pcaSelectionThreshold = 0.98, bool debug = false);
 
     //LDAofPCA(const char *path);
 
-    void learn(QVector<Matrix> &vectors, QVector<int> &classMembership, double pcaSelectionThreshold = 0.98, bool debug = false);
+    void learn(QVector<Vector> &vectors, QVector<int> &classMembership, double pcaSelectionThreshold = 0.98, bool debug = false);
 
-    Matrix project(const Matrix &vector);
+    Vector project(const Vector &vector);
 
-    QVector<Matrix> project(const QVector<Matrix> &vector);
+    QVector<Vector> project(const QVector<Vector> &vector);
 
-    Matrix normalizeParams(const Matrix &params) { return params; }
+    Vector normalizeParams(const Vector &params) { return params; }
 };
 
 #endif // LDAOFPCA_H

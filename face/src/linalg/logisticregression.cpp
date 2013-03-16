@@ -7,12 +7,12 @@
 
 #include "matrixconverter.h"
 
-LogisticRegression::LogisticRegression(QVector<Matrix> &data, QVector<int> &classLabels)
+LogisticRegression::LogisticRegression(QVector<Vector> &data, QVector<int> &classLabels)
 {
     learn(data, classLabels);
 }
 
-void LogisticRegression::learn(QVector<Matrix> &data, QVector<int> &classLabels)
+void LogisticRegression::learn(QVector<Vector> &data, QVector<int> &classLabels)
 {
     // initial assertion
     int N = data.count();
@@ -55,9 +55,9 @@ Matrix LogisticRegression::sigma(Matrix x)
     return result;
 }
 
-Matrix LogisticRegression::createDesignMatrix(QVector<Matrix> &data)
+Matrix LogisticRegression::createDesignMatrix(QVector<Vector> &data)
 {
-    QVector<Matrix> zeroPadding;
+    QVector<Vector> zeroPadding;
     for (int i = 0; i < data.count(); i++)
     {
         Matrix modified = prependOne(data[i]);
@@ -67,17 +67,18 @@ Matrix LogisticRegression::createDesignMatrix(QVector<Matrix> &data)
     return MatrixConverter::columnVectorsToDataMatrix(zeroPadding).t();
 }
 
-double LogisticRegression::classify(Matrix x)
+double LogisticRegression::classify(Vector &x)
 {
-    Matrix psi = prependOne(x);
-    Matrix product = w.t() * psi;
+    Vector psi = prependOne(x);
+    Matrix m = w.t() * psi;
+    Vector product = m;
     return sigma(product(0));
 }
 
-Matrix LogisticRegression::prependOne(Matrix &in)
+Vector LogisticRegression::prependOne(Vector &in)
 {
     int M = in.rows;
-    Matrix modified = Matrix::ones(M+1, 1);
+    Vector modified(M+1);
     for (int r = 0; r < M; r++)
     {
         modified(r+1) = in(r);

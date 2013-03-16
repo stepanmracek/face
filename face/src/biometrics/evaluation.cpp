@@ -64,7 +64,7 @@ Evaluation::Evaluation(QVector<Template> &templates, Metrics &metrics, bool debu
     commonEvaluation(debugOutput);
 }
 
-Evaluation::Evaluation(QVector<Matrix> &rawData, QVector<int> &classes,
+Evaluation::Evaluation(QVector<Vector> &rawData, QVector<int> &classes,
                        FeatureExtractor &extractor, Metrics &metric, bool debugOutput)
 {
     QVector<Template> templates = Template::createTemplates(rawData, classes, extractor);
@@ -235,14 +235,15 @@ BatchEvaluationResult Evaluation::batch(QList<QVector<Template> > &templates, Me
         eer.append(e.eer);
     }
 
-    batchResult.meanEER = Vector::meanValue(eer);
-    batchResult.stdDevOfEER = Vector::stdDeviation(eer);
+    Vector eerVec = Vector(eer);
+    batchResult.meanEER = eerVec.meanValue();
+    batchResult.stdDevOfEER = eerVec.stdDeviation();
 
     return batchResult;
 }
 
-BatchEvaluationResult Evaluation::batch(QList<QVector<Matrix> > &images, QList<QVector<int> > &classes,
-		FeatureExtractor &extractor, Metrics &metrics, int startIndex)
+BatchEvaluationResult Evaluation::batch(QList<QVector<Vector> > &images, QList<QVector<int> > &classes,
+        FeatureExtractor &extractor, Metrics &metrics, int startIndex)
 {
     BatchEvaluationResult batchResult;
     QVector<double> eer;
@@ -255,8 +256,9 @@ BatchEvaluationResult Evaluation::batch(QList<QVector<Matrix> > &images, QList<Q
         eer.append(e.eer);
     }
 
-    batchResult.meanEER = Vector::meanValue(eer);
-    batchResult.stdDevOfEER = Vector::stdDeviation(eer);
+    Vector eerVec = Vector(eer);
+    batchResult.meanEER = eerVec.meanValue();
+    batchResult.stdDevOfEER = eerVec.stdDeviation();
 
     return batchResult;
 }

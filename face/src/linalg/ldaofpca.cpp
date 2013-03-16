@@ -2,12 +2,12 @@
 
 #include <QDebug>
 
-LDAofPCA::LDAofPCA (QVector<Matrix> &vectors, QVector<int> &classMembership, double pcaSelectionThreshold, bool debug)
+LDAofPCA::LDAofPCA (QVector<Vector> &vectors, QVector<int> &classMembership, double pcaSelectionThreshold, bool debug)
 {
     learn(vectors, classMembership, pcaSelectionThreshold, debug);
 }
 
-void LDAofPCA::learn(QVector<Matrix> &vectors, QVector<int> &classMembership, double pcaSelectionThreshold, bool debug)
+void LDAofPCA::learn(QVector<Vector> &vectors, QVector<int> &classMembership, double pcaSelectionThreshold, bool debug)
 {
     // pca
     pca.learn(vectors, 0, debug);
@@ -18,7 +18,7 @@ void LDAofPCA::learn(QVector<Matrix> &vectors, QVector<int> &classMembership, do
 
     if (debug)
         qDebug() << "PCA projection";
-    QVector<Matrix> projected;
+    QVector<Vector> projected;
     for (int i = 0; i < vectors.count(); i++)
     {
         Matrix p = pca.project(vectors[i]);
@@ -29,7 +29,7 @@ void LDAofPCA::learn(QVector<Matrix> &vectors, QVector<int> &classMembership, do
     lda.learn(projected, classMembership, debug);
 }
 
-Matrix LDAofPCA::project(const Matrix &vector)
+Vector LDAofPCA::project(const Vector &vector)
 {
     // pca projection
     Matrix pcaProjection = pca.project(vector);
@@ -38,9 +38,9 @@ Matrix LDAofPCA::project(const Matrix &vector)
     return lda.project(pcaProjection);
 }
 
-QVector<Matrix> LDAofPCA::project(const QVector<Matrix> &vectors)
+QVector<Vector> LDAofPCA::project(const QVector<Vector> &vectors)
 {
-    QVector<Matrix> result;
+    QVector<Vector> result;
     for (int i = 0; i < vectors.count(); i++)
     {
         Matrix out = project(vectors[i]);

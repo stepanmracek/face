@@ -21,16 +21,16 @@ class TestGAOptimization
 public:
     static void testGAOptimizationOnFisherface()
     {
-        QVector<Matrix> vectors;
-        QVector<Matrix> vectors2;
+        QVector<Vector> vectors;
+        QVector<Vector> vectors2;
         QVector<int> classMembership;
         QVector<int> classMembership2;
         QString path("/home/stepo/SVN/disp-stepan-mracek/databases/orl");
         QString path2("/home/stepo/SVN/disp-stepan-mracek/databases/orl2");
 
         // load images
-        Loader::loadImages(path, vectors, &classMembership, "*.pgm", true);
-        Loader::loadImages(path2, vectors2, &classMembership2, "*.pgm", true);
+        Loader::loadImages(path, vectors, &classMembership, "*.pgm");
+        Loader::loadImages(path2, vectors2, &classMembership2, "*.pgm");
 
         // train
         //LDAofPCA fisher(vectors, classMembership);
@@ -64,8 +64,8 @@ public:
         Common::savePlot(result.iterations, result.validationEER, "GA-validation1");
         Common::savePlot(result.iterations, result.diversity, "GA-popdiversity1");
 
-        Vector::toFile(result.bestWeightsOnTrain, "GA-train-weight1");
-        Vector::toFile(result.bestWeightsOnValidation, "GA-validation-weight1");
+        result.bestWeightsOnTrain.toFile("GA-train-weight1");
+        result.bestWeightsOnValidation.toFile("GA-validation-weight1");
     }
 };
 
