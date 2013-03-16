@@ -20,6 +20,14 @@ Vector::Vector(Matrix &m) : Matrix(m.rows, 1)
     }
 }
 
+Vector::Vector(Vector src) : Matrix(src.rows, 1)
+{
+    for (int i = 0; i < src.rows; i++)
+    {
+        (*this)(i) = src(i, 0);
+    }
+}
+
 Vector::Vector(Vector &src) : Matrix(src.rows, 1)
 {
     for (int i = 0; i < src.rows; i++)

@@ -24,6 +24,8 @@ public:
 
     Vector(Vector &src);
 
+    Vector(Vector src);
+
     //Vector(cv::MatExpr &expr);
 
     Vector(QVector<double> &vec);
