@@ -24,7 +24,7 @@ public:
 
     Vector(Vector &src);
 
-    Vector(const QVector<double> &vec);
+    Vector(const Vector &src);
 
     Vector(QVector<double> &vec);
 
