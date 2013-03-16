@@ -15,5 +15,6 @@ Vector FeaturePotentialBase::createSelectionWeights(double threshold)
 Vector FeaturePotentialBase::createWeights()
 {
     Vector result(scores);
-    return result.normalizeComponents();
+    result = result.normalizeComponents();
+    return result;
 }
