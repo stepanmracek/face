@@ -65,7 +65,7 @@ public:
     static void procrustesAnalysis(QVector<Vector> &vectors, bool scale = true,
     							   double eps = 0, int maxIterations = INT_MAX);
 
-    static double getOptimalRotation(Matrix &from, Matrix &to);
+    static double getOptimalRotation(Vector &from, Vector &to);
 
     static RotateAndScaleCoefs align(Vector &from, Vector &to);
 
@@ -84,7 +84,11 @@ public:
     static cv::Point3d centralizedTranslation(const QVector<cv::Point3d> &shape);
 
     static Vector getMeanShape(QVector<Vector> &vectors);
+};
 
+class Procrustes3D
+{
+public:
     static Matrix alignRigid(QVector<cv::Point3d> &from, QVector<cv::Point3d> &to, bool centralize);
 
     static Procrustes3DResult SVDAlign(QVector<QVector<cv::Point3d> > &vectorOfPointclouds); //, bool centralize, double eps = 0, int maxIterations = INT_MAX);
@@ -104,10 +108,5 @@ public:
     static void translate(QVector<cv::Point3d> &points, cv::Point3d shift);
 
     static double getShapeVariation(QVector<QVector<cv::Point3d> > &vectorOfPointclouds, QVector<cv::Point3d> &mean);
-};
-
-class Procrustes3D
-{
-public:
 }
 #endif // PROCRUSTES_H
