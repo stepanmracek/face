@@ -59,7 +59,7 @@ struct Procrustes3DResult
     QVector<Matrix> rotations;
 };
 
-class Procrustes
+class Procrustes2D
 {
 public:
     static void procrustesAnalysis(QVector<Vector> &vectors, bool scale = true,
@@ -106,4 +106,8 @@ public:
     static double getShapeVariation(QVector<QVector<cv::Point3d> > &vectorOfPointclouds, QVector<cv::Point3d> &mean);
 };
 
+class Procrustes3D
+{
+public:
+}
 #endif // PROCRUSTES_H
