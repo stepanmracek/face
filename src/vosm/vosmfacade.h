@@ -5,6 +5,10 @@ class VOSMFacade
 {
 public:
     VOSMFacade();
+
+    bool learn();
+
+    bool fit();
 };
 
 #endif // VOSMFACADE_H
