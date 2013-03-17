@@ -7,4 +7,5 @@ SUBDIRS += \
     kinect \
     pclWrapper \
     unitTests \
-    integrationTests
+    integrationTests \
+    vosm
