@@ -61,7 +61,7 @@ public:
     ZScorePCAExtractor(PCA pca, QVector<Vector> &rawData )
     {
         this->pca = pca;
-        QVector<Vector> projectedData = pca.project(rawData);
+        QVector<Vector> projectedData = pca.batchProject(rawData);
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
@@ -123,7 +123,7 @@ public:
     ZScoreICAofPCAExtractor(ICAofPCA icaOfpca, QVector<Vector> &rawData )
     {
         this->icaOfpca = icaOfpca;
-        QVector<Vector> projectedData = icaOfpca.project(rawData);
+        QVector<Vector> projectedData = icaOfpca.batchProject(rawData);
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
@@ -212,7 +212,7 @@ public:
     ZScoreLDAofPCAExtractor(LDAofPCA ldaOfpca, QVector<Vector> &rawData )
     {
         this->ldaOfpca = ldaOfpca;
-        QVector<Vector> projectedData = ldaOfpca.project(rawData);
+        QVector<Vector> projectedData = ldaOfpca.batchProject(rawData);
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
@@ -256,7 +256,7 @@ public:
     ZScoreLDAExtractor(LDA lda, QVector<Vector> &rawData )
     {
         this->lda = lda;
-        QVector<Vector> projectedData = lda.project(rawData);
+        QVector<Vector> projectedData = lda.batchProject(rawData);
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
@@ -277,8 +277,7 @@ class PassExtractor : public FeatureExtractor
 public:
     Vector extract(Vector &rawData)
     {
-        Matrix m = rawData.clone();
-        return m;
+        return Vector(rawData);
     }
 
     int outputLen() { return -1; }
@@ -295,16 +294,14 @@ public:
         QVector<Vector> projectedData;
         for (int i = 0; i < rawData.count(); i++)
         {
-             Matrix projected = rawData[i].clone();
-             projectedData.append(projected);
+             projectedData.append(Vector(rawData[i]));
         }
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
     Vector extract(Vector &rawData)
     {
-        Matrix m = rawData.clone();
-        Vector projected = m;
+        Vector projected(rawData);
         Normalization::zScoreNormalization(projected, normParams);
         return projected;
     }

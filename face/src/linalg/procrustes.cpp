@@ -60,8 +60,7 @@ void Procrustes::procrustesAnalysis(QVector<Vector> &vectors, bool scale, double
             mean.normalize();
 
         // If not converged, iterate
-        Matrix diffMat = mean-oldMean;
-        Vector diff = diffMat;
+        Vector diff = mean-oldMean;
         double delta = diff.sqrMagnitude();
 
         if (delta <= eps || iteration > maxIterations)
@@ -205,8 +204,7 @@ Vector Procrustes::getMeanShape(QVector<Vector> &vectors)
 	{
 		mean += vectors[0];
 	}
-    Matrix m = mean / ((double)n);
-    mean = m;
+    mean = mean / ((double)n);
 	return mean;
 }
 

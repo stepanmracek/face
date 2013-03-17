@@ -15,7 +15,7 @@ QVector<Template> Template::loadTemplates(const QString &dirPath, const QString 
     for (int i = 0; i < n; i++)
     {
         QString path(dirPath + QDir::separator() + filenames[i]);
-        Matrix featureVector = Vector::fromFile(path);
+        Vector featureVector = Vector::fromFile(path);
 
         int indexOfSeparator = filenames.at(i).indexOf(classSeparator);
         QString classString = filenames.at(i).left(indexOfSeparator);
@@ -189,8 +189,7 @@ QVector<Template> Template::clone(QVector<Template> &src)
 	{
 		Template t;
 		t.subjectID = src[i].subjectID;
-        Matrix cloned = src[i].featureVector.clone();
-        t.featureVector = cloned;
+        t.featureVector = src[i].featureVector;
 		result << t;
 	}
 	return result;

@@ -63,7 +63,7 @@ void BioDataProcessing::divide(QVector<Vector> &vectors, QVector<int> &classMemb
 
     for (int i = 0; i < n; i++)
     {
-        Matrix &v = vectors[i];
+        Vector &v = vectors[i];
         int c = classMembership[i];
         if (currentClusterClasses.contains(c))
         {

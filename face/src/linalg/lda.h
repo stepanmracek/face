@@ -24,8 +24,6 @@ public:
 
     Vector project(const Vector &vector);
 
-    QVector<Vector> project(const QVector<Vector> &vectors);
-
     void serialize(const char *path);
 
     Vector normalizeParams(const Vector &params) { return params; }

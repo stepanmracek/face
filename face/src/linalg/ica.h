@@ -26,8 +26,6 @@ public:
 
     Vector project(const Vector &vector);
 
-    QVector<Vector> project(const QVector<Vector> &vectors);
-
     Vector backProject(const Vector &vector);
 
     int getModes() { return W.rows; }

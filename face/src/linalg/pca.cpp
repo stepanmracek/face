@@ -37,19 +37,8 @@ void PCA::serialize(const QString &path)
 
 Vector PCA::project(const Vector &in)
 {
-    Matrix out = cvPca.project(in);
-    return out;
-}
-
-QVector<Vector> PCA::project(const QVector<Vector> &vectors)
-{
-    QVector<Vector> result;
-    for (int i = 0; i < vectors.count(); i++)
-    {
-        Vector out = project(vectors[i]);
-        result.append(out);
-    }
-    return result;
+    Matrix m = cvPca.project(in);
+    return m;
 }
 
 Vector PCA::scaledProject(const Vector &vector)
@@ -62,8 +51,8 @@ Vector PCA::scaledProject(const Vector &vector)
 
 Vector PCA::backProject(const Vector &in)
 {
-    Matrix out = cvPca.backProject(in);
-    return out;
+    Matrix m = cvPca.backProject(in);
+    return m;
 }
 
 void PCA::modesSelectionThreshold(double t)
@@ -99,7 +88,7 @@ double PCA::getVariation(int mode)
 
 Vector PCA::getMean()
 {
-    Matrix mean = (cvPca.mean);
+    Matrix mean = cvPca.mean;
     return mean;
 }
 

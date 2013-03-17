@@ -39,8 +39,6 @@ public:
 
     Vector project(const Vector &vector);
 
-    QVector<Vector> project(const QVector<Vector> &vectors);
-
     Vector scaledProject(const Vector &vector);
 
     Vector backProject(const Vector &vector);

@@ -5,8 +5,6 @@
 
 #include "mesh.h"
 #include "map.h"
-#include "linalg/vector2.h"
-#include "linalg/vector3.h"
 
 class CurvatureStruct;
 class MapConverter;

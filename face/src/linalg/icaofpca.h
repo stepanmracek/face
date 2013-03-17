@@ -31,8 +31,6 @@ public:
 
     Vector project(const Vector &vector);
 
-    QVector<Vector> project(const QVector<Vector> &vector);
-
     Vector whiten(const Vector &vector);
 
     QVector<Vector> whiten(const QVector<Vector> &vectors);

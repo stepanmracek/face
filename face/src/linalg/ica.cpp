@@ -34,8 +34,7 @@ void ICA::learn(QVector<Vector> &vectors, int independentComponentCount, double 
 
     for (int i = 0; i < n; i++)
     {
-        Matrix m = vectors[i] - mean;
-        vectors[i] = m;
+        vectors[i] = vectors[i] - mean;
     }
 
     // whitening; x <- E * D^(-1/2) * E^T * x
@@ -55,8 +54,7 @@ void ICA::learn(QVector<Vector> &vectors, int independentComponentCount, double 
     EDET = pca.cvPca.eigenvectors * eVals * pca.cvPca.eigenvectors.t();
     for (int i = 0; i < n; i++)
     {
-        Matrix m = EDET * vectors[i];
-        vectors[i] = m;
+        vectors[i] = EDET * vectors[i];
     }
     EDETinv = EDET.inv();
 
@@ -68,10 +66,8 @@ void ICA::learn(QVector<Vector> &vectors, int independentComponentCount, double 
         double sameErrCount = 0;
 
         // initicalization
-        Matrix colMat = W.col(p);
-        Vector w = colMat; // Matrix::ones(m, 1, CV_64F);
-        Matrix mat = w/w.magnitude();
-        w = mat;
+        Vector w = W.col(p); // Matrix::ones(m, 1, CV_64F);
+        w = w/w.magnitude();
 
         int iteration = 1;
         while(1)
@@ -90,10 +86,8 @@ void ICA::learn(QVector<Vector> &vectors, int independentComponentCount, double 
             expected1 = expected1/n;
             Matrix expected2Mat = expected2/n * w;
             Vector wOld(w);
-            Matrix diffMat = expected1 - expected2Mat;
-            w = diffMat;
-            Matrix normalized = w/w.magnitude();
-            w = normalized;
+            w = expected1 - expected2Mat;
+            w = w/w.magnitude();
 
             /*if (p > 0)
             {
@@ -175,34 +169,16 @@ ICA::ICA(QVector<Vector> &vectors, int independentComponentCount, double eps, in
 
 Vector ICA::whiten(const Vector &vector)
 {
-    Matrix m = EDET * (vector - mean);
-    //Vector result = m;
-    return m;
+    return EDET * (vector - mean);
 }
 
 Vector ICA::project(const Vector &vector)
 {
     Vector whitened = whiten(vector);
-    Matrix m = W * whitened;
-    //Vector result = m;
-    return m;
-}
-
-QVector<Vector> ICA::project(const QVector<Vector> &vectors)
-{
-    QVector<Vector> result;
-    for (int i = 0; i < vectors.count(); i++)
-    {
-        Matrix out = project(vectors[i]);
-        result.append(out);
-    }
-    return result;
+    return W * whitened;
 }
 
 Vector ICA::backProject(const Vector &vector)
 {
-    Matrix result = W.t() * vector;
-    result = EDETinv * result;
-    result = result + mean;
-    return result;
+    return (EDETinv * (W.t() * vector)) + mean;
 }

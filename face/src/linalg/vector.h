@@ -20,9 +20,9 @@ public:
 
     Vector(int size);
 
-    Vector(Matrix &m);
+    Vector(const Matrix &m);
 
-    Vector(Vector &src);
+    Vector(const cv::MatExpr &expr);
 
     Vector(const Vector &src);
 

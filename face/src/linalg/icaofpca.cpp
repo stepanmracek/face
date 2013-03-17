@@ -38,17 +38,6 @@ Vector ICAofPCA::project(const Vector &vector)
     return result;
 }
 
-QVector<Vector> ICAofPCA::project(const QVector<Vector> &vectors)
-{
-    QVector<Vector> result;
-    for (int i = 0; i < vectors.count(); i++)
-    {
-        Vector out = project(vectors[i]);
-        result.append(out);
-    }
-    return result;
-}
-
 Vector ICAofPCA::whiten(const Vector &vector)
 {
     Vector pcaProjected = pca.project(vector);
@@ -61,7 +50,7 @@ QVector<Vector> ICAofPCA::whiten(const QVector<Vector> &vectors)
     QVector<Vector> result;
     for (int i = 0; i < vectors.count(); i++)
     {
-        Matrix out = whiten(vectors[i]);
+        Vector out = whiten(vectors[i]);
         result.append(out);
     }
     return result;

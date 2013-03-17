@@ -4,7 +4,6 @@
 #include "mesh.h"
 #include "landmarks.h"
 #include "surfaceprocessor.h"
-#include "linalg/vector3.h"
 
 class LandmarkDetector
 {

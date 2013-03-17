@@ -25,8 +25,6 @@ public:
 
     Vector project(const Vector &vector);
 
-    QVector<Vector> project(const QVector<Vector> &vector);
-
     Vector normalizeParams(const Vector &params) { return params; }
 };
 

@@ -134,17 +134,5 @@ Vector LDA::project(const Vector &vector)
     assert(vector.rows == mean.rows);
     assert(vector.cols == 1);
 
-    Matrix m = Wt * (vector - mean);
-    return m;
-}
-
-QVector<Vector> LDA::project(const QVector<Vector> &vectors)
-{
-    QVector<Vector> result;
-    for (int i = 0; i < vectors.count(); i++)
-    {
-        Matrix out = project(vectors[i]);
-        result.append(out);
-    }
-    return result;
+    return Wt * (vector - mean);
 }

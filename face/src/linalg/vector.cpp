@@ -12,21 +12,20 @@ Vector::Vector(int size) : Matrix(size, 1)
     }
 }
 
-Vector::Vector(Matrix &m) : Matrix(m.rows, 1)
+Vector::Vector(const Matrix &m) : Matrix(m.rows, 1)
 {
+    assert(m.cols == 1);
     for (int i = 0; i < m.rows; i++)
     {
         (*this)(i) = m(i, 0);
     }
 }
 
-Vector::Vector(Vector &src) : Matrix(src.rows, 1)
+Vector::Vector(const cv::MatExpr &expr) : Matrix(expr)
 {
-    for (int i = 0; i < src.rows; i++)
-    {
-        (*this)(i) = src(i, 0);
-    }
+    assert(cols == 1);
 }
+
 
 Vector::Vector(const Vector &src) : Matrix(src.rows, 1)
 {
@@ -488,8 +487,7 @@ Vector Vector::normalizeComponents()
     double min = minValue();
     double max = maxValue();
 
-    Matrix m = ((*this)-min)/(max-min);
-    Vector result = m;
+    Vector result = ((*this)-min)/(max-min);
     return result;
 }
 
@@ -500,8 +498,7 @@ Vector Vector::meanVector(QVector<Vector> &vectors)
     for (int i = 0; i < n; i++)
         result += vectors[i];
 
-    Matrix m = result / ((double)n);
-    result = m;
+    result = result / ((double)n);
     return result;
 }
 

@@ -32,7 +32,7 @@ FeatureSelection::FeatureSelection(QVector<Template> &trainTemplates,
     QVector<int> availableIndicies;
     for (int i = 0; i < trainTemplates[0].featureVector.rows; i++)
         availableIndicies.append(i);
-    Matrix weights = Matrix::zeros(trainTemplates[0].featureVector.rows, 1);
+    Vector weights(trainTemplates[0].featureVector.rows);
 
     int candidatesCount;
     int step = 1;
@@ -47,7 +47,7 @@ FeatureSelection::FeatureSelection(QVector<Template> &trainTemplates,
         for (int i = 0; i < candidatesCount; i++)
         {
             // create candidate
-            Matrix candidateWeight = weights.clone();
+            Vector candidateWeight = weights;
             candidateWeight(availableIndicies.at(i)) = 1.0;
             metrics.w = candidateWeight;
 

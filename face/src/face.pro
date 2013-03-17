@@ -71,11 +71,9 @@ HEADERS += \
     linalg/random.h \
     linalg/icaofpca.h \
     linalg/projectionbase.h \
-    linalg/vector2.h \
     linalg/vector.h \
     linalg/svd.h \
     linalg/pca.h \
-    linalg/vector3.h \
     linalg/normalization.h \
     linalg/loader.h \
     linalg/ldaofpca.h \

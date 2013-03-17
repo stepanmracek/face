@@ -60,7 +60,7 @@ Matrix LogisticRegression::createDesignMatrix(QVector<Vector> &data)
     QVector<Vector> zeroPadding;
     for (int i = 0; i < data.count(); i++)
     {
-        Matrix modified = prependOne(data[i]);
+        Vector modified = prependOne(data[i]);
         zeroPadding << modified;
     }
 
@@ -70,8 +70,7 @@ Matrix LogisticRegression::createDesignMatrix(QVector<Vector> &data)
 double LogisticRegression::classify(Vector &x)
 {
     Vector psi = prependOne(x);
-    Matrix m = w.t() * psi;
-    Vector product = m;
+    Vector product = w.t() * psi;
     return sigma(product(0));
 }
 
