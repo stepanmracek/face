@@ -1,6 +1,6 @@
 #include "procrustes.h"
 
-#include <cassert>
+//#include <cassert>
 #include <cmath>
 
 /***
