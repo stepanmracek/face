@@ -124,7 +124,7 @@ public:
 
     MaskedVector horizontalPointDensity(int y, int stripeWidth) const;
 
-    Map densityMap(int windowSize, bool fromCenter) const;
+    Map densityMap(int kernelSize, bool fromCenter) const;
 
     int maxIndex() const;
 

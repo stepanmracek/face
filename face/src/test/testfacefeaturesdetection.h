@@ -58,7 +58,7 @@ public:
         Matrix pits = cs.pits.toMatrix(0, 0, 1);
         cv::imshow("pits", pits);
 
-        Matrix peaksDensity = cs.peaks.densityMap(10, true).toMatrix();
+        Matrix peaksDensity = cs.peaks.densityMap(21, true).toMatrix();
         cv::imshow("peaksDensity", peaksDensity);
 
         QApplication app(argc, argv);

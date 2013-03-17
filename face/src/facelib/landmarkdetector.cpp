@@ -16,8 +16,8 @@ LandmarkDetector::LandmarkDetector(Mesh &mesh) : mesh(mesh)
     depthErode = 7;
     depthLevelSelect = 0;
     depthScale = 1; //2;
-    peakDensityWindowsSize = 10; //10;
-    pitDensityWindowsSize = 5; //5;
+    peakDensityWindowsSize = 21; //10;
+    pitDensityWindowsSize = 11; //5;
     pitsStripeSmoothKernel = 7; //11;
     minYDistanceFromNosetipToEyes = 20; //40;
     maxYDistanceFromNosetipToEyes = 70; //140;
