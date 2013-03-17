@@ -196,7 +196,7 @@ void Mesh::centralize()
 
 void Mesh::move(cv::Point3d translationVector)
 {
-    Procrustes::translate(points, translationVector);
+    Procrustes3D::translate(points, translationVector);
     minx += translationVector.x;
     miny += translationVector.y;
     minz += translationVector.z;
@@ -207,7 +207,7 @@ void Mesh::move(cv::Point3d translationVector)
 
 void Mesh::scale(cv::Point3d scaleParam)
 {
-    Procrustes::scale(points, scaleParam);
+    Procrustes3D::scale(points, scaleParam);
     minx *= scaleParam.x;
     miny *= scaleParam.y;
     minz *= scaleParam.z;
@@ -255,7 +255,7 @@ void Mesh::rotate(double x, double y, double z)
 
 void Mesh::transform(Matrix &m)
 {
-    Procrustes::transform(points, m);
+    Procrustes3D::transform(points, m);
 
     recalculateMinMax();
 }

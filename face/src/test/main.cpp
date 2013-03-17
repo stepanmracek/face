@@ -25,8 +25,8 @@ QString frgcPath()
 
 int main(int argc, char *argv[])
 {
-    TestVector::testConstructor();
-    TestVector::testBasicOperations();
+    //TestVector::testConstructor();
+    //TestVector::testBasicOperations();
     //TestProcrustes::testRotateAndScale();
     //TestProcrustes::testProcrustes();
     //TestProcrustes::testAlign();
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 
     //TestMorphableFaceModel::testCreate("/media/data/frgc/obj-centralized/Spring2004",
     //                                   "test/align-landmarks.xml", "test/align-pca.xml", "test/align-flags");
-    //TestMorphableFaceModel::testModel(argc, argv, "../test/align-pca.xml", "../test/align-flags", "../test/align-landmarks.xml");
+    TestMorphableFaceModel::testModel(argc, argv, "../test/align-pca.xml", "../test/align-flags", "../test/align-landmarks.xml");
     //TestMorphableFaceModel::testMorph(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml",
     //                                  "/run/media/stepo/frgc/frgc-spring2004-obj-centralized/04200d74.obj");
     //TestMorphableFaceModel::testMorphFromKinect(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml");

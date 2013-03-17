@@ -48,20 +48,20 @@ void Morphable3DFaceModel::setModelParams(Vector &params)
 void Morphable3DFaceModel::align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations)
 {
     // centralize
-    cv::Point3d shift = Procrustes::centralizedTranslation(inputLandmarks.points);
-    Procrustes::translate(inputLandmarks.points, shift);
+    cv::Point3d shift = Procrustes3D::centralizedTranslation(inputLandmarks.points);
+    Procrustes3D::translate(inputLandmarks.points, shift);
     inputMesh.move(shift);
 
     for (int iteration = 0; iteration < iterations; iteration++)
     {
         // rotate
-        Matrix rotation = Procrustes::getOptimalRotation(inputLandmarks.points, this->landmarks.points);
-        Procrustes::transform(inputLandmarks.points, rotation);
+        Matrix rotation = Procrustes3D::getOptimalRotation(inputLandmarks.points, this->landmarks.points);
+        Procrustes3D::transform(inputLandmarks.points, rotation);
         inputMesh.transform(rotation);
 
         // scale
-        cv::Point3d scaleParams = Procrustes::getOptimalScale(inputLandmarks.points, this->landmarks.points);
-        Procrustes::scale(inputLandmarks.points, scaleParams);
+        cv::Point3d scaleParams = Procrustes3D::getOptimalScale(inputLandmarks.points, this->landmarks.points);
+        Procrustes3D::scale(inputLandmarks.points, scaleParams);
         inputMesh.scale(scaleParams);
     }
 }
@@ -102,36 +102,36 @@ void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
     for (int i = 0; i < meshCount; i++)
     {
         VectorOfPoints &pointcloud = controlPoints[i];
-        cv::Point3d shift = Procrustes::centralizedTranslation(pointcloud);
+        cv::Point3d shift = Procrustes3D::centralizedTranslation(pointcloud);
 
-        Procrustes::translate(pointcloud, shift);
+        Procrustes3D::translate(pointcloud, shift);
         meshes[i].move(shift);
     }
 
-    VectorOfPoints meanShape = Procrustes::getMeanShape(controlPoints);
-    qDebug() << "Initial variation:" << Procrustes::getShapeVariation(controlPoints, meanShape);
+    VectorOfPoints meanShape = Procrustes3D::getMeanShape(controlPoints);
+    qDebug() << "Initial variation:" << Procrustes3D::getShapeVariation(controlPoints, meanShape);
 
     for (int iteration = 0; iteration < iterations; iteration++)
     {
         // rotate
-        Procrustes3DResult rotResult = Procrustes::SVDAlign(controlPoints);
+        Procrustes3DResult rotResult = Procrustes3D::SVDAlign(controlPoints);
         for (int i = 0; i < meshCount; i++)
         {
             meshes[i].transform(rotResult.rotations[i]);
         }
-        meanShape = Procrustes::getMeanShape(controlPoints);
-        qDebug() << "Iteration:" << iteration << "after SVD:" << Procrustes::getShapeVariation(controlPoints, meanShape);
+        meanShape = Procrustes3D::getMeanShape(controlPoints);
+        qDebug() << "Iteration:" << iteration << "after SVD:" << Procrustes3D::getShapeVariation(controlPoints, meanShape);
 
         // scale
         for (int meshIndex = 0; meshIndex < meshCount; meshIndex++)
         {
-            cv::Point3d scaleParams = Procrustes::getOptimalScale(controlPoints[meshIndex], meanShape);
-            Procrustes::scale(controlPoints[meshIndex], scaleParams);
+            cv::Point3d scaleParams = Procrustes3D::getOptimalScale(controlPoints[meshIndex], meanShape);
+            Procrustes3D::scale(controlPoints[meshIndex], scaleParams);
             meshes[meshIndex].scale(scaleParams);
         }
 
-        meanShape = Procrustes::getMeanShape(controlPoints);
-        qDebug() << "Iteration:" << iteration << "after scaling:" << Procrustes::getShapeVariation(controlPoints, meanShape);
+        meanShape = Procrustes3D::getMeanShape(controlPoints);
+        qDebug() << "Iteration:" << iteration << "after scaling:" << Procrustes3D::getShapeVariation(controlPoints, meanShape);
     }
 }
 
@@ -140,7 +140,7 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
                                   Map &depthMapMask)
 {
     align(meshes, controlPoints, iterations);
-    VectorOfPoints meanControlPoints = Procrustes::getMeanShape(controlPoints);
+    VectorOfPoints meanControlPoints = Procrustes3D::getMeanShape(controlPoints);
     Landmarks l(meanControlPoints);
     l.serialize(meanControlPointsFile);
 

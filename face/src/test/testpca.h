@@ -33,7 +33,7 @@ public:
         }
 
         // align them
-        Procrustes::procrustesAnalysis(vectors);
+        Procrustes2D::procrustesAnalysis(vectors);
 
         PCA pca(vectors);
         for (int i = 0; i < vectors.count(); i++)
@@ -61,7 +61,7 @@ public:
         }
 
         // align them
-        Procrustes::procrustesAnalysis(vectors);
+        Procrustes2D::procrustesAnalysis(vectors);
 
         PCA pca(vectors);
         pca.serialize("myPCA.yml");

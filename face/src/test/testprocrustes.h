@@ -22,7 +22,7 @@ public:
     static void testRotateAndScale()
     {
         Vector v = Vector::fromTwoColsFile("vectorsToAlign/vec01");
-        Procrustes::centralize(v);
+        Procrustes2D::centralize(v);
         double sum = 0.0;
         for (int i = 0; i < v.rows; i++)
             sum += v(i, 0);
@@ -30,7 +30,7 @@ public:
         v.toFileTwoCols("original");
 
         RotateAndScaleCoefs rs(1.2, 0.75);
-        Procrustes::rotateAndScale(v, rs);
+        Procrustes2D::rotateAndScale(v, rs);
         v.toFileTwoCols("rotatedAndScaled");
     }
 
@@ -38,27 +38,25 @@ public:
     {
         // Load vectors
         Vector from = Vector::fromTwoColsFile("vectorsToAlign/vec01");
-        Procrustes::centralize(from);
+        Procrustes2D::centralize(from);
         Vector to(from);
 
         // Rotate first one
         RotateAndScaleCoefs testCoefs(1.2, -0.95);
-        Procrustes::rotateAndScale(to, testCoefs);
+        Procrustes2D::rotateAndScale(to, testCoefs);
 
-        Matrix diffMat = from - to;
-        Vector diff = diffMat;
+        Vector diff = from - to;
         qDebug() << "before:" << diff.sqrMagnitude();
         from.toFileTwoCols("before");
         to.toFileTwoCols("before", true);
 
         // Estimate needed rotation of second one
         //TransformationCoefs gainedCoefs = Procrustes::AlignAlt(from, to);
-        RotateAndScaleCoefs gainedCoefs = Procrustes::align(from, to);
+        RotateAndScaleCoefs gainedCoefs = Procrustes2D::align(from, to);
         //Procrustes::Transformate(from, gainedCoefs);
-        Procrustes::rotateAndScale(from, gainedCoefs);
+        Procrustes2D::rotateAndScale(from, gainedCoefs);
         qDebug() << "coefs:" << gainedCoefs.s << gainedCoefs.theta;
-        diffMat = from - to;
-        diff = diffMat;
+        diff = from - to;
         qDebug() << "after:" << diff.sqrMagnitude();
 
         from.toFileTwoCols("after");
@@ -79,7 +77,7 @@ public:
             RotateAndScaleCoefs c;
             c.s = 1;
             c.theta = ((double)qrand())/RAND_MAX - 0.5;
-            Procrustes::rotateAndScale(v, c);
+            Procrustes2D::rotateAndScale(v, c);
             vectors.append(v);
         }
 
@@ -92,7 +90,7 @@ public:
         }
 
         // align them
-        Procrustes::procrustesAnalysis(vectors, 1e-100);
+        Procrustes2D::procrustesAnalysis(vectors, 1e-100);
 
         // save all to one file
         if (QFile::exists("aligned"))
