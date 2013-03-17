@@ -75,7 +75,8 @@ HEADERS += \
     VO_AFM.h \
     VO_AAMInverseIA.h \
     VO_AAMForwardIA.h \
-    VO_AAMBasic.h
+    VO_AAMBasic.h \
+    vosmfacade.h
 
 SOURCES += \
     VO_WindowFunc.cpp \
@@ -140,4 +141,5 @@ SOURCES += \
     VO_AFM.cpp \
     VO_AAMInverseIA.cpp \
     VO_AAMForwardIA.cpp \
-    VO_AAMBasic.cpp
+    VO_AAMBasic.cpp \
+    vosmfacade.cpp
