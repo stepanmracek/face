@@ -81,14 +81,14 @@ public:
 
     static void centralize(QVector<Vector> &vectors);
 
-    static cv::Point3d centralizedTranslation(const QVector<cv::Point3d> &shape);
-
     static Vector getMeanShape(QVector<Vector> &vectors);
 };
 
 class Procrustes3D
 {
 public:
+    static cv::Point3d centralizedTranslation(const QVector<cv::Point3d> &shape);
+
     static Matrix alignRigid(QVector<cv::Point3d> &from, QVector<cv::Point3d> &to, bool centralize);
 
     static Procrustes3DResult SVDAlign(QVector<QVector<cv::Point3d> > &vectorOfPointclouds); //, bool centralize, double eps = 0, int maxIterations = INT_MAX);
