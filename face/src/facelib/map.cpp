@@ -273,7 +273,7 @@ Map Map::densityMap(int kernelSize, bool fromCenter) const
     int range = kernelSize/2;
 
     Map density(this->w, this->h);
-    double windowCount = windowSize*windowSize;
+    double windowCount = kernelSize*kernelSize;
 
     double fromCenterToBorder = sqrt(w/2*w/2 + h/2*h/2);
 
