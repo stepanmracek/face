@@ -3,3 +3,13 @@
 VOSMFacade::VOSMFacade()
 {
 }
+
+VOSMFacade::learn()
+{
+
+}
+
+VOSMFacade::fit()
+{
+
+}
