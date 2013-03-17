@@ -6,7 +6,7 @@
 /***
  * Procrustes analysis
  */
-void Procrustes::procrustesAnalysis(QVector<Vector> &vectors, bool scale, double eps, int maxIterations)
+void Procrustes2D::procrustesAnalysis(QVector<Vector> &vectors, bool scale, double eps, int maxIterations)
 {
     qDebug() << "Procrustes analysis";
 
@@ -76,7 +76,7 @@ void Procrustes::procrustesAnalysis(QVector<Vector> &vectors, bool scale, double
     }
 }
 
-void Procrustes::translate(Vector &vector, TranslationCoefs &coefs)
+void Procrustes2D::translate(Vector &vector, TranslationCoefs &coefs)
 {
     int n = vector.rows/2;
     for (int i = 0; i < n; i++)
@@ -86,7 +86,7 @@ void Procrustes::translate(Vector &vector, TranslationCoefs &coefs)
     }
 }
 
-TranslationCoefs Procrustes::centralizedTranslation(Vector &vector)
+TranslationCoefs Procrustes2D::centralizedTranslation(Vector &vector)
 {
     double meanx = 0.0;
     double meany = 0.0;
@@ -106,20 +106,20 @@ TranslationCoefs Procrustes::centralizedTranslation(Vector &vector)
     return c;
 }
 
-void Procrustes::centralize(Vector &vector)
+void Procrustes2D::centralize(Vector &vector)
 {
     TranslationCoefs c = centralizedTranslation(vector);
     translate(vector, c);
 }
 
-void Procrustes::centralize(QVector<Vector> &vectors)
+void Procrustes2D::centralize(QVector<Vector> &vectors)
 {
 	int n = vectors.count();
 	for (int i = 0; i < n; i++)
 		centralize(vectors[i]);
 }
 
-void Procrustes::rotateAndScale(Vector &vector, RotateAndScaleCoefs &coefs)
+void Procrustes2D::rotateAndScale(Vector &vector, RotateAndScaleCoefs &coefs)
 {
     double sint = coefs.s * sin(coefs.theta);
     double cost = coefs.s * cos(coefs.theta);
@@ -137,7 +137,7 @@ void Procrustes::rotateAndScale(Vector &vector, RotateAndScaleCoefs &coefs)
     }
 }
 
-void Procrustes::transformate(Vector &vector, TransformationCoefs &coefs)
+void Procrustes2D::transformate(Vector &vector, TransformationCoefs &coefs)
 {
     int n = vector.rows/2;
     for (int i = 0; i < n; i++)
@@ -152,7 +152,7 @@ void Procrustes::transformate(Vector &vector, TransformationCoefs &coefs)
     }
 }
 
-double Procrustes::getOptimalRotation(Matrix &from, Matrix &to)
+double Procrustes2D::getOptimalRotation(Matrix &from, Matrix &to)
 {
     int n = from.rows/2;
     double numerator = 0.0;
@@ -166,7 +166,7 @@ double Procrustes::getOptimalRotation(Matrix &from, Matrix &to)
     return atan(numerator/denumerator);
 }
 
-RotateAndScaleCoefs Procrustes::align(Vector &from, Vector &to)
+RotateAndScaleCoefs Procrustes2D::align(Vector &from, Vector &to)
 {
     Vector reference(to);
     double referenceScale = 1.0/reference.magnitude();
@@ -196,7 +196,7 @@ RotateAndScaleCoefs Procrustes::align(Vector &from, Vector &to)
     return c;
 }
 
-Vector Procrustes::getMeanShape(QVector<Vector> &vectors)
+Vector Procrustes2D::getMeanShape(QVector<Vector> &vectors)
 {
 	int n = vectors.count();
     Vector mean(vectors[0].rows);
@@ -225,7 +225,9 @@ Vector Procrustes::getMeanShape(QVector<Vector> &vectors)
     return coefs;
 }*/
 
-cv::Point3d Procrustes::centralizedTranslation(const QVector<cv::Point3d> &shape)
+// ------------------------------------------------------------------------------
+
+cv::Point3d Procrustes3D::centralizedTranslation(const QVector<cv::Point3d> &shape)
 {
     cv::Point3d mean(0,0,0);
     int numberOfPoints = shape.count();
@@ -241,7 +243,7 @@ cv::Point3d Procrustes::centralizedTranslation(const QVector<cv::Point3d> &shape
     return shift;
 }
 
-Matrix Procrustes::alignRigid(QVector<cv::Point3d> &from, QVector<cv::Point3d> &to, bool centralize)
+Matrix Procrustes3D::alignRigid(QVector<cv::Point3d> &from, QVector<cv::Point3d> &to, bool centralize)
 {
     int n = from.count();
     assert(n == to.count());
@@ -275,7 +277,7 @@ Matrix Procrustes::alignRigid(QVector<cv::Point3d> &from, QVector<cv::Point3d> &
     return R;
 }
 
-Matrix Procrustes::getOptimalRotation(QVector<cv::Point3d> &from, QVector<cv::Point3d> &to)
+Matrix Procrustes3D::getOptimalRotation(QVector<cv::Point3d> &from, QVector<cv::Point3d> &to)
 {
     int n = from.count();
     assert(n == to.count());
@@ -297,7 +299,7 @@ Matrix Procrustes::getOptimalRotation(QVector<cv::Point3d> &from, QVector<cv::Po
     return R;
 }
 
-void Procrustes::transform(cv::Point3d &p, Matrix &m)
+void Procrustes3D::transform(cv::Point3d &p, Matrix &m)
 {
     Matrix A = (Matrix(3,1) << p.x, p.y, p.z);
     A = m*A;
@@ -305,7 +307,7 @@ void Procrustes::transform(cv::Point3d &p, Matrix &m)
 }
 
 
-void Procrustes::transform(QVector<cv::Point3d> &points, Matrix &m)
+void Procrustes3D::transform(QVector<cv::Point3d> &points, Matrix &m)
 {
     int n = points.count();
     for (int i = 0; i < n; i++)
@@ -315,7 +317,7 @@ void Procrustes::transform(QVector<cv::Point3d> &points, Matrix &m)
     }
 }
 
-cv::Point3d Procrustes::getOptimalScale(const QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to)
+cv::Point3d Procrustes3D::getOptimalScale(const QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to)
 {
     cv::Point3d scaleParamsNumerator(0.0, 0.0, 0.0);
     cv::Point3d scaleParamsDenominator(0.0, 0.0, 0.0);
@@ -337,7 +339,7 @@ cv::Point3d Procrustes::getOptimalScale(const QVector<cv::Point3d> &from, const 
 
 }
 
-void Procrustes::scale(QVector<cv::Point3d> &points, cv::Point3d scaleParams)
+void Procrustes3D::scale(QVector<cv::Point3d> &points, cv::Point3d scaleParams)
 {
     int n = points.count();
     for (int i = 0; i < n; i++)
@@ -348,7 +350,7 @@ void Procrustes::scale(QVector<cv::Point3d> &points, cv::Point3d scaleParams)
     }
 }
 
-void Procrustes::translate(QVector<cv::Point3d> &points, cv::Point3d shift)
+void Procrustes3D::translate(QVector<cv::Point3d> &points, cv::Point3d shift)
 {
     int n = points.count();
     for (int i = 0; i < n; i++)
@@ -357,7 +359,7 @@ void Procrustes::translate(QVector<cv::Point3d> &points, cv::Point3d shift)
     }
 }
 
-Procrustes3DResult Procrustes::SVDAlign(QVector<QVector<cv::Point3d> > &vectorOfPointclouds)//, bool centralize, double eps, int maxIterations)
+Procrustes3DResult Procrustes3D::SVDAlign(QVector<QVector<cv::Point3d> > &vectorOfPointclouds)//, bool centralize, double eps, int maxIterations)
 {
     Procrustes3DResult result;
 
@@ -389,7 +391,7 @@ Procrustes3DResult Procrustes::SVDAlign(QVector<QVector<cv::Point3d> > &vectorOf
     return result;
 }
 
-QVector<cv::Point3d> Procrustes::getMeanShape(QVector<QVector<cv::Point3d> > &vectorOfPointclouds)
+QVector<cv::Point3d> Procrustes3D::getMeanShape(QVector<QVector<cv::Point3d> > &vectorOfPointclouds)
 {
     int numberOfPointclouds = vectorOfPointclouds.count();
     int numberOfPoints = vectorOfPointclouds[0].count();
@@ -417,7 +419,7 @@ QVector<cv::Point3d> Procrustes::getMeanShape(QVector<QVector<cv::Point3d> > &ve
     return mean;
 }
 
-double Procrustes::getShapeVariation(QVector<QVector<cv::Point3d> > &vectorOfPointclouds, QVector<cv::Point3d> &mean)
+double Procrustes3D::getShapeVariation(QVector<QVector<cv::Point3d> > &vectorOfPointclouds, QVector<cv::Point3d> &mean)
 {
     int numberOfPointclouds = vectorOfPointclouds.count();
     int numberOfPoints = vectorOfPointclouds[0].count();
