@@ -266,10 +266,14 @@ MaskedVector Map::horizontalPointDensity(int y, int stripeWidth) const
     return curve;
 }
 
-Map Map::densityMap(int windowSize, bool fromCenter) const
+Map Map::densityMap(int kernelSize, bool fromCenter) const
 {
+    assert(kernelSize % 2 == 1);
+    assert(kernelSize >= 3);
+    int range = kernelSize/2;
+
     Map density(this->w, this->h);
-    double windowCount = (windowSize*2+1)*(windowSize*2+1);
+    double windowCount = windowSize*windowSize;
 
     double fromCenterToBorder = sqrt(w/2*w/2 + h/2*h/2);
 
@@ -278,9 +282,9 @@ Map Map::densityMap(int windowSize, bool fromCenter) const
         for(int x = 0; x < w; x++)
         {
             int count = 0;
-            for (int y2 = y-windowSize; y2 <= y+windowSize; y2++)
+            for (int y2 = y-range; y2 <= y+range; y2++)
             {
-                for (int x2 = x-windowSize; x2 <= x+windowSize; x2++)
+                for (int x2 = x-range; x2 <= x+range; x2++)
                 {
                     if (!isValidCoord(x2, y2)) continue;
                     if (!isSet(x2, y2)) continue;
