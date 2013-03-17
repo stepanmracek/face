@@ -2,7 +2,7 @@ QT += core gui opengl
 TARGET = vosm
 TEMPLATE = lib
 
-LIBS += `pkg-config --libs opencv`
+#LIBS += `pkg-config --libs opencv`
 
 HEADERS += \
     VO_WindowFunc.h \
