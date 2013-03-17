@@ -152,15 +152,15 @@ void Procrustes2D::transformate(Vector &vector, TransformationCoefs &coefs)
     }
 }
 
-double Procrustes2D::getOptimalRotation(Matrix &from, Matrix &to)
+double Procrustes2D::getOptimalRotation(Vector &from, Vector &to)
 {
     int n = from.rows/2;
     double numerator = 0.0;
     double denumerator = 0.0;
     for (int i = 0; i < n; i++)
     {
-        numerator += (from(i, 0) * to(n+i, 0) - from(n+i, 0) * to(i, 0));
-        denumerator += (from(i, 0) * to(i, 0) + from(n+i, 0) * to(n+i, 0));
+        numerator += (from(i) * to(n+i) - from(n+i) * to(i));
+        denumerator += (from(i) * to(i) + from(n+i) * to(n+i));
     }
 
     return atan(numerator/denumerator);
