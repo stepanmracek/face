@@ -12,7 +12,7 @@
 #include "facelib/surfaceprocessor.h"
 #include "facelib/glwidget.h"
 #include "facelib/facefeaturesanotation.h"
-#include "kinect/kinnect.h"
+//#include "kinect/kinnect.h"
 
 class TestMorphableFaceModel
 {
@@ -58,7 +58,7 @@ public:
         return app.exec();
     }
 
-    static int testMorphFromKinect(int argc, char *argv[], const QString &pca, const QString &flags, const QString &landmarksPath)
+    /*static int testMorphFromKinect(int argc, char *argv[], const QString &pca, const QString &flags, const QString &landmarksPath)
     {
         QApplication app(argc, argv);
         Morphable3DFaceModel model(pca, flags, landmarksPath, 200);
@@ -81,7 +81,7 @@ public:
         widget.show();
 
         return app.exec();
-    }
+    }*/
 
     static void testCreate(const QString &dirPath, const QString &meanLadmarksFile,
                            const QString &pcaFile, const QString &flagsFile)

@@ -1,6 +1,6 @@
 QT += core gui opengl
-TARGET = face
-TEMPLATE = app
+TARGET = faceCommon
+TEMPLATE = lib
 
 SOURCES += \
     biometrics/featurepotentialbase.cpp \
@@ -32,7 +32,6 @@ SOURCES += \
     linalg/normalization.cpp \
     facetrack/realtimetrack.cpp \
     facetrack/bioidprocess.cpp \
-    test/main.cpp \
     facelib/map.cpp \
     facelib/util.cpp \
     facelib/landmarkdetector.cpp \
@@ -40,9 +39,6 @@ SOURCES += \
     facelib/maskedvector.cpp \
     facelib/surfaceprocessor.cpp \
     facelib/glwidget.cpp \
-    evaluation/main_evaluation.cpp \
-    facetrack/main_facetrack.cpp \
-    kinect/kinnect.cpp \
     linalg/pointcloud.cpp \
     facelib/facefeaturesanotation.cpp \
     facelib/landmarks.cpp \
@@ -85,19 +81,6 @@ HEADERS += \
     linalg/common.h \
     facetrack/bioidprocess.h \
     facetrack/realtimetrack.h \
-    test/testvector.h \
-    test/testica.h \
-    test/testbiodataprocessing.h \
-    test/testdelaunay.h \
-    test/testprocrustes.h \
-    test/testpca.h \
-    test/testgaborwavelet.h \
-    test/testdiscriminativepotential.h \
-    test/testlda.h \
-    test/testsvd.h \
-    test/testmetrics.h \
-    test/testgaoptimization.h \
-    test/testsvm.h \
     evaluation/evaluateICA.h \
     evaluation/evaluate3dfrgc.h \
     evaluation/evaluatefeaturestability.h \
@@ -112,23 +95,14 @@ HEADERS += \
     facelib/surfaceprocessor.h \
     facelib/maskedvector.h \
     facelib/glwidget.h \
-    test/testkinect.h \
-    test/testfacefeaturesdetection.h \
     linalg/pointcloud.h \
     facelib/facefeaturesanotation.h \
     facelib/landmarks.h \
-    test/testmorphablefacemodel.h \
     facelib/morphable3dfacemodel.h \
     facelib/morphable3dfacemodelwidget.h \
-    test/testglwidget.h \
-    test/testmesh.h \
-    test/testlandmarks.h \
     facelib/widgetmeshselect.h
 
-INCLUDEPATH += /usr/include/libfreenect
-#INCLUDEPATH += /usr/include/pcl-1.6/ /usr/include/eigen3/ /usr/include/ni/ /usr/include/vtk-5.10/
-LIBS += `pkg-config --libs opencv` -lGL -lGLU -lfreenect -lfreenect_sync
-#LIBS += -lpcl_visualization -lpcl_io -lpcl_common -lboost_system -lboost_thread -lOpenNI
+LIBS += `pkg-config --libs opencv` -lGL -lGLU
 
 FORMS += \
     facelib/morphable3dfacemodelwidget.ui \

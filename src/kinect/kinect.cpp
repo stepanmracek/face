@@ -1,6 +1,6 @@
 #include "facetrack/realtimetrack.h"
 
-#include "kinnect.h"
+#include "kinect.h"
 
 bool Kinect::getDepth(double *depth, bool *mask, double minDistance, double maxDistance)
 {

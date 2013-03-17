@@ -1,8 +1,8 @@
-//QT += core gui opengl
-TARGET = pcl
-TEMPLATE = app
+QT += core gui opengl
+TARGET = pclWrapper
+TEMPLATE = lib
 
-SOURCES += main.cpp \
+SOURCES += \
     kinectacquire.cpp \
     align.cpp \
     common.cpp

@@ -8,8 +8,6 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 
-#include "kinect/kinnect.h"
-
 GLWidget::GLWidget(QWidget* parent) : QGLWidget(parent)
 {
     init();

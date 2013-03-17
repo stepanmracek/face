@@ -1,4 +1,4 @@
-#include "test/testvector.h"
+#include "testvector.h"
 #include "testprocrustes.h"
 #include "testpca.h"
 #include "testmetrics.h"
@@ -11,12 +11,11 @@
 #include "testica.h"
 #include "testsvm.h"
 #include "testgaborwavelet.h"
-#include "test/testkinect.h"
-#include "test/testfacefeaturesdetection.h"
-#include "test/testmorphablefacemodel.h"
-#include "test/testglwidget.h"
-#include "test/testmesh.h"
-#include "test/testlandmarks.h"
+#include "testfacefeaturesdetection.h"
+#include "testmorphablefacemodel.h"
+#include "testglwidget.h"
+#include "testmesh.h"
+#include "testlandmarks.h"
 
 QString frgcPath()
 {
@@ -36,11 +35,6 @@ int main(int argc, char *argv[])
     //TestLineProcessing::testLine();
     //TestLineProcessing::testMultipleLines();
     //TestMetrics::testMahalanobisDistance();
-    //TestActiveShapeModel::testInstantiate();
-    //TestActiveShapeModel::testLearn();
-    //TestActiveShapeModel::testFitToShape();
-    //TestActiveShapeModel::testFitToImage();
-    //TestActiveShapeModel::testFitToShapeIterative();
 
     //TestDelaunay::testSubdivision();
     //TestDelaunay::testTextureReader();
@@ -96,7 +90,7 @@ int main(int argc, char *argv[])
 
     //TestMorphableFaceModel::testCreate("/media/data/frgc/obj-centralized/Spring2004",
     //                                   "test/align-landmarks.xml", "test/align-pca.xml", "test/align-flags");
-    TestMorphableFaceModel::testModel(argc, argv, "../test/align-pca.xml", "../test/align-flags", "../test/align-landmarks.xml");
+    //TestMorphableFaceModel::testModel(argc, argv, "../test/align-pca.xml", "../test/align-flags", "../test/align-landmarks.xml");
     //TestMorphableFaceModel::testMorph(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml",
     //                                  "/run/media/stepo/frgc/frgc-spring2004-obj-centralized/04200d74.obj");
     //TestMorphableFaceModel::testMorphFromKinect(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml");

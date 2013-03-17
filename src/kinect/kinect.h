@@ -4,9 +4,6 @@
 #include <libfreenect/libfreenect.h>
 #include <libfreenect/libfreenect_sync.h>
 
-//#include <pcl/io/openni_grabber.h>
-//#include <pcl/visualization/cloud_viewer.h>
-
 #include "linalg/common.h"
 #include "facelib/mesh.h"
 #include "facelib/map.h"
