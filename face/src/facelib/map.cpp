@@ -70,7 +70,7 @@ void Map::linearScale(double multiply, double add)
 
 void Map::erode(int kernelSize)
 {
-    assert(kernelSize % 2 = 1);
+    assert(kernelSize % 2 == 1);
     assert(kernelSize >= 3);
     int range = kernelSize/2;
 
