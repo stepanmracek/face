@@ -13,7 +13,7 @@ LandmarkDetector::LandmarkDetector(Mesh &mesh) : mesh(mesh)
     stripeWidth = 50; //100;
     depthSmoothIterations = 20; // 20;
     depthSmoothAlpha = 0.5; //1.0;
-    depthErode = 3; //7;
+    depthErode = 7;
     depthLevelSelect = 0;
     depthScale = 1; //2;
     peakDensityWindowsSize = 10; //10;

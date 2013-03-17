@@ -70,6 +70,10 @@ void Map::linearScale(double multiply, double add)
 
 void Map::erode(int kernelSize)
 {
+    assert(kernelSize % 2 = 1);
+    assert(kernelSize >= 3);
+    int range = kernelSize/2;
+
     int count = 0;
     int toRemoveX[w*h];
     int toRemoveY[w*h];
@@ -81,9 +85,9 @@ void Map::erode(int kernelSize)
             if (!isSet(x, y)) continue;
 
             bool notValid = false;
-            for (int y2 = y-kernelSize; y2 <= y+kernelSize; y2++)
+            for (int y2 = y-range; y2 <= y+range; y2++)
             {
-                for (int x2 = x-kernelSize; x2 <= x+kernelSize; x2++)
+                for (int x2 = x-range; x2 <= x+range; x2++)
                 {
                     if (!isValidCoord(x2, y2))
                         continue;
