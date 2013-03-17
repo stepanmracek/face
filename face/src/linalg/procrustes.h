@@ -107,6 +107,7 @@ public:
 
     static void translate(QVector<cv::Point3d> &points, cv::Point3d shift);
 
-    static double getShapeVariation(QVector<QVector<cv::Point3d> > &vectorOfPointclouds, QVector<cv::Point3d> &mean);
+    static double getShapeVariation(QVector<
 }
+
 #endif // PROCRUSTES_H
