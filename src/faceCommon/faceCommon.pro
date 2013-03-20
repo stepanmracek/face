@@ -102,8 +102,6 @@ HEADERS += \
     facelib/morphable3dfacemodelwidget.h \
     facelib/widgetmeshselect.h
 
-LIBS += `pkg-config --libs opencv` -lGL -lGLU
-
 FORMS += \
     facelib/morphable3dfacemodelwidget.ui \
     facelib/widgetmeshselect.ui
