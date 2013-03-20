@@ -12,5 +12,6 @@ TEMPLATE = app
 INCLUDEPATH += "../faceCommon"
 
 LIBS += -L../faceCommon -lfaceCommon
+LIBS += `pkg-config --libs opencv` -lGL -lGLU
 
 SOURCES += main.cpp
