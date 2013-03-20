@@ -4,12 +4,13 @@ VOSMFacade::VOSMFacade()
 {
 }
 
-VOSMFacade::learn()
+bool VOSMFacade::learn(const QString &shapeInfoFilePath, const QString &imageDirPath,
+                       const QString &imageNameFilter, const QString &anotationsDirPath, const QString &outputDirPath)
 {
 
 }
 
-VOSMFacade::fit()
+void VOSMFacade::fit()
 {
 
 }
