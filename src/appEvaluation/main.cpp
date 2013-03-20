@@ -6,7 +6,7 @@
 //#include "evaluatethermo2.h"
 #include "evaluate3dfrgc.h"
 
-int main_evaluation(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     //EvaluateFeatureSelection::compareEERandDPSelectionOnFRGCAnatomical();
     //EvaluateFeatureSelection::createFRGCShapeIndexPCATemplates();
