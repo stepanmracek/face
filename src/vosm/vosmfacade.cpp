@@ -10,7 +10,7 @@ bool VOSMFacade::learn(const QString &shapeInfoFilePath, const QString &imageDir
 
 }
 
-void VOSMFacade::fit()
+bool VOSMFacade::fit()
 {
 
 }
