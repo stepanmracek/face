@@ -164,7 +164,7 @@ inline double linearInterpolation(double x1, double y1, double z1,
     return result;
 }
 
-void SurfaceProcessor::depthmap(Mesh &mesh, Map &map, cv::Point2d meshStart, cv::Point2d meshEnd)
+void SurfaceProcessor::depthmap(Mesh &mesh, Map &map, cv::Point2d meshStart, cv::Point2d meshEnd, bool useTexture)
 {
     qDebug() << "Depthmap calculation";
 
@@ -176,13 +176,24 @@ void SurfaceProcessor::depthmap(Mesh &mesh, Map &map, cv::Point2d meshStart, cv:
         cv::Vec3i &t = mesh.triangles[i];
         double x1d = mesh.points[t[0]].x;
         double y1d = mesh.points[t[0]].y;
-        double z1d = mesh.points[t[0]].z;
         double x2d = mesh.points[t[1]].x;
         double y2d = mesh.points[t[1]].y;
-        double z2d = mesh.points[t[1]].z;
         double x3d = mesh.points[t[2]].x;
         double y3d = mesh.points[t[2]].y;
-        double z3d = mesh.points[t[2]].z;
+
+        double z1d, z2d, z3d;
+        if (useTexture)
+        {
+            z1d = 0.299*mesh.colors[t[0]][2] + 0.587*mesh.colors[t[0]][1] + 0.114*mesh.colors[t[0]][0];
+            z2d = 0.299*mesh.colors[t[1]][2] + 0.587*mesh.colors[t[1]][1] + 0.114*mesh.colors[t[1]][0];
+            z3d = 0.299*mesh.colors[t[2]][2] + 0.587*mesh.colors[t[2]][1] + 0.114*mesh.colors[t[2]][0];
+        }
+        else
+        {
+            z1d = mesh.points[t[0]].z;
+            z2d = mesh.points[t[1]].z;
+            z3d = mesh.points[t[2]].z;
+        }
 
         int x1 = convert3DmodelToMap(x1d, meshStart.x, meshEnd.x, map.w);
         int y1 = convert3DmodelToMap(y1d, meshStart.y, meshEnd.y, map.h);
@@ -251,36 +262,38 @@ void SurfaceProcessor::depthmap(Mesh &mesh, Map &map, cv::Point2d meshStart, cv:
     qDebug() << "..done";
 }
 
-Map SurfaceProcessor::depthmap(Mesh &mesh, MapConverter &converter, cv::Point2d meshStart, cv::Point2d meshEnd, double scaleCoef)
+Map SurfaceProcessor::depthmap(Mesh &mesh, MapConverter &converter,
+                               cv::Point2d meshStart, cv::Point2d meshEnd,
+                               double scaleCoef, bool useTexture)
 {
     converter.meshStart = meshStart;
     converter.meshSize = meshEnd - meshStart;
 
     Map map(converter.meshSize.x * scaleCoef , converter.meshSize.y * scaleCoef);
-    depthmap(mesh, map, converter.meshStart, meshEnd);
+    depthmap(mesh, map, converter.meshStart, meshEnd, useTexture);
     return map;
 }
 
-Map SurfaceProcessor::depthmap(Mesh &mesh, MapConverter &converter, double scaleCoef)
+Map SurfaceProcessor::depthmap(Mesh &mesh, MapConverter &converter, double scaleCoef, bool useTexture)
 {
     converter.meshStart = cv::Point2d(mesh.minx, mesh.miny);
     converter.meshSize = cv::Point2d(mesh.maxx - mesh.minx, mesh.maxy - mesh.miny);
 
     Map map(converter.meshSize.x * scaleCoef , converter.meshSize.y * scaleCoef);
-    depthmap(mesh, map, converter.meshStart, cv::Point2d(mesh.maxx, mesh.maxy));
+    depthmap(mesh, map, converter.meshStart, cv::Point2d(mesh.maxx, mesh.maxy), useTexture);
     return map;
 }
 
-Map SurfaceProcessor::depthmap(Mesh &mesh, MapConverter &converter,
-                               int mapWidth, int mapHeight)
+/*Map SurfaceProcessor::depthmap(Mesh &mesh, MapConverter &converter,
+                               int mapWidth, int mapHeight, bool useTexture)
 {
     converter.meshStart = cv::Point2d(mesh.minx, mesh.miny);
     converter.meshSize = cv::Point2d(mesh.maxx - mesh.minx, mesh.maxy - mesh.miny);
 
     Map map(mapWidth, mapHeight);
-    depthmap(mesh, map, converter.meshStart, cv::Point2d(mesh.maxx, mesh.maxy));
+    depthmap(mesh, map, converter.meshStart, cv::Point2d(mesh.maxx, mesh.maxy), useTexture);
     return map;
-}
+}*/
 
 double dist(double x1, double y1, double x2, double y2)
 {

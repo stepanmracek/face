@@ -155,7 +155,7 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
         Map depth = SurfaceProcessor::depthmap(mesh, converter,
                                                cv::Point2d(-depthMapMask.w/2, -depthMapMask.h/2),
                                                cv::Point2d(depthMapMask.w/2, depthMapMask.h/2),
-                                               1);
+                                               1.0);
         resultMap.add(depth);
         depthMaps.append(depth);
 

@@ -2,6 +2,8 @@ QT += core gui opengl
 TARGET = faceCommon
 TEMPLATE = lib
 
+LIBS += `pkg-config --libs opencv` -lGL -lGLU
+
 SOURCES += \
     biometrics/featurepotentialbase.cpp \
     biometrics/featurelevelfusion.cpp \

@@ -1,11 +1,16 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    appEvaluation \
-    appMorphFaceModel \
+    # common library
     faceCommon \
-    kinect \
-    pclWrapper \
+    # tests
     unitTests \
     integrationTests \
-    vosm
+    # wrappers
+    kinect \
+    pclWrapper \
+    vosm \
+    # apps
+    appEvaluation \
+    appMorphFaceModel \
+    appKinectAcquire \

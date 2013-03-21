@@ -11,7 +11,7 @@ class FaceFeaturesAnotation
 public:  
     static void anotateOBJ(const QString &dirPath, bool uniqueIDsOnly);
 
-    static Landmarks anotate(Mesh &mesh);
+    static Landmarks anotate(Mesh &mesh, int desiredLandmarksCount);
 };
 
 #endif // FACEFEATURESANOTATION_H

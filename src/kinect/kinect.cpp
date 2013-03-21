@@ -1,6 +1,9 @@
-#include "facetrack/realtimetrack.h"
-
 #include "kinect.h"
+
+#include <libfreenect/libfreenect.h>
+#include <libfreenect/libfreenect_sync.h>
+
+#include "facetrack/realtimetrack.h"
 
 bool Kinect::getDepth(double *depth, bool *mask, double minDistance, double maxDistance)
 {
@@ -201,6 +204,7 @@ ImageGrayscale Kinect::RGBToGrayscale(uint8_t *rgb)
             double r = rgb[i3 + 2];
             double g = rgb[i3 + 1];
             double b = rgb[i3];
+            //if (x == 0 && y == 0) qDebug() << r;
             result(y, x) = cv::saturate_cast<uint8_t>(0.299*r + 0.587*g + 0.114*b);
 
             i++;
@@ -212,13 +216,13 @@ ImageGrayscale Kinect::RGBToGrayscale(uint8_t *rgb)
 Mesh Kinect::scanFace()
 {
     RealTimeTrack rtTrack;
+    int minDistanceFromSensor = 200;
+    int maxDistanceFromSensor = 800;
 
     double depth[640*480];
     bool mask[640*480];
     uint8_t rgb[640*480*3];
     ImageGrayscale grayScaleImg;
-    //ImageBGR colorImage;
-    cv::Rect faceRect;
 
     bool iterate = true;
     const char *testWinName = "Test Scan";
@@ -231,52 +235,49 @@ Mesh Kinect::scanFace()
             exit(1);
         }
 
+        grayScaleImg = Kinect::RGBToGrayscale(rgb);
+        std::vector<cv::Rect> faces = rtTrack.trackFace(grayScaleImg);
+
+        int faceCount = faces.size();
+        for (int i = 0; i < faceCount; i++)
+        {
+            int maskIndex = 0;
+            for (int r = 0; r < 480; r++)
+            {
+                for (int c = 0; c < 640; c++)
+                {
+                    mask[maskIndex] = faces[0].contains(cv::Point(c, r));
+                    maskIndex++;
+                }
+            }
+        }
+        if (faceCount > 0)
+        {
+            if (!Kinect::getDepth(depth, mask, minDistanceFromSensor, maxDistanceFromSensor))
+            {
+                qDebug() << "Kinect depth error";
+                exit(1);
+            }
+
+            int depthIndex = 0;
+            for (int r = 0; r < 480; r++)
+            {
+                for (int c = 0; c < 640; c++)
+                {
+                    if (depth[depthIndex] == 0)
+                        grayScaleImg(r,c) = 0;
+                    depthIndex++;
+                }
+            }
+            cv::rectangle(grayScaleImg, faces[0], cv::Scalar(255));
+        }
+        cv::imshow(testWinName, grayScaleImg);
+
         char key = cv::waitKey(1);
         if (key != -1)
         {
             break;
         }
-
-        grayScaleImg = Kinect::RGBToGrayscale(rgb);
-        std::vector<cv::Rect> faces = rtTrack.trackFace(grayScaleImg);
-        /*if (faces.size() == 0)
-        {
-            cv::imshow(testWinName, grayScaleImg);
-            //qDebug() << "no face detected";
-            continue;
-        }*/
-
-        if (faces.size() > 0)
-        faceRect = faces[0];
-        int maskIndex = 0;
-        for (int r = 0; r < 480; r++)
-        {
-            for (int c = 0; c < 640; c++)
-            {
-                mask[maskIndex] = faceRect.contains(cv::Point(c, r));
-                maskIndex++;
-            }
-        }
-
-        if (!Kinect::getDepth(depth, mask, 450, 800))
-        {
-            qDebug() << "Kinect depth error";
-            exit(1);
-        }
-
-        int depthIndex = 0;
-        for (int r = 0; r < 480; r++)
-        {
-            for (int c = 0; c < 640; c++)
-            {
-                if (depth[depthIndex] == 0)
-                    grayScaleImg(r,c) = 0;
-                depthIndex++;
-            }
-        }
-
-        cv::rectangle(grayScaleImg, faceRect, cv::Scalar(255));
-        cv::imshow(testWinName, grayScaleImg);
     }
     cv::destroyWindow(testWinName);
 
@@ -297,7 +298,7 @@ Mesh Kinect::scanFace()
         }
     }*/
 
-    if (!Kinect::getDepth(depth, 5, mask, 450, 800))
+    if (!Kinect::getDepth(depth, 5, mask, minDistanceFromSensor, maxDistanceFromSensor))
     {
         qDebug() << "Kinect depth error";
         exit(1);
