@@ -54,7 +54,7 @@ struct TransformationCoefs
 
 struct Procrustes3DResult
 {
-    QVector<cv::Point3d> translations;
+    //QVector<cv::Point3d> translations;
     QVector<cv::Point3d> scaleParams;
     QVector<Matrix> rotations;
 };
