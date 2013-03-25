@@ -45,8 +45,10 @@ void Morphable3DFaceModel::setModelParams(Vector &params)
     }
 }
 
-void Morphable3DFaceModel::align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations)
+Procrustes3DResult Morphable3DFaceModel::align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations)
 {
+    Procrustes3DResult result;
+
     // centralize
     cv::Point3d shift = Procrustes3D::centralizedTranslation(inputLandmarks.points);
     Procrustes3D::translate(inputLandmarks.points, shift);
@@ -58,12 +60,16 @@ void Morphable3DFaceModel::align(Mesh &inputMesh, Landmarks &inputLandmarks, int
         Matrix rotation = Procrustes3D::getOptimalRotation(inputLandmarks.points, this->landmarks.points);
         Procrustes3D::transform(inputLandmarks.points, rotation);
         inputMesh.transform(rotation);
+        result.rotations << rotation;
 
         // scale
         cv::Point3d scaleParams = Procrustes3D::getOptimalScale(inputLandmarks.points, this->landmarks.points);
         Procrustes3D::scale(inputLandmarks.points, scaleParams);
         inputMesh.scale(scaleParams);
+        result.scaleParams << scaleParams;
     }
+
+    return result;
 }
 
 void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
