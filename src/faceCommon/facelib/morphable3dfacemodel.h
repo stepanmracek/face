@@ -9,6 +9,7 @@
 #include "facelib/map.h"
 #include "facelib/maskedvector.h"
 #include "facelib/landmarks.h"
+#include "linalg/procrustes.h"
 
 class Morphable3DFaceModel
 {
