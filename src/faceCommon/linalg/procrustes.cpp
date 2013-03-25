@@ -368,7 +368,7 @@ Procrustes3DResult Procrustes3D::SVDAlign(QVector<QVector<cv::Point3d> > &vector
     int numberOfPoints = vectorOfPointclouds[0].count();
     assert(numberOfPoints > 0);
 
-    result.translations = QVector<cv::Point3d>(numberOfPointclouds, cv::Point3d(0,0,0));
+    //result.translations = QVector<cv::Point3d>(numberOfPointclouds, cv::Point3d(0,0,0));
     result.scaleParams = QVector<cv::Point3d>(numberOfPointclouds, cv::Point3d(1,1,1));
     result.rotations = QVector<Matrix>(numberOfPointclouds, Matrix::eye(3,3));
 
