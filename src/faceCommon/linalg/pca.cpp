@@ -92,7 +92,7 @@ Vector PCA::getMean()
     return mean;
 }
 
-Vector PCA::normalizeParams(const Vector &params)
+Vector PCA::normalizeParams(const Vector &params, double stdMultiplier)
 {
     int n = getModes();
     assert(params.rows == n);
@@ -101,7 +101,7 @@ Vector PCA::normalizeParams(const Vector &params)
     for (int i = 0; i < n; i++)
     {
         double p = params(i);
-        double limit = 3*sqrt(getVariation(i));
+        double limit = stdMultiplier*sqrt(getVariation(i));
         if (p > limit)
             p = limit;
         else if (p < -limit)
