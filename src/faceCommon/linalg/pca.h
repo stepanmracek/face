@@ -45,7 +45,7 @@ public:
 
     Vector getMean();
 
-    Vector normalizeParams(const Vector &params);
+    Vector normalizeParams(const Vector &params, double stdMultiplier = 3);
 };
 
 #endif // PCA_H

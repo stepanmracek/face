@@ -94,7 +94,7 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     QVector<double> usedValues = depthmap.getUsedValues();
     Vector inputValues(usedValues);
     Vector params = pca.project(inputValues);
-    Vector normalizedParams = pca.normalizeParams(params);
+    Vector normalizedParams = pca.normalizeParams(params, 1);
     setModelParams(normalizedParams);
 }
 
