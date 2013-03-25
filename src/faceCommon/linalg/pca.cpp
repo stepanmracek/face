@@ -92,6 +92,11 @@ Vector PCA::getMean()
     return mean;
 }
 
+Vector PCA::normalizeParams(const Vector &params)
+{
+    return normalizeParams(params, 3);
+}
+
 Vector PCA::normalizeParams(const Vector &params, double stdMultiplier)
 {
     int n = getModes();
