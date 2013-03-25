@@ -101,7 +101,7 @@ Vector PCA::normalizeParams(const Vector &params)
     for (int i = 0; i < n; i++)
     {
         double p = params(i);
-        double limit = 1*sqrt(getVariation(i));
+        double limit = 3*sqrt(getVariation(i));
         if (p > limit)
             p = limit;
         else if (p < -limit)
