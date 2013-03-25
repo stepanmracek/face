@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 {
     //scan(argc, argv, "face.obj");
 
-    Mesh m = Mesh::fromOBJ("../../test/obj/stepan.obj"); // Kinect::scanFace();
+    Mesh m = Mesh::fromOBJ("../../test/obj/ondra.obj"); // Kinect::scanFace();
 
     QString pca = "../../test/align-pca.xml";
     QString flags = "../../test/align-flags";
