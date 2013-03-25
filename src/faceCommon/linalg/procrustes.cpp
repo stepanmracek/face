@@ -359,6 +359,22 @@ void Procrustes3D::translate(QVector<cv::Point3d> &points, cv::Point3d shift)
     }
 }
 
+void Procrustes3D::applyInversedProcrustesResult(QVector<cv::Point3d> &pointCloud, Procrustes3DResult &procrustesResult)
+{
+    int n = procrustesResult.rotations.count();
+    assert(n == procrustesResult.scaleParams.count());
+
+    for (int i = n-1; i >= 0; i--)
+    {
+        cv::Point3d s = procrustesResult.scaleParams[i];
+        cv::Point3d invScale(1.0/s.x, 1.0/s.y, 1.0/s.z);
+        scale(pointCloud, invScale);
+
+        Matrix invRot = procrustesResult.rotations[i].inv();
+        transform(pointCloud, invRot);
+    }
+}
+
 Procrustes3DResult Procrustes3D::SVDAlign(QVector<QVector<cv::Point3d> > &vectorOfPointclouds)//, bool centralize, double eps, int maxIterations)
 {
     Procrustes3DResult result;
