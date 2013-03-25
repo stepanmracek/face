@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
 
     m.move(cv::Point3d(0,0,-50));
     Procrustes3D::applyInversedProcrustesResult(m.points, procrustesResult);
+    m.recalculateMinMax();
     model.mesh.move(cv::Point3d(0,0,50));
     widget.addFace(&model.mesh);
     //widget.addLandmarks(&landmarks);
