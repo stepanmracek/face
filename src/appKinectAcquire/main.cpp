@@ -5,7 +5,6 @@
 #include "facelib/glwidget.h"
 #include "facelib/morphable3dfacemodel.h"
 #include "facelib/facefeaturesanotation.h"
-#include "linalg/procrustes.h"
 
 int scan(int argc, char *argv[], const QString &outputPath)
 {
