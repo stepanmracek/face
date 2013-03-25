@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     GLWidget widget;
 
 
-    m.move(cv::Point3d(0,0,-50));
+    //m.move(cv::Point3d(0,0,-50));
     Procrustes3D::applyInversedProcrustesResult(model.mesh.points, procrustesResult);
     Procrustes3D::applyInversedProcrustesResult(m.points, procrustesResult);
     model.mesh.recalculateMinMax();
