@@ -5,6 +5,7 @@
 #include "facelib/glwidget.h"
 #include "facelib/morphable3dfacemodel.h"
 #include "facelib/facefeaturesanotation.h"
+#include "linalg/procrustes.h"
 
 int scan(int argc, char *argv[], const QString &outputPath)
 {
@@ -33,7 +34,7 @@ int main(int argc, char *argv[])
 
     Landmarks landmarks = FaceFeaturesAnotation::anotate(m, 8);
 
-    model.align(m, landmarks, 10);
+    Procrustes3DResult procrustesResult = model.align(m, landmarks, 10);
     model.morphModel(m);
 
     QApplication app(argc, argv);
@@ -41,6 +42,7 @@ int main(int argc, char *argv[])
     widget.addFace(&m);
 
     m.move(cv::Point3d(0,0,-50));
+    Procrustes3D::applyInversedProcrustesResult(m.points, procrustesResult);
     model.mesh.move(cv::Point3d(0,0,50));
     widget.addFace(&model.mesh);
     //widget.addLandmarks(&landmarks);

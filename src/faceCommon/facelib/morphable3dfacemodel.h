@@ -23,7 +23,7 @@ public:
 
     void setModelParams(Vector &params);
 
-    void align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations);
+    Procrustes3DResult align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations);
 
     void morphModel(Mesh &alignedMesh);
 
