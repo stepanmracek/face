@@ -38,14 +38,16 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
     GLWidget widget;
-    widget.addFace(&m);
+
 
     m.move(cv::Point3d(0,0,-50));
     Procrustes3D::applyInversedProcrustesResult(model.mesh.points, procrustesResult);
-    Procrustes3D::applyInversedProcrustesResult(m, procrustesResult);
+    Procrustes3D::applyInversedProcrustesResult(m.points, procrustesResult);
     model.mesh.recalculateMinMax();
     m.recalculateMinMax();
     //model.mesh.move(cv::Point3d(0,0,50));
+
+    widget.addFace(&m);
     widget.addFace(&model.mesh);
     //widget.addLandmarks(&landmarks);
     //widget.addLandmarks(&model.landmarks);
