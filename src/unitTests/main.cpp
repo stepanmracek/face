@@ -16,6 +16,9 @@
 #include "testglwidget.h"
 #include "testmesh.h"
 #include "testlandmarks.h"
+#include "testsurfaceprocessing.h"
+
+#include <QString>
 
 QString frgcPath()
 {
@@ -100,6 +103,8 @@ int main(int argc, char *argv[])
     //TestMesh::testXYZLodaderOBJWriter("/media/data/frgc/xyz/Spring2004", "/media/data/frgc/obj-centralized/Spring2004");
 
     //TestLandmarks::testReadWrite();
+
+    TestSurfaceProcessing::testNormals();
 
 	return 0;
 }

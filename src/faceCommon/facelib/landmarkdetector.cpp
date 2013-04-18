@@ -25,7 +25,7 @@ LandmarkDetector::LandmarkDetector(Mesh &mesh) : mesh(mesh)
     maxXDistanceFromNosetipToEyes = 20; //40;
 
     // Convert to range image
-    depth = SurfaceProcessor::depthmap(mesh, converter, depthScale);
+    depth = SurfaceProcessor::depthmap(mesh, converter, depthScale, ZCoord);
 
     // smooth
     SurfaceProcessor::smooth(depth, depthSmoothAlpha, depthSmoothIterations);

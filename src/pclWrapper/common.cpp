@@ -1,4 +1,4 @@
-#include "common.h"
+/*#include "common.h"
 
 void loadTransformAndSave(const char *in, const char *out, float mx, float my, float mz, float tz)
 {
@@ -13,3 +13,4 @@ void loadTransformAndSave(const char *in, const char *out, float mx, float my, f
     }
     pcl::io::savePCDFileBinary(out, cloud);
 }
+*/

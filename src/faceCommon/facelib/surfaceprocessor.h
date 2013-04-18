@@ -9,6 +9,11 @@
 class CurvatureStruct;
 class MapConverter;
 
+enum SurfaceDataToProcess
+{
+    ZCoord, Texture, Curvature
+};
+
 class SurfaceProcessor
 {
 private:
@@ -21,9 +26,8 @@ public:
     //static void interpolate(Mesh &f);
     static CurvatureStruct calculateCurvatures(Map &depthmap);
 
-    static Map depthmap(Mesh &mesh, MapConverter &converter, double scaleCoef, bool useTexture = false);
-    //static Map depthmap(Mesh &mesh, MapConverter &converter, int mapWidth, int mapHeight, bool useTexture = false);
-    static Map depthmap(Mesh &mesh, MapConverter &converter, cv::Point2d meshStart, cv::Point2d meshEnd, double scaleCoef, bool useTexture = false);
+    static Map depthmap(Mesh &mesh, MapConverter &converter, double scaleCoef, SurfaceDataToProcess dataToProcess);
+    static Map depthmap(Mesh &mesh, MapConverter &converter, cv::Point2d meshStart, cv::Point2d meshEnd, double scaleCoef, SurfaceDataToProcess dataToProcess);
 
     static QVector<cv::Point3d> isoGeodeticCurve(Mesh &f, cv::Point3d center, double distance, int samples,
                                                  double mapScaleFactor, double smoothAlpha = 0, int smoothIterations = 0);
@@ -32,8 +36,10 @@ public:
 
     static QVector<double> isoGeodeticCurveToEuclDistance(QVector<cv::Point3d> &isoCuvre, cv::Point3d &center);
 
+    static void calculateNormals(Mesh &mesh, int knn);
+
 private:
-    static void depthmap(Mesh &f, Map &map, cv::Point2d meshStart, cv::Point2d meshEnd, bool useTexture);
+    static void depthmap(Mesh &f, Map &map, cv::Point2d meshStart, cv::Point2d meshEnd, SurfaceDataToProcess dataToProcess);
 };
 
 class CurvatureStruct

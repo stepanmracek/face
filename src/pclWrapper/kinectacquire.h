@@ -1,7 +1,7 @@
 #ifndef KINECTACQUIRE_H
 #define KINECTACQUIRE_H
 
-#include <pcl/point_cloud.h>
+/*#include <pcl/point_cloud.h>
 #include <pcl/visualization/cloud_viewer.h>
 
 #include "common.h"
@@ -20,6 +20,6 @@ public:
     }
 
     void run();
-};
+};*/
 
 #endif // KINECTACQUIRE_H

@@ -22,6 +22,8 @@ public:
     VectorOfPoints points;
     VectorOfTriangles triangles;
     VectorOfColors colors;
+    VectorOfPoints normals;
+    QVector<double> curvatures;
 
     double minx, maxx, miny, maxy, minz, maxz;
     void writeOFF(const QString &path);

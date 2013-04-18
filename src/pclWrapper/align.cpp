@@ -1,4 +1,4 @@
-#include "align.h"
+/*#include "align.h"
 
 void downSample(PointCloud::Ptr &input, float gridSize, PointCloud::Ptr &output)
 {
@@ -162,4 +162,4 @@ void alignICP(std::string targetPath, std::vector<std::string> &sourcePaths)
     }
 
     pcl::io::savePCDFileBinary("../test/result.pcd", *targetCloud);
-}
+}*/

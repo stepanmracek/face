@@ -1,7 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include <iostream>
+/*#include <iostream>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
@@ -26,6 +26,6 @@ typedef pcl::PointCloud<Descriptor> Descriptors;
 typedef pcl::PointWithScale Keypoint;
 typedef pcl::PointCloud<Keypoint> Keypoints;
 
-void loadTransformAndSave(const char *in, const char *out, float mx, float my, float mz, float tz);
+void loadTransformAndSave(const char *in, const char *out, float mx, float my, float mz, float tz);*/
 
 #endif // COMMON_H

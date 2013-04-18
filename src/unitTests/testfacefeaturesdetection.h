@@ -35,7 +35,7 @@ public:
         SurfaceProcessor::smooth(face, 0.5, 5);
 
         MapConverter converter;
-        Map depthMap = SurfaceProcessor::depthmap(face, converter, 1);
+        Map depthMap = SurfaceProcessor::depthmap(face, converter, 1, ZCoord);
         SurfaceProcessor::smooth(depthMap, 0.5, 20);
 
         Matrix depthImage = depthMap.toMatrix();
@@ -104,7 +104,7 @@ public:
             Landmarks l(lPath);
 
             MapConverter converter;
-            Map depth = SurfaceProcessor::depthmap(m, converter, 1.0);
+            Map depth = SurfaceProcessor::depthmap(m, converter, 1.0, ZCoord);
             Matrix img = depth.toMatrix() * 255;
 
             for (int i = 0; i < l.points.size(); i++)
@@ -137,7 +137,7 @@ public:
             Landmarks l(lPath);
 
             MapConverter converter;
-            Map depthmap = SurfaceProcessor::depthmap(m, converter, 1.0);
+            Map depthmap = SurfaceProcessor::depthmap(m, converter, 1.0, ZCoord);
 
             QString ptsPath = dirPath + QDir::separator() + info.baseName() + ".pts";
             QFile ptsFile(ptsPath);
@@ -169,7 +169,7 @@ public:
             Landmarks l(lPath);
 
             MapConverter converter;
-            Map depthmap = SurfaceProcessor::depthmap(m, converter, 1.0);
+            Map depthmap = SurfaceProcessor::depthmap(m, converter, 1.0, ZCoord);
             SurfaceProcessor::smooth(depthmap, 1, 10);
             CurvatureStruct curvature = SurfaceProcessor::calculateCurvatures(depthmap);
 
@@ -211,7 +211,7 @@ public:
     {
         Mesh face = Mesh::fromXYZFile("02463d652.abs.xyz", true);
         MapConverter converter;
-        Map depth = SurfaceProcessor::depthmap(face, converter, 2);
+        Map depth = SurfaceProcessor::depthmap(face, converter, 2, ZCoord);
         SurfaceProcessor::smooth(depth, 1, 20);
         depth.levelSelect(0);
         CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(depth);
@@ -251,7 +251,7 @@ public:
     {
         Mesh face = Mesh::fromXYZFile("02463d652.abs.xyz", true);
         MapConverter converter;
-        Map depth = SurfaceProcessor::depthmap(face, converter, 2);
+        Map depth = SurfaceProcessor::depthmap(face, converter, 2, ZCoord);
         SurfaceProcessor::smooth(depth, 1, 20);
         CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(depth);
 

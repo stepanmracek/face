@@ -339,7 +339,10 @@ Matrix Map::toMatrix(double voidValue, double min, double max) const
         {
             if (isSet(x, y))
             {
-                result(y, x) = (get(x, y)-min)/delta; //*255;
+                double val = (get(x, y)-min)/delta;
+                if (val > max) val = max;
+                if (val < min) val = min;
+                result(y, x) = val; //*255;
             }
             else
             {

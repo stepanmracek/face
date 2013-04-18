@@ -1,9 +1,12 @@
+#include "surfaceprocessor.h"
+
 #include <QDebug>
 #include <math.h>
 #include <limits>
+#include <opencv2/flann/flann.hpp>
 
 #include "util.h"
-#include "surfaceprocessor.h"
+#include "linalg/pca.h"
 
 void SurfaceProcessor::smooth(Map &map, double alpha, int steps)
 {
@@ -164,7 +167,7 @@ inline double linearInterpolation(double x1, double y1, double z1,
     return result;
 }
 
-void SurfaceProcessor::depthmap(Mesh &mesh, Map &map, cv::Point2d meshStart, cv::Point2d meshEnd, bool useTexture)
+void SurfaceProcessor::depthmap(Mesh &mesh, Map &map, cv::Point2d meshStart, cv::Point2d meshEnd, SurfaceDataToProcess dataToProcess)
 {
     qDebug() << "Depthmap calculation";
 
@@ -182,17 +185,22 @@ void SurfaceProcessor::depthmap(Mesh &mesh, Map &map, cv::Point2d meshStart, cv:
         double y3d = mesh.points[t[2]].y;
 
         double z1d, z2d, z3d;
-        if (useTexture)
+        switch (dataToProcess)
         {
-            z1d = 0.299*mesh.colors[t[0]][2] + 0.587*mesh.colors[t[0]][1] + 0.114*mesh.colors[t[0]][0];
-            z2d = 0.299*mesh.colors[t[1]][2] + 0.587*mesh.colors[t[1]][1] + 0.114*mesh.colors[t[1]][0];
-            z3d = 0.299*mesh.colors[t[2]][2] + 0.587*mesh.colors[t[2]][1] + 0.114*mesh.colors[t[2]][0];
-        }
-        else
-        {
+        case ZCoord:
             z1d = mesh.points[t[0]].z;
             z2d = mesh.points[t[1]].z;
             z3d = mesh.points[t[2]].z;
+            break;
+        case Texture:
+            z1d = 0.299*mesh.colors[t[0]][2] + 0.587*mesh.colors[t[0]][1] + 0.114*mesh.colors[t[0]][0];
+            z2d = 0.299*mesh.colors[t[1]][2] + 0.587*mesh.colors[t[1]][1] + 0.114*mesh.colors[t[1]][0];
+            z3d = 0.299*mesh.colors[t[2]][2] + 0.587*mesh.colors[t[2]][1] + 0.114*mesh.colors[t[2]][0];
+            break;
+        case Curvature:
+            z1d = mesh.curvatures[t[0]];
+            z2d = mesh.curvatures[t[1]];
+            z3d = mesh.curvatures[t[2]];
         }
 
         int x1 = convert3DmodelToMap(x1d, meshStart.x, meshEnd.x, map.w);
@@ -264,23 +272,23 @@ void SurfaceProcessor::depthmap(Mesh &mesh, Map &map, cv::Point2d meshStart, cv:
 
 Map SurfaceProcessor::depthmap(Mesh &mesh, MapConverter &converter,
                                cv::Point2d meshStart, cv::Point2d meshEnd,
-                               double scaleCoef, bool useTexture)
+                               double scaleCoef, SurfaceDataToProcess dataToProcess)
 {
     converter.meshStart = meshStart;
     converter.meshSize = meshEnd - meshStart;
 
     Map map(converter.meshSize.x * scaleCoef , converter.meshSize.y * scaleCoef);
-    depthmap(mesh, map, converter.meshStart, meshEnd, useTexture);
+    depthmap(mesh, map, converter.meshStart, meshEnd, dataToProcess);
     return map;
 }
 
-Map SurfaceProcessor::depthmap(Mesh &mesh, MapConverter &converter, double scaleCoef, bool useTexture)
+Map SurfaceProcessor::depthmap(Mesh &mesh, MapConverter &converter, double scaleCoef, SurfaceDataToProcess dataToProcess)
 {
     converter.meshStart = cv::Point2d(mesh.minx, mesh.miny);
     converter.meshSize = cv::Point2d(mesh.maxx - mesh.minx, mesh.maxy - mesh.miny);
 
     Map map(converter.meshSize.x * scaleCoef , converter.meshSize.y * scaleCoef);
-    depthmap(mesh, map, converter.meshStart, cv::Point2d(mesh.maxx, mesh.maxy), useTexture);
+    depthmap(mesh, map, converter.meshStart, cv::Point2d(mesh.maxx, mesh.maxy), dataToProcess);
     return map;
 }
 
@@ -465,7 +473,7 @@ QVector<cv::Point3d> SurfaceProcessor::isoGeodeticCurve(Mesh &f, cv::Point3d cen
                                                         double mapScaleFactor, double smoothAlpha, int smoothIterations)
 {
     MapConverter converter;
-    Map map = depthmap(f, converter, mapScaleFactor);
+    Map map = depthmap(f, converter, mapScaleFactor, ZCoord);
 
     if (smoothIterations > 0)
     {
@@ -483,4 +491,76 @@ QVector<double> SurfaceProcessor::isoGeodeticCurveToEuclDistance(QVector<cv::Poi
         result << euclideanDistance(p, center);
     }
     return result;
+}
+
+void SurfaceProcessor::calculateNormals(Mesh &mesh, int knn)
+{
+    assert(knn >= 3);
+    int n = mesh.points.size();
+
+    qDebug() << "Calculating normals";
+    qDebug() << "  features matrix";
+    cv::Mat features(n, 3, CV_32F);
+    for (int i = 0; i < n; i++)
+    {
+        features.at<float>(i, 0) = mesh.points[i].x;
+        features.at<float>(i, 1) = mesh.points[i].y;
+        features.at<float>(i, 2) = mesh.points[i].z;
+    }
+    qDebug() << "  kd tree";
+    cv::flann::KDTreeIndexParams indexParams;
+    cv::flann::Index kdTree(features, indexParams);
+
+    qDebug() << "  normals";
+    mesh.normals = VectorOfPoints(n);
+    mesh.curvatures = QVector<double>(n);
+    std::vector<int> resultIndicies;
+    std::vector<float> resultDistances;
+    cv::Mat query(1, 3, CV_32F);
+    for (int i = 0; i < n; i++)
+    {
+        query.at<float>(0, 0) = mesh.points[i].x;
+        query.at<float>(0, 1) = mesh.points[i].y;
+        query.at<float>(0, 2) = mesh.points[i].z;   
+
+        kdTree.knnSearch(query, resultIndicies, resultDistances, knn);
+        /*kdTree.radiusSearch(query, resultIndicies, resultDistances, 2.0, 100);
+        for (int j = 0; j < resultIndicies.size(); j++)
+        {
+            qDebug() << i << j << resultIndicies[j] << resultDistances[j];
+        }*/
+
+        QVector<Vector> points;
+        for (int j = 0; j < knn; j++)
+        {
+            Vector p(3);
+            int k = resultIndicies[j];
+            p(0) = mesh.points[k].x;
+            p(1) = mesh.points[k].y;
+            p(2) = mesh.points[k].z;
+            points << p;
+        }
+        PCA pca(points);
+        mesh.normals[i].x = pca.cvPca.eigenvectors.at<double>(2, 0);
+        mesh.normals[i].y = pca.cvPca.eigenvectors.at<double>(2, 1);
+        mesh.normals[i].z = pca.cvPca.eigenvectors.at<double>(2, 2);
+
+        if (mesh.normals[i].z < 0)
+        {
+            mesh.normals[i].x = -mesh.normals[i].x;
+            mesh.normals[i].y = -mesh.normals[i].y;
+            mesh.normals[i].z = -mesh.normals[i].z;
+        }
+
+        // curvature
+        double l0 = pca.cvPca.eigenvalues.at<double>(2);
+        double l1 = pca.cvPca.eigenvalues.at<double>(1);
+        double l2 = pca.cvPca.eigenvalues.at<double>(0);
+        if (mesh.points[i].z > 0)
+            mesh.curvatures[i] = l0/(l0+l1+l2);
+        else
+            mesh.curvatures[i] = 0;
+        //mesh.curvatures[i] = fabs(atan(mesh.normals[i].z/mesh.normals[i].y));
+        //mesh.curvatures[i] = fabs(atan(sqrt(mesh.normals[i].y*mesh.normals[i].y + mesh.normals[i].z*mesh.normals[i].z)/mesh.normals[i].x));
+    }
 }

@@ -1,4 +1,4 @@
-#include "kinectacquire.h"
+/*#include "kinectacquire.h"
 
 #include <pcl/io/openni_grabber.h>
 #include <pcl/filters/passthrough.h>
@@ -37,3 +37,4 @@ void KinectAcquire::displayCallback(const PointCloud::ConstPtr &cloud)
         viewer.showCloud(filtered);
     }
 }
+*/

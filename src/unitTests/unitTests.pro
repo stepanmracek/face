@@ -34,4 +34,5 @@ HEADERS += \
     testfacefeaturesdetection.h \
     testdiscriminativepotential.h \
     testdelaunay.h \
-    testbiodataprocessing.h
+    testbiodataprocessing.h \
+    testsurfaceprocessing.h

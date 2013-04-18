@@ -75,7 +75,7 @@ Procrustes3DResult Morphable3DFaceModel::align(Mesh &inputMesh, Landmarks &input
 void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
 {
     MapConverter converter;
-    Map depthmap = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1);
+    Map depthmap = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, ZCoord);
     for (int i = 0; i < mask.rows; i++)
     {
         if (mask(i) == 0)
@@ -161,7 +161,7 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
         Map depth = SurfaceProcessor::depthmap(mesh, converter,
                                                cv::Point2d(-depthMapMask.w/2, -depthMapMask.h/2),
                                                cv::Point2d(depthMapMask.w/2, depthMapMask.h/2),
-                                               1.0);
+                                               1.0, ZCoord);
         resultMap.add(depth);
         depthMaps.append(depth);
 

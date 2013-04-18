@@ -92,8 +92,8 @@ Landmarks FaceFeaturesAnotation::anotate(Mesh &mesh, int desiredLandmarksCount)
     std::string windowName = "face";
     MapConverter converter, depthConverter;
     bool useTexture = mesh.colors.count() == mesh.points.count();
-    Map map = SurfaceProcessor::depthmap(mesh, converter, 2.0, useTexture);
-    Map depth = SurfaceProcessor::depthmap(mesh, depthConverter, 2.0);
+    Map map = SurfaceProcessor::depthmap(mesh, converter, 2.0, ZCoord);
+    Map depth = SurfaceProcessor::depthmap(mesh, depthConverter, 2.0, ZCoord);
 
     FaceFeaturesAnotationStruct anotationStruct;
     anotationStruct.texture = map.toMatrix();
@@ -146,7 +146,7 @@ void FaceFeaturesAnotation::anotateOBJ(const QString &dirPath, bool uniqueIDsOnl
 
         Mesh mesh = Mesh::fromOBJ(filePath, false);
         MapConverter converter;
-        Map depth = SurfaceProcessor::depthmap(mesh, converter, 2);
+        Map depth = SurfaceProcessor::depthmap(mesh, converter, 2, ZCoord);
         SurfaceProcessor::smooth(depth, 1, 2);
         CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(depth);
 
