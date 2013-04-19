@@ -3,7 +3,6 @@
 #include <QDebug>
 #include <math.h>
 #include <limits>
-#include <opencv2/flann/flann.hpp>
 
 #include "util.h"
 #include "linalg/pca.h"
@@ -68,7 +67,7 @@ void SurfaceProcessor::smooth(Map &map, double alpha, int steps)
     }
 }
 
-void SurfaceProcessor::smooth(Mesh &mesh, int knn, double alpha, int steps)
+void SurfaceProcessor::smooth(Mesh &mesh, int knn, double alpha, int steps, cv::flann::IndexParams indexParams)
 {
     assert(knn >= 3);
     int n = mesh.points.size();

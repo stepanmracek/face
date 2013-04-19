@@ -29,10 +29,17 @@ enum AlignType
 class TestFaceFeatuesDetection
 {
 public:
+    static int testSmoothing(int argc, char *argv[], QString pathToOBJ)
+    {
+        Mesh face = Mesh::fromOBJ(pathToOBJ);
+        SurfaceProcessor::smooth(face, 20, 1.0, 1, cv::flann::AutotunedIndexParams);
+
+        return 0;
+    }
+
     static int testDepthmapProcessing(int argc, char *argv[], QString pathToOBJ)
     {
         Mesh face = Mesh::fromOBJ(pathToOBJ);
-        SurfaceProcessor::smooth(face, 20, 1.0, 5);
 
         MapConverter converter;
         Map depthMap = SurfaceProcessor::depthmap(face, converter, 1, ZCoord);

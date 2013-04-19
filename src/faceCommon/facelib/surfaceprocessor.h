@@ -2,6 +2,7 @@
 #define SURFACEPROCESSOR_H
 
 #include <QDebug>
+#include <opencv2/flann/flann.hpp>
 
 #include "mesh.h"
 #include "map.h"
@@ -23,7 +24,7 @@ public:
     //static void smooth(Mesh *f, double alpha, int steps);
     static void smooth(Map &map, double alpha, int steps);
     static void smooth(Mesh &mesh, double alpha, int steps);
-    static void smooth(Mesh &mesh, int knn, double alpha, int steps);
+    static void smooth(Mesh &mesh, int knn, double alpha, int steps, cv::flann::IndexParams indexParams);
 
     //static void interpolate(Mesh &f);
     static CurvatureStruct calculateCurvatures(Map &depthmap);
