@@ -33,7 +33,7 @@ public:
     {
         QVector<cv::flann::IndexParams *> params;
         Mesh face = Mesh::fromOBJ(pathToOBJ);
-        cv::flann::KDTreeIndexParams *p = new cv::flann::KDTreeIndexParams();
+        cv::flann::IndexParams *p = new cv::flann::CompositeIndexParams();
         params << p;
         SurfaceProcessor::smooth(face, 20, 1.0, 1, *(params.at(0)) );
 
