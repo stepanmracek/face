@@ -68,6 +68,50 @@ void SurfaceProcessor::smooth(Map &map, double alpha, int steps)
     }
 }
 
+void SurfaceProcessor::smooth(Mesh &mesh, int knn, double alpha, int steps)
+{
+    assert(knn >= 3);
+    int n = mesh.points.size();
+
+    qDebug() << "Smoothing";
+    qDebug() << "  features matrix";
+    cv::Mat features(n, 3, CV_32F);
+    for (int i = 0; i < n; i++)
+    {
+        features.at<float>(i, 0) = mesh.points[i].x;
+        features.at<float>(i, 1) = mesh.points[i].y;
+        features.at<float>(i, 2) = mesh.points[i].z;
+    }
+    qDebug() << "  kd tree";
+    cv::flann::KDTreeIndexParams indexParams;
+    cv::flann::Index kdTree(features, indexParams);
+
+    qDebug() << "  smoothing";
+    VectorOfPoints newValues(n);
+    std::vector<int> resultIndicies;
+    std::vector<float> resultDistances;
+    cv::Mat query(1, 3, CV_32F);
+    for (int i = 0; i < n; i++)
+    {
+        query.at<float>(0, 0) = mesh.points[i].x;
+        query.at<float>(0, 1) = mesh.points[i].y;
+        query.at<float>(0, 2) = mesh.points[i].z;
+
+        kdTree.knnSearch(query, resultIndicies, resultDistances, knn);
+
+        cv::Point3d sum(0, 0, 0);
+        for (int j = 1; j < knn; j++)
+        {
+            int pIndex = resultIndicies[j];
+            sum += mesh.points[pIndex];
+        }
+        sum /= knn;
+        newValues[i] += (alpha * sum);
+    }
+
+    mesh.points = newValues;
+}
+
 void SurfaceProcessor::smooth(Mesh &mesh, double alpha, int steps)
 {
     // neighbours initialization
