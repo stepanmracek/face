@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
     //TestKinect::testPCL();
     //TestKinect::testPCLMerge(argc, argv);
 
-    TestFaceFeatuesDetection::testDepthmapProcessing(argc, argv, "/home/stepo/face2.obj");
+    TestFaceFeatuesDetection::testDepthmapProcessing(argc, argv, "/home/stepo/face.obj");
     //TestFaceFeatuesDetection::testLandmarkDetection(argc, argv, frgcPath() +
     //                                                "frgc-spring2004-obj-centralized/04202d566.obj");
     //TestFaceFeatuesDetection::testBatchLandmarkDetection(argc, argv, frgcPath() + "frgc-spring2004-obj-centralized");
