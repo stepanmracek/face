@@ -31,7 +31,7 @@ class TestFaceFeatuesDetection
 public:
     static int testSmoothing(int argc, char *argv[], QString pathToOBJ)
     {
-        QVector<cv::flann::IndexParams> params;
+        QVector<const cv::flann::IndexParams &> params;
         Mesh face = Mesh::fromOBJ(pathToOBJ);
         cv::flann::KDTreeIndexParams p;
         params << p;
