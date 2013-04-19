@@ -112,6 +112,9 @@ void SurfaceProcessor::smooth(Mesh &mesh, int knn, double alpha, int steps)
     }
 
     mesh.points = newValues;
+
+    mesh.recalculateMinMax();
+    mesh.calculateTriangles();
 }
 
 void SurfaceProcessor::smooth(Mesh &mesh, double alpha, int steps)
