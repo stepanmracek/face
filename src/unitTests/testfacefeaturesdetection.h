@@ -36,7 +36,7 @@ public:
 
         MapConverter converter;
         Map depthMap = SurfaceProcessor::depthmap(face, converter, 1, ZCoord);
-        SurfaceProcessor::smooth(depthMap, 0.5, 20);
+        SurfaceProcessor::smooth(depthMap, 1, 10);
 
         Matrix depthImage = depthMap.toMatrix();
         cv::imshow("depthMap", depthImage);
