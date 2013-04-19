@@ -31,11 +31,11 @@ class TestFaceFeatuesDetection
 public:
     static int testSmoothing(int argc, char *argv[], QString pathToOBJ)
     {
-        QVector<const cv::flann::IndexParams &> params;
+        QVector<cv::flann::IndexParams *> params;
         Mesh face = Mesh::fromOBJ(pathToOBJ);
-        cv::flann::KDTreeIndexParams p;
+        cv::flann::KDTreeIndexParams *p = new cv::flann::KDTreeIndexParams();
         params << p;
-        SurfaceProcessor::smooth(face, 20, 1.0, 1, params.at(0));
+        SurfaceProcessor::smooth(face, 20, 1.0, 1, *(params.at(0)) );
 
         QApplication app(argc, argv);
         GLWidget widget;
