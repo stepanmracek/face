@@ -35,6 +35,8 @@ public:
         params << new cv::flann::LinearIndexParams();
         params << new cv::flann::KDTreeIndexParams();
         params << new cv::flann::KMeansIndexParams();
+        params << new cv::flann::HierarchicalClusteringIndexParams();
+        params << new cv::flann::CompositeIndexParams();
 
         foreach (cv::flann::IndexParams *p, params)
         {
