@@ -11,7 +11,7 @@ public:
     {
         Mesh m = Mesh::fromOBJ("/home/stepo/face.obj");
         SurfaceProcessor::smooth(m, 1.0, 10);
-        SurfaceProcessor::calculateNormals(m, 5);
+        SurfaceProcessor::calculateNormals(m, 9);
 
         MapConverter converter;
         Map map = SurfaceProcessor::depthmap(m, converter, 2, Curvature);
