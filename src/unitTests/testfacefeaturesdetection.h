@@ -32,7 +32,7 @@ public:
     static int testSmoothing(int argc, char *argv[], QString pathToOBJ)
     {
         Mesh face = Mesh::fromOBJ(pathToOBJ);
-        //SurfaceProcessor::smooth(face, 20, 1.0, 1, cv::flann::KDTreeIndexParams());
+        SurfaceProcessor::smooth(face, 20, 1.0, 1, cv::flann::KDTreeIndexParams());
 
         QApplication app(argc, argv);
         GLWidget widget;
