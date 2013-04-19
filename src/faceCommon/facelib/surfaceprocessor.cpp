@@ -556,7 +556,7 @@ void SurfaceProcessor::calculateNormals(Mesh &mesh, int knn)
         double l0 = pca.cvPca.eigenvalues.at<double>(2);
         double l1 = pca.cvPca.eigenvalues.at<double>(1);
         double l2 = pca.cvPca.eigenvalues.at<double>(0);
-        mesh.curvatures[i] = exp( l0/(l0+l1+l2) );
+        mesh.curvatures[i] = l0/(l0+l1+l2);
 
         //mesh.curvatures[i] = fabs(atan(mesh.normals[i].z/mesh.normals[i].y));
         //mesh.curvatures[i] = fabs(atan(sqrt(mesh.normals[i].y*mesh.normals[i].y + mesh.normals[i].z*mesh.normals[i].z)/mesh.normals[i].x));
