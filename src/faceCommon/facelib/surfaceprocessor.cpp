@@ -82,7 +82,6 @@ void SurfaceProcessor::smooth(Mesh &mesh, int knn, double alpha, int steps, cv::
         features.at<float>(i, 2) = mesh.points[i].z;
     }
     qDebug() << "  kd tree";
-    cv::flann::HierarchicalClusteringIndexParams indexParams;
     cv::flann::Index kdTree(features, indexParams);
 
     qDebug() << "  smoothing";
