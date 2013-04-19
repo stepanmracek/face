@@ -36,6 +36,7 @@ public:
 
         MapConverter converter;
         Map depthMap = SurfaceProcessor::depthmap(face, converter, 2, ZCoord);
+        depthMap.levelSelect(0);
         SurfaceProcessor::smooth(depthMap, 1, 20);
 
         Matrix depthImage = depthMap.toMatrix();
