@@ -35,7 +35,7 @@ public:
         Mesh face = Mesh::fromOBJ(pathToOBJ);
         cv::flann::KDTreeIndexParams p;
         params << p;
-        SurfaceProcessor::smooth(face, 20, 1.0, 1, params[0]);
+        SurfaceProcessor::smooth(face, 20, 1.0, 1, params.at(0));
 
         QApplication app(argc, argv);
         GLWidget widget;
