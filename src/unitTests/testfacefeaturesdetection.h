@@ -32,7 +32,7 @@ public:
     static int testSmoothing(int argc, char *argv[], QString pathToOBJ)
     {
         Mesh face = Mesh::fromOBJ(pathToOBJ);
-        SurfaceProcessor::smooth(face, 20, 1.0, 1, cv::flann::AutotunedIndexParams());
+        SurfaceProcessor::smooth(face, 20, 1.0, 1, cv::flann::KDTreeIndexParams());
 
         return 0;
     }
