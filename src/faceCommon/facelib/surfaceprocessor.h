@@ -23,6 +23,8 @@ public:
     //static void smooth(Mesh *f, double alpha, int steps);
     static void smooth(Map &map, double alpha, int steps);
     static void smooth(Mesh &mesh, double alpha, int steps);
+    static void smooth(Mesh &mesh, int knn, double alpha, int steps);
+
     //static void interpolate(Mesh &f);
     static CurvatureStruct calculateCurvatures(Map &depthmap);
 
