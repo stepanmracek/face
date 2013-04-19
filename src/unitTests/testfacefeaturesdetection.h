@@ -32,7 +32,7 @@ public:
     static int testDepthmapProcessing(int argc, char *argv[], QString pathToOBJ)
     {
         Mesh face = Mesh::fromOBJ(pathToOBJ);
-        SurfaceProcessor::smooth(face, 20, 1.0, 5);
+        SurfaceProcessor::smooth(face, 50, 1.0, 5);
 
         MapConverter converter;
         Map depthMap = SurfaceProcessor::depthmap(face, converter, 1, ZCoord);
