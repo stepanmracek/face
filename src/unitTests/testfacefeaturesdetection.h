@@ -33,7 +33,7 @@ public:
     {
         QVector<cv::flann::IndexParams *> params;
         Mesh face = Mesh::fromOBJ(pathToOBJ);
-        cv::flann::IndexParams *p = new cv::flann::HierarchicalClusteringIndexParams();
+        cv::flann::IndexParams *p = new cv::flann::LinearIndexParams();
         params << p;
         SurfaceProcessor::smooth(face, 50, 1.0, 1, *(params.at(0)) );
 
