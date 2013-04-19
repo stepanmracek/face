@@ -9,7 +9,7 @@ class TestSurfaceProcessing
 public:
     static void testNormals()
     {
-        Mesh m = Mesh::fromOBJ("/home/stepo/face.obj");
+        Mesh m = Mesh::fromOBJ("/home/stepo/face2.obj");
         //SurfaceProcessor::smooth(m, 1.0, 10);
         SurfaceProcessor::calculateNormals(m, 20);
 
