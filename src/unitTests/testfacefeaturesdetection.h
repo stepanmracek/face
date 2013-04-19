@@ -32,18 +32,24 @@ public:
     static int testSmoothing(int argc, char *argv[], QString pathToOBJ)
     {
         QVector<cv::flann::IndexParams *> params;
-        Mesh face = Mesh::fromOBJ(pathToOBJ);
-        cv::flann::IndexParams *p = new cv::flann::LinearIndexParams();
-        params << p;
-        SurfaceProcessor::smooth(face, 50, 1.0, 1, *(params.at(0)) );
+        params << *p = new cv::flann::LinearIndexParams();
+        params << *p = new cv::flann::KDTreeIndexParams();
+        params << *p = new cv::flann::LshIndexParams();
+        params << *p = new cv::flann::KMeansIndexParams();
 
-        QApplication app(argc, argv);
+        foreach (cv::flann::IndexParams *p, params)
+        {
+            Mesh face = Mesh::fromOBJ(pathToOBJ);
+            SurfaceProcessor::smooth(face, 20, 1.0, 1, *p);
+        }
+
+        /*QApplication app(argc, argv);
         GLWidget widget;
         widget.setWindowTitle("GL Widget");
         widget.addFace(&face);
-        widget.show();
-
-        return app.exec();
+        widget.show()
+        return app.exec();*/
+        return 0;
     }
 
     static int testDepthmapProcessing(int argc, char *argv[], QString pathToOBJ)
