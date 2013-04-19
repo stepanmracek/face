@@ -34,7 +34,13 @@ public:
         Mesh face = Mesh::fromOBJ(pathToOBJ);
         SurfaceProcessor::smooth(face, 20, 1.0, 1, cv::flann::KDTreeIndexParams());
 
-        return 0;
+        QApplication app(argc, argv);
+        GLWidget widget;
+        widget.setWindowTitle("GL Widget");
+        widget.addFace(&face);
+        widget.show();
+
+        return app.exec();
     }
 
     static int testDepthmapProcessing(int argc, char *argv[], QString pathToOBJ)
