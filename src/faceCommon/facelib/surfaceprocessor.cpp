@@ -105,7 +105,9 @@ void SurfaceProcessor::smooth(Mesh &mesh, int knn, double alpha, int steps)
             int pIndex = resultIndicies[j];
             sum += mesh.points[pIndex];
         }
-        sum = sum / knn;
+        sum.x /= knn;
+        sum.y /= knn;
+        sum.z /= knn;
         newValues[i] += (alpha * sum);
     }
 
