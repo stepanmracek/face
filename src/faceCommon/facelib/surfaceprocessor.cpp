@@ -519,6 +519,8 @@ void SurfaceProcessor::calculateNormals(Mesh &mesh, int knn)
     cv::Mat query(1, 3, CV_32F);
     for (int i = 0; i < n; i++)
     {
+        qDebug() << mesh.points[i].z;
+
         query.at<float>(0, 0) = mesh.points[i].x;
         query.at<float>(0, 1) = mesh.points[i].y;
         query.at<float>(0, 2) = mesh.points[i].z;   
