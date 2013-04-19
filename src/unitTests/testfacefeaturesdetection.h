@@ -32,10 +32,10 @@ public:
     static int testSmoothing(int argc, char *argv[], QString pathToOBJ)
     {
         QVector<cv::flann::IndexParams *> params;
-        params << *p = new cv::flann::LinearIndexParams();
-        params << *p = new cv::flann::KDTreeIndexParams();
-        params << *p = new cv::flann::LshIndexParams();
-        params << *p = new cv::flann::KMeansIndexParams();
+        params << new cv::flann::LinearIndexParams();
+        params << new cv::flann::KDTreeIndexParams();
+        params << new cv::flann::LshIndexParams();
+        params << new cv::flann::KMeansIndexParams();
 
         foreach (cv::flann::IndexParams *p, params)
         {
