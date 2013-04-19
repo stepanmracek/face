@@ -16,7 +16,7 @@ public:
         MapConverter converter;
         Map map = SurfaceProcessor::depthmap(m, converter, 2, Curvature);
         qDebug() << map.minValue() << map.maxValue();
-        Matrix mat = map.toMatrix(0, 0, 0.1);
+        Matrix mat = map.toMatrix();
         //mat = Matrix::ones(mat.rows, mat.cols) - mat;
         cv::imshow("curvature from 3d", mat);
         cv::waitKey();
