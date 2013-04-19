@@ -86,6 +86,7 @@ void SurfaceProcessor::smooth(Mesh &mesh, int knn, double alpha, int steps, cons
 
     qDebug() << "  smoothing";
     VectorOfPoints newValues(n);
+    QVector<double> newZValues(n);
     std::vector<int> resultIndicies;
     std::vector<float> resultDistances;
     cv::Mat query(1, 3, CV_32F);
@@ -106,10 +107,13 @@ void SurfaceProcessor::smooth(Mesh &mesh, int knn, double alpha, int steps, cons
         sum.x /= knn;
         sum.y /= knn;
         sum.z /= knn;
-        newValues[i] += (alpha * sum);
+        newZValues[i] += (alpha * sum.z);
     }
 
-    mesh.points = newValues;
+    for (int i = 0; i < n; i++)
+    {
+        mesh.points[i].z = newZValues[i];
+    }
 
     mesh.recalculateMinMax();
     mesh.calculateTriangles();
