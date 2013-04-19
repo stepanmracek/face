@@ -32,9 +32,9 @@ public:
     static int testSmoothing(int argc, char *argv[], QString pathToOBJ)
     {
         QVector<cv::flann::IndexParams> params;
-        params << cv::flann::KDTreeIndexParams();
         Mesh face = Mesh::fromOBJ(pathToOBJ);
         cv::flann::KDTreeIndexParams p;
+        params << p;
         SurfaceProcessor::smooth(face, 20, 1.0, 1, params[0]);
 
         QApplication app(argc, argv);
