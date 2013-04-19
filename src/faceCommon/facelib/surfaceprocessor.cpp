@@ -67,7 +67,7 @@ void SurfaceProcessor::smooth(Map &map, double alpha, int steps)
     }
 }
 
-void SurfaceProcessor::smooth(Mesh &mesh, int knn, double alpha, int steps, cv::flann::IndexParams indexParams)
+void SurfaceProcessor::smooth(Mesh &mesh, int knn, double alpha, int steps, const cv::flann::IndexParams &indexParams)
 {
     assert(knn >= 3);
     int n = mesh.points.size();
