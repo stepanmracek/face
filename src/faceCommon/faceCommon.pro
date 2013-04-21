@@ -46,7 +46,9 @@ SOURCES += \
     facelib/landmarks.cpp \
     facelib/morphable3dfacemodel.cpp \
     facelib/morphable3dfacemodelwidget.cpp \
-    facelib/widgetmeshselect.cpp
+    facelib/widgetmeshselect.cpp \
+    linalg/kernelgenerator.cpp \
+    linalg/gabor.cpp
 
 HEADERS += \
     kinect/kinnect.h \
@@ -102,7 +104,9 @@ HEADERS += \
     facelib/landmarks.h \
     facelib/morphable3dfacemodel.h \
     facelib/morphable3dfacemodelwidget.h \
-    facelib/widgetmeshselect.h
+    facelib/widgetmeshselect.h \
+    linalg/kernelgenerator.h \
+    linalg/gabor.h
 
 FORMS += \
     facelib/morphable3dfacemodelwidget.ui \

@@ -46,6 +46,21 @@ bool Common::matrixContainsNan(Matrix &m)
 	return false;
 }
 
+void Common::getMinMax(Matrix &m, double &min, double &max)
+{
+    max = -INFINITY;
+    min = INFINITY;
+    for (int y = 0; y < m.rows; y++)
+    {
+        for (int x = 0; x < m.cols; x++)
+        {
+            double v = m(y, x);
+            if (v > max) max = v;
+            if (v < min) min = v;
+        }
+    }
+}
+
 void Common::savePlot(QVector<double> &x, QVector<double> &y, QVector<double> &z, const QString &path)
 {
     int n = x.count();

@@ -20,6 +20,14 @@ Map::Map(int w, int h)
     init(w, h);
 }
 
+Map::Map(const Map &src)
+{
+    w = src.w;
+    h = src.h;
+    flags = src.flags;
+    values = src.values;
+}
+
 /*Map::~Map()
 {
     if (flags != NULL) delete [] flags;
@@ -435,4 +443,52 @@ QVector<double> Map::getUsedValues() const
     }
 
     return result;
+}
+
+void Map::applyFilter(Matrix &kernel, int times, bool checkSum)
+{
+    assert(kernel.rows % 2 == 1);
+    assert(kernel.cols % 2 == 1);
+
+    int kernelAnchorX = kernel.cols/2;
+    int kernelAnchorY = kernel.rows/2;
+    int kernelW = kernel.cols/2;
+    int kernelH = kernel.rows/2;
+
+    for (int i = 0; i < times; i++)
+    {
+        QVector<double> newValues(w*h);
+        for (int y = 0; y < this->h; y++)
+        {
+            for (int x = 0; x < this->w; x++)
+            {
+                if (!isSet(x, y)) continue;
+
+                double newValue = 0;
+                double sumOfKernelValues = 0;
+                for (int yy = -kernelH; yy <= kernelH; yy++)
+                {
+                    for (int xx = -kernelW; xx <= kernelW; xx++)
+                    {
+                        if (!isValidCoord(x+xx, y+yy)) continue;
+                        if (!isSet(x+xx, y+yy)) continue;
+
+                        double kernelValue = kernel(cv::Point(kernelAnchorX+xx,kernelAnchorY+yy));
+                        newValue += get(x+xx, y+yy)*kernelValue;
+                        sumOfKernelValues += kernelValue;
+                    }
+                }
+
+                if (checkSum)
+                {
+                    newValue = newValue/sumOfKernelValues;
+                }
+                newValues[coordToIndex(x, y)] = newValue;
+            }
+        }
+
+        values = newValues;
+    }
+    /*Matrix src = this->toMatrix();
+    cv::filter2D()*/
 }

@@ -18,6 +18,7 @@ public:
     static void printMatrix(CvMat *m);
     static void printMatrix(Matrix &m);
     static bool matrixContainsNan(Matrix &m);
+    static void getMinMax(Matrix &m, double &min, double &max);
 
     static void savePlot(QVector<double> &x, QVector<double> &y, QVector<double> &z, const QString &path);
     static void savePlot(QVector<double> &x, QVector<double> &y, const QString &path);

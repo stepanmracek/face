@@ -67,7 +67,7 @@ void SurfaceProcessor::smooth(Map &map, double alpha, int steps)
     }
 }
 
-void SurfaceProcessor::smooth(Mesh &mesh, int knn, double alpha, int steps, const cv::flann::IndexParams &indexParams)
+/*void SurfaceProcessor::smooth(Mesh &mesh, int knn, double alpha, int steps, const cv::flann::IndexParams &indexParams)
 {
     assert(knn >= 3);
     int n = mesh.points.size();
@@ -117,7 +117,7 @@ void SurfaceProcessor::smooth(Mesh &mesh, int knn, double alpha, int steps, cons
 
     mesh.recalculateMinMax();
     mesh.calculateTriangles();
-}
+}*/
 
 void SurfaceProcessor::smooth(Mesh &mesh, double alpha, int steps)
 {
@@ -400,8 +400,6 @@ CurvatureStruct SurfaceProcessor::calculateCurvatures(Map &depthmap)
                 double delta = (first[2]+second[2])/2;
                 if (point[2] < delta)
                     k1 = -k1;
-
-                //qDebug() << x << y << angle << k1;
 
                 // top - down direction
                 first[0] = x; first[1] = y+1; first[2] = depthmap.get(x, y+1);

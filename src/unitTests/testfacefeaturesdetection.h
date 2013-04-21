@@ -20,6 +20,8 @@
 #include "facelib/landmarks.h"
 #include "linalg/pca.h"
 #include "facelib/widgetmeshselect.h"
+#include "linalg/kernelgenerator.h"
+#include "linalg/gabor.h"
 
 enum AlignType
 {
@@ -29,28 +31,37 @@ enum AlignType
 class TestFaceFeatuesDetection
 {
 public:
-    static int testSmoothing(int argc, char *argv[], QString pathToOBJ)
+
+    static int testFilters(int argc, char *argv[], QString pathToOBJ)
     {
-        QVector<cv::flann::IndexParams *> params;
-        params << new cv::flann::LinearIndexParams();
-        params << new cv::flann::KDTreeIndexParams();
-        params << new cv::flann::KMeansIndexParams();
-        params << new cv::flann::HierarchicalClusteringIndexParams();
-        params << new cv::flann::CompositeIndexParams();
+        Gabor gaborBank(21);
 
-        foreach (cv::flann::IndexParams *p, params)
+        Mesh face = Mesh::fromOBJ(pathToOBJ);
+        MapConverter converter;
+        Map depthMap = SurfaceProcessor::depthmap(face, converter, 1, ZCoord);
+
+        Matrix smoothKernel = KernelGenerator::gaussianKernel(5);
+        depthMap.applyFilter(smoothKernel, 5, true);
+
+        CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(depthMap);
+
+        Matrix smoothed = depthMap.toMatrix();
+        cv::imshow("smoothed", smoothed);
+        cv::imshow("shape index", cs.curvatureIndex.toMatrix());
+
+        qDebug() << "before response";
+        Matrix index = cs.curvatureIndex.toMatrix();
+        QVector<Matrix> responses = gaborBank.getAbsResponse(index);
+        qDebug() << "after response";
+        for (int i = 0; i < responses.count(); i++)
         {
-            Mesh face = Mesh::fromOBJ(pathToOBJ);
-            SurfaceProcessor::smooth(face, 20, 1.0, 1, *p);
+            Matrix response = responses[i];
+            double min, max;
+            Common::getMinMax(response, min, max);
+            cv::imshow("response", (response-min)/(max - min));
+            cv::waitKey(100);
         }
-
-        /*QApplication app(argc, argv);
-        GLWidget widget;
-        widget.setWindowTitle("GL Widget");
-        widget.addFace(&face);
-        widget.show()
-        return app.exec();*/
-        return 0;
+        cv::waitKey();
     }
 
     static int testDepthmapProcessing(int argc, char *argv[], QString pathToOBJ)

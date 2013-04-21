@@ -21,6 +21,7 @@ public:
     Map();
     void init(int _w, int _h);
     Map(int w, int h);
+    Map(const Map &src);
     //virtual ~Map();
 
     QVector<double> getUsedValues() const;
@@ -145,6 +146,8 @@ public:
     Map subMap(int startx, int width, int starty, int height) const;
 
     static Map fromMatrix(Matrix &matrix, double voidValue = 0.0);
+
+    void applyFilter(Matrix &kernel, int times = 1, bool checkSum = false);
 };
 
 #endif // MAP_H
