@@ -26,7 +26,3 @@ Matrix KernelGenerator::gaussianKernel(int size)
     return kernel;
 }
 
-QVector<Matrix> KernelGenerator::gaborBank(int size)
-{
-
-}

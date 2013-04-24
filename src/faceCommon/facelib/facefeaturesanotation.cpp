@@ -12,6 +12,7 @@
 #include "map.h"
 #include "surfaceprocessor.h"
 #include "landmarks.h"
+#include "linalg/kernelgenerator.h"
 
 struct FaceFeaturesAnotationStruct
 {
@@ -90,13 +91,14 @@ void FaceFeaturesAnotationMouseCallback(int event, int x, int y, int flags, void
 Landmarks FaceFeaturesAnotation::anotate(Mesh &mesh, int desiredLandmarksCount)
 {
     std::string windowName = "face";
-    MapConverter converter, depthConverter;
-    bool useTexture = mesh.colors.count() == mesh.points.count();
-    Map map = SurfaceProcessor::depthmap(mesh, converter, 2.0, ZCoord);
+    MapConverter depthConverter;
     Map depth = SurfaceProcessor::depthmap(mesh, depthConverter, 2.0, ZCoord);
+    Matrix gauss = KernelGenerator::gaussianKernel(5);
+    depth.applyFilter(gauss, 3, true);
+    CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(depth);
 
     FaceFeaturesAnotationStruct anotationStruct;
-    anotationStruct.texture = map.toMatrix();
+    anotationStruct.texture = cs.curvatureIndex.toMatrix();
     anotationStruct.windowName = windowName;
 
     cv::namedWindow(windowName);
