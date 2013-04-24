@@ -35,4 +35,5 @@ HEADERS += \
     testdiscriminativepotential.h \
     testdelaunay.h \
     testbiodataprocessing.h \
-    testsurfaceprocessing.h
+    testsurfaceprocessing.h \
+    testanotation.h

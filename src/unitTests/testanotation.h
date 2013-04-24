@@ -1,0 +1,4 @@
+#ifndef TESTANOTATION_H
+#define TESTANOTATION_H
+
+#endif // TESTANOTATION_H
