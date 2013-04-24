@@ -40,7 +40,7 @@ LandmarkDetector::LandmarkDetector(Mesh &mesh) : mesh(mesh)
 
     // erode and select only points with z-coordinate higher or equal than some threshold
     depth.erode(depthErode);
-    depth.levelSelect(depthLevelSelect);
+    depth.levelSelect((mesh.maxz+mesh.minz)/2);
     int cropWidth, cropHeight;
     depth.getCropParams(cropStartX, cropWidth, cropStartY, cropHeight);
     croppedDepth = depth.subMap(cropStartX, cropWidth, cropStartY, cropHeight);
