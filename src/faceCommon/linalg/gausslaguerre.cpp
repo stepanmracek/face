@@ -2,7 +2,7 @@
 
 GaussLaguerre::GaussLaguerre(int size)
 {
-    for (int j = 2; j <= 2; j++)
+    for (int j = 0; j <= 2; j++)
     {
         for (int n = 1; n <= 5; n++)
         {
