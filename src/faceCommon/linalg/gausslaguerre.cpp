@@ -3,7 +3,7 @@
 GaussLaguerre::GaussLaguerre(int size)
 {
     int j = 0;
-    for (int n = 1; n <= 5; n++) // frequency
+    for (int n = 2; n <= 2; n++) // frequency
     {
         for (int k = 0; k <= 0; k++) // size
         {
