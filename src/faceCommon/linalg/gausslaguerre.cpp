@@ -50,7 +50,7 @@ double GaussLaguerre::L(double r, int n, int k)
     double sum = 0;
     for (int h = 0; h <= k; h++)
     {
-        sum += pow(-1, K) * over(n + k, k - h) * pow(r, h) / factorial(h);
+        sum += pow(-1, k) * over(n + k, k - h) * pow(r, h) / factorial(h);
     }
 }
 
