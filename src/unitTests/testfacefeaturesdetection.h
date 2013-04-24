@@ -61,6 +61,8 @@ public:
             double min, max;
             Common::getMinMax(response, min, max);
             cv::imshow("response", (response-min)/(max - min));
+            cv::imshow("real", bank.realKernels[i]);
+            cv::imshow("imag", bank.imagKernels[i]);
             cv::waitKey(100);
         }
         cv::waitKey();
