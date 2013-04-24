@@ -27,8 +27,8 @@ GaussLaguerre::GaussLaguerre(int size)
 
                 realKernels << re;
                 imagKernels << im;
-                Common::printMatrix(re);
-                Common::printMatrix(im);
+                //Common::printMatrix(re);
+                //Common::printMatrix(im);
             }
         }
     }
