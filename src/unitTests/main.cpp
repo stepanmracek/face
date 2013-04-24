@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     //TestKinect::testPCLMerge(argc, argv);
 
     //TestFaceFeatuesDetection::testDepthmapProcessing(argc, argv, "/home/stepo/face.obj");
-    return TestFaceFeatuesDetection::testFilters(argc, argv, "/home/stepo/face.obj");
+    //return TestFaceFeatuesDetection::testFilters(argc, argv, "/home/stepo/face.obj");
     //TestFaceFeatuesDetection::testLandmarkDetection(argc, argv, frgcPath() +
     //                                                "frgc-spring2004-obj-centralized/04202d566.obj");
     //TestFaceFeatuesDetection::testBatchLandmarkDetection(argc, argv, frgcPath() + "frgc-spring2004-obj-centralized");
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     //                                  "/run/media/stepo/frgc/frgc-spring2004-obj-centralized/04200d74.obj");
     //TestMorphableFaceModel::testMorphFromKinect(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml");
 
-    //TestGlWidget::test(argc, argv, "/media/data/frgc/obj-centralized/Spring2004/");
+    TestGlWidget::test(argc, argv, "/home/stepo/frgc/spring2004/xyz");
 
     //TestMesh::testXYZLodaderOBJWriter("/media/data/frgc/xyz/Spring2004", "/media/data/frgc/obj-centralized/Spring2004");
 

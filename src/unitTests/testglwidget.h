@@ -2,6 +2,7 @@
 #define TESTGLWIDGET_H
 
 #include <QApplication>
+#include <QDir>
 
 #include "facelib/glwidget.h"
 #include "facelib/mesh.h"
@@ -12,9 +13,9 @@ class TestGlWidget
 public:
     static int test(int argc, char *argv[], const QString &dir)
     {
-        Mesh mesh = Mesh::fromOBJ(dir + "02463d652.obj", false);
+        Mesh mesh = Mesh::fromXYZFile(dir + QDir::separator() + "02463d652.abs.xyz", false);
         mesh.printStats();
-        Landmarks landmarks(dir + "02463d652.xml");
+        //Landmarks landmarks(dir + "02463d652.xml");
 
         /*mesh.move(-landmarks.Nosetip);
         landmarks.LeftInnerEye -= landmarks.Nosetip;
@@ -25,7 +26,7 @@ public:
         GLWidget widget;
         widget.setWindowTitle("GL Widget");
         widget.addFace(&mesh);
-        widget.addLandmarks(&landmarks);
+        //widget.addLandmarks(&landmarks);
         widget.show();
         return app.exec();
     }
