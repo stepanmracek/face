@@ -25,6 +25,7 @@ public:
 
         MapConverter converter;
         Map depth = SurfaceProcessor::depthmap(mesh, converter, 2, ZCoord);
+        cv::imshow("depth", depth.toMatrix());
 
         QApplication app(argc, argv);
         GLWidget widget;
