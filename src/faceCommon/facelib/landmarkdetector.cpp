@@ -36,7 +36,6 @@ LandmarkDetector::LandmarkDetector(Mesh &mesh) : mesh(mesh)
 
     cv::imshow("kernel", smoothKernel);
     cv::imshow("smoothed", depth.toMatrix());
-    cv::waitKey(0);
 
     // erode and select only points with z-coordinate higher or equal than some threshold
     depth.erode(depthErode);
