@@ -306,11 +306,6 @@ public:
         cv::imwrite("combination.png", resultMat);
     }
 
-    static void testAnotation(const QString &dirPath, bool uniqueIDsOnly)
-    {
-        FaceFeaturesAnotation::anotateOBJ(dirPath, uniqueIDsOnly);
-    }
-
     static void testGoodAnotation(const QString &dirPath)
     {
         QDir dir(dirPath, "*.xml");
