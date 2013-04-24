@@ -48,7 +48,8 @@ SOURCES += \
     facelib/morphable3dfacemodelwidget.cpp \
     facelib/widgetmeshselect.cpp \
     linalg/kernelgenerator.cpp \
-    linalg/gabor.cpp
+    linalg/gabor.cpp \
+    linalg/filterbank.cpp
 
 HEADERS += \
     kinect/kinnect.h \
