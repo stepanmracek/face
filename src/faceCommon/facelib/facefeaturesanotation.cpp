@@ -126,8 +126,6 @@ void FaceFeaturesAnotation::anotateXYZ(const QString &dirPath, bool uniqueIDsOnl
 
     dir.setSorting(QDir::Name);
     QFileInfoList entries = dir.entryInfoList();
-    std::string windowName = "face";
-
     //QSet<QString> usedIDs;
 
     foreach(const QFileInfo &fileInfo, entries)
@@ -147,7 +145,8 @@ void FaceFeaturesAnotation::anotateXYZ(const QString &dirPath, bool uniqueIDsOnl
         }
 
         Mesh mesh = Mesh::fromOBJ(filePath, false);
-        anotate(mesh, 9);
+        Landmarks lm = anotate(mesh, 9);
+        if (lm.points) lm.serialize(landmarksPath);
 
         char key = cv::waitKey();
         if (key == 27) break;
