@@ -44,7 +44,7 @@ unsigned int factorial(unsigned int n)
 
 double over(double n, double k)
 {
-    return factorial(n)/(factorial(k) * factorial(n-k));
+    return ((double)factorial(n))/(factorial(k) * factorial(n-k));
 }
 
 double GaussLaguerre::L(double r, int n, int k)
