@@ -404,7 +404,6 @@ void Map::getCropParams(int &startx, int &width, int &starty, int &height) const
 
     assert(endx > startx);
     assert(endy > starty);
-    qDebug() << startx << starty << endx << endy;
     width = endx - startx;
     height = endy - starty;
 }
