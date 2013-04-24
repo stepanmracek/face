@@ -36,7 +36,7 @@ public:
     static int testFilters(int argc, char *argv[], QString pathToOBJ)
     {
         //Gabor gaborBank(21);
-        GaussLaguerre bank(21);
+        GaussLaguerre bank(101);
 
         Mesh face = Mesh::fromOBJ(pathToOBJ);
         MapConverter converter;
