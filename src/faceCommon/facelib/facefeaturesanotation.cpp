@@ -119,9 +119,9 @@ Landmarks FaceFeaturesAnotation::anotate(Mesh &mesh, int desiredLandmarksCount)
     return l;
 }
 
-void FaceFeaturesAnotation::anotateOBJ(const QString &dirPath, bool uniqueIDsOnly)
+void FaceFeaturesAnotation::anotateXYZ(const QString &dirPath, bool uniqueIDsOnly)
 {
-    QDir dir(dirPath, "*.obj");
+    QDir dir(dirPath, "*.xyz");
     assert(dir.exists());
 
     dir.setSorting(QDir::Name);
@@ -147,42 +147,9 @@ void FaceFeaturesAnotation::anotateOBJ(const QString &dirPath, bool uniqueIDsOnl
         }
 
         Mesh mesh = Mesh::fromOBJ(filePath, false);
-        MapConverter converter;
-        Map depth = SurfaceProcessor::depthmap(mesh, converter, 2, ZCoord);
-        SurfaceProcessor::smooth(depth, 1, 2);
-        CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(depth);
+        anotate(mesh, 9);
 
-        FaceFeaturesAnotationStruct anotationStruct;
-        //anotationStruct.curvature = cs.curvatureIndex.toMatrix();
-        //anotationStruct.depth = depth.toMatrix();
-        //anotationStruct.mixture = 7;
-        anotationStruct.texture = 0.7*cs.curvatureIndex.toMatrix() + 0.3*depth.toMatrix();
-        anotationStruct.windowName = windowName;
-
-        cv::namedWindow(windowName);
-        //cv::createTrackbar("depth/curvature", windowName, &anotationStruct.mixture, 10,
-        //                   FaceFeaturesAnotationTrackbarCallback, &anotationStruct);
-        cv::setMouseCallback(windowName, FaceFeaturesAnotationMouseCallback, &anotationStruct);
-
-        FaceFeaturesAnotationShowFace(anotationStruct);
-        //cv::imshow(windowName, anotationStruct.curvature);
-
-        char key = cv::waitKey(0);
-        cv::destroyWindow(windowName);
-
-        Landmarks l;
-        int lCount = l.points.size();
-        qDebug() << "Count info" << lCount << anotationStruct.points.count();
-        if (anotationStruct.points.count() == lCount)
-        {
-            for (int i = 0; i < lCount; i++)
-            {
-                l.points[i] = converter.MapToMeshCoords(depth, anotationStruct.points[i]);
-            }
-            l.serialize(landmarksPath);
-        }
-
-        if (key == 27)
-            break;
+        char key = cv::waitKey();
+        if (key == 27) break;
     }
 }
