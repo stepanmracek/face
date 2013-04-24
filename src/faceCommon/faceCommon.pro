@@ -49,7 +49,8 @@ SOURCES += \
     facelib/widgetmeshselect.cpp \
     linalg/kernelgenerator.cpp \
     linalg/gabor.cpp \
-    linalg/filterbank.cpp
+    linalg/filterbank.cpp \
+    linalg/gausslaguerre.cpp
 
 HEADERS += \
     kinect/kinnect.h \
@@ -108,7 +109,8 @@ HEADERS += \
     facelib/widgetmeshselect.h \
     linalg/kernelgenerator.h \
     linalg/gabor.h \
-    linalg/filterbank.h
+    linalg/filterbank.h \
+    linalg/gausslaguerre.h
 
 FORMS += \
     facelib/morphable3dfacemodelwidget.ui \
