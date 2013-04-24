@@ -22,12 +22,13 @@ GaussLaguerre::GaussLaguerre(int size)
 
                         re(y, x) = h(r, theta, n, k, j) * cos(n * theta);
                         im(y, x) = h(r, theta, n, k, j) * sin(n * theta);
-                        qDebug() << re(y,x) << im(y,x);
                     }
                 }
 
                 realKernels << re;
-                imagKernels << re;
+                imagKernels << im;
+                Common::printMatrix(re);
+                Common::printMatrix(im);
             }
         }
     }
