@@ -24,7 +24,7 @@ public:
         landmarks.Nosetip = cv::Point3d(0,0,0);*/
 
         MapConverter converter;
-        Map depth = SurfaceProcessor::depthmap(mesh, converter, 2, ZCoord);
+        Map depth = SurfaceProcessor::depthmap(mesh, converter, 1, ZCoord);
         cv::imshow("depth", depth.toMatrix());
 
         QApplication app(argc, argv);
