@@ -3,7 +3,7 @@
 
 #include <QVector>
 
-#include "common.h"
+#include "linalg/common.h"
 #include "facelib/map.h"
 
 class FilterBank
