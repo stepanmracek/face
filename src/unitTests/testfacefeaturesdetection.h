@@ -58,11 +58,13 @@ public:
         for (int i = 0; i < responses.count(); i++)
         {
             Matrix response = responses[i];
-            double min, max;
+            double min, max, rmin, rmax, imin, imax;
             Common::getMinMax(response, min, max);
+            Common::getMinMax(bank.realKernels[i], rmin, rmax);
+            Common::getMinMax(bank.imagKernels[i], imin, imax);
             cv::imshow("response", (response-min)/(max - min));
-            cv::imshow("real", bank.realKernels[i]);
-            cv::imshow("imag", bank.imagKernels[i]);
+            cv::imshow("real", (bank.realKernels[i]-rmin)/(rmax - rmin));
+            cv::imshow("imag", (bank.imagKernels[i]-imin)/(imax - imin));
             cv::waitKey(500);
         }
         cv::waitKey();
