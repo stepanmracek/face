@@ -63,7 +63,7 @@ public:
             cv::imshow("response", (response-min)/(max - min));
             cv::imshow("real", bank.realKernels[i]);
             cv::imshow("imag", bank.imagKernels[i]);
-            cv::waitKey(100);
+            cv::waitKey(500);
         }
         cv::waitKey();
     }
