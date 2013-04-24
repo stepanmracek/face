@@ -3,9 +3,9 @@
 GaussLaguerre::GaussLaguerre(int size)
 {
     int j = 0;
-    for (int n = 1; n <= 5; n++)
+    for (int n = 1; n <= 5; n++) // frequency
     {
-        for (int k = 0; k <= 0; k++)
+        for (int k = 0; k <= 0; k++) // size
         {
             Matrix re = Matrix::zeros(size, size);
             Matrix im = Matrix::zeros(size, size);
