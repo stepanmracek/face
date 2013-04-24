@@ -54,6 +54,7 @@ double GaussLaguerre::L(double r, int n, int k)
     {
         sum += pow(-1, k) * over(n + k, k - h) * pow(r, h) / factorial(h);
     }
+    return sum;
 }
 
 double GaussLaguerre::h(double r, double theta, int n, int k, int j)
