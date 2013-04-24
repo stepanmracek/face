@@ -106,7 +106,8 @@ HEADERS += \
     facelib/morphable3dfacemodelwidget.h \
     facelib/widgetmeshselect.h \
     linalg/kernelgenerator.h \
-    linalg/gabor.h
+    linalg/gabor.h \
+    linalg/filterbank.h
 
 FORMS += \
     facelib/morphable3dfacemodelwidget.ui \
