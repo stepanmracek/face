@@ -17,7 +17,7 @@ GaussLaguerre::GaussLaguerre(int size)
                     for (int x = 0; x < size; x++)
                     {
                         double realX = size/2 - x;
-                        double r = sqrt(realX*realX + realY*realY)/10;
+                        double r = sqrt(realX*realX + realY*realY)/(size);
                         double theta = atan2(realY, realX);
 
                         re(y, x) = h(r, theta, n, k, j) * cos(n * theta);
