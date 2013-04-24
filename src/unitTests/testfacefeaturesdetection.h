@@ -233,10 +233,9 @@ public:
 
     static int  testLandmarkDetection(int argc, char *argv[], QString pathToOBJ)
     {
-        Mesh face = Mesh::fromOBJ(pathToOBJ);
+        Mesh face = Mesh::fromXYZFile(pathToOBJ);
         LandmarkDetector detector(face);
         Landmarks landmarks = detector.Detect();
-
 
         QApplication app(argc, argv);
         GLWidget widget;

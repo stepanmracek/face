@@ -23,7 +23,7 @@
 
 QString frgcPath()
 {
-    return "/run/media/stepo/frgc/";
+    return "/home/stepo/frgc/spring2004/xyz/";
 }
 
 int main(int argc, char *argv[])
@@ -76,8 +76,7 @@ int main(int argc, char *argv[])
 
     //TestFaceFeatuesDetection::testDepthmapProcessing(argc, argv, "/home/stepo/face.obj");
     //return TestFaceFeatuesDetection::testFilters(argc, argv, "/home/stepo/face.obj");
-    //TestFaceFeatuesDetection::testLandmarkDetection(argc, argv, frgcPath() +
-    //                                                "frgc-spring2004-obj-centralized/04202d566.obj");
+    TestFaceFeatuesDetection::testLandmarkDetection(argc, argv, frgcPath() + "02463d652.abs.xyz");
     //TestFaceFeatuesDetection::testBatchLandmarkDetection(argc, argv, frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::testSuccessBatchLandmarkDetection(frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::testIsoGeodeticCurves(argc, argv);
@@ -107,7 +106,7 @@ int main(int argc, char *argv[])
 
     //TestSurfaceProcessing::testNormals();
 
-    TestAnotation::test("/home/stepo/frgc/spring2004/xyz");
+    //TestAnotation::test("/home/stepo/frgc/spring2004/xyz");
 
 	return 0;
 }
