@@ -7,12 +7,15 @@
 #include "map.h"
 #include "maskedvector.h"
 #include "linalg/vector.h"
+#include "linalg/kernelgenerator.h"
 
 LandmarkDetector::LandmarkDetector(Mesh &mesh) : mesh(mesh)
 {
     stripeWidth = 50; //100;
-    depthSmoothIterations = 20; // 20;
-    depthSmoothAlpha = 0.5; //1.0;
+    //depthSmoothIterations = 20; // 20;
+    //depthSmoothAlpha = 0.5; //1.0;
+    depthGaussSize = 5;
+    depthGaussIterations = 3;
     depthErode = 7;
     depthLevelSelect = 0;
     depthScale = 1; //2;
@@ -28,7 +31,8 @@ LandmarkDetector::LandmarkDetector(Mesh &mesh) : mesh(mesh)
     depth = SurfaceProcessor::depthmap(mesh, converter, depthScale, ZCoord);
 
     // smooth
-    SurfaceProcessor::smooth(depth, depthSmoothAlpha, depthSmoothIterations);
+    Matrix smoothKernel = KernelGenerator::gaussianKernel(depthGaussSize);
+    depth.applyFilter(smoothKernel, depthGaussIterations, true);
 
     // erode and select only points with z-coordinate higher or equal than some threshold
     depth.erode(depthErode);

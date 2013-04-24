@@ -20,8 +20,10 @@ private:
 
     // detector params
     int stripeWidth;
-    int depthSmoothIterations;
-    double depthSmoothAlpha;
+    //int depthSmoothIterations;
+    //double depthSmoothAlpha;
+    int depthGaussSize;
+    int depthGaussIterations;
     double depthScale;
     int depthErode;
     int depthLevelSelect;
