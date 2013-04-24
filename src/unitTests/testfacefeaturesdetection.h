@@ -53,7 +53,7 @@ public:
 
         qDebug() << "before response";
         Matrix index = cs.curvatureIndex.toMatrix();
-        QVector<Matrix> responses = bank.getRealResponse(index);
+        QVector<Matrix> responses = bank.getAbsResponse(index);
         qDebug() << "after response";
         for (int i = 0; i < responses.count(); i++)
         {
