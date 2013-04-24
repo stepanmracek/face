@@ -12,7 +12,7 @@ class Landmarks
 public:
     QVector<cv::Point3d> points;
 
-    Landmarks() : points(QVector<cv::Point3d>(8, cv::Point3d())) { } // 15!!!!!
+    Landmarks() : points(QVector<cv::Point3d>(9, cv::Point3d())) { } // 15!!!!!
     Landmarks(QVector<cv::Point3d> points) : points(points) { }
     Landmarks(const QString &path);
 
@@ -25,8 +25,8 @@ public:
         RightOuterEye = 4,
         LeftOuterNose = 5,
         Nosetip = 6,
-        RightOuterNose = 7/*,
-        LowerNose = 8,
+        RightOuterNose = 7,
+        LowerNose = 8/*,
         LeftMouseCorner = 9,
         RighMouseCorner = 10,
         LeftOuterEyebrow = 11,
