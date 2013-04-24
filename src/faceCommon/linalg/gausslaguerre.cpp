@@ -2,34 +2,32 @@
 
 GaussLaguerre::GaussLaguerre(int size)
 {
-    for (int j = 0; j <= 0; j++)
+    int j = 0;
+    for (int n = 1; n <= 5; n++)
     {
-        for (int n = 1; n <= 5; n++)
+        for (int k = 0; k <= 0; k++)
         {
-            for (int k = 0; k <= 4; k++)
+            Matrix re = Matrix::zeros(size, size);
+            Matrix im = Matrix::zeros(size, size);
+
+            for (int y = 0; y < size; y++)
             {
-                Matrix re = Matrix::zeros(size, size);
-                Matrix im = Matrix::zeros(size, size);
-
-                for (int y = 0; y < size; y++)
+                double realY = size/2 - y;
+                for (int x = 0; x < size; x++)
                 {
-                    double realY = size/2 - y;
-                    for (int x = 0; x < size; x++)
-                    {
-                        double realX = size/2 - x;
-                        double r = sqrt(realX*realX + realY*realY)/(size/4);
-                        double theta = atan2(realY, realX);
+                    double realX = size/2 - x;
+                    double r = sqrt(realX*realX + realY*realY)/(size/4);
+                    double theta = atan2(realY, realX);
 
-                        re(y, x) = h(r, theta, n, k, j) * cos(n * theta);
-                        im(y, x) = h(r, theta, n, k, j) * sin(n * theta);
-                    }
+                    re(y, x) = h(r, theta, n, k, j) * cos(n * theta);
+                    im(y, x) = h(r, theta, n, k, j) * sin(n * theta);
                 }
-
-                realKernels << re;
-                imagKernels << im;
-                //Common::printMatrix(re);
-                //Common::printMatrix(im);
             }
+
+            realKernels << re;
+            imagKernels << im;
+            //Common::printMatrix(re);
+            //Common::printMatrix(im);
         }
     }
 }
