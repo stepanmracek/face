@@ -17,6 +17,7 @@
 #include "testmesh.h"
 #include "testlandmarks.h"
 #include "testsurfaceprocessing.h"
+#include "testanotation.h"
 
 #include <QString>
 
@@ -98,13 +99,15 @@ int main(int argc, char *argv[])
     //                                  "/run/media/stepo/frgc/frgc-spring2004-obj-centralized/04200d74.obj");
     //TestMorphableFaceModel::testMorphFromKinect(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml");
 
-    TestGlWidget::test(argc, argv, "/home/stepo/frgc/spring2004/xyz");
+    //TestGlWidget::test(argc, argv, "/home/stepo/frgc/spring2004/xyz");
 
     //TestMesh::testXYZLodaderOBJWriter("/media/data/frgc/xyz/Spring2004", "/media/data/frgc/obj-centralized/Spring2004");
 
     //TestLandmarks::testReadWrite();
 
     //TestSurfaceProcessing::testNormals();
+
+    TestAnotation::test("/home/stepo/frgc/spring2004/xyz");
 
 	return 0;
 }
