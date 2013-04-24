@@ -149,7 +149,7 @@ void FaceFeaturesAnotation::anotateXYZ(const QString &dirPath, bool uniqueIDsOnl
             }
         }
 
-        Mesh mesh = Mesh::fromOBJ(filePath, false);
+        Mesh mesh = Mesh::fromXYZFile(filePath, false);
         bool success;
         Landmarks lm = anotate(mesh, 9, success);
         if (success) lm.serialize(landmarksPath);
