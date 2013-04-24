@@ -61,5 +61,5 @@ double GaussLaguerre::h(double r, double theta, int n, int k, int j)
 {
     return pow(-1, k) * pow(2, (fabs(n)+1.0)/2.0) * pow(M_PI, fabs(n)/2.0) *
             pow((((double)(factorial(k)))/factorial(fabs(n) + k)), 0.5) * pow(r, fabs(n)) *
-            L(2 * M_PI * r * r, n, k) * exp(-M_PI * r * r); // * exp(j * n * theta);
+            L(2 * M_PI * r * r, n, k) * exp(-M_PI * r * r) * exp(j * n * theta);
 }
