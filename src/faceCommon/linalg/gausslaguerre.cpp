@@ -5,7 +5,7 @@ GaussLaguerre::GaussLaguerre(int size)
     int j = 0;
     for (int n = 2; n <= 2; n++) // frequency
     {
-        for (int k = 0; k <= 0; k++) // size
+        for (int k = 0; k <= 5; k++) // size
         {
             Matrix re = Matrix::zeros(size, size);
             Matrix im = Matrix::zeros(size, size);
