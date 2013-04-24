@@ -22,6 +22,7 @@
 #include "facelib/widgetmeshselect.h"
 #include "linalg/kernelgenerator.h"
 #include "linalg/gabor.h"
+#include "linalg/gausslaguerre.h"
 
 enum AlignType
 {
@@ -34,7 +35,8 @@ public:
 
     static int testFilters(int argc, char *argv[], QString pathToOBJ)
     {
-        Gabor gaborBank(21);
+        //Gabor gaborBank(21);
+        GaussLaguerre bank(21);
 
         Mesh face = Mesh::fromOBJ(pathToOBJ);
         MapConverter converter;
@@ -51,7 +53,7 @@ public:
 
         qDebug() << "before response";
         Matrix index = cs.curvatureIndex.toMatrix();
-        QVector<Matrix> responses = gaborBank.getAbsResponse(index);
+        QVector<Matrix> responses = bank.getAbsResponse(index);
         qDebug() << "after response";
         for (int i = 0; i < responses.count(); i++)
         {
