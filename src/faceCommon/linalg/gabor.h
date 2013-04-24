@@ -4,14 +4,12 @@
 #include "common.h"
 #include "kernelgenerator.h"
 #include "facelib/map.h"
+#include "linalg/filterbank.h"
 
-class Gabor
+class Gabor : public FilterBank
 {
 public:
     Gabor(int size);
-
-    QVector<Matrix> realKernels;
-    QVector<Matrix> imagKernels;
 
     QVector<Map> getRealResponse(Map &map);
     QVector<Matrix> getRealResponse(Matrix &mat);

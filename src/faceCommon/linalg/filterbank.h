@@ -12,14 +12,14 @@ public:
     QVector<Matrix> realKernels;
     QVector<Matrix> imagKernels;
 
-    QVector<Map> getRealResponse(Map &map);
-    QVector<Matrix> getRealResponse(Matrix &mat);
+    virtual QVector<Map> getRealResponse(Map &map) = 0;
+    virtual QVector<Matrix> getRealResponse(Matrix &mat) = 0;
 
-    QVector<Map> getImagResponse(Map &map);
-    QVector<Matrix> getImagResponse(Matrix &mat);
+    virtual QVector<Map> getImagResponse(Map &map) = 0;
+    virtual QVector<Matrix> getImagResponse(Matrix &mat) = 0;
 
-    QVector<Map> getAbsResponse(Map &map);
-    QVector<Matrix> getAbsResponse(Matrix &mat);
+    virtual QVector<Map> getAbsResponse(Map &map) = 0;
+    virtual QVector<Matrix> getAbsResponse(Matrix &mat) = 0;
 };
 
 #endif // FILTERBANK_H
