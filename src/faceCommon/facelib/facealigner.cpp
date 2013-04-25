@@ -48,7 +48,7 @@ void FaceAligner::align(Mesh &face)
         cv::imshow("sampled depth", sampledMap.toMatrix());
 
         cv::imshow("sampled points", img);
-        cv::waitKey(100);
+        cv::waitKey(1000);
     }
 
     //Procrustes3D::getOptimalRotation(pointsToAlign, pointsOnMeanFace);
