@@ -44,8 +44,8 @@ void FaceAligner::align(Mesh &face)
         sampled.recalculateMinMax();
         sampled.calculateTriangles();
         MapConverter c;
-        Map sampled = SurfaceProcessor::depthmap(sampled, c, 2, ZCoord);
-        cv::imshow("sampled depth", sampled.toMatrix());
+        Map sampledMap = SurfaceProcessor::depthmap(sampled, c, 2, ZCoord);
+        cv::imshow("sampled depth", sampledMap.toMatrix());
 
         cv::imshow("sampled points", img);
         cv::waitKey(100);
