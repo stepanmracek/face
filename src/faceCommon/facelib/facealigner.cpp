@@ -19,7 +19,7 @@ void FaceAligner::align(Mesh &face)
     VectorOfPoints pointsOnMeanFace; // TODO!!!
     VectorOfPoints pointsToAlign;
     Matrix depthMatrix = depth.toMatrix(); // DEBUG
-    for (int y = -20; y <= 40; y += 10)
+    for (int y = -40; y <= 60; y += 10)
     {
         for (int x = -40; x <= 40; x += 10)
         {
