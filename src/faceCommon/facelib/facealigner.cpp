@@ -19,9 +19,9 @@ void FaceAligner::align(Mesh &face)
     VectorOfPoints pointsOnMeanFace; // TODO!!!
     VectorOfPoints pointsToAlign;
     Matrix depthMatrix = depth.toMatrix(); // DEBUG
-    for (int y = -10; y <= 20; y += 5)
+    for (int y = -20; y <= 40; y += 10)
     {
-        for (int x = -10; x <= 10; x += 5)
+        for (int x = -20; x <= 20; x += 10)
         {
             cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(x, y));
             cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint);
