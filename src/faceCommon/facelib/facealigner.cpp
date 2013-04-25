@@ -35,7 +35,7 @@ void FaceAligner::align(Mesh &face)
                 cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint);
                 pointsToAlign << meshPoint;
 
-                cv::circle(img, mapPoint, 2, 0);
+                cv::circle(img, mapPoint, 1, 0);
             }
         }
 
