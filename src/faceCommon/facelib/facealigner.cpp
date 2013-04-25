@@ -40,7 +40,7 @@ void FaceAligner::align(Mesh &face)
         }
 
         cv::imshow("sampled points", img);
-        cv::waitKey(1);
+        cv::waitKey(10);
     }
 
     //Procrustes3D::getOptimalRotation(pointsToAlign, pointsOnMeanFace);
