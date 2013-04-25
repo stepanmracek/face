@@ -35,7 +35,7 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
     QVector<Mesh> vectorOfFaces;
     foreach (const QFileInfo &lmInfo, lmFiles)
     {
-        if (vecOfLandmarks.count() == 5) break; // DEBUG ONLY!!!
+        //if (vecOfLandmarks.count() == 5) break; // DEBUG ONLY!!!
 
         qDebug() << lmInfo.fileName();
         Landmarks lm(lmInfo.absoluteFilePath());
@@ -96,7 +96,7 @@ void FaceAligner::align(Mesh &face)
     double minTheta;
     double minD = 1e300;
     Matrix rotation;
-    for (double theta = -0.25; theta <= 0.25; theta += 0.025)
+    for (double theta = -0.15; theta <= 0.15; theta += 0.005)
     {
         VectorOfPoints pointsToAlign;
         double cosT = cos(theta);
@@ -117,7 +117,6 @@ void FaceAligner::align(Mesh &face)
         Procrustes3D::transform(pointsToAlign, rotationCandidate);
         double d = Procrustes3D::diff(pointsToAlign, meanFace.points);
 
-        qDebug() << theta << d;
         if (d < minD)
         {
             minD = d;
@@ -126,6 +125,7 @@ void FaceAligner::align(Mesh &face)
         }
     }
 
+    qDebug() << "theta" << minTheta;
     face.rotate(0, 0, minTheta);
     face.transform(rotation);
 }
