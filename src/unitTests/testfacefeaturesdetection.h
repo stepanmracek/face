@@ -12,6 +12,7 @@
 #include "facelib/map.h"
 #include "facelib/surfaceprocessor.h"
 #include "facelib/landmarkdetector.h"
+#include "facelib/facealigner.h"
 #include "linalg/vector.h"
 #include "linalg/procrustes.h"
 #include "linalg/pointcloud.h"
@@ -231,9 +232,9 @@ public:
         }
     }
 
-    static int  testLandmarkDetection(int argc, char *argv[], QString pathToOBJ)
+    static int  testLandmarkDetection(int argc, char *argv[], QString pathToXYZ)
     {
-        Mesh face = Mesh::fromXYZFile(pathToOBJ);
+        Mesh face = Mesh::fromXYZFile(pathToXYZ);
         LandmarkDetector detector(face);
         Landmarks landmarks = detector.Detect();
 
@@ -245,6 +246,13 @@ public:
         widget.show();
 
         return app.exec();
+    }
+
+    static int  testAlign(int argc, char *argv[], QString pathToXYZ)
+    {
+        Mesh face = Mesh::fromXYZFile(pathToXYZ);
+        FaceAligner aligner;
+        aligner.align(face);
     }
 
     static int testHorizontalProfileLines(int argc, char *argv[])
