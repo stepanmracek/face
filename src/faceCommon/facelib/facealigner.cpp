@@ -34,7 +34,9 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
     }
     for (int i = 0; i < lmCount; i++)
     {
-        meanLandmarks[i] = meanLandmarks[i]/lmFiles.count();
+        meanLandmarks[i].x = meanLandmarks[i].x/lmFiles.count();
+        meanLandmarks[i].y = meanLandmarks[i].y/lmFiles.count();
+        meanLandmarks[i].z = meanLandmarks[i].z/lmFiles.count();
     }
 }
 
