@@ -9,7 +9,7 @@
 
 void FaceAligner::init()
 {
-    sampleStartX -40;
+    sampleStartX = -40;
     sampleEndX = 40;
     sampleStartY = -40;
     sampleEndY = 60;
@@ -76,7 +76,7 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
         {
             cv::Point2d mapPoint = converter.MeshToMapCoords(meanDepth, cv::Point2d(x, y));
             cv::Point3d meshPoint = converter.MapToMeshCoords(meanDepth, mapPoint);
-            qDebug() << x << mapPoint.x << meshPoint.x;
+            //qDebug() << x << mapPoint.x << meshPoint.x;
             meanFace.points << meshPoint;
         }
     }
