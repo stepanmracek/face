@@ -27,7 +27,7 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
         qDebug() << lmInfo.fileName();
         Landmarks lm(lmInfo.absoluteFilePath());
         vecOfLandmarks << lm;
-        cv::Point3d shift = -lm.get(Landmarks::Nosetip)
+        cv::Point3d shift = -lm.get(Landmarks::Nosetip);
         Procrustes3D::translate(lm.points, shift);
 
         for (int i = 0; i < lmCount; i++)
