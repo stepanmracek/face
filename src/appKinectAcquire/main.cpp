@@ -31,7 +31,8 @@ int main(int argc, char *argv[])
     QString landmarksPath = "../../test/align-landmarks.xml";
     Morphable3DFaceModel model(pca, flags, landmarksPath, 200);
 
-    Landmarks landmarks = FaceFeaturesAnotation::anotate(m, 8);
+    bool success;
+    Landmarks landmarks = FaceFeaturesAnotation::anotate(m, 8, success);
 
     Procrustes3DResult procrustesResult = model.align(m, landmarks, 10);
     model.morphModel(m);

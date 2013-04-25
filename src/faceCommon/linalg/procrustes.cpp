@@ -375,6 +375,18 @@ void Procrustes3D::applyInversedProcrustesResult(QVector<cv::Point3d> &pointClou
     }
 }
 
+double Procrustes3D::diff(QVector<cv::Point3d> &first, QVector<cv::Point3d> &second)
+{
+    int n = first.count();
+    assert(n == second.count());
+    double sum = 0;
+    for (int i = 0; i < n; i++)
+    {
+        sum += euclideanDistance(first[i], second[i]);
+    }
+    return sum;
+}
+
 Procrustes3DResult Procrustes3D::SVDAlign(QVector<QVector<cv::Point3d> > &vectorOfPointclouds)//, bool centralize, double eps, int maxIterations)
 {
     Procrustes3DResult result;

@@ -252,12 +252,12 @@ public:
     {
         FaceAligner aligner(dirPath);
 
-        QApplication app(argc, argv);
+        /*QApplication app(argc, argv);
         GLWidget widget;
         widget.setWindowTitle("GL Widget");
         widget.addFace(&aligner.meanFace);
         widget.show();
-        return app.exec();
+        return app.exec();*/
 
         Mesh face = Mesh::fromXYZFile(dirPath + QDir::separator() + fileName);
         aligner.align(face);

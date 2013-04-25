@@ -23,7 +23,7 @@
 
 QString frgcPath()
 {
-    return "/home/stepo/frgc/spring2004/xyz/";
+    return "/mnt/data/frgc"; // "/home/stepo/frgc/spring2004/xyz/";
 }
 
 int main(int argc, char *argv[])

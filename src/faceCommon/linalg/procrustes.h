@@ -110,6 +110,8 @@ public:
     static double getShapeVariation(QVector<QVector<cv::Point3d> > &vectorOfPointclouds, QVector<cv::Point3d> &mean);
 
     static void applyInversedProcrustesResult(QVector<cv::Point3d> &pointCloud, Procrustes3DResult &procrustesResult);
+
+    static double diff(QVector<cv::Point3d> &first, QVector<cv::Point3d> &second);
 };
 
 #endif // PROCRUSTES_H

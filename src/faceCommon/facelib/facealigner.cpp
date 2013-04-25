@@ -93,15 +93,14 @@ void FaceAligner::align(Mesh &face)
     MapConverter converter;
     Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
 
-    VectorOfPoints pointsOnMeanFace; // TODO!!!
-    VectorOfPoints pointsToAlign;
-    Matrix depthMatrix = depth.toMatrix(); // DEBUG
-
+    double minTheta;
+    double minD = 1e300;
+    Matrix rotation;
     for (double theta = -0.25; theta <= 0.25; theta += 0.025)
     {
+        VectorOfPoints pointsToAlign;
         double cosT = cos(theta);
         double sinT = sin(theta);
-        Matrix img = depthMatrix.clone();
         for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
         {
             for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
@@ -111,14 +110,22 @@ void FaceAligner::align(Mesh &face)
                 cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(xr, yr));
                 cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint);
                 pointsToAlign << meshPoint;
-
-                cv::circle(img, mapPoint, 1.0, cv::Scalar(0));
             }
         }
 
-        cv::imshow("sampled points", img);
-        cv::waitKey(1000);
+        Matrix rotationCandidate = Procrustes3D::getOptimalRotation(pointsToAlign, meanFace.points);
+        Procrustes3D::transform(pointsToAlign, rotationCandidate);
+        double d = Procrustes3D::diff(pointsToAlign, meanFace.points);
+
+        qDebug() << theta << d;
+        if (d < minD)
+        {
+            minD = d;
+            minTheta = theta;
+            rotation = rotationCandidate.clone();
+        }
     }
 
-    //Procrustes3D::getOptimalRotation(pointsToAlign, pointsOnMeanFace);
+    face.rotate(0, 0, minTheta);
+    face.transform(rotation);
 }
