@@ -472,7 +472,7 @@ Mesh::Mesh(Mesh *src)
 
 Mesh::~Mesh()
 {
-    qDebug() << "deleting mesh";
+    //qDebug() << "deleting mesh";
 }
 
 QString formatNumber(double n, char decimalPoint)
