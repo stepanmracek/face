@@ -250,8 +250,16 @@ public:
 
     static int  testAlign(int argc, char *argv[], QString dirPath, QString fileName)
     {
-        Mesh face = Mesh::fromXYZFile(dirPath + QDir::separator() + fileName);
         FaceAligner aligner(dirPath);
+
+        Application app(argc, argv);
+        GLWidget widget;
+        widget.setWindowTitle("GL Widget");
+        widget.addFace(&aligner.meanFace);
+        widget.show();
+        return app.exec();
+
+        Mesh face = Mesh::fromXYZFile(dirPath + QDir::separator() + fileName);
         aligner.align(face);
     }
 

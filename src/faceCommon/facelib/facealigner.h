@@ -5,6 +5,14 @@
 
 class FaceAligner
 {
+private:
+    int sampleStartX;
+    int sampleEndX;
+    int sampleStartY;
+    int sampleEndY;
+    int sampleStep;
+    void init();
+
 public:
     Mesh meanFace;
 

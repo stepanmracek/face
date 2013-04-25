@@ -7,13 +7,24 @@
 #include "facelib/landmarkdetector.h"
 #include "linalg/procrustes.h"
 
+void FaceAligner::init()
+{
+    sampleStartX -40;
+    sampleEndX = 40;
+    sampleStartY = -40;
+    sampleEndY = 60;
+    sampleStep = 5;
+}
+
 FaceAligner::FaceAligner(Mesh &meanFace) : meanFace(meanFace)
 {
-
+    init();
 }
 
 FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
 {
+    init();
+
     QDir dir(dirWithLandmarksAndXYZfiles);
     QStringList xmlFilter; xmlFilter << "*.xml";
     QFileInfoList lmFiles = dir.entryInfoList(xmlFilter, QDir::Files, QDir::Name);
@@ -50,17 +61,26 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
 
     Map meanDepth = Map(320, 480);
     meanDepth.setAll(0);
-    MapConverter c;
+    MapConverter converter;
     for (int i = 0; i < vecOfLandmarks.count(); i++)
     {
         Matrix rotation = Procrustes3D::getOptimalRotation(vecOfLandmarks[i].points, meanLandmarks);
         vectorOfFaces[i].transform(rotation);
-        Map depth = SurfaceProcessor::depthmap(vectorOfFaces[i], c, cv::Point2d(-160, -240), cv::Point2d(160, 240), 1.0, ZCoord);
+        Map depth = SurfaceProcessor::depthmap(vectorOfFaces[i], converter, cv::Point2d(-160, -240), cv::Point2d(160, 240), 1.0, ZCoord);
         meanDepth.add(depth);
     }
 
-    cv::imshow("depth", meanDepth.toMatrix());
-    cv::waitKey(0);
+    for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
+    {
+        for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
+        {
+            cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(x, y));
+            cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint);
+            meanFace.points << meshPoint;
+        }
+    }
+    meanFace.recalculateMinMax();
+    meanFace.calculateTriangles();
 }
 
 void FaceAligner::align(Mesh &face)
@@ -81,9 +101,9 @@ void FaceAligner::align(Mesh &face)
         double cosT = cos(theta);
         double sinT = sin(theta);
         Matrix img = depthMatrix.clone();
-        for (int y = -40; y <= 60; y += 5)
+        for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
         {
-            for (int x = -40; x <= 40; x += 5)
+            for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
             {
                 double xr = x * cosT - y * sinT;
                 double yr = x * sinT + y * cosT;
