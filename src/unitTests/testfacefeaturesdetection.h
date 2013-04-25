@@ -250,7 +250,7 @@ public:
 
     static int  testAlign(int argc, char *argv[], QString dirPath, QString fileName)
     {
-        Mesh face = Mesh::fromXYZFile(pathToXYZ + QDir::separator() + fileName);
+        Mesh face = Mesh::fromXYZFile(dirPath + QDir::separator() + fileName);
         FaceAligner aligner(dirPath);
         aligner.align(face);
     }
