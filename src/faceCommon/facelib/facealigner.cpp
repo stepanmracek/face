@@ -20,7 +20,7 @@ void FaceAligner::align(Mesh &face)
     VectorOfPoints pointsToAlign;
     Matrix depthMatrix = depth.toMatrix(); // DEBUG
 
-    for (double theta = -0.5; theta <= 0.5; theta += 0.05)
+    for (double theta = -0.25; theta <= 0.25; theta += 0.025)
     {
         double cosT = cos(theta);
         double sinT = sin(theta);
