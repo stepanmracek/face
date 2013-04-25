@@ -21,7 +21,7 @@ void FaceAligner::align(Mesh &face)
     Matrix depthMatrix = depth.toMatrix(); // DEBUG
     for (int y = -20; y <= 40; y += 10)
     {
-        for (int x = -20; x <= 20; x += 10)
+        for (int x = -40; x <= 40; x += 10)
         {
             cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(x, y));
             cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint);
