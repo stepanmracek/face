@@ -24,7 +24,7 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
     QVector<Mesh> vectorOfFaces;
     foreach (const QFileInfo &lmInfo, lmFiles)
     {
-        if (vecOfLandmarks.count() == 10) break;
+        if (vecOfLandmarks.count() == 10) break; // DEBUG ONLY!!!
 
         qDebug() << lmInfo.fileName();
         Landmarks lm(lmInfo.absoluteFilePath());
@@ -50,11 +50,11 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
 
     Map meanDepth = Map(320, 480);
     meanDepth.setAll(0);
+    MapConverter c;
     for (int i = 0; i < vecOfLandmarks.count(); i++)
     {
         Matrix rotation = Procrustes3D::getOptimalRotation(vecOfLandmarks[i].points, meanLandmarks);
         vectorOfFaces[i].transform(rotation);
-        MapConverter c;
         Map depth = SurfaceProcessor::depthmap(vectorOfFaces[i], c, cv::Point2d(-160, -240), cv::Point2d(160, 240), 1.0, ZCoord);
         meanDepth.add(depth);
     }
