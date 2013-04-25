@@ -24,6 +24,7 @@ void FaceAligner::align(Mesh &face)
     {
         double cosT = cos(theta);
         double sinT = sin(theta);
+        Matrix img = depthMatrix.clone();
         for (int y = -40; y <= 60; y += 5)
         {
             for (int x = -40; x <= 40; x += 5)
@@ -34,11 +35,11 @@ void FaceAligner::align(Mesh &face)
                 cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint);
                 pointsToAlign << meshPoint;
 
-                cv::circle(depthMatrix, mapPoint, 2, 0);
+                cv::circle(img, mapPoint, 2, 0);
             }
         }
 
-        cv::imshow("sampled points", depthMatrix);
+        cv::imshow("sampled points", img);
         cv::waitKey(500);
     }
 
