@@ -74,8 +74,8 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
     {
         for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
         {
-            cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(x, y));
-            cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint);
+            cv::Point2d mapPoint = converter.MeshToMapCoords(meanDepth, cv::Point2d(x, y));
+            cv::Point3d meshPoint = converter.MapToMeshCoords(meanDepth, mapPoint);
             meanFace.points << meshPoint;
         }
     }
