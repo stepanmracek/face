@@ -17,9 +17,24 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
     QDir dir(dirWithLandmarksAndXYZfiles);
     QStringList xmlFilter; xmlFilter << "*.xml";
     QFileInfoList lmFiles = dir.entryInfoList(xmlFilter, QDir::Files, QDir::Name);
+    QVector<Landmarks> vecOfLandmarks;
+
+    int lmCount = 9;
+    VectorOfPoints meanLandmarks(lmCount);
     foreach (const QFileInfo &lmInfo, lmFiles)
     {
         qDebug() << lmInfo.fileName() << lmInfo.baseName() + ".abs.xyz";
+        Landmarks lm(lmInfo.absoluteFilePath());
+        vecOfLandmarks << lm;
+
+        for (int i = 0; i < lmCount; i++)
+        {
+            meanLandmarks[i] += lm.points[i];
+        }
+    }
+    for (int i = 0; i < lmCount; i++)
+    {
+        meanLandmarks[i] = meanLandmarks[i]/lmFiles.count();
     }
 }
 
