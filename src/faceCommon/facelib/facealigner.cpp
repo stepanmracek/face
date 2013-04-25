@@ -39,6 +39,14 @@ void FaceAligner::align(Mesh &face)
             }
         }
 
+        Mesh sampled;
+        sampled.points = pointsToAlign;
+        sampled.recalculateMinMax();
+        sampled.calculateTriangles();
+        MapConverter c;
+        Map sampled = SurfaceProcessor::depthmap(sampled, c, 2, ZCoord);
+        cv::imshow("sampled depth", sampled.toMatrix());
+
         cv::imshow("sampled points", img);
         cv::waitKey(100);
     }
