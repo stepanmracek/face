@@ -79,6 +79,7 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
             meanFace.points << meshPoint;
         }
     }
+    meanFace.scale(cv::Point3d(1,1,1.0/vecOfLandmarks.count()));
     meanFace.recalculateMinMax();
     meanFace.calculateTriangles();
 }
