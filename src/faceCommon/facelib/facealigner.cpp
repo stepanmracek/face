@@ -46,10 +46,17 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
         meanLandmarks[i].z = meanLandmarks[i].z/lmFiles.count();
     }
 
+    Map meanDepth = Map(320, 480);
+    meanDepth.setAll(0);
     for (int i = 0; i < vecOfLandmarks.count(); i++)
     {
         Matrix rotation = Procrustes3D::getOptimalRotation(vecOfLandmarks[i].points, meanLandmarks);
         vectorOfFaces[i].transform(rotation);
+        MapConverter c;
+        Map depth = SurfaceProcessor::depthmap(vectorOfFaces[i], c, cv::Point2d(-160, 240), cv::Point2d(160, -240), ZCoord);
+        qDebug() << depth.w << depth.h;
+        cv::imshow("depth", depth.toMatrix());
+        cv::waitKey(0);
     }
 }
 
