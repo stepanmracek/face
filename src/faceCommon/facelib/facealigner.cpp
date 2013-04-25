@@ -35,7 +35,7 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
     QVector<Mesh> vectorOfFaces;
     foreach (const QFileInfo &lmInfo, lmFiles)
     {
-        if (vecOfLandmarks.count() == 30) break; // DEBUG ONLY!!!
+        if (vecOfLandmarks.count() == 5) break; // DEBUG ONLY!!!
 
         qDebug() << lmInfo.fileName();
         Landmarks lm(lmInfo.absoluteFilePath());
