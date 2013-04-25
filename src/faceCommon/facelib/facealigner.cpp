@@ -36,6 +36,7 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
         }
 
         Mesh f = Mesh::fromXYZFile(dirWithLandmarksAndXYZfiles + QDir::separator() + lmInfo.baseName() + ".abs.xyz");
+        f.move(shift);
         vectorOfFaces << f;
     }
     for (int i = 0; i < lmCount; i++)
@@ -47,7 +48,8 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
 
     for (int i = 0; i < vecOfLandmarks.count(); i++)
     {
-        Procrustes3D::getOptimalRotation()
+        Matrix rotation = Procrustes3D::getOptimalRotation(vecOfLandmarks[i].points, meanLandmarks);
+        vectorOfFaces[i].transform(rotation);
     }
 }
 
