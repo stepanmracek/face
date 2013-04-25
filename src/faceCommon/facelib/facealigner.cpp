@@ -27,6 +27,8 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
         qDebug() << lmInfo.fileName();
         Landmarks lm(lmInfo.absoluteFilePath());
         vecOfLandmarks << lm;
+        cv::Point3d shift = -lm.get(Landmarks::Nosetip)
+        Procrustes3D::translate(lm.points, shift);
 
         for (int i = 0; i < lmCount; i++)
         {
@@ -41,6 +43,11 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
         meanLandmarks[i].x = meanLandmarks[i].x/lmFiles.count();
         meanLandmarks[i].y = meanLandmarks[i].y/lmFiles.count();
         meanLandmarks[i].z = meanLandmarks[i].z/lmFiles.count();
+    }
+
+    for (int i = 0; i < vecOfLandmarks.count(); i++)
+    {
+        Procrustes3D::getOptimalRotation()
     }
 }
 
