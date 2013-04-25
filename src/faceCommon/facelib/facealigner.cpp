@@ -18,6 +18,7 @@ void FaceAligner::align(Mesh &face)
 
     VectorOfPoints pointsOnMeanFace; // TODO!!!
     VectorOfPoints pointsToAlign;
+    Matrix depthMatrix = depth.toMatrix(); // DEBUG
     for (int y = -10; y <= 20; y += 5)
     {
         for (int x = -10; x <= 10; x += 5)
@@ -25,8 +26,12 @@ void FaceAligner::align(Mesh &face)
             cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(x, y));
             cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint);
             pointsToAlign << meshPoint;
+
+            cv::circle(depthMatrix, mapPoint, 2, 1);
         }
     }
-    Procrustes3D::getOptimalRotation(pointsToAlign, pointsOnMeanFace);
 
+    cv::imshow("sampled points", depthMatrix);
+    cv::waitKey();
+    //Procrustes3D::getOptimalRotation(pointsToAlign, pointsOnMeanFace);
 }
