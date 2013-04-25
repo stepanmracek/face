@@ -24,6 +24,8 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
     QVector<Mesh> vectorOfFaces;
     foreach (const QFileInfo &lmInfo, lmFiles)
     {
+        if (vecOfLandmarks.count() == 10) break;
+
         qDebug() << lmInfo.fileName();
         Landmarks lm(lmInfo.absoluteFilePath());
         vecOfLandmarks << lm;
@@ -54,11 +56,11 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
         vectorOfFaces[i].transform(rotation);
         MapConverter c;
         Map depth = SurfaceProcessor::depthmap(vectorOfFaces[i], c, cv::Point2d(-160, -240), cv::Point2d(160, 240), 1.0, ZCoord);
-        qDebug() << depth.w << depth.h;
-        cv::imshow("depth", depth.toMatrix());
-        cv::waitKey(0);
-        return;
+        meanDepth.add(depth);
     }
+
+    cv::imshow("depth", meanDepth.toMatrix());
+    cv::waitKey(0);
 }
 
 void FaceAligner::align(Mesh &face)
