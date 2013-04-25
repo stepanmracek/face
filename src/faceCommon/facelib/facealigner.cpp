@@ -21,9 +21,10 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
 
     int lmCount = 9;
     VectorOfPoints meanLandmarks(lmCount);
+    QVector<Mesh> vectorOfFaces;
     foreach (const QFileInfo &lmInfo, lmFiles)
     {
-        qDebug() << lmInfo.fileName() << lmInfo.baseName() + ".abs.xyz";
+        qDebug() << lmInfo.fileName();
         Landmarks lm(lmInfo.absoluteFilePath());
         vecOfLandmarks << lm;
 
@@ -31,6 +32,9 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
         {
             meanLandmarks[i] += lm.points[i];
         }
+
+        Mesh f(dirWithLandmarksAndXYZfiles + QDir::separator() + lmInfo.baseName() + ".abs.xyz");
+        vectorOfFaces << f;
     }
     for (int i = 0; i < lmCount; i++)
     {
