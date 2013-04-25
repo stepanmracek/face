@@ -57,6 +57,7 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
         qDebug() << depth.w << depth.h;
         cv::imshow("depth", depth.toMatrix());
         cv::waitKey(0);
+        return;
     }
 }
 
