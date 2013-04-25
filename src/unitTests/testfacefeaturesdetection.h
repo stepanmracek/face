@@ -248,7 +248,7 @@ public:
         return app.exec();
     }
 
-    static int  testAlign(int argc, char *argv[], QString dirPath, Qstring fileName)
+    static int  testAlign(int argc, char *argv[], QString dirPath, QString fileName)
     {
         Mesh face = Mesh::fromXYZFile(pathToXYZ + QDir::separator() + fileName);
         FaceAligner aligner(dirPath);
