@@ -6,7 +6,10 @@
 class FaceAligner
 {
 public:
-    FaceAligner();
+    Mesh meanFace;
+
+    FaceAligner(Mesh &meanFace);
+    FaceAligner(const QString &dirWithLandmarksAndXYZfiles);
 
     void align(Mesh &face);
 };

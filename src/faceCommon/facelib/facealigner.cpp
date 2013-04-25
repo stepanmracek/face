@@ -1,10 +1,26 @@
 #include "facealigner.h"
 
+#include <QDir>
+#include <QFileInfoList>
+#include <QFileInfo>
+
 #include "facelib/landmarkdetector.h"
 #include "linalg/procrustes.h"
 
-FaceAligner::FaceAligner()
+FaceAligner::FaceAligner(Mesh &meanFace) : meanFace(meanFace)
 {
+
+}
+
+FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
+{
+    QDir dir(dirWithLandmarksAndXYZfiles);
+    QStringList xmlFilter; xmlFilter << "*.xml";
+    QFileInfoList lmFiles = dir.entryInfoList(xmlFilter, QDir::Files, QDir::Name);
+    foreach (const QFileInfo &lmInfo, lmFiles)
+    {
+        qDebug() << lmInfo.fileName() << lmInfo.baseName() + ".abs.xyz";
+    }
 }
 
 void FaceAligner::align(Mesh &face)
@@ -38,14 +54,6 @@ void FaceAligner::align(Mesh &face)
                 cv::circle(img, mapPoint, 1.0, cv::Scalar(0));
             }
         }
-
-        Mesh sampled;
-        sampled.points = pointsToAlign;
-        sampled.recalculateMinMax();
-        sampled.calculateTriangles();
-        MapConverter c;
-        Map sampledMap = SurfaceProcessor::depthmap(sampled, c, 2, ZCoord);
-        cv::imshow("sampled depth", sampledMap.toMatrix());
 
         cv::imshow("sampled points", img);
         cv::waitKey(1000);
