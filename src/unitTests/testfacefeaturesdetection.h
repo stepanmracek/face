@@ -252,7 +252,7 @@ public:
     {
         FaceAligner aligner(dirPath);
 
-        Application app(argc, argv);
+        QApplication app(argc, argv);
         GLWidget widget;
         widget.setWindowTitle("GL Widget");
         widget.addFace(&aligner.meanFace);
