@@ -30,7 +30,7 @@ public:
                            const char *classSeparator = "-", bool qdebug = false);
 
     static void loadMaps(const QString &dirPath, QVector<Map>, QVector<int> *classes = 0,
-                         const char *extensionFilter = "*.yml",
+                         const char *extensionFilter = "*.map",
                          const char *classSeparator = "-", bool qdebug = false);
 
     static void loadVectors(const QString &dirPath, QVector<Vector> &vectors, QVector<int> &classes,
