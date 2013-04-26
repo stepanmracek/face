@@ -16,6 +16,10 @@ public:
         MapConverter c;
         Map map = SurfaceProcessor::depthmap(mesh, c, 1.0, ZCoord);
         map.serialize("serializedMap.map");
+
+        Map deserialized("serializedMap.map");
+        cv::imshow("deserialized", deserialized.toMatrix());
+        cv::waitKey();
     }
 };
 
