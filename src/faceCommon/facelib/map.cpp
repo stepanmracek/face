@@ -496,6 +496,23 @@ void Map::applyFilter(Matrix &kernel, int times, bool checkSum)
     cv::filter2D()*/
 }
 
+Map::Map(const QString &path)
+{
+    cv::FileStorage fs(path, cv::FileStorage::READ);
+    w = (int)fs["w"];
+    h = (int)fs["h"];
+
+    cv::FileNode flagsNode = fs["flags"];
+    std::vector<bool> stdFlags;
+    flagsNode >> stdFlags;
+    flags = QVector::fromStdVector(stdFlags);
+
+    cv::FileNode valuesNode = fs["values"];
+    std::vector<double> stdValues;
+    valuesNode >> stdValues;
+    values = QVector::fromStdVector(stdValues);
+}
+
 void Map::serialize(const QString &path)
 {
     cv::FileStorage fs(path.toStdString(), cv::FileStorage::WRITE);

@@ -22,6 +22,7 @@ public:
     void init(int _w, int _h);
     Map(int w, int h);
     Map(const Map &src);
+    Map(const QString &path);
     //virtual ~Map();
 
     QVector<double> getUsedValues() const;
@@ -148,6 +149,8 @@ public:
     static Map fromMatrix(Matrix &matrix, double voidValue = 0.0);
 
     void applyFilter(Matrix &kernel, int times = 1, bool checkSum = false);
+
+    void serialize(const QString &path);
 };
 
 #endif // MAP_H
