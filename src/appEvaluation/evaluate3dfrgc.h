@@ -27,6 +27,14 @@ public:
 			assert(first[i] == second[i]);
 	}
 
+    static void evaluateIsoCurves()
+    {
+        bool align = false;
+
+
+
+    }
+
 	static void evaluateFusion()
 	{
 		QString commonPath = "/run/media/stepo/frgc/frgc-norm-iterative/";

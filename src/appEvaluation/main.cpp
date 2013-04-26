@@ -35,7 +35,8 @@ int main(int argc, char *argv[])
 	//EvaluateThermo2::evaluateFilterBanks();
 
 	//Evaluate3dFrgc::pcaSubspace();
-	Evaluate3dFrgc::evaluateFusion();
+    //Evaluate3dFrgc::evaluateFusion();
+    Evaluate3dFrgc::evaluateIsoCurves();
 
     return 0;
 }
