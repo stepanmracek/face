@@ -509,7 +509,7 @@ Map::Map(const QString &path)
 
     cv::FileNode valuesNode = fs["values"];
     std::vector<double> stdValues;
-    //valuesNode >> stdValues;
+    valuesNode >> stdValues;
     values = QVector<double>::fromStdVector(stdValues);
 }
 
