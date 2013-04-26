@@ -498,7 +498,7 @@ void Map::applyFilter(Matrix &kernel, int times, bool checkSum)
 
 Map::Map(const QString &path)
 {
-    cv::FileStorage fs(path, cv::FileStorage::READ);
+    cv::FileStorage fs(path.toStdString(), cv::FileStorage::READ);
     w = (int)fs["w"];
     h = (int)fs["h"];
 
