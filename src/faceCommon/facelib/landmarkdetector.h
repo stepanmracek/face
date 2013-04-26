@@ -35,8 +35,8 @@ private:
     int minXDistanceFromNosetipToEyes;
     int maxXDistanceFromNosetipToEyes;
 
-    void Nosetip(Landmarks &l);
-    void InnerEyeCorners(Landmarks &l);
+    void nosetip(Landmarks &l);
+    void innerEyeCorners(Landmarks &l);
 
 public:
     LandmarkDetector(Mesh &mesh);

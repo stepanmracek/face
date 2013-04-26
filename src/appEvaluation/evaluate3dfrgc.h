@@ -16,6 +16,9 @@
 #include "biometrics/discriminativepotential.h"
 #include "biometrics/scorelevefusion.h"
 #include "facelib/mesh.h"
+#include "facelib/landmarkdetector.h"
+#include "facelib/landmarks.h"
+#include "linalg/kernelgenerator.h"
 
 class Evaluate3dFrgc
 {
@@ -36,7 +39,18 @@ public:
         QFileInfoList infoList = dir.entryList(nameFilter, QDir::Files, QDir::Name);
         foreach (const QFileInfo &info, infoList)
         {
-            Mes
+            Mesh face = Mesh::fromXYZFile(info.absoluteFilePath());
+            LandmarkDetector detector(face);
+            Landmarks l = detector.detect();
+            face.move(-l.get(Landmarks::Nosetip));
+            MapConverter mapConverter;
+            Map depth = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-160,-240), cv::Point2d(160,240), 2.0, ZCoord);
+            Matrix gaussKernel = KernelGenerator::gaussianKernel(11);
+            depth.applyFilter(gaussKernel, 3);
+            CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(depth);
+            cv::imshow("shapeIndex", cs.curvatureIndex.toMatrix());
+            cv::waitKey();
+            return;
         }
     }
 

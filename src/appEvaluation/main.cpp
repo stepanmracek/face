@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
 	//Evaluate3dFrgc::pcaSubspace();
     //Evaluate3dFrgc::evaluateFusion();
-    Evaluate3dFrgc::evaluateIsoCurves();
+    Evaluate3dFrgc::createShapeIndexMaps();
 
     return 0;
 }

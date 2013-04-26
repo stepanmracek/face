@@ -65,13 +65,13 @@ Landmarks LandmarkDetector::detect()
 {
     Landmarks l;
 
-    Nosetip(l);
-    InnerEyeCorners(l);
+    nosetip(l);
+    innerEyeCorners(l);
 
     return l;
 }
 
-void LandmarkDetector::Nosetip(Landmarks &l)
+void LandmarkDetector::nosetip(Landmarks &l)
 {
     int i = peakDensity.maxIndex();
     if (i < 0)
@@ -86,7 +86,7 @@ void LandmarkDetector::Nosetip(Landmarks &l)
     l.set(Landmarks::Nosetip, nosetip);
 }
 
-void LandmarkDetector::InnerEyeCorners(Landmarks &l)
+void LandmarkDetector::innerEyeCorners(Landmarks &l)
 {
     cv::Point3d nosetip = l.get(Landmarks::Nosetip);
     cv::Point2d nose2d = converter.MeshToMapCoords(depth, cv::Point2d(nosetip.x, nosetip.y));
