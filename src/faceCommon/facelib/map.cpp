@@ -1,5 +1,9 @@
 #include "map.h"
 
+#include <opencv2/core/core.hpp>
+
+#include "linalg/matrixconverter.h"
+
 Map::Map()
 {
     w = 0;
@@ -490,4 +494,26 @@ void Map::applyFilter(Matrix &kernel, int times, bool checkSum)
     }
     /*Matrix src = this->toMatrix();
     cv::filter2D()*/
+}
+
+void Map::serialize(const QString &path)
+{
+    cv::FileStorage fs(path.toStdString(), cv::FileStorage::WRITE);
+    fs << "w" << w;
+    fs << "h" << h;
+    int n = w * h;
+
+    fs << "flags" << "[";
+    for (int i = 0; i < n; i++)
+    {
+        fs << flags[i];
+    }
+    fs << "]";
+
+    fs << "values" << "[";
+    for (int i = 0; i < n; i++)
+    {
+        fs << values[i];
+    }
+    fs << "]";
 }
