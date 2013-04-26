@@ -27,12 +27,15 @@ public:
 			assert(first[i] == second[i]);
 	}
 
-    static void evaluateIsoCurves()
+    static void createShapeIndexMaps()
     {
-        bool align = false;
-
-
-
+        QString dirPath = "/media/data/frgc/";
+        QDir dir(dirPath + "xyz");
+        QStringList nameFilter; nameFilter << "*.abs.xyz";
+        QFileInfoList infoList = dir.entryList(nameFilter, QDir::Files, QDir::Name);
+        foreach (const QFileInfo &info, infoList)
+        {
+        }
     }
 
 	static void evaluateFusion()
