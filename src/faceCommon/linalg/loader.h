@@ -12,6 +12,7 @@
 
 #include "linalg/vector.h"
 #include "matrixconverter.h"
+#include "facelib/map.h"
 
 class Loader
 {
