@@ -510,7 +510,7 @@ Map::Map(const QString &path)
     cv::FileNode flagsNode = fs["flags"];
     std::vector<int> stdFlags;
     flagsNode >> stdFlags;
-    for (int i = 0; i < stdFlags.size(); i++)
+    for (unsigned int i = 0; i < stdFlags.size(); i++)
     {
         flags << stdFlags[i];
     }
