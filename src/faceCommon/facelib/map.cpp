@@ -502,10 +502,10 @@ Map::Map(const QString &path)
     w = (int)fs["w"];
     h = (int)fs["h"];
 
-    cv::FileNode valuesNode = fs["values"];
+    /*cv::FileNode valuesNode = fs["values"];
     std::vector<double> stdValues;
     valuesNode >> stdValues;
-    values = QVector<double>::fromStdVector(stdValues);
+    values = QVector<double>::fromStdVector(stdValues);*/
 
     cv::FileNode flagsNode = fs["flags"];
     std::vector<bool> stdFlags;
