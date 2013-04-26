@@ -18,7 +18,7 @@ public:
         map.serialize("serializedMap.map");
 
         Map deserialized("serializedMap.map");
-        cv::imshow("deserialized", deserialized.toMatrix());
+        cv::imshow("deserialized", deserialized.toMatrix(0.5));
         cv::waitKey();
     }
 };
