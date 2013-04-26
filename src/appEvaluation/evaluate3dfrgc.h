@@ -15,6 +15,7 @@
 #include "biometrics/featureextractor.h"
 #include "biometrics/discriminativepotential.h"
 #include "biometrics/scorelevefusion.h"
+#include "facelib/mesh.h"
 
 class Evaluate3dFrgc
 {
@@ -35,6 +36,7 @@ public:
         QFileInfoList infoList = dir.entryList(nameFilter, QDir::Files, QDir::Name);
         foreach (const QFileInfo &info, infoList)
         {
+            Mes
         }
     }
 
