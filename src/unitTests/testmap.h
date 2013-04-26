@@ -18,7 +18,7 @@ public:
         map.serialize("serializedMap.map");
 
         Map deserialized("serializedMap.map");
-        cv::imshow("deserialized", deserialized.toMatrix(mesh.maxz));
+        cv::imshow("deserialized", deserialized.toMatrix(1));
         cv::waitKey();
     }
 };
