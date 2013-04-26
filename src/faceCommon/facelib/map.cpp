@@ -504,12 +504,12 @@ Map::Map(const QString &path)
 
     cv::FileNode flagsNode = fs["flags"];
     std::vector<bool> stdFlags;
-    flagsNode >> stdFlags;
+    //flagsNode >> stdFlags;
     flags = QVector<bool>::fromStdVector(stdFlags);
 
     cv::FileNode valuesNode = fs["values"];
     std::vector<double> stdValues;
-    valuesNode >> stdValues;
+    //valuesNode >> stdValues;
     values = QVector<double>::fromStdVector(stdValues);
 }
 
