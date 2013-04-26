@@ -18,6 +18,7 @@
 #include "facelib/mesh.h"
 #include "facelib/landmarkdetector.h"
 #include "facelib/landmarks.h"
+#include "facelib/facealigner.h"
 #include "linalg/kernelgenerator.h"
 
 class Evaluate3dFrgc
@@ -35,6 +36,9 @@ public:
     {
         QString dirPath = "/media/data/frgc/";
         QDir dir(dirPath + "xyz");
+
+        Mesh meanFace = Mesh::fromOBJ(dirPath + "xyz/meanFace.obj");
+
         QStringList nameFilter; nameFilter << "*.abs.xyz";
         QFileInfoList infoList = dir.entryList(nameFilter, QDir::Files, QDir::Name);
         foreach (const QFileInfo &info, infoList)
@@ -51,6 +55,12 @@ public:
             cv::imshow("shapeIndex", cs.curvatureIndex.toMatrix());
             cv::waitKey();
             return;
+
+            FaceAligner aligner(meanFace);
+            aligner.align(face, 3);
+            depth = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-160,-240), cv::Point2d(160,240), 2.0, ZCoord);
+            depth.applyFilter(gaussKernel, 3);
+            cs = SurfaceProcessor::calculateCurvatures(depth);
         }
     }
 
