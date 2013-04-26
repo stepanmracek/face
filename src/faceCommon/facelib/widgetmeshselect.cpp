@@ -45,7 +45,7 @@ void WidgetMeshSelect::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 
     Mesh mesh = Mesh::fromOBJ(fullPath);
     LandmarkDetector detector(mesh);
-    Landmarks landmarks = detector.Detect();
+    Landmarks landmarks = detector.detect();
 
     GLWidget *w = new GLWidget();
     w->addFace(&mesh);

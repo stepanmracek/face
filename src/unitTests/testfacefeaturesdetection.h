@@ -128,7 +128,7 @@ public:
         {
             Mesh m = Mesh::fromOBJ(info.absoluteFilePath());
             LandmarkDetector detector(m);
-            Landmarks l = detector.Detect();
+            Landmarks l = detector.detect();
             QString lPath = dirPath + QDir::separator() + info.baseName() + "_auto.xml";
             l.serialize(lPath);
         }
@@ -236,7 +236,7 @@ public:
     {
         Mesh face = Mesh::fromXYZFile(pathToXYZ);
         LandmarkDetector detector(face);
-        Landmarks landmarks = detector.Detect();
+        Landmarks landmarks = detector.detect();
 
         QApplication app(argc, argv);
         GLWidget widget;

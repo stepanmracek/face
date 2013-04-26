@@ -61,7 +61,7 @@ LandmarkDetector::LandmarkDetector(Mesh &mesh) : mesh(mesh)
     cv::waitKey();*/
 }
 
-Landmarks LandmarkDetector::Detect()
+Landmarks LandmarkDetector::detect()
 {
     Landmarks l;
 

@@ -92,7 +92,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
     for (int i = 0; i < iterations; i++)
     {
         LandmarkDetector lmDetector(face);
-        lm = lmDetector.Detect();
+        lm = lmDetector.detect();
         face.move(-lm.get(Landmarks::Nosetip));
 
         MapConverter converter;

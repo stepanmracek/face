@@ -40,7 +40,7 @@ private:
 
 public:
     LandmarkDetector(Mesh &mesh);
-    Landmarks Detect();
+    Landmarks detect();
 };
 
 #endif // LANDMARKDETECTOR_H
