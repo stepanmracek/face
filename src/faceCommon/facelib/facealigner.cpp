@@ -126,6 +126,6 @@ void FaceAligner::align(Mesh &face)
     }
 
     qDebug() << "theta" << minTheta;
-    face.rotate(0, 0, minTheta);
+    face.rotate(0, 0, -minTheta);
     face.transform(rotation);
 }
