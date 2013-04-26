@@ -510,7 +510,10 @@ Map::Map(const QString &path)
     cv::FileNode flagsNode = fs["flags"];
     std::vector<int> stdFlags;
     flagsNode >> stdFlags;
-    flags = QVector<bool>::fromStdVector(stdFlags);
+    for (int i = 0; i < stdFlags.size(); i++)
+    {
+        flags << stdFlags[i];
+    }
 }
 
 void Map::serialize(const QString &path)
