@@ -18,7 +18,11 @@ public:
         map.serialize("serializedMap.map");
 
         Map deserialized("serializedMap.map");
-        cv::imshow("deserialized", deserialized.toMatrix(-1000));
+        Matrix mat = deserialized.toMatrix();
+        cv::imshow("deserialized", mat);
+        double min, max;
+        Common::getMinMax(mat, min, max);
+        qDebug() << min << max;
         cv::waitKey();
     }
 };
