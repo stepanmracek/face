@@ -252,7 +252,7 @@ public:
     {
         Mesh mean = Mesh::fromOBJ(dirPath + QDir::separator() + "mean.obj");
         FaceAligner aligner(mean);
-        Mesh face = Mesh::fromXYZFile(dirPath + QDir::separator() + "04265d345.abs.xyz");
+        Mesh face = Mesh::fromXYZFile(dirPath + QDir::separator() + fileName);
         Mesh old = face;
         old.move(cv::Point3d(100,0,0));
         //aligner.meanFace.writeOBJ(dirPath + QDir::separator() + "mean.obj", '.');
