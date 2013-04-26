@@ -36,4 +36,5 @@ HEADERS += \
     testdelaunay.h \
     testbiodataprocessing.h \
     testsurfaceprocessing.h \
-    testanotation.h
+    testanotation.h \
+    testmap.h
