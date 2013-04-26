@@ -84,48 +84,56 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
     meanFace.calculateTriangles();
 }
 
-void FaceAligner::align(Mesh &face)
+Landmarks FaceAligner::align(Mesh &face, int iterations)
 {
-    LandmarkDetector lmDetector(face);
-    Landmarks lm = lmDetector.Detect();
-    face.move(-lm.get(Landmarks::Nosetip));
+    assert(iterations >= 1);
+    Landmarks lm;
 
-    MapConverter converter;
-    Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
-
-    double minTheta;
-    double minD = 1e300;
-    Matrix rotation;
-    for (double theta = -0.15; theta <= 0.15; theta += 0.005)
+    for (int i = 0; i < iterations; i++)
     {
-        VectorOfPoints pointsToAlign;
-        double cosT = cos(theta);
-        double sinT = sin(theta);
-        for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
+        LandmarkDetector lmDetector(face);
+        lm = lmDetector.Detect();
+        face.move(-lm.get(Landmarks::Nosetip));
+
+        MapConverter converter;
+        Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
+
+        double minTheta;
+        double minD = 1e300;
+        Matrix rotation;
+        for (double theta = -0.15; theta <= 0.15; theta += 0.005)
         {
-            for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
+            VectorOfPoints pointsToAlign;
+            double cosT = cos(theta);
+            double sinT = sin(theta);
+            for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
             {
-                double xr = x * cosT - y * sinT;
-                double yr = x * sinT + y * cosT;
-                cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(xr, yr));
-                cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint);
-                pointsToAlign << meshPoint;
+                for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
+                {
+                    double xr = x * cosT - y * sinT;
+                    double yr = x * sinT + y * cosT;
+                    cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(xr, yr));
+                    cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint);
+                    pointsToAlign << meshPoint;
+                }
+            }
+
+            Matrix rotationCandidate = Procrustes3D::getOptimalRotation(pointsToAlign, meanFace.points);
+            Procrustes3D::transform(pointsToAlign, rotationCandidate);
+            double d = Procrustes3D::diff(pointsToAlign, meanFace.points);
+
+            if (d < minD)
+            {
+                minD = d;
+                minTheta = theta;
+                rotation = rotationCandidate.clone();
             }
         }
 
-        Matrix rotationCandidate = Procrustes3D::getOptimalRotation(pointsToAlign, meanFace.points);
-        Procrustes3D::transform(pointsToAlign, rotationCandidate);
-        double d = Procrustes3D::diff(pointsToAlign, meanFace.points);
-
-        if (d < minD)
-        {
-            minD = d;
-            minTheta = theta;
-            rotation = rotationCandidate.clone();
-        }
+        qDebug() << "theta" << minTheta;
+        face.rotate(0, 0, -minTheta);
+        face.transform(rotation);
     }
 
-    qDebug() << "theta" << minTheta;
-    face.rotate(0, 0, -minTheta);
-    face.transform(rotation);
+    return lm;
 }

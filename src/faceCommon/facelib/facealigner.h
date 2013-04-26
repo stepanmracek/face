@@ -2,6 +2,7 @@
 #define FACEALIGNER_H
 
 #include "facelib/mesh.h"
+#include "facelib/landmarks.h"
 
 class FaceAligner
 {
@@ -19,7 +20,7 @@ public:
     FaceAligner(Mesh &meanFace);
     FaceAligner(const QString &dirWithLandmarksAndXYZfiles);
 
-    void align(Mesh &face);
+    Landmarks align(Mesh &face, int iterations = 3);
 };
 
 #endif // FACEALIGNER_H
