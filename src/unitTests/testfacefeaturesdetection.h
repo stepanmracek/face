@@ -257,7 +257,7 @@ public:
         Mesh old = face;
         old.move(cv::Point3d(100,0,0));
         //aligner.meanFace.writeOBJ(dirPath + QDir::separator() + "mean.obj", '.');
-        aligner.align(face, 4);
+        aligner.align(face, 5);
         face.move(cv::Point3d(-100,0,0));
 
         QApplication app(argc, argv);
