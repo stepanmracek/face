@@ -512,7 +512,7 @@ Map::Map(const QString &path)
     flagsNode >> stdFlags;
     for (unsigned int i = 0; i < stdFlags.size(); i++)
     {
-        flags << stdFlags[i];
+        flags << stdFlags[i] == 1;
     }
 }
 
