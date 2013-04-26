@@ -18,7 +18,7 @@ public:
         map.serialize("serializedMap.map");
 
         Map deserialized("serializedMap.map");
-        Matrix mat = deserialized.toMatrix();
+        Matrix mat = deserialized.toMatrix(0.5);
         cv::imshow("deserialized", mat);
         double min, max;
         Common::getMinMax(mat, min, max);
