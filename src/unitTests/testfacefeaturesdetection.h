@@ -255,10 +255,12 @@ public:
         Mesh face = Mesh::fromXYZFile(dirPath + QDir::separator() + fileName);
         face.rotate(cv::Vec3d(0.15, 0.15, 0.15));
         Mesh old = face;
-        old.move(cv::Point3d(100,0,0));
         //aligner.meanFace.writeOBJ(dirPath + QDir::separator() + "mean.obj", '.');
         aligner.align(face, 10);
+
+        old.move(cv::Point3d(100,0,0));
         face.move(cv::Point3d(-100,0,0));
+        aligner.meanFace.move(cv::Point3d(-100,0,20));
 
         QApplication app(argc, argv);
         GLWidget widget;
