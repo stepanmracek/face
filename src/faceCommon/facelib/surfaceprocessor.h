@@ -99,9 +99,21 @@ public:
         return cv::Point2d(x, y);
     }
 
-    cv::Point3d MapToMeshCoords(Map &map, cv::Point2d mapCoords)
+    cv::Point3d MapToMeshCoords(Map &map, cv::Point2d mapCoords, bool *success = 0)
     {
-        double z = map.get(mapCoords.x, mapCoords.y);
+        double z = map.get(mapCoords.x, mapCoords.y, success);
+
+        double realMapY = (map.h - 1) - mapCoords.y;
+
+        double x = mapCoords.x/map.w * meshSize.x + meshStart.x;
+        double y = realMapY/map.h * meshSize.y + meshStart.y;
+
+        return cv::Point3d(x, y, z);
+    }
+
+    cv::Point3d MapToMeshCoordsSafe(Map &map, cv::Point2d mapCoords, double safeZValue)
+    {
+        double z = map.getSafe(mapCoords.x, mapCoords.y, safeZValue);
 
         double realMapY = (map.h - 1) - mapCoords.y;
 

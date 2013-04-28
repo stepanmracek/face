@@ -24,7 +24,7 @@
 
 QString frgcPath()
 {
-    return "/mnt/data/frgc"; //"/home/stepo/frgc/spring2004/xyz/";
+    return "/mnt/data/frgc/xyz/"; //"/home/stepo/frgc/spring2004/xyz/";
 }
 
 int main(int argc, char *argv[])
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     //TestFaceFeatuesDetection::testDepthmapProcessing(argc, argv, "/home/stepo/face.obj");
     //return TestFaceFeatuesDetection::testFilters(argc, argv, "/home/stepo/face.obj");
     //TestFaceFeatuesDetection::testLandmarkDetection(argc, argv, frgcPath() + "02463d652.abs.xyz");
-    //TestFaceFeatuesDetection::testAlign(argc, argv, frgcPath(), "04225d402.abs.xyz");
+    TestFaceFeatuesDetection::testAlign(argc, argv, frgcPath(), "04202d564.abs.xyz");
     //TestFaceFeatuesDetection::testBatchLandmarkDetection(argc, argv, frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::testSuccessBatchLandmarkDetection(frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::testIsoGeodeticCurves(argc, argv);
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 
     //TestAnotation::test("/home/stepo/frgc/spring2004/xyz");
 
-    TestMap::testSerialization(frgcPath() + "04225d402.abs.xyz");
+    //TestMap::testSerialization(frgcPath() + "04225d402.abs.xyz");
 
 	return 0;
 }

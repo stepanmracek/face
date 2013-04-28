@@ -68,11 +68,28 @@ public:
         return flags[coordToIndex(x, y)];
     }
 
-    double get(int x, int y) const
+    double getSafe(int x, int y, double safeValue)
     {
         int i = coordToIndex(x, y);
         assert(isValidCoord(x,y));
-        assert(flags[i]);
+        if (flags[i])
+            return values[i];
+        else
+            return safeValue;
+    }
+
+    double get(int x, int y, bool *success = 0) const
+    {
+        int i = coordToIndex(x, y);
+        assert(isValidCoord(x,y));
+        if (success == 0)
+        {
+            assert(flags[i]);
+        }
+        else
+        {
+            (*success) = flags[i];
+        }
         return values[i];
     }
 

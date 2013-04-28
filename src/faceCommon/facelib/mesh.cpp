@@ -262,7 +262,7 @@ void Mesh::transform(Matrix &m)
 
 void Mesh::calculateTriangles()
 {
-    qDebug() << "Calculating triangles";
+    //qDebug() << "Calculating triangles";
 
     QVector<cv::Point2d> points2d;
     foreach(cv::Point3d p3d, points)
@@ -299,7 +299,7 @@ void Mesh::calculateTriangles()
         triangles.remove(toRemove.at(i));
     }
 
-    qDebug() << "Triangles done, |triangles| =" << triangles.count();
+    //qDebug() << "Triangles done, |triangles| =" << triangles.count();
 }
 
 Mesh Mesh::fromXYZFile(const QString &filename, bool centralizeLoadedMesh)

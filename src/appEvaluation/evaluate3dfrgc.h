@@ -34,13 +34,13 @@ public:
 
     static void createShapeIndexMaps()
     {
-        QString dirPath = "/media/data/frgc/";
+        QString dirPath = "/mnt/data/frgc/";
         QDir dir(dirPath + "xyz");
 
-        Mesh meanFace = Mesh::fromOBJ(dirPath + "xyz/meanFace.obj");
+        Mesh meanFace = Mesh::fromOBJ(dirPath + "xyz/mean.obj");
 
         QStringList nameFilter; nameFilter << "*.abs.xyz";
-        QFileInfoList infoList = dir.entryList(nameFilter, QDir::Files, QDir::Name);
+        QFileInfoList infoList = dir.entryInfoList(nameFilter, QDir::Files, QDir::Name);
         foreach (const QFileInfo &info, infoList)
         {
             Mesh face = Mesh::fromXYZFile(info.absoluteFilePath());
@@ -48,19 +48,20 @@ public:
             Landmarks l = detector.detect();
             face.move(-l.get(Landmarks::Nosetip));
             MapConverter mapConverter;
-            Map depth = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-160,-240), cv::Point2d(160,240), 2.0, ZCoord);
+            Map depth = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
             Matrix gaussKernel = KernelGenerator::gaussianKernel(11);
-            depth.applyFilter(gaussKernel, 3);
+            depth.applyFilter(gaussKernel, 3, true);
             CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(depth);
-            cv::imshow("shapeIndex", cs.curvatureIndex.toMatrix());
-            cv::waitKey();
-            return;
+            cv::imwrite((dirPath + "shapeIndex-notAligned/" + info.baseName() + ".png").toStdString(),
+                        cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
 
             FaceAligner aligner(meanFace);
             aligner.align(face, 3);
-            depth = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-160,-240), cv::Point2d(160,240), 2.0, ZCoord);
-            depth.applyFilter(gaussKernel, 3);
+            depth = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
+            depth.applyFilter(gaussKernel, 3, true);
             cs = SurfaceProcessor::calculateCurvatures(depth);
+            cv::imwrite((dirPath + "shapeIndex-aligned/" + info.baseName() + ".png").toStdString(),
+                        cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
         }
     }
 

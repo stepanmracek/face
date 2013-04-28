@@ -104,8 +104,10 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
         for (double theta = -0.15; theta <= 0.15; theta += 0.005)
         {
             VectorOfPoints pointsToAlign;
+            VectorOfPoints referencePoints;
             double cosT = cos(theta);
             double sinT = sin(theta);
+            int index = 0;
             for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
             {
                 for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
@@ -113,14 +115,20 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
                     double xr = x * cosT - y * sinT;
                     double yr = x * sinT + y * cosT;
                     cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(xr, yr));
-                    cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint);
-                    pointsToAlign << meshPoint;
+                    bool success;
+                    cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint, &success);
+                    if (success)
+                    {
+                        pointsToAlign << meshPoint;
+                        referencePoints << meanFace.points[index];
+                    }
+                    index++;
                 }
             }
 
-            Matrix rotationCandidate = Procrustes3D::getOptimalRotation(pointsToAlign, meanFace.points);
+            Matrix rotationCandidate = Procrustes3D::getOptimalRotation(pointsToAlign, referencePoints);
             Procrustes3D::transform(pointsToAlign, rotationCandidate);
-            double d = Procrustes3D::diff(pointsToAlign, meanFace.points);
+            double d = Procrustes3D::diff(pointsToAlign, referencePoints);
 
             if (d < minD)
             {
@@ -128,10 +136,17 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
                 minTheta = theta;
                 rotation = rotationCandidate.clone();
             }
+
+            Mesh testMesh = Mesh::fromPointcloud(pointsToAlign);
+            MapConverter testMC;
+            Map testMap = SurfaceProcessor::depthmap(testMesh, testMC, 1, ZCoord);
+            cv::imshow("test", testMap.toMatrix());
+            qDebug() << theta << d << minD;
+            cv::waitKey();
         }
 
         qDebug() << "theta" << minTheta;
-        face.rotate(0, 0, -minTheta);
+        //face.rotate(0, 0, -minTheta);
         face.transform(rotation);
     }
 

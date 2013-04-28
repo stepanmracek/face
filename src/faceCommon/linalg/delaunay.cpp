@@ -33,7 +33,7 @@ QVector<cv::Vec3i> Delaunay::process(QVector<cv::Point2d> &points)
     maxx += 1;
     maxy += 1;
 
-    qDebug() << "Delaunay in x =" << minx << ".." << maxx << "; y =" << miny << ".." << maxy << "; |points| =" << n;
+    //qDebug() << "Delaunay in x =" << minx << ".." << maxx << "; y =" << miny << ".." << maxy << "; |points| =" << n;
     QMap<QPair<float, float>, int> coord2Index;
 
     CvRect rect = cv::Rect(minx, miny, maxx-minx, maxy-miny);

@@ -220,7 +220,7 @@ inline double linearInterpolation(double x1, double y1, double z1,
 
 void SurfaceProcessor::depthmap(Mesh &mesh, Map &map, cv::Point2d meshStart, cv::Point2d meshEnd, SurfaceDataToProcess dataToProcess)
 {
-    qDebug() << "Depthmap calculation";
+    //qDebug() << "Depthmap calculation";
 
     int emptyCounter = 0;
     int c = mesh.triangles.count();
@@ -318,7 +318,7 @@ void SurfaceProcessor::depthmap(Mesh &mesh, Map &map, cv::Point2d meshStart, cv:
         }
     }
     //qDebug() << "Total empty triangles" << emptyCounter;
-    qDebug() << "..done";
+    //qDebug() << "..done";
 }
 
 Map SurfaceProcessor::depthmap(Mesh &mesh, MapConverter &converter,
