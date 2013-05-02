@@ -112,10 +112,8 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
             if (success)
             {
                 pointsToTransform << meshPoint;
-                referencePoints << meanFace.points[index];
+                referencePoints << meanFace.points[i];
             }
-            index++;
-
         }
 
         // translation
