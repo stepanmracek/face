@@ -305,7 +305,7 @@ Mesh Mesh::fromABS(const QString &filename, bool centralizeLoadedMesh)
             {
                 mesh.maxz = z;
             }
-            if (z < minz)
+            if (z < mesh.minz)
             {
                 mesh.minz = z;
             }
@@ -321,7 +321,7 @@ Mesh Mesh::fromABS(const QString &filename, bool centralizeLoadedMesh)
             p.x = xPoints[i];
             p.y = yPoints[i];
             p.z = zPoints[i];
-            points.append(p);
+            mesh.points.append(p);
         }
     }
 
@@ -330,9 +330,9 @@ Mesh Mesh::fromABS(const QString &filename, bool centralizeLoadedMesh)
     delete [] zPoints;
 
     if (centralizeLoadedMesh)
-        centralize();
+        mesh.centralize();
 
-    calculateTriangles();
+    mesh.calculateTriangles();
 }
 
 Mesh Mesh::fromPointcloud(VectorOfPoints &pointcloud, bool centralizeLoadedMesh)
