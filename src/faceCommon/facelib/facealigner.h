@@ -15,7 +15,7 @@ private:
     void init();
 
 public:
-    Mesh meanFace;
+    Mesh &meanFace;
 
     FaceAligner(Mesh &meanFace);
     FaceAligner(const QString &dirWithLandmarksAndXYZfiles);
