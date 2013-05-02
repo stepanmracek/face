@@ -483,7 +483,7 @@ double Procrustes3D::getShapeVariation(const QVector<QVector<cv::Point3d> > &vec
     double variation = 0;
     for (int i = 0; i < numberOfPointclouds; i++)
     {
-        QVector<cv::Point3d> &pointcloud = vectorOfPointclouds[i];
+        const QVector<cv::Point3d> &pointcloud = vectorOfPointclouds[i];
         for (int j = 0; j < numberOfPoints; j++)
         {
             cv::Point3d diff = mean[j] - pointcloud[j];
