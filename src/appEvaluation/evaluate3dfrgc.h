@@ -58,14 +58,15 @@ public:
             //            cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
             cv::imshow("not-aligned", cs.curvatureIndex.toMatrix());
 
+            // align
             FaceAligner aligner(meanFace);
             aligner.align(face, 10);
-            depth = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
-            depth.applyFilter(gaussKernel, 3, true);
-            cs = SurfaceProcessor::calculateCurvatures(depth);
+            Map depth2 = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
+            depth2.applyFilter(gaussKernel, 3, true);
+            CurvatureStruct cs2 = SurfaceProcessor::calculateCurvatures(depth2);
             //cv::imwrite((dirPath + "xyz-aligned/shapeIndex/" + info.baseName() + ".png").toStdString(),
             //            cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
-            cv::imshow("aligned", cs.curvatureIndex.toMatrix());
+            cv::imshow("aligned", cs2.curvatureIndex.toMatrix());
             cv::waitKey();
         }
     }
