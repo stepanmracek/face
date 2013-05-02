@@ -94,10 +94,14 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
     {
         qDebug() << "FaceAligner::align" << (iteration+1) << "/" << iterations;
 
+        MapConverter converter;
+        Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
 
         double minTheta;
         double minD = 1e300;
-        Matrix rotation;
+        Matrix minRotation;
+        cv::Point3d minMove;
+
         for (double theta = -0.15; theta <= 0.15; theta += 0.01)
         {
             double cosT = cos(theta);
@@ -105,8 +109,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
 
             VectorOfPoints pointsToTransform;
             VectorOfPoints referencePoints;
-            MapConverter converter;
-            Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
+
             int index = 0;
             for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
             {
@@ -127,26 +130,33 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
                 }
             }
 
+            // theta rotation
             Procrustes3D::rotate(pointsToTransform, 0, 0, -theta);
+
+            // translation
+            cv::Point3d move = Procrustes3D::getOptimalTranslation(pointsToTransform, referencePoints);
+            Procrustes3D::translate(pointsToTransform, move);
+
+            // SVD rotation
+            Matrix rotation = Procrustes3D::getOptimalRotation(pointsToTransform, referencePoints);
+            Procrustes3D::transform(pointsToTransform, rotation);
+
             double d = Procrustes3D::diff(pointsToTransform, referencePoints);
+
             if (d < minD)
             {
                 minD = d;
                 minTheta = theta;
+                minRotation = rotation.clone();
+                minMove = move;
             }
         }
+
         face.rotate(0, 0, -minTheta);
+        face.move(minMove);
+        face.transform(minRotation);
+
         Procrustes3D::rotate(lm.points, 0, 0, -minTheta);
-
-        cv::Point3d move = Procrustes3D::getOptimalTranslation(pointsToTransform, referencePoints);
-        Procrustes3D::translate(pointsToTransform, move);
-
-        Matrix rotation = Procrustes3D::getOptimalRotation(pointsToTransform, referencePoints);
-        Procrustes3D::transform(pointsToTransform, rotation);
-
-        face.move(move);
-        face.transform(rotation);
-
         Procrustes3D::translate(lm.points, move);
         Procrustes3D::transform(lm.points, rotation);
     }
