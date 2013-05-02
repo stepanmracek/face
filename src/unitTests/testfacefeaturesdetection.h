@@ -234,7 +234,7 @@ public:
 
     static int  testLandmarkDetection(int argc, char *argv[], QString pathToXYZ)
     {
-        Mesh face = Mesh::fromXYZFile(pathToXYZ);
+        Mesh face = Mesh::fromXYZ(pathToXYZ);
         LandmarkDetector detector(face);
         Landmarks landmarks = detector.detect();
 
@@ -252,7 +252,7 @@ public:
     {
         Mesh mean = Mesh::fromOBJ(dirPath + QDir::separator() + "mean.obj");
         FaceAligner aligner(mean);
-        Mesh face = Mesh::fromXYZFile(dirPath + QDir::separator() + fileName);
+        Mesh face = Mesh::fromXYZ(dirPath + QDir::separator() + fileName);
         //face.rotate(-0.1, 0.1, -0.15);
         Mesh old = face;
         aligner.meanFace.writeOBJ(dirPath + QDir::separator() + "mean.obj", '.');
@@ -274,7 +274,7 @@ public:
 
     static int testHorizontalProfileLines(int argc, char *argv[])
     {
-        Mesh face = Mesh::fromXYZFile("02463d652.abs.xyz", true);
+        Mesh face = Mesh::fromXYZ("02463d652.abs.xyz", true);
         MapConverter converter;
         Map depth = SurfaceProcessor::depthmap(face, converter, 2, ZCoord);
         SurfaceProcessor::smooth(depth, 1, 20);
@@ -314,7 +314,7 @@ public:
 
     static void testCombine()
     {
-        Mesh face = Mesh::fromXYZFile("02463d652.abs.xyz", true);
+        Mesh face = Mesh::fromXYZ("02463d652.abs.xyz", true);
         MapConverter converter;
         Map depth = SurfaceProcessor::depthmap(face, converter, 2, ZCoord);
         SurfaceProcessor::smooth(depth, 1, 20);

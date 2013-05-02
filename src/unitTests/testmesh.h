@@ -16,7 +16,7 @@ public:
         QFileInfoList srcEntries = srcDir.entryInfoList();
         foreach (const QFileInfo &srcFileInfo, srcEntries)
         {
-            Mesh srcMesh = Mesh::fromXYZFile(srcFileInfo.absoluteFilePath(), true);
+            Mesh srcMesh = Mesh::fromXYZ(srcFileInfo.absoluteFilePath(), true);
             QString dstFilePath = dstDirPath + QDir::separator() + srcFileInfo.baseName() + ".obj";
             srcMesh.writeOBJ(dstFilePath, '.');
         }

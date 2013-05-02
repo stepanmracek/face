@@ -12,7 +12,7 @@ class TestMap
 public:
     static void testSerialization(const QString &pathToXYZ)
     {
-        Mesh mesh = Mesh::fromXYZFile(pathToXYZ);
+        Mesh mesh = Mesh::fromXYZ(pathToXYZ);
         MapConverter c;
         Map map = SurfaceProcessor::depthmap(mesh, c, 1.0, ZCoord);
         map.serialize("serializedMap.map");

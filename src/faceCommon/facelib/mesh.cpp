@@ -302,7 +302,7 @@ void Mesh::calculateTriangles()
     //qDebug() << "Triangles done, |triangles| =" << triangles.count();
 }
 
-Mesh Mesh::fromXYZFile(const QString &filename, bool centralizeLoadedMesh)
+Mesh Mesh::fromXYZ(const QString &filename, bool centralizeLoadedMesh)
 {
     qDebug() << "loading" << filename;
     QFile f(filename);

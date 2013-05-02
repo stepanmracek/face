@@ -49,7 +49,7 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
             meanLandmarks[i] += lm.points[i];
         }
 
-        Mesh f = Mesh::fromXYZFile(dirWithLandmarksAndXYZfiles + QDir::separator() + lmInfo.baseName() + ".abs.xyz");
+        Mesh f = Mesh::fromXYZ(dirWithLandmarksAndXYZfiles + QDir::separator() + lmInfo.baseName() + ".abs.xyz");
         f.move(shift);
         vectorOfFaces << f;
     }
