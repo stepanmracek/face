@@ -145,7 +145,7 @@ Landmarks FaceAligner::align(Mesh &face, int maxIterations)
 
             // translation
             cv::Point3d move = Procrustes3D::getOptimalTranslation(pointsToTransform, referencePoints);
-            //Procrustes3D::translate(pointsToTransform, move);
+            Procrustes3D::translate(pointsToTransform, move);
 
             // SVD rotation
             Matrix rotation = Procrustes3D::getOptimalRotation(pointsToTransform, referencePoints);
@@ -169,11 +169,11 @@ Landmarks FaceAligner::align(Mesh &face, int maxIterations)
         if (improve)
         {
             face.rotate(0, 0, -minTheta);
-            //face.move(minMove);
+            face.move(minMove);
             face.transform(minRotation);
 
             Procrustes3D::rotate(lm.points, 0, 0, -minTheta);
-            //Procrustes3D::translate(lm.points, minMove);
+            Procrustes3D::translate(lm.points, minMove);
             Procrustes3D::transform(lm.points, minRotation);
         }
         else
