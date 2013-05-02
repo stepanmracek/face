@@ -37,6 +37,7 @@ public:
     void scale(cv::Point3d scaleParam);
     void transform(Matrix &m);
     void printStats();
+    cv::Point3d getNearestPoint(cv::Point3d input);
 
     Mesh();
     Mesh(const Mesh &src);

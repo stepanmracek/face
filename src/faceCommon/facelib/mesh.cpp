@@ -3,6 +3,7 @@
 #include <QTextStream>
 #include <QDebug>
 #include <opencv/highgui.h>
+#include <opencv2/flann/flann.hpp>
 
 #include "mesh.h"
 #include "surfaceprocessor.h"
@@ -482,4 +483,30 @@ void Mesh::printStats()
     qDebug() << "z-range: "<< minz << maxz;
     qDebug() << "points: "<< points.count();
     qDebug() << "triangles: "<< triangles.count();
+}
+
+cv::Point3d Mesh::getNearestPoint(cv::Point3d input)
+{
+    int n = points.size();
+    cv::Mat features(n, 3, CV_32F);
+    for (int i = 0; i < n; i++)
+    {
+        features.at<float>(i, 0) = points[i].x;
+        features.at<float>(i, 1) = points[i].y;
+        features.at<float>(i, 2) = points[i].z;
+    }
+    qDebug() << "  kd tree";
+    cv::flann::KDTreeIndexParams indexParams;
+    cv::flann::Index kdTree(features, indexParams);
+
+    cv::Mat query(1, 3, CV_32F);
+    query.at<float>(0, 0) = input.x;
+    query.at<float>(0, 1) = input.y;
+    query.at<float>(0, 2) = input.z;
+    std::vector<int> resultIndicies;
+    std::vector<float> resultDistances;
+    kdTree.knnSearch(query, resultIndicies, resultDistances, 1);
+
+    int pIndex = resultIndicies[0];
+    return points[pIndex];
 }
