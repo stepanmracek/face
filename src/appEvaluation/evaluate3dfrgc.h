@@ -59,7 +59,7 @@ public:
             cv::imshow("not-aligned", cs.curvatureIndex.toMatrix());
 
             FaceAligner aligner(meanFace);
-            aligner.align(face, 10);
+            aligner.align(face, 1);
             depth = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
             depth.applyFilter(gaussKernel, 3, true);
             cs = SurfaceProcessor::calculateCurvatures(depth);
