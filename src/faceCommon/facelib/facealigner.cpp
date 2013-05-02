@@ -99,10 +99,10 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
 
         MapConverter converter;
         Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
-        cv::imshow("smooth1", depth.toMatrix());
+        //cv::imshow("smooth1", depth.toMatrix());
         depth.applyFilter(smoothKernel, 3, true);
-        cv::imshow("smooth2", depth.toMatrix());
-        cv::waitKey();
+        //cv::imshow("smooth2", depth.toMatrix());
+        //cv::waitKey();
 
         double minTheta;
         double minD = 1e300;
@@ -159,7 +159,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
             }
         }
 
-        qDebug() << minTheta;
+        qDebug() << minTheta << minD;
 
         face.rotate(0, 0, -minTheta);
         face.move(minMove);
