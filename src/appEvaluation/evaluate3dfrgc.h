@@ -61,7 +61,7 @@ public:
             FaceAligner aligner(meanFace);
             aligner.align(face, 1);
             depth = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
-            depth.applyFilter(gaussKernel, 3, true);
+            //depth.applyFilter(gaussKernel, 3, true);
             cs = SurfaceProcessor::calculateCurvatures(depth);
             //cv::imwrite((dirPath + "xyz-aligned/shapeIndex/" + info.baseName() + ".png").toStdString(),
             //            cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
