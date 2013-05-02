@@ -44,7 +44,7 @@ public:
         QFileInfoList infoList = dir.entryInfoList(nameFilter, QDir::Files, QDir::Name);
         foreach (const QFileInfo &info, infoList)
         {
-            if (info.baseName().compare("04202d566") != 0) continue;
+            //if (info.baseName().compare("04202d566") != 0) continue;
 
             Mesh face = Mesh::fromXYZ(info.absoluteFilePath());
             Mesh face2(face);
@@ -57,9 +57,9 @@ public:
             Map depth = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
             depth.applyFilter(gaussKernel, 3, true);
             CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(depth);
-            //cv::imwrite((dirPath + "xyz/shapeIndex/" + info.baseName() + ".png").toStdString(),
-            //            cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
-            cv::imshow("not-aligned", cs.curvatureIndex.toMatrix());
+            cv::imwrite((dirPath + "xyz/shapeIndex/" + info.baseName() + ".png").toStdString(),
+                        cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
+            //cv::imshow("not-aligned", cs.curvatureIndex.toMatrix());
 
             // aligned
             FaceAligner aligner(meanFace);
@@ -67,10 +67,10 @@ public:
             Map depth2 = SurfaceProcessor::depthmap(face2, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
             depth2.applyFilter(gaussKernel, 3, true);
             CurvatureStruct cs2 = SurfaceProcessor::calculateCurvatures(depth2);
-            //cv::imwrite((dirPath + "xyz-aligned/shapeIndex/" + info.baseName() + ".png").toStdString(),
-            //            cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
-            cv::imshow("aligned", cs2.curvatureMean.toMatrix());
-            cv::waitKey();
+            cv::imwrite((dirPath + "xyz-aligned/shapeIndex/" + info.baseName() + ".png").toStdString(),
+                        cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
+            //cv::imshow("aligned", cs2.curvatureIndex.toMatrix());
+            //cv::waitKey();
         }
     }
 
