@@ -114,7 +114,13 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
         }
     }
     cv::Point3d move = Procrustes3D::getOptimalTranslation(pointsToTransform, referencePoints);
-    //face.move(move);
+    Procrustes3D::translate(pointsToTransform, move);
+
+    Matrix rotation = Procrustes3D::getOptimalRotation(pointsToTransform, referencePoints);
+    Procrustes3D::transform(pointsToTransform, rotation);
+
+    face.move(move);
+    face.transform(rotation);
 
     /*double minTheta;
     double minD = 1e300;
