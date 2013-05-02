@@ -99,6 +99,8 @@ public:
 
     static cv::Point3d getOptimalScale(const QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to);
 
+    static void rotate(QVector<cv::Point3d> &points, double x, double y, double z);
+
     static void transform(cv::Point3d &p, Matrix &m);
 
     static void transform(QVector<cv::Point3d> &points, Matrix &m);

@@ -95,27 +95,49 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
         qDebug() << "FaceAligner::align" << (iteration+1) << "/" << iterations;
 
 
-
-        VectorOfPoints pointsToTransform;
-        VectorOfPoints referencePoints;
-        MapConverter converter;
-        Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
-        int index = 0;
-        for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
+        double minTheta;
+        double minD = 1e300;
+        Matrix rotation;
+        for (double theta = -0.15; theta <= 0.15; theta += 0.01)
         {
-            for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
+            double cosT = cos(theta);
+            double sinT = sin(theta);
+
+            VectorOfPoints pointsToTransform;
+            VectorOfPoints referencePoints;
+            MapConverter converter;
+            Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
+            int index = 0;
+            for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
             {
-                cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(x, y));
-                bool success;
-                cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint, &success);
-                if (success)
+                for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
                 {
-                    pointsToTransform << meshPoint;
-                    referencePoints << meanFace.points[index];
+                    double xr = x * cosT - y * sinT;
+                    double yr = x * sinT + y * cosT;
+
+                    cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(xr, yr));
+                    bool success;
+                    cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint, &success);
+                    if (success)
+                    {
+                        pointsToTransform << meshPoint;
+                        referencePoints << meanFace.points[index];
+                    }
+                    index++;
                 }
-                index++;
+            }
+
+            Procrustes3D::rotate(pointsToTransform, 0, 0, -theta);
+            double d = Procrustes3D::diff(pointsToTransform, referencePoints);
+            if (d < minD)
+            {
+                minD = d;
+                minTheta = theta;
             }
         }
+        face.rotate(0, 0, -minTheta);
+        Procrustes3D::rotate(lm.points, 0, 0, -minTheta);
+
         cv::Point3d move = Procrustes3D::getOptimalTranslation(pointsToTransform, referencePoints);
         Procrustes3D::translate(pointsToTransform, move);
 
