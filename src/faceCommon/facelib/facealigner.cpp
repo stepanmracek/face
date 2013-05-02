@@ -166,7 +166,7 @@ void FaceAligner::align(Mesh &face, int maxIterations)
 
         qDebug() << minTheta << minD << improve;
 
-        if (improve)
+        if (1) //(improve)
         {
             face.rotate(0, 0, -minTheta);
             face.move(minMove);
