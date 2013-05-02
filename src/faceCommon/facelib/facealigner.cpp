@@ -123,10 +123,6 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
         {
             bestD = d;
         }
-        else
-        {
-            break;
-        }
     }
 }
 
