@@ -91,7 +91,7 @@ Landmarks FaceAligner::align(Mesh &face, int maxIterations)
     LandmarkDetector lmDetector(face);
     Landmarks lm = lmDetector.detect();
     qDebug()<< "FaceAligner::align - nose" << lm.get(Landmarks::Nosetip).x << lm.get(Landmarks::Nosetip).y << lm.get(Landmarks::Nosetip).z;
-    face.move(-lm.get(Landmarks::Nosetip));
+    //face.move(-lm.get(Landmarks::Nosetip));
 
     Matrix smoothKernel = KernelGenerator::gaussianKernel(5);
     double totalMinD = 1e300;
