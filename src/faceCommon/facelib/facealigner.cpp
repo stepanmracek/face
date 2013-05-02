@@ -85,7 +85,7 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
     meanFace.calculateTriangles();
 }
 
-Landmarks FaceAligner::align(Mesh &face, int maxIterations)
+void FaceAligner::align(Mesh &face, int maxIterations)
 {
     assert(maxIterations >= 1);
     LandmarkDetector lmDetector(face);
@@ -172,15 +172,13 @@ Landmarks FaceAligner::align(Mesh &face, int maxIterations)
             face.move(minMove);
             face.transform(minRotation);
 
-            Procrustes3D::rotate(lm.points, 0, 0, -minTheta);
+            /*Procrustes3D::rotate(lm.points, 0, 0, -minTheta);
             Procrustes3D::translate(lm.points, minMove);
-            Procrustes3D::transform(lm.points, minRotation);
+            Procrustes3D::transform(lm.points, minRotation);*/
         }
         else
         {
             break;
         }
     }
-
-    return lm;
 }
