@@ -281,7 +281,7 @@ Mesh Mesh::fromABS(const QString &filename, bool centralizeLoadedMesh)
                 //maxMapY = indexToYCoord(i);
                 mesh.maxy = y;
             }
-            if (y < miny)
+            if (y < mesh.miny)
             {
                 //minMapY = indexToYCoord(i);
                 mesh.miny = y;
