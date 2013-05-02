@@ -51,14 +51,14 @@ LandmarkDetector::LandmarkDetector(Mesh &mesh) : mesh(mesh)
     peakDensity = curvature.peaks.densityMap(peakDensityWindowsSize, true);
     pitDensity = curvature.pits.densityMap(pitDensityWindowsSize, false);
 
-    /*cv::imshow("depth", depth.toMatrix());
+    cv::imshow("depth", depth.toMatrix());
     cv::imshow("croppedDepth", croppedDepth.toMatrix());
     cv::imshow("curvature", curvature.curvatureIndex.toMatrix());
     cv::imshow("peaks", curvature.peaks.toMatrix(0, 0, 1));
     cv::imshow("pits", curvature.pits.toMatrix(0, 0, 1));
     cv::imshow("peakDensity", peakDensity.toMatrix(0, 0, 1));
     cv::imshow("pitDensity", pitDensity.toMatrix(0, 0, 1));
-    cv::waitKey();*/
+    cv::waitKey();
 }
 
 Landmarks LandmarkDetector::detect()
