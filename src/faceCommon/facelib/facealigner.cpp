@@ -103,7 +103,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
         Matrix rotation;
         for (double theta = -0.15; theta <= 0.15; theta += 0.005)
         {
-            VectorOfPoints pointsToAlign;
+            Mesh sampledFace;
             VectorOfPoints referencePoints;
             double cosT = cos(theta);
             double sinT = sin(theta);
@@ -119,14 +119,22 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
                     cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint, &success);
                     if (success)
                     {
-                        pointsToAlign << meshPoint;
+                        sampledFace.points << meshPoint;
                         referencePoints << meanFace.points[index];
                     }
                     index++;
                 }
             }
 
-            Matrix rotationCandidate = Procrustes3D::getOptimalRotation(pointsToAlign, referencePoints);
+            sampledFace.rotate(0, 0, -theta);
+            sampledFace.recalculateMinMax();
+            sampledFace.calculateTriangles();
+            MapConverter testMC;
+            Map testMap = SurfaceProcessor::depthmap(testMesh, testMC, 1, ZCoord);
+            cv::imshow("test", testMap.toMatrix());
+            cv::waitKey();
+
+            Matrix rotationCandidate = Procrustes3D::getOptimalRotation(sampledFace.points, referencePoints);
             Procrustes3D::transform(pointsToAlign, rotationCandidate);
             double d = Procrustes3D::diff(pointsToAlign, referencePoints);
 
@@ -136,13 +144,6 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
                 minTheta = theta;
                 rotation = rotationCandidate.clone();
             }
-
-            Mesh testMesh = Mesh::fromPointcloud(pointsToAlign);
-            MapConverter testMC;
-            Map testMap = SurfaceProcessor::depthmap(testMesh, testMC, 1, ZCoord);
-            cv::imshow("test", testMap.toMatrix());
-            qDebug() << theta << d << minD;
-            cv::waitKey();
         }
 
         qDebug() << "theta" << minTheta;
