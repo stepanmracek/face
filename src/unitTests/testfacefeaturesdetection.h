@@ -250,12 +250,12 @@ public:
 
     static int  testAlign(int argc, char *argv[], QString dirPath, QString fileName)
     {
-        Mesh mean = Mesh::fromOBJ(dirPath + QDir::separator() + "mean.obj");
+        Mesh mean = Mesh::fromOBJ(dirPath + "xyz/mean.obj");
         FaceAligner aligner(mean);
-        Mesh face = Mesh::fromXYZ(dirPath + QDir::separator() + fileName);
+        Mesh face = Mesh::fromABS(dirPath + "abs/" + fileName);
         //face.rotate(-0.1, 0.1, -0.15);
         Mesh old = face;
-        aligner.meanFace.writeOBJ(dirPath + QDir::separator() + "mean.obj", '.');
+        //aligner.meanFace.writeOBJ(dirPath + QDir::separator() + "mean.obj", '.');
         aligner.align(face, 24);
 
         old.move(cv::Point3d(100,0,0));
