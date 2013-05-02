@@ -15,7 +15,6 @@ public:
     static int test(int argc, char *argv[], const QString &dir)
     {
         Mesh mesh = Mesh::fromOBJ(dir + "xyz/mean.obj", false);
-        mesh.move(cv::Point3d(0,0,-1));
         mesh.printStats();
 
         Landmarks landmarks;
