@@ -92,6 +92,8 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
     Landmarks lm = lmDetector.detect();
     face.translate(-lm.get(Landmarks::Nosetip));
 
+    Matrix smoothKernel = KernelGenerator::gaussianKernel(5);
+
     double bestD = 1e300;
     for (int iteration = 0; iteration < maxIterations; iteration ++)
     {
