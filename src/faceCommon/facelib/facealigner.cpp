@@ -114,6 +114,7 @@ void FaceAligner::align(Mesh &face, int maxIterations)
 
         for (double shifty = -10; shifty <= 10; shifty += 2)
         {
+            qDebug() << " " << shifty;
             for (double shiftx = -10; shiftx <= 10; shiftx +=2)
             {
                 for (double theta = -0.15; theta <= 0.15; theta += 0.01)
