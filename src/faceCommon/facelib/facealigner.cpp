@@ -108,6 +108,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
         double minD = 1e300;
         Matrix minRotation;
         cv::Point3d minMove;
+        bool improve = false;
 
         for (double theta = -0.15; theta <= 0.15; theta += 0.005)
         {
@@ -150,24 +151,29 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
 
             double d = Procrustes3D::diff(pointsToTransform, referencePoints);
 
-            if (d < minD)
+            if (d < minD && d < totalMinD)
             {
+                improve = true;
                 minD = d;
+                totalMinD = d;
                 minTheta = theta;
                 minRotation = rotation.clone();
                 minMove = move;
             }
         }
 
-        qDebug() << minTheta << minD;
+        qDebug() << minTheta << minD << improve;
 
-        face.rotate(0, 0, -minTheta);
-        face.move(minMove);
-        face.transform(minRotation);
+        if (improve)
+        {
+            face.rotate(0, 0, -minTheta);
+            face.move(minMove);
+            face.transform(minRotation);
 
-        Procrustes3D::rotate(lm.points, 0, 0, -minTheta);
-        Procrustes3D::translate(lm.points, minMove);
-        Procrustes3D::transform(lm.points, minRotation);
+            Procrustes3D::rotate(lm.points, 0, 0, -minTheta);
+            Procrustes3D::translate(lm.points, minMove);
+            Procrustes3D::transform(lm.points, minRotation);
+        }
     }
 
     /*double minTheta;
