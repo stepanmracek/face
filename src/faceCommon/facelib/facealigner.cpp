@@ -134,8 +134,8 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
         cv::imshow("testDepth", testDepth);
         cv::waitKey(30);
 
-        Matrix rotationCandidate = Procrustes3D::getOptimalRotation(sampledFace.points, referencePoints);
-        Procrustes3D::transform(sampledFace.points, rotationCandidate);
+        //Matrix rotationCandidate = Procrustes3D::getOptimalRotation(sampledFace.points, referencePoints);
+        //Procrustes3D::transform(sampledFace.points, rotationCandidate);
         double d = Procrustes3D::diff(sampledFace.points, referencePoints);
 
         if (d < minD)
@@ -150,7 +150,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
 
     qDebug() << "theta" << minTheta;
     face.rotate(0, 0, minTheta);
-    face.transform(rotation);
+    //face.transform(rotation);
 
     return lm;
 }
