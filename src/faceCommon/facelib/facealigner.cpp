@@ -101,36 +101,8 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
         //depth.applyFilter(smoothKernel, 3, true);
         cv::waitKey(1);
 
-        int n = meanFace.points.count();
-        VectorOfPoints pointsToTransform;
-        VectorOfPoints referencePoints;
-        for (int i = 0; i < n; i++)
-        {
-            referencePoints << meanFace.points[i];
-
-            /*double minDistance = 1e300;
-            double minDistanceIndex = -1;
-            for (int j = 0; j < face.points.count(); j++)
-            {
-                double d = euclideanDistance(meanFace.points[i], face.points[j]);
-                if (d < minDistance)
-                {
-                    minDistance = d;
-                    minDistanceIndex = j;
-                }
-            }*/
-
-            pointsToTransform << face.getNearestPoint(meanFace.points[i]);
-
-            /*cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(meanFace.points[i].x, meanFace.points[i].y));
-            bool success;
-            cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint, &success);
-            if (success)
-            {
-                pointsToTransform << meshPoint;
-                referencePoints << meanFace.points[i];
-            }*/
-        }
+        VectorOfPoints pointsToTransform = meanFace.points;
+        VectorOfPoints referencePoints = face.getNearestPoints(pointsToTransform);
 
         // translation
         cv::Point3d move = Procrustes3D::getOptimalTranslation(pointsToTransform, referencePoints);
