@@ -91,6 +91,8 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
 
     for (int iteration = 0; iteration < iterations; iteration ++)
     {
+        qDebug() << "FaceAligner::align" << (iteration+1) << "/" << iterations;
+
         LandmarkDetector lmDetector(face);
         lm = lmDetector.detect();
         face.move(-lm.get(Landmarks::Nosetip));
