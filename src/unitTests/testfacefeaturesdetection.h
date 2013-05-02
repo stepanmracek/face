@@ -260,7 +260,7 @@ public:
 
         old.move(cv::Point3d(100,0,0));
         face.move(cv::Point3d(-100,0,0));
-        aligner.meanFace.move(cv::Point3d(-100,0,10));
+        aligner.meanFace.move(cv::Point3d(-100,0,20));
 
         QApplication app(argc, argv);
         GLWidget widget;
