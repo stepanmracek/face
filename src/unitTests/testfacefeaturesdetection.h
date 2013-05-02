@@ -256,7 +256,7 @@ public:
         face.rotate(-0.1, 0.1, -0.15);
         Mesh old = face;
         aligner.meanFace.writeOBJ(dirPath + QDir::separator() + "mean.obj", '.');
-        aligner.align(face, 5);
+        aligner.align(face, 20);
 
         old.move(cv::Point3d(100,0,0));
         face.move(cv::Point3d(-100,0,0));
