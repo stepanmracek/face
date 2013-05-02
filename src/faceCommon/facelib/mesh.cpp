@@ -333,6 +333,8 @@ Mesh Mesh::fromABS(const QString &filename, bool centralizeLoadedMesh)
         mesh.centralize();
 
     mesh.calculateTriangles();
+
+    return mesh;
 }
 
 Mesh Mesh::fromPointcloud(VectorOfPoints &pointcloud, bool centralizeLoadedMesh)
