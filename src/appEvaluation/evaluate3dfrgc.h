@@ -47,9 +47,12 @@ public:
             if (info.baseName().compare("04202d566") != 0) continue;
 
             Mesh face = Mesh::fromXYZFile(info.absoluteFilePath());
+            Mesh face2(face);
+
+            // not-aligned
             LandmarkDetector detector(face);
             Landmarks l = detector.detect();
-            //face.move(-l.get(Landmarks::Nosetip));
+            face.move(-l.get(Landmarks::Nosetip));
             MapConverter mapConverter;
             Map depth = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
             depth.applyFilter(gaussKernel, 3, true);
@@ -58,10 +61,10 @@ public:
             //            cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
             cv::imshow("not-aligned", cs.curvatureIndex.toMatrix());
 
-            // align
+            // aligned
             FaceAligner aligner(meanFace);
-            aligner.align(face, 10);
-            Map depth2 = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
+            aligner.align(face2, 10);
+            Map depth2 = SurfaceProcessor::depthmap(face2, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
             depth2.applyFilter(gaussKernel, 3, true);
             CurvatureStruct cs2 = SurfaceProcessor::calculateCurvatures(depth2);
             //cv::imwrite((dirPath + "xyz-aligned/shapeIndex/" + info.baseName() + ".png").toStdString(),
