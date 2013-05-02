@@ -100,9 +100,9 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
         MapConverter converter;
         Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
 
-        cv::imshow("smooth1", depth.toMatrix());
+        //cv::imshow("smooth1", depth.toMatrix());
         //depth.applyFilter(smoothKernel, 3, true);
-        cv::waitKey(1);
+        //cv::waitKey(1);
 
         // Find correspondence
         VectorOfPoints referencePoints = meanFace.points;
