@@ -495,7 +495,7 @@ VectorOfPoints Mesh::getNearestPoints(VectorOfPoints input)
         features.at<float>(i, 1) = points[i].y;
         features.at<float>(i, 2) = points[i].z;
     }
-    cv::flann::LshIndexParams indexParams;
+    cv::flann::KDTreeIndexParams indexParams;
     cv::flann::Index index(features, indexParams);
 
     VectorOfPoints resultPoints;
