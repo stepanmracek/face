@@ -52,7 +52,7 @@ Procrustes3DResult Morphable3DFaceModel::align(Mesh &inputMesh, Landmarks &input
     // centralize
     cv::Point3d shift = Procrustes3D::centralizedTranslation(inputLandmarks.points);
     Procrustes3D::translate(inputLandmarks.points, shift);
-    inputMesh.move(shift);
+    inputMesh.translate(shift);
 
     for (int iteration = 0; iteration < iterations; iteration++)
     {
@@ -111,7 +111,7 @@ void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
         cv::Point3d shift = Procrustes3D::centralizedTranslation(pointcloud);
 
         Procrustes3D::translate(pointcloud, shift);
-        meshes[i].move(shift);
+        meshes[i].translate(shift);
     }
 
     VectorOfPoints meanShape = Procrustes3D::getMeanShape(controlPoints);
