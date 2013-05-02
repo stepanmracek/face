@@ -223,7 +223,7 @@ void Mesh::rotate(cv::Vec3d xyz)
 
 void Mesh::rotate(double x, double y, double z)
 {
-    Matrix Rx = (Matrix(3,3) <<
+    /*Matrix Rx = (Matrix(3,3) <<
                  1, 0, 0,
                  0, cos(x), -sin(x),
                  0, sin(x), cos(x));
@@ -248,8 +248,8 @@ void Mesh::rotate(double x, double y, double z)
         p.x = newV(0);
         p.y = newV(1);
         p.z = newV(2);
-    }
-
+    }*/
+    Procrustes3D::rotate(points, x, y, z);
     recalculateMinMax();
 }
 
