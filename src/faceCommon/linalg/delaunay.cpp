@@ -28,10 +28,10 @@ QVector<cv::Vec3i> Delaunay::process(QVector<cv::Point2d> &points)
         if (y < miny) miny = y;
     }
 
-    minx -= 1;
-    miny -= 1;
-    maxx += 1;
-    maxy += 1;
+    minx -= 10;
+    miny -= 10;
+    maxx += 10;
+    maxy += 10;
 
     //qDebug() << "Delaunay in x =" << minx << ".." << maxx << "; y =" << miny << ".." << maxy << "; |points| =" << n;
     QMap<QPair<float, float>, int> coord2Index;
