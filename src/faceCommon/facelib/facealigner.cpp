@@ -130,13 +130,13 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
             sampledFace.recalculateMinMax();
             sampledFace.calculateTriangles();
             MapConverter testMC;
-            Map testMap = SurfaceProcessor::depthmap(testMesh, testMC, 1, ZCoord);
+            Map testMap = SurfaceProcessor::depthmap(sampledFace, testMC, 1, ZCoord);
             cv::imshow("test", testMap.toMatrix());
             cv::waitKey();
 
             Matrix rotationCandidate = Procrustes3D::getOptimalRotation(sampledFace.points, referencePoints);
-            Procrustes3D::transform(pointsToAlign, rotationCandidate);
-            double d = Procrustes3D::diff(pointsToAlign, referencePoints);
+            Procrustes3D::transform(sampledFace.points, rotationCandidate);
+            double d = Procrustes3D::diff(sampledFace.points, referencePoints);
 
             if (d < minD)
             {
@@ -147,7 +147,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
         }
 
         qDebug() << "theta" << minTheta;
-        //face.rotate(0, 0, -minTheta);
+        face.rotate(0, 0, -minTheta);
         face.transform(rotation);
     }
 
