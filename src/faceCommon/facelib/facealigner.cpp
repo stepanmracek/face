@@ -102,7 +102,7 @@ void FaceAligner::align(Mesh &face, int maxIterations)
         cv::imshow("smooth1", depth.toMatrix());
         depth.applyFilter(smoothKernel, 3, true);
         //cv::imshow("smooth2", depth.toMatrix());
-        cv::waitKey();
+        cv::waitKey(1);
 
         double minTheta;
         double minD = 1e300;
@@ -110,9 +110,9 @@ void FaceAligner::align(Mesh &face, int maxIterations)
         cv::Point3d minMove;
         bool improve = false;
 
-        for (double shifty = -10; shifty <= 10; shifty += 1)
+        for (double shifty = -10; shifty <= 10; shifty += 2)
         {
-            for (double shiftx = -10; shiftx <= 10; shiftx +=1)
+            for (double shiftx = -10; shiftx <= 10; shiftx +=2)
             {
                 for (double theta = -0.15; theta <= 0.15; theta += 0.01)
                 {
