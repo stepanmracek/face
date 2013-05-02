@@ -107,11 +107,12 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
         Mesh sampledFace;
         VectorOfPoints referencePoints;
 
+        int index = 0;
         for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
         {
             for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
             {
-                cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(x, r));
+                cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(x, y));
                 bool success;
                 cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint, &success);
                 if (success)
