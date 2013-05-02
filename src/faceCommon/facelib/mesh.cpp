@@ -403,7 +403,7 @@ Mesh::Mesh()
     maxz = -1e300;
 }
 
-Mesh::Mesh(Mesh &src)
+Mesh::Mesh(const Mesh &src)
 {
     minx = src.minx;
     maxx = src.maxx;

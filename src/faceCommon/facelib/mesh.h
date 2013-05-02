@@ -39,7 +39,7 @@ public:
     void printStats();
 
     Mesh();
-    Mesh(Mesh &src);
+    Mesh(const Mesh &src);
     virtual ~Mesh();
 
     static Mesh fromABS(const QString &filename, bool centralizeLoadedMesh = false);
