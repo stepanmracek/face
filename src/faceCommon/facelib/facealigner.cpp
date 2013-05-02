@@ -106,14 +106,30 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
         VectorOfPoints referencePoints;
         for (int i = 0; i < n; i++)
         {
-            cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(meanFace.points[i].x, meanFace.points[i].y));
+            referencePoints << meanFace.points[i];
+
+            double minDistance = 1e300;
+            double minDistanceIndex = -1;
+            for (int j = 0; j < face.points.count(); j++)
+            {
+                double d = euclideanDistance(meanFace.points[i], face.points[j]);
+                if (d < minDistance)
+                {
+                    minDistance = d;
+                    minDistanceIndex = -1;
+                }
+            }
+
+            pointsToTransform << face.points[minDistanceIndex];
+
+            /*cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(meanFace.points[i].x, meanFace.points[i].y));
             bool success;
             cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint, &success);
             if (success)
             {
                 pointsToTransform << meshPoint;
                 referencePoints << meanFace.points[i];
-            }
+            }*/
         }
 
         // translation
