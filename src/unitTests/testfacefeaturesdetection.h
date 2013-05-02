@@ -265,7 +265,7 @@ public:
         QApplication app(argc, argv);
         GLWidget widget;
         widget.setWindowTitle("GL Widget");
-        //widget.addFace(&aligner.meanFace);
+        widget.addFace(&aligner.meanFace);
         widget.addFace(&face);
         widget.addFace(&old);
         widget.show();
