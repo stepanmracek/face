@@ -151,7 +151,7 @@ void FaceAligner::align(Mesh &face, int maxIterations)
 
             double d = Procrustes3D::diff(pointsToTransform, referencePoints);
 
-            if (d < minD) // && d < totalMinD)
+            if (d < minD && d < totalMinD)
             {
                 improve = true;
                 minD = d;
@@ -164,7 +164,7 @@ void FaceAligner::align(Mesh &face, int maxIterations)
 
         qDebug() << "FaceAligner::align" << (iteration+1) << minD;
 
-        if (1) //(improve)
+        if (improve)
         {
             face.rotate(0, 0, -minTheta);
             face.translate(minMove);
