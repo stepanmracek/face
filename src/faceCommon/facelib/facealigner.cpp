@@ -108,7 +108,7 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
         {
             referencePoints << meanFace.points[i];
 
-            double minDistance = 1e300;
+            /*double minDistance = 1e300;
             double minDistanceIndex = -1;
             for (int j = 0; j < face.points.count(); j++)
             {
@@ -118,9 +118,9 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
                     minDistance = d;
                     minDistanceIndex = j;
                 }
-            }
+            }*/
 
-            pointsToTransform << face.points[minDistanceIndex];
+            pointsToTransform << face.getNearestPoint(meanFace.points[i]);
 
             /*cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(meanFace.points[i].x, meanFace.points[i].y));
             bool success;
