@@ -495,8 +495,8 @@ VectorOfPoints Mesh::getNearestPoints(VectorOfPoints input)
         features.at<float>(i, 1) = points[i].y;
         features.at<float>(i, 2) = points[i].z;
     }
-    cv::flann::KDTreeIndexParams indexParams;
-    cv::flann::Index kdTree(features, indexParams);
+    cv::flann::HierarchicalClusteringIndexParams indexParams;
+    cv::flann::Index index(features, indexParams);
 
     VectorOfPoints resultPoints;
     for (int i = 0; i < input.count(); i++)
@@ -507,7 +507,7 @@ VectorOfPoints Mesh::getNearestPoints(VectorOfPoints input)
         query.at<float>(0, 2) = input[i].z;
         std::vector<int> resultIndicies;
         std::vector<float> resultDistances;
-        kdTree.knnSearch(query, resultIndicies, resultDistances, 1);
+        index.knnSearch(query, resultIndicies, resultDistances, 1);
 
         int pIndex = resultIndicies[0];
         resultPoints << points[pIndex];
