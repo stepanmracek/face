@@ -485,7 +485,7 @@ void Mesh::printStats()
     qDebug() << "triangles: "<< triangles.count();
 }
 
-cv::Point3d Mesh::getNearestPoint(cv::Point3d input)
+VectorOfPoints Mesh::getNearestPoints(VectorOfPoints input)
 {
     int n = points.size();
     cv::Mat features(n, 3, CV_32F);
@@ -495,18 +495,23 @@ cv::Point3d Mesh::getNearestPoint(cv::Point3d input)
         features.at<float>(i, 1) = points[i].y;
         features.at<float>(i, 2) = points[i].z;
     }
-    qDebug() << "  kd tree";
     cv::flann::KDTreeIndexParams indexParams;
     cv::flann::Index kdTree(features, indexParams);
 
-    cv::Mat query(1, 3, CV_32F);
-    query.at<float>(0, 0) = input.x;
-    query.at<float>(0, 1) = input.y;
-    query.at<float>(0, 2) = input.z;
-    std::vector<int> resultIndicies;
-    std::vector<float> resultDistances;
-    kdTree.knnSearch(query, resultIndicies, resultDistances, 1);
+    VectorOfPoints resultPoints;
+    for (int i = 0; i < input.count; i++)
+    {
+        cv::Mat query(1, 3, CV_32F);
+        query.at<float>(0, 0) = input[i].x;
+        query.at<float>(0, 1) = input[i].y;
+        query.at<float>(0, 2) = input[i].z;
+        std::vector<int> resultIndicies;
+        std::vector<float> resultDistances;
+        kdTree.knnSearch(query, resultIndicies, resultDistances, 1);
 
-    int pIndex = resultIndicies[0];
-    return points[pIndex];
+        int pIndex = resultIndicies[0];
+        resultPoints << points[pIndex];
+    }
+
+    return resultPoints;
 }
