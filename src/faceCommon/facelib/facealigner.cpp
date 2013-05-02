@@ -99,7 +99,7 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
         Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
 
         cv::imshow("smooth1", depth.toMatrix());
-        //depth.applyFilter(smoothKernel, 3, true);
+        depth.applyFilter(smoothKernel, 3, true);
         cv::waitKey(1);
 
         // Find correspondence
