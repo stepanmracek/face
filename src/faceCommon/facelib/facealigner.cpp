@@ -142,7 +142,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
         {
             minD = d;
             minTheta = theta;
-            rotation = rotationCandidate.clone();
+            //rotation = rotationCandidate.clone();
         }
 
         qDebug() << theta << d << minD;
