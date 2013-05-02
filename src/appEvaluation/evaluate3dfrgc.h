@@ -46,7 +46,7 @@ public:
         {
             if (info.baseName().compare("04202d566") != 0) continue;
 
-            Mesh face = Mesh::fromXYZFile(info.absoluteFilePath());
+            Mesh face = Mesh::fromXYZ(info.absoluteFilePath());
             Mesh face2(face);
 
             // not-aligned

@@ -39,12 +39,12 @@ public:
     void printStats();
 
     Mesh();
-    Mesh(const QString &filename, bool centralizeLoadedMesh = false);
     Mesh(Mesh *src);
     virtual ~Mesh();
 
+    static Mesh fromABS(const QString &filename, bool centralizeLoadedMesh = false);
     static Mesh fromOBJ(const QString &filename, bool centralizeLoadedMesh = false);
-    static Mesh fromXYZFile(const QString &filename, bool centralizeLoadedMesh = false);
+    static Mesh fromXYZ(const QString &filename, bool centralizeLoadedMesh = false);
     static Mesh fromMap(Map &map, bool centralizeLoadedMesh = false);
     static Mesh fromPointcloud(VectorOfPoints &pointcloud, bool centralizeLoadedMesh = false);
 };
