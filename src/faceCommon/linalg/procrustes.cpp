@@ -299,6 +299,14 @@ Matrix Procrustes3D::getOptimalRotation(QVector<cv::Point3d> &from, QVector<cv::
     return R;
 }
 
+cv::Point3d Procrustes3D::getOptimalTranslation(QVector<cv::Point3d> &from, QVector<cv::Point3d> &to)
+{
+    cv::Point3d centralizedTranslationFrom = centralizedTranslation(from);
+    cv::Point3d centralizedTranslationTo = centralizedTranslation(to);
+
+    return centralizedTranslationFrom - centralizedTranslationTo;
+}
+
 void Procrustes3D::transform(cv::Point3d &p, Matrix &m)
 {
     Matrix A = (Matrix(3,1) << p.x, p.y, p.z);
