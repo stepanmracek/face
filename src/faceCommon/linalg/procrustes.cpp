@@ -454,7 +454,7 @@ QVector<cv::Point3d> Procrustes3D::getMeanShape(const QVector<QVector<cv::Point3
 
     for (int i = 0; i < numberOfPointclouds; i++)
     {
-        QVector<cv::Point3d> &pointcloud = vectorOfPointclouds[i];
+        const QVector<cv::Point3d> &pointcloud = vectorOfPointclouds[i];
         for (int j = 0; j < numberOfPoints; j++)
         {
             mean[j] = mean[j] + pointcloud[j];
