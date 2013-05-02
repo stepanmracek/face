@@ -149,7 +149,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
     }
 
     qDebug() << "theta" << minTheta;
-    face.rotate(0, 0, -minTheta);
+    face.rotate(0, 0, minTheta);
     //face.transform(rotation);
 
     return lm;
