@@ -93,11 +93,34 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
     lm = lmDetector.detect();
     face.move(-lm.get(Landmarks::Nosetip));
 
-    double minTheta;
+    VectorOfPoints pointsToTransform;
+    VectorOfPoints referencePoints;
+    MapConverter converter;
+    Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
+    int index = 0;
+    for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
+    {
+        for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
+        {
+            cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(x, y));
+            bool success;
+            cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint, &success);
+            if (success)
+            {
+                pointsToTransform << meshPoint;
+                referencePoints << meanFace.points[index];
+            }
+            index++;
+        }
+    }
+    cv::Point3d move = Procrustes3D::getOptimalTranslation(pointsToTransform, referencePoints);
+    face.move(move);
+
+    /*double minTheta;
     double minD = 1e300;
     Matrix rotation;
 
-    /*for (double theta = -0.15; theta <= 0.15; theta += 0.01)
+    for (double theta = -0.15; theta <= 0.15; theta += 0.01)
     {
         Mesh faceCopy(face);
         faceCopy.rotate(0, 0, theta);

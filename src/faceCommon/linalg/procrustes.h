@@ -95,6 +95,8 @@ public:
 
     static Matrix getOptimalRotation(QVector<cv::Point3d> &from, QVector<cv::Point3d> &to);
 
+    static cv::Point3d getOptimalTranslation(QVector<cv::Point3d> &from, QVector<cv::Point3d> &to);
+
     static cv::Point3d getOptimalScale(const QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to);
 
     static void transform(cv::Point3d &p, Matrix &m);
