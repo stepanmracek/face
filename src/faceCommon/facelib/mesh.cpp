@@ -499,7 +499,7 @@ VectorOfPoints Mesh::getNearestPoints(VectorOfPoints input)
     cv::flann::Index kdTree(features, indexParams);
 
     VectorOfPoints resultPoints;
-    for (int i = 0; i < input.count; i++)
+    for (int i = 0; i < input.count(); i++)
     {
         cv::Mat query(1, 3, CV_32F);
         query.at<float>(0, 0) = input[i].x;
