@@ -92,6 +92,7 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
     Landmarks lm = lmDetector.detect();
     face.translate(-lm.get(Landmarks::Nosetip));
 
+    double bestD = 1e300;
     for (int iteration = 0; iteration < maxIterations; iteration ++)
     {
         MapConverter converter;
@@ -117,6 +118,15 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
 
         double d = Procrustes3D::diff(pointsToTransform, referencePoints);
         qDebug() << "FaceAligner::align" << (iteration+1) << d;
+
+        if (d < bestD)
+        {
+            bestD = d;
+        }
+        else
+        {
+            break;
+        }
     }
 }
 
