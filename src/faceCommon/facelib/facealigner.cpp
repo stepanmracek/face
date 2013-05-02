@@ -126,7 +126,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
                 }
             }
 
-            sampledFace.rotate(0, 0, theta);
+            sampledFace.rotate(0, 0, -theta);
             sampledFace.recalculateMinMax();
             sampledFace.calculateTriangles();
             MapConverter testMC;
