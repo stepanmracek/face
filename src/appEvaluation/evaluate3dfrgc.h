@@ -44,7 +44,7 @@ public:
         QFileInfoList infoList = dir.entryInfoList(nameFilter, QDir::Files, QDir::Name);
         foreach (const QFileInfo &info, infoList)
         {
-            if (info.baseName().compare("04202d564") != 0) continue;
+            if (info.baseName().compare("04202d566") != 0) continue;
 
             Mesh face = Mesh::fromXYZ(info.absoluteFilePath());
             Mesh face2(face);
