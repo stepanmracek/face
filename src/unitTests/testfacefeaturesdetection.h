@@ -255,7 +255,7 @@ public:
         Mesh face = Mesh::fromABS(dirPath + "abs/" + fileName);
         Mesh old = face;
         //aligner.meanFace.writeOBJ(dirPath + QDir::separator() + "mean.obj", '.');
-        aligner.icpAlign(face, 40);
+        aligner.icpAlign(face, 20);
 
         old.translate(cv::Point3d(100,0,0));
         face.translate(cv::Point3d(-100,0,0));
