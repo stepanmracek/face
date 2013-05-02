@@ -119,7 +119,7 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
         face.transform(rotation);
 
         double d = Procrustes3D::diff(pointsToTransform, referencePoints);
-        qDebug() << "FaceAligner::align" << (iteration+1) << d;
+        qDebug() << "FaceAligner::icpAlign" << (iteration+1) << d;
 
         if (d < bestD)
         {
