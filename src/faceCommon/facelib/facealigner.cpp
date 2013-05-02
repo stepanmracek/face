@@ -87,15 +87,14 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
 Landmarks FaceAligner::align(Mesh &face, int iterations)
 {
     assert(iterations >= 1);
-    Landmarks lm;
+    LandmarkDetector lmDetector(face);
+    Landmarks lm = lmDetector.detect();
 
     for (int iteration = 0; iteration < iterations; iteration ++)
     {
         qDebug() << "FaceAligner::align" << (iteration+1) << "/" << iterations;
 
-        LandmarkDetector lmDetector(face);
-        lm = lmDetector.detect();
-        face.move(-lm.get(Landmarks::Nosetip));
+
 
         VectorOfPoints pointsToTransform;
         VectorOfPoints referencePoints;
