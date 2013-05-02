@@ -99,7 +99,7 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
 
         cv::imshow("smooth1", depth.toMatrix());
         //depth.applyFilter(smoothKernel, 3, true);
-        cv::waitKey();
+        cv::waitKey(1);
 
         int index = 0;
         VectorOfPoints pointsToTransform;
