@@ -102,7 +102,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
         Matrix minRotation;
         cv::Point3d minMove;
 
-        for (double theta = -0.15; theta <= 0.15; theta += 0.01)
+        for (double theta = -0.15; theta <= 0.15; theta += 0.005)
         {
             double cosT = cos(theta);
             double sinT = sin(theta);
