@@ -99,7 +99,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
 
     for (double theta = -0.15; theta <= 0.15; theta += 0.01)
     {
-        Mesh faceCopy = face;
+        Mesh faceCopy(face);
         faceCopy.rotate(0, 0, theta);
         MapConverter converter;
         Map depth = SurfaceProcessor::depthmap(faceCopy, converter, 1.0, ZCoord);
