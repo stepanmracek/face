@@ -103,7 +103,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
         faceCopy.rotate(0, 0, theta);
         MapConverter converter;
         Map depth = SurfaceProcessor::depthmap(faceCopy, converter, 1.0, ZCoord);
-        Matrix testDepth = depth.toMatrix();
+        //Matrix testDepth = depth.toMatrix();
 
         Mesh sampledFace;
         VectorOfPoints referencePoints;
@@ -120,16 +120,16 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
                 {
                     sampledFace.points << meshPoint;
                     referencePoints << meanFace.points[index];
-                    cv::circle(testDepth, mapPoint, 2, 0);
+                    //cv::circle(testDepth, mapPoint, 2, 0);
                 }
                 index++;
             }
         }
 
-        sampledFace.recalculateMinMax();
-        sampledFace.calculateTriangles();
-        MapConverter testMC;
-        Map testMap = SurfaceProcessor::depthmap(sampledFace, testMC, 1, ZCoord);
+        //sampledFace.recalculateMinMax();
+        //sampledFace.calculateTriangles();
+        //MapConverter testMC;
+        //Map testMap = SurfaceProcessor::depthmap(sampledFace, testMC, 1, ZCoord);
         //cv::imshow("test", testMap.toMatrix());
         //cv::imshow("testDepth", testDepth);
         //cv::waitKey(1);
