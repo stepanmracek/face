@@ -63,7 +63,7 @@ void Mesh::centralize()
     qDebug() << "..done";
 }
 
-void Mesh::move(cv::Point3d translationVector)
+void Mesh::translate(cv::Point3d translationVector)
 {
     Procrustes3D::translate(points, translationVector);
     minx += translationVector.x;

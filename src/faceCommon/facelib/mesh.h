@@ -31,7 +31,7 @@ public:
     void calculateTriangles();
     void recalculateMinMax();
     void centralize();
-    void move(cv::Point3d translationVector);
+    void translate(cv::Point3d translationVector);
     void rotate(double x, double y, double z);
     void rotate(cv::Vec3d xyz);
     void scale(cv::Point3d scaleParam);

@@ -258,9 +258,9 @@ public:
         //aligner.meanFace.writeOBJ(dirPath + QDir::separator() + "mean.obj", '.');
         aligner.align(face, 24);
 
-        old.move(cv::Point3d(100,0,0));
-        face.move(cv::Point3d(-100,0,0));
-        aligner.meanFace.move(cv::Point3d(-100,0,0));
+        old.translate(cv::Point3d(100,0,0));
+        face.translate(cv::Point3d(-100,0,0));
+        aligner.meanFace.translate(cv::Point3d(-100,0,0));
 
         QApplication app(argc, argv);
         GLWidget widget;

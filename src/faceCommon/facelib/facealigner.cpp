@@ -50,7 +50,7 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
         }
 
         Mesh f = Mesh::fromXYZ(dirWithLandmarksAndXYZfiles + QDir::separator() + lmInfo.baseName() + ".abs.xyz");
-        f.move(shift);
+        f.translate(shift);
         vectorOfFaces << f;
     }
     for (int i = 0; i < lmCount; i++)
@@ -91,7 +91,7 @@ void FaceAligner::align(Mesh &face, int maxIterations)
     LandmarkDetector lmDetector(face);
     Landmarks lm = lmDetector.detect();
     qDebug()<< "FaceAligner::align - nose" << lm.get(Landmarks::Nosetip).x << lm.get(Landmarks::Nosetip).y << lm.get(Landmarks::Nosetip).z;
-    face.move(-lm.get(Landmarks::Nosetip));
+    face.translate(-lm.get(Landmarks::Nosetip));
 
     Matrix smoothKernel = KernelGenerator::gaussianKernel(5);
     double totalMinD = 1e300;
@@ -167,7 +167,7 @@ void FaceAligner::align(Mesh &face, int maxIterations)
         if (1) //(improve)
         {
             face.rotate(0, 0, -minTheta);
-            face.move(minMove);
+            face.translate(minMove);
             face.transform(minRotation);
 
             /*Procrustes3D::rotate(lm.points, 0, 0, -minTheta);
