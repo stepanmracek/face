@@ -97,8 +97,6 @@ void FaceAligner::align(Mesh &face, int maxIterations)
     double totalMinD = 1e300;
     for (int iteration = 0; iteration < maxIterations; iteration ++)
     {
-        qDebug() << "FaceAligner::align" << (iteration+1) << "/" << maxIterations;
-
         MapConverter converter;
         Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
         cv::imshow("smooth1", depth.toMatrix());
@@ -164,7 +162,7 @@ void FaceAligner::align(Mesh &face, int maxIterations)
             }
         }
 
-        qDebug() << minTheta << minD << improve;
+        qDebug() << "FaceAligner::align" << (iteration+1) << minD;
 
         if (1) //(improve)
         {
