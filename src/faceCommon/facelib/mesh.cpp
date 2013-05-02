@@ -10,137 +10,6 @@
 #include "linalg/common.h"
 #include "linalg/procrustes.h"
 
-Mesh::Mesh(const QString &filename, bool centralizeLoadedMesh)
-{
-    QString modelPath = filename;
-    modelPath.append(".abs");
-    QFile f(modelPath);
-    f.open(QIODevice::ReadOnly);
-    QTextStream in(&f);
-
-    int mapHeight;
-    in >> mapHeight;
-    in.readLine();
-    int mapwidth;
-    in >> mapwidth;
-
-    /*minMapX = mapwidth;
-    maxMapX = 0;
-    minMapY = mapHeight;
-    maxMapY = 0;*/
-
-    in.readLine();
-    in.readLine();
-
-    int total = mapwidth*mapHeight;
-    qDebug() << "total points" << total;
-
-    int flags[total];
-    double *xPoints = new double[total];
-    double *yPoints = new double[total];
-    double *zPoints = new double[total];
-
-    for (int i = 0; i < total; i++)
-    {
-        in >> (flags[i]);
-    }
-    qDebug() << "flags loaded";
-
-    minx = 1e300;
-    maxx = -1e300;
-    for (int i = 0; i < total; i++)
-    {
-        in >> (xPoints[i]);
-        if (flags[i])
-        {
-            double x = xPoints[i];
-            if (x > maxx)
-            {
-                //maxMapX = indexToXCoord(i);
-                maxx = x;
-            }
-            if (x < minx)
-            {
-                //minMapX = indexToXCoord(i);
-                minx = x;
-            }
-        }
-    }
-    qDebug() << "x points loaded";
-
-    miny = 1e300;
-    maxy = -1e300;
-    for (int i = 0; i < total; i++)
-    {
-        in >> (yPoints[i]);
-        if (flags[i])
-        {
-            double y = yPoints[i];
-            //qDebug() << y << miny << maxy;
-            if (y > maxy)
-            {
-                //maxMapY = indexToYCoord(i);
-                maxy = y;
-            }
-            if (y < miny)
-            {
-                //minMapY = indexToYCoord(i);
-                miny = y;
-            }
-        }
-    }
-    qDebug() << "y points loaded";
-    /*double tmp = maxMapY;
-    maxMapY = minMapY;
-    minMapY = tmp;*/
-
-    minz = 1e300;
-    maxz = -1e300;
-    for (int i = 0; i < total; i++)
-    {
-        in >> (zPoints[i]);
-        if (flags[i])
-        {
-            double z = zPoints[i];
-            if (z > maxz)
-            {
-                maxz = z;
-            }
-            if (z < minz)
-            {
-                minz = z;
-            }
-        }
-    }
-    qDebug() << "z points loaded";
-
-    for (int i = 0; i < total; i++)
-    {
-        if (flags[i])
-        {
-            cv::Point3d p;
-            p.x = xPoints[i];
-            p.y = yPoints[i];
-            p.z = zPoints[i];
-            points.append(p);
-        }
-    }
-
-    delete [] xPoints;
-    delete [] yPoints;
-    delete [] zPoints;
-
-    if (centralizeLoadedMesh)
-        centralize();
-
-    calculateTriangles();
-
-    // Texture
-    //QString texturePath(filename);
-    //texturePath.append(".ppm");
-    //texture = cvLoadImage(texturePath.toStdString());
-}
-
 void Mesh::recalculateMinMax()
 {
     minx = 1e300;
@@ -339,6 +208,131 @@ Mesh Mesh::fromXYZ(const QString &filename, bool centralizeLoadedMesh)
 
     mesh.calculateTriangles();
     return mesh;
+}
+
+Mesh Mesh::fromABS(const QString &filename, bool centralizeLoadedMesh)
+{
+    qDebug() << "loading" << filename;
+    QFile f(filename);
+    bool exists = f.exists();
+    assert(exists);
+    bool opened = f.open(QIODevice::ReadOnly);
+    assert(opened);
+    QTextStream in(&f);
+
+    int mapHeight;
+    in >> mapHeight;
+    in.readLine();
+    int mapwidth;
+    in >> mapwidth;
+
+    Mesh mesh;
+
+    in.readLine();
+    in.readLine();
+
+    int total = mapwidth*mapHeight;
+    qDebug() << "total points" << total;
+
+    int flags[total];
+    double *xPoints = new double[total];
+    double *yPoints = new double[total];
+    double *zPoints = new double[total];
+
+    for (int i = 0; i < total; i++)
+    {
+        in >> (flags[i]);
+    }
+    qDebug() << "flags loaded";
+
+    mesh.minx = 1e300;
+    mesh.maxx = -1e300;
+    for (int i = 0; i < total; i++)
+    {
+        in >> (xPoints[i]);
+        if (flags[i])
+        {
+            double x = xPoints[i];
+            if (x > mesh.maxx)
+            {
+                //maxMapX = indexToXCoord(i);
+                mesh.maxx = x;
+            }
+            if (x < mesh.minx)
+            {
+                //minMapX = indexToXCoord(i);
+                mesh.minx = x;
+            }
+        }
+    }
+    qDebug() << "x points loaded";
+
+    mesh.miny = 1e300;
+    mesh.maxy = -1e300;
+    for (int i = 0; i < total; i++)
+    {
+        in >> (yPoints[i]);
+        if (flags[i])
+        {
+            double y = yPoints[i];
+            //qDebug() << y << miny << maxy;
+            if (y > mesh.maxy)
+            {
+                //maxMapY = indexToYCoord(i);
+                mesh.maxy = y;
+            }
+            if (y < miny)
+            {
+                //minMapY = indexToYCoord(i);
+                mesh.miny = y;
+            }
+        }
+    }
+    qDebug() << "y points loaded";
+    /*double tmp = maxMapY;
+    maxMapY = minMapY;
+    minMapY = tmp;*/
+
+    mesh.minz = 1e300;
+    mesh.maxz = -1e300;
+    for (int i = 0; i < total; i++)
+    {
+        in >> (zPoints[i]);
+        if (flags[i])
+        {
+            double z = zPoints[i];
+            if (z > mesh.maxz)
+            {
+                mesh.maxz = z;
+            }
+            if (z < minz)
+            {
+                mesh.minz = z;
+            }
+        }
+    }
+    qDebug() << "z points loaded";
+
+    for (int i = 0; i < total; i++)
+    {
+        if (flags[i])
+        {
+            cv::Point3d p;
+            p.x = xPoints[i];
+            p.y = yPoints[i];
+            p.z = zPoints[i];
+            points.append(p);
+        }
+    }
+
+    delete [] xPoints;
+    delete [] yPoints;
+    delete [] zPoints;
+
+    if (centralizeLoadedMesh)
+        centralize();
+
+    calculateTriangles();
 }
 
 Mesh Mesh::fromPointcloud(VectorOfPoints &pointcloud, bool centralizeLoadedMesh)
