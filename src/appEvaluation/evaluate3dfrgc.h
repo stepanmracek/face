@@ -69,7 +69,7 @@ public:
             CurvatureStruct cs2 = SurfaceProcessor::calculateCurvatures(depth2);
             //cv::imwrite((dirPath + "xyz-aligned/shapeIndex/" + info.baseName() + ".png").toStdString(),
             //            cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
-            cv::imshow("aligned", cs2.curvatureIndex.toMatrix());
+            cv::imshow("aligned", cs2.mea.toMatrix());
             cv::waitKey();
         }
     }
