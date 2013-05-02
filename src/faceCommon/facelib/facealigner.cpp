@@ -6,6 +6,7 @@
 
 #include "facelib/landmarkdetector.h"
 #include "linalg/procrustes.h"
+#include "linalg/kernelgenerator.h"
 
 void FaceAligner::init()
 {
@@ -90,12 +91,15 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
     LandmarkDetector lmDetector(face);
     Landmarks lm = lmDetector.detect();
 
+    Matrix smoothKernel = KernelGenerator::gaussianKernel(5);
+
     for (int iteration = 0; iteration < iterations; iteration ++)
     {
         qDebug() << "FaceAligner::align" << (iteration+1) << "/" << iterations;
 
         MapConverter converter;
         Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
+        depth.applyFilter(smoothKernel, 3, true);
 
         double minTheta;
         double minD = 1e300;
