@@ -307,6 +307,25 @@ cv::Point3d Procrustes3D::getOptimalTranslation(QVector<cv::Point3d> &from, QVec
     return centralizedTranslationFrom - centralizedTranslationTo;
 }
 
+void Procrustes3D::rotate(QVector<cv::Point3d> &points, double x, double y, double z)
+{
+        Matrix Rx = (Matrix(3,3) <<
+                     1, 0, 0,
+                     0, cos(x), -sin(x),
+                     0, sin(x), cos(x));
+        Matrix Ry = (Matrix(3,3) <<
+                     cos(y), 0, sin(y),
+                     0, 1, 0,
+                     -sin(y), 0, cos(y));
+        Matrix Rz = (Matrix(3,3) <<
+                     cos(z), -sin(z), 0,
+                     sin(z), cos(z), 0,
+                     0, 0, 1);
+        Matrix R = Rx*Ry*Rz;
+
+        transform(points, R);
+}
+
 void Procrustes3D::transform(cv::Point3d &p, Matrix &m)
 {
     Matrix A = (Matrix(3,1) << p.x, p.y, p.z);
