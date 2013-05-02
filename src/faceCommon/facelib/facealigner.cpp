@@ -157,8 +157,8 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
         face.transform(minRotation);
 
         Procrustes3D::rotate(lm.points, 0, 0, -minTheta);
-        Procrustes3D::translate(lm.points, move);
-        Procrustes3D::transform(lm.points, rotation);
+        Procrustes3D::translate(lm.points, minMove);
+        Procrustes3D::transform(lm.points, minRotation);
     }
 
     /*double minTheta;
