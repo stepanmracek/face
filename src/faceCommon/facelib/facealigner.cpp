@@ -140,14 +140,12 @@ void FaceAligner::align(Mesh &face, int maxIterations)
                 }
             }
 
-            // translation
-            cv::Point3d move = Procrustes3D::getOptimalTranslation(pointsToTransform, referencePoints);
-            Procrustes3D::translate(pointsToTransform, move);
-
             // theta rotation
             Procrustes3D::rotate(pointsToTransform, 0, 0, -theta);
 
-
+            // translation
+            cv::Point3d move = Procrustes3D::getOptimalTranslation(pointsToTransform, referencePoints);
+            Procrustes3D::translate(pointsToTransform, move);
 
             // SVD rotation
             Matrix rotation = Procrustes3D::getOptimalRotation(pointsToTransform, referencePoints);

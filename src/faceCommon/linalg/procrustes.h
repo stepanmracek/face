@@ -93,9 +93,9 @@ public:
 
     static Procrustes3DResult SVDAlign(QVector<QVector<cv::Point3d> > &vectorOfPointclouds); //, bool centralize, double eps = 0, int maxIterations = INT_MAX);
 
-    static Matrix getOptimalRotation(QVector<cv::Point3d> &from, QVector<cv::Point3d> &to);
+    static Matrix getOptimalRotation(const QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to);
 
-    static cv::Point3d getOptimalTranslation(QVector<cv::Point3d> &from, QVector<cv::Point3d> &to);
+    static cv::Point3d getOptimalTranslation(const QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to);
 
     static cv::Point3d getOptimalScale(const QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to);
 
@@ -105,13 +105,13 @@ public:
 
     static void transform(QVector<cv::Point3d> &points, Matrix &m);
 
-    static QVector<cv::Point3d> getMeanShape(QVector<QVector<cv::Point3d> > &vectorOfPointclouds);
+    static QVector<cv::Point3d> getMeanShape(const QVector<QVector<cv::Point3d> > &vectorOfPointclouds);
 
     static void scale(QVector<cv::Point3d> &points, cv::Point3d scaleParams);
 
     static void translate(QVector<cv::Point3d> &points, cv::Point3d shift);
 
-    static double getShapeVariation(QVector<QVector<cv::Point3d> > &vectorOfPointclouds, QVector<cv::Point3d> &mean);
+    static double getShapeVariation(const QVector<QVector<cv::Point3d> > &vectorOfPointclouds, QVector<cv::Point3d> &mean);
 
     static void applyInversedProcrustesResult(QVector<cv::Point3d> &pointCloud, Procrustes3DResult &procrustesResult);
 

@@ -277,7 +277,7 @@ Matrix Procrustes3D::alignRigid(QVector<cv::Point3d> &from, QVector<cv::Point3d>
     return R;
 }
 
-Matrix Procrustes3D::getOptimalRotation(QVector<cv::Point3d> &from, QVector<cv::Point3d> &to)
+Matrix Procrustes3D::getOptimalRotation(const QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to)
 {
     int n = from.count();
     assert(n == to.count());
@@ -299,7 +299,7 @@ Matrix Procrustes3D::getOptimalRotation(QVector<cv::Point3d> &from, QVector<cv::
     return R;
 }
 
-cv::Point3d Procrustes3D::getOptimalTranslation(QVector<cv::Point3d> &from, QVector<cv::Point3d> &to)
+cv::Point3d Procrustes3D::getOptimalTranslation(const QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to)
 {
     cv::Point3d centralizedTranslationFrom = centralizedTranslation(from);
     cv::Point3d centralizedTranslationTo = centralizedTranslation(to);
@@ -446,7 +446,7 @@ Procrustes3DResult Procrustes3D::SVDAlign(QVector<QVector<cv::Point3d> > &vector
     return result;
 }
 
-QVector<cv::Point3d> Procrustes3D::getMeanShape(QVector<QVector<cv::Point3d> > &vectorOfPointclouds)
+QVector<cv::Point3d> Procrustes3D::getMeanShape(const QVector<QVector<cv::Point3d> > &vectorOfPointclouds)
 {
     int numberOfPointclouds = vectorOfPointclouds.count();
     int numberOfPoints = vectorOfPointclouds[0].count();
@@ -474,7 +474,7 @@ QVector<cv::Point3d> Procrustes3D::getMeanShape(QVector<QVector<cv::Point3d> > &
     return mean;
 }
 
-double Procrustes3D::getShapeVariation(QVector<QVector<cv::Point3d> > &vectorOfPointclouds, QVector<cv::Point3d> &mean)
+double Procrustes3D::getShapeVariation(const QVector<QVector<cv::Point3d> > &vectorOfPointclouds, QVector<cv::Point3d> &mean)
 {
     int numberOfPointclouds = vectorOfPointclouds.count();
     int numberOfPoints = vectorOfPointclouds[0].count();
