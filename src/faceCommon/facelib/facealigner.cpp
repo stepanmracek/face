@@ -101,23 +101,21 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
         //depth.applyFilter(smoothKernel, 3, true);
         cv::waitKey(1);
 
-        int index = 0;
+        int n = meanFace.points.count();
         VectorOfPoints pointsToTransform;
         VectorOfPoints referencePoints;
-        for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
+        for (int i = 0; i < n; i++)
         {
-            for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
+            cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(meanFace.points[i].x, meanFace.points[i].y));
+            bool success;
+            cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint, &success);
+            if (success)
             {
-                cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(x, y));
-                bool success;
-                cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint, &success);
-                if (success)
-                {
-                    pointsToTransform << meshPoint;
-                    referencePoints << meanFace.points[index];
-                }
-                index++;
+                pointsToTransform << meshPoint;
+                referencePoints << meanFace.points[index];
             }
+            index++;
+
         }
 
         // translation
