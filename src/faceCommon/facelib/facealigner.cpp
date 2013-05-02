@@ -97,7 +97,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
     double minD = 1e300;
     Matrix rotation;
 
-    for (double theta = -0.15; theta <= 0.15; theta += 0.01)
+    /*for (double theta = -0.15; theta <= 0.15; theta += 0.01)
     {
         Mesh faceCopy(face);
         faceCopy.rotate(0, 0, theta);
@@ -150,7 +150,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
 
     qDebug() << "theta" << minTheta;
     face.rotate(0, 0, minTheta);
-    //face.transform(rotation);
+    //face.transform(rotation);*/
 
     return lm;
 }
