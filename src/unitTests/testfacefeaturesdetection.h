@@ -251,7 +251,7 @@ public:
     static int  testAlign(int argc, char *argv[], QString dirPath, QString fileName)
     {
         Mesh face = Mesh::fromXYZFile(dirPath + QDir::separator() + fileName);
-        face.rotate(0,0,1);
+        face.rotate(0,0,-1);
         QApplication app(argc, argv);
         GLWidget widget;
         widget.setWindowTitle("GL Widget");
