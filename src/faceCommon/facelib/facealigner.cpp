@@ -106,6 +106,8 @@ void FaceAligner::align(Mesh &face, int maxIterations)
 
         double minTheta;
         double minD = 1e300;
+        double minShiftX;
+        double minShiftY;
         Matrix minRotation;
         cv::Point3d minMove;
         bool improve = false;
@@ -142,6 +144,9 @@ void FaceAligner::align(Mesh &face, int maxIterations)
                         }
                     }
 
+                    // shift
+                    Procrustes3D::translate(pointsToTransform, cv::Point3d(shiftx, shifty, 0));
+
                     // theta rotation
                     Procrustes3D::rotate(pointsToTransform, 0, 0, -theta);
 
@@ -163,6 +168,8 @@ void FaceAligner::align(Mesh &face, int maxIterations)
                         minTheta = theta;
                         minRotation = rotation.clone();
                         minMove = move;
+                        minShiftX = shiftx;
+                        minShiftY = shifty;
                     }
                 }
             }
@@ -172,6 +179,7 @@ void FaceAligner::align(Mesh &face, int maxIterations)
 
         if (improve)
         {
+            face.translate(cv::Point3d(minShiftX, minShiftY, 0));
             face.rotate(0, 0, -minTheta);
             face.translate(minMove);
             face.transform(minRotation);
