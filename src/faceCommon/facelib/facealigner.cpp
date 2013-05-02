@@ -85,6 +85,56 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
     meanFace.calculateTriangles();
 }
 
+void FaceAligner::icpAlign(Mesh &face, int maxIterations)
+{
+    assert(maxIterations >= 1);
+    LandmarkDetector lmDetector(face);
+    Landmarks lm = lmDetector.detect();
+    face.translate(-lm.get(Landmarks::Nosetip));
+
+    for (int iteration = 0; iteration < maxIterations; iteration ++)
+    {
+        MapConverter converter;
+        Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
+
+        cv::imshow("smooth1", depth.toMatrix());
+        //depth.applyFilter(smoothKernel, 3, true);
+        cv::waitKey();
+
+        int index = 0;
+        VectorOfPoints pointsToTransform;
+        VectorOfPoints referencePoints;
+        for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
+        {
+            for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
+            {
+                cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(x, y));
+                bool success;
+                cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint, &success);
+                if (success)
+                {
+                    pointsToTransform << meshPoint;
+                    referencePoints << meanFace.points[index];
+                }
+                index++;
+            }
+        }
+
+        // translation
+        cv::Point3d move = Procrustes3D::getOptimalTranslation(pointsToTransform, referencePoints);
+        Procrustes3D::translate(pointsToTransform, move);
+        face.translate(move);
+
+        // SVD rotation
+        Matrix rotation = Procrustes3D::getOptimalRotation(pointsToTransform, referencePoints);
+        Procrustes3D::transform(pointsToTransform, rotation);
+        face.transform(rotation);
+
+        double d = Procrustes3D::diff(pointsToTransform, referencePoints);
+        qDebug() << "FaceAligner::align" << (iteration+1) << d;
+    }
+}
+
 void FaceAligner::align(Mesh &face, int maxIterations)
 {
     assert(maxIterations >= 1);

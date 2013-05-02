@@ -21,6 +21,7 @@ public:
     FaceAligner(const QString &dirWithLandmarksAndXYZfiles);
 
     void align(Mesh &face, int maxIterations);
+    void icpAlign(Mesh &face, int maxIterations);
 };
 
 #endif // FACEALIGNER_H
