@@ -89,73 +89,66 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
     assert(iterations >= 1);
     Landmarks lm;
 
-    for (int i = 0; i < iterations; i++)
+    LandmarkDetector lmDetector(face);
+    lm = lmDetector.detect();
+    face.move(-lm.get(Landmarks::Nosetip));
+
+    double minTheta;
+    double minD = 1e300;
+    Matrix rotation;
+
+    for (double theta = -0.15; theta <= 0.15; theta += 0.005)
     {
-        LandmarkDetector lmDetector(face);
-        lm = lmDetector.detect();
-        face.move(-lm.get(Landmarks::Nosetip));
-
+        Mesh faceCopy = face;
+        faceCopy.rotate(0, 0, theta);
         MapConverter converter;
-        Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
+        Map depth = SurfaceProcessor::depthmap(faceCopy, converter, 1.0, ZCoord);
 
-        double minTheta;
-        double minD = 1e300;
-        Matrix rotation;
-        for (double theta = -0.15; theta <= 0.15; theta += 0.005)
+        Mesh sampledFace;
+        VectorOfPoints referencePoints;
+
+        for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
         {
-            Matrix testDepth = depth.toMatrix();
-
-            Mesh sampledFace;
-            VectorOfPoints referencePoints;
-            double cosT = cos(theta);
-            double sinT = sin(theta);
-            int index = 0;
-            for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
+            for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
             {
-                for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
+                cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(x, r));
+                bool success;
+                cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint, &success);
+                if (success)
                 {
-                    double xr = x * cosT - y * sinT;
-                    double yr = x * sinT + y * cosT;
-                    cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(xr, yr));
-                    bool success;
-                    cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint, &success);
-                    if (success)
-                    {
-                        sampledFace.points << meshPoint;
-                        referencePoints << meanFace.points[index];
-                        cv::circle(testDepth, mapPoint, 2, 0);
-                    }
-                    index++;
+                    sampledFace.points << meshPoint;
+                    referencePoints << meanFace.points[index];
+                    cv::circle(testDepth, mapPoint, 2, 0);
                 }
+                index++;
             }
-
-            sampledFace.rotate(0, 0, -theta);
-            sampledFace.recalculateMinMax();
-            sampledFace.calculateTriangles();
-            MapConverter testMC;
-            Map testMap = SurfaceProcessor::depthmap(sampledFace, testMC, 1, ZCoord);
-            cv::imshow("test", testMap.toMatrix());
-            cv::imshow("testDepth", testDepth);
-            cv::waitKey(30);
-
-            Matrix rotationCandidate = Procrustes3D::getOptimalRotation(sampledFace.points, referencePoints);
-            Procrustes3D::transform(sampledFace.points, rotationCandidate);
-            double d = Procrustes3D::diff(sampledFace.points, referencePoints);
-
-            if (d < minD)
-            {
-                minD = d;
-                minTheta = theta;
-                rotation = rotationCandidate.clone();
-            }
-
-            qDebug() << theta << d << minD;
         }
 
-        qDebug() << "theta" << minTheta;
-        face.rotate(0, 0, minTheta);
-        face.transform(rotation);
+        sampledFace.recalculateMinMax();
+        sampledFace.calculateTriangles();
+        MapConverter testMC;
+        Map testMap = SurfaceProcessor::depthmap(sampledFace, testMC, 1, ZCoord);
+        cv::imshow("test", testMap.toMatrix());
+        cv::imshow("testDepth", testDepth);
+        cv::waitKey(30);
+
+        Matrix rotationCandidate = Procrustes3D::getOptimalRotation(sampledFace.points, referencePoints);
+        Procrustes3D::transform(sampledFace.points, rotationCandidate);
+        double d = Procrustes3D::diff(sampledFace.points, referencePoints);
+
+        if (d < minD)
+        {
+            minD = d;
+            minTheta = theta;
+            rotation = rotationCandidate.clone();
+        }
+
+        qDebug() << theta << d << minD;
     }
+
+    qDebug() << "theta" << minTheta;
+    face.rotate(0, 0, minTheta);
+    face.transform(rotation);
 
     return lm;
 }
