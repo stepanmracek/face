@@ -79,7 +79,7 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
             meanFace.points << meshPoint;
         }
     }
-    meanFace.scale(cv::Point3d(1,1,1.0/vecOfLandmarks.count()));
+    meanFace.scale(cv::Point3d(1.0, 1.0, 1.0/vecOfLandmarks.count()));
     meanFace.recalculateMinMax();
     meanFace.calculateTriangles();
 }
@@ -97,7 +97,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
     double minD = 1e300;
     Matrix rotation;
 
-    for (double theta = -0.15; theta <= 0.15; theta += 0.005)
+    for (double theta = -0.15; theta <= 0.15; theta += 0.01)
     {
         Mesh faceCopy = face;
         faceCopy.rotate(0, 0, theta);
