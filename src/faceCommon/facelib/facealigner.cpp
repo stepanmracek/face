@@ -85,17 +85,17 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
     meanFace.calculateTriangles();
 }
 
-Landmarks FaceAligner::align(Mesh &face, int iterations)
+Landmarks FaceAligner::align(Mesh &face, int maxIterations)
 {
-    assert(iterations >= 1);
+    assert(maxIterations >= 1);
     LandmarkDetector lmDetector(face);
     Landmarks lm = lmDetector.detect();
 
     Matrix smoothKernel = KernelGenerator::gaussianKernel(5);
     double totalMinD = 1e300;
-    for (int iteration = 0; iteration < iterations; iteration ++)
+    for (int iteration = 0; iteration < maxIterations; iteration ++)
     {
-        qDebug() << "FaceAligner::align" << (iteration+1) << "/" << iterations;
+        qDebug() << "FaceAligner::align" << (iteration+1) << "/" << maxIterations;
 
         MapConverter converter;
         Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);

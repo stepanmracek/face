@@ -20,7 +20,7 @@ public:
     FaceAligner(Mesh &meanFace);
     FaceAligner(const QString &dirWithLandmarksAndXYZfiles);
 
-    Landmarks align(Mesh &face, int iterations = 3);
+    Landmarks align(Mesh &face, int maxIterations);
 };
 
 #endif // FACEALIGNER_H
