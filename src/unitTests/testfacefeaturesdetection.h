@@ -253,10 +253,9 @@ public:
         Mesh mean = Mesh::fromOBJ(dirPath + "xyz/mean.obj");
         FaceAligner aligner(mean);
         Mesh face = Mesh::fromABS(dirPath + "abs/" + fileName);
-        face.rotate(-0.1, 0.1, -0.15);
         Mesh old = face;
         //aligner.meanFace.writeOBJ(dirPath + QDir::separator() + "mean.obj", '.');
-        aligner.icpAlign(face, 100);
+        aligner.icpAlign(face, 20);
 
         old.translate(cv::Point3d(100,0,0));
         face.translate(cv::Point3d(-100,0,0));
