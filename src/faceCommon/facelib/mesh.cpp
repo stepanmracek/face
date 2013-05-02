@@ -245,71 +245,21 @@ Mesh Mesh::fromABS(const QString &filename, bool centralizeLoadedMesh)
     }
     qDebug() << "flags loaded";
 
-    mesh.minx = 1e300;
-    mesh.maxx = -1e300;
     for (int i = 0; i < total; i++)
     {
         in >> (xPoints[i]);
-        if (flags[i])
-        {
-            double x = xPoints[i];
-            if (x > mesh.maxx)
-            {
-                //maxMapX = indexToXCoord(i);
-                mesh.maxx = x;
-            }
-            if (x < mesh.minx)
-            {
-                //minMapX = indexToXCoord(i);
-                mesh.minx = x;
-            }
-        }
     }
     qDebug() << "x points loaded";
 
-    mesh.miny = 1e300;
-    mesh.maxy = -1e300;
     for (int i = 0; i < total; i++)
     {
         in >> (yPoints[i]);
-        if (flags[i])
-        {
-            double y = yPoints[i];
-            //qDebug() << y << miny << maxy;
-            if (y > mesh.maxy)
-            {
-                //maxMapY = indexToYCoord(i);
-                mesh.maxy = y;
-            }
-            if (y < mesh.miny)
-            {
-                //minMapY = indexToYCoord(i);
-                mesh.miny = y;
-            }
-        }
     }
     qDebug() << "y points loaded";
-    /*double tmp = maxMapY;
-    maxMapY = minMapY;
-    minMapY = tmp;*/
 
-    mesh.minz = 1e300;
-    mesh.maxz = -1e300;
     for (int i = 0; i < total; i++)
     {
         in >> (zPoints[i]);
-        if (flags[i])
-        {
-            double z = zPoints[i];
-            if (z > mesh.maxz)
-            {
-                mesh.maxz = z;
-            }
-            if (z < mesh.minz)
-            {
-                mesh.minz = z;
-            }
-        }
     }
     qDebug() << "z points loaded";
 
@@ -329,9 +279,9 @@ Mesh Mesh::fromABS(const QString &filename, bool centralizeLoadedMesh)
     delete [] yPoints;
     delete [] zPoints;
 
+    mesh.recalculateMinMax();
     if (centralizeLoadedMesh)
         mesh.centralize();
-
     mesh.calculateTriangles();
 
     return mesh;
