@@ -144,6 +144,8 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
                 minTheta = theta;
                 rotation = rotationCandidate.clone();
             }
+
+            qDebug() << theta << d << mind;
         }
 
         qDebug() << "theta" << minTheta;
