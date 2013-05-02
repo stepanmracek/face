@@ -101,8 +101,9 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
         //depth.applyFilter(smoothKernel, 3, true);
         cv::waitKey(1);
 
-        VectorOfPoints pointsToTransform = meanFace.points;
-        VectorOfPoints referencePoints = face.getNearestPoints(pointsToTransform);
+        // Find correspondence
+        VectorOfPoints referencePoints = meanFace.points;
+        VectorOfPoints pointsToTransform = face.getNearestPoints(pointsToTransform);
 
         // translation
         cv::Point3d move = Procrustes3D::getOptimalTranslation(pointsToTransform, referencePoints);
