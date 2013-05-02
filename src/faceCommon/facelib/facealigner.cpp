@@ -92,7 +92,7 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
     Landmarks lm = lmDetector.detect();
     face.translate(-lm.get(Landmarks::Nosetip));
 
-    Matrix smoothKernel = KernelGenerator::gaussianKernel(5);
+    //Matrix smoothKernel = KernelGenerator::gaussianKernel(5);
 
     double bestD = 1e300;
     for (int iteration = 0; iteration < maxIterations; iteration ++)
@@ -101,7 +101,7 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
         Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
 
         cv::imshow("smooth1", depth.toMatrix());
-        depth.applyFilter(smoothKernel, 3, true);
+        //depth.applyFilter(smoothKernel, 3, true);
         cv::waitKey(1);
 
         // Find correspondence
