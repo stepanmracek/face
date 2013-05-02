@@ -106,73 +106,59 @@ void FaceAligner::align(Mesh &face, int maxIterations)
 
         double minTheta;
         double minD = 1e300;
-        double minShiftX;
-        double minShiftY;
         Matrix minRotation;
         cv::Point3d minMove;
         bool improve = false;
 
-        for (double shifty = -10; shifty <= 10; shifty += 2)
+        for (double theta = -0.15; theta <= 0.15; theta += 0.01)
         {
-            qDebug() << " " << shifty;
-            for (double shiftx = -10; shiftx <= 10; shiftx +=2)
+            double cosT = cos(theta);
+            double sinT = sin(theta);
+
+            VectorOfPoints pointsToTransform;
+            VectorOfPoints referencePoints;
+
+            int index = 0;
+            for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
             {
-                for (double theta = -0.15; theta <= 0.15; theta += 0.01)
+                for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
                 {
-                    double cosT = cos(theta);
-                    double sinT = sin(theta);
+                    double xr = x * cosT - y * sinT;
+                    double yr = x * sinT + y * cosT;
 
-                    VectorOfPoints pointsToTransform;
-                    VectorOfPoints referencePoints;
-
-                    int index = 0;
-                    for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
+                    cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(xr, yr));
+                    bool success;
+                    cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint, &success);
+                    if (success)
                     {
-                        for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
-                        {
-                            double xr = (x + shiftx) * cosT - (y + shifty) * sinT;
-                            double yr = (x + shiftx) * sinT + (y + shifty) * cosT;
-
-                            cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(xr, yr));
-                            bool success;
-                            cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint, &success);
-                            if (success)
-                            {
-                                pointsToTransform << meshPoint;
-                                referencePoints << meanFace.points[index];
-                            }
-                            index++;
-                        }
+                        pointsToTransform << meshPoint;
+                        referencePoints << meanFace.points[index];
                     }
-
-                    // shift
-                    Procrustes3D::translate(pointsToTransform, -cv::Point3d(shiftx, shifty, 0));
-
-                    // theta rotation
-                    Procrustes3D::rotate(pointsToTransform, 0, 0, -theta);
-
-                    // translation
-                    cv::Point3d move = Procrustes3D::getOptimalTranslation(pointsToTransform, referencePoints);
-                    Procrustes3D::translate(pointsToTransform, move);
-
-                    // SVD rotation
-                    Matrix rotation = Procrustes3D::getOptimalRotation(pointsToTransform, referencePoints);
-                    Procrustes3D::transform(pointsToTransform, rotation);
-
-                    double d = Procrustes3D::diff(pointsToTransform, referencePoints);
-
-                    if (d < minD && d < totalMinD)
-                    {
-                        improve = true;
-                        minD = d;
-                        totalMinD = d;
-                        minTheta = theta;
-                        minRotation = rotation.clone();
-                        minMove = move;
-                        minShiftX = shiftx;
-                        minShiftY = shifty;
-                    }
+                    index++;
                 }
+            }
+
+            // theta rotation
+            Procrustes3D::rotate(pointsToTransform, 0, 0, -theta);
+
+            // translation
+            cv::Point3d move = Procrustes3D::getOptimalTranslation(pointsToTransform, referencePoints);
+            Procrustes3D::translate(pointsToTransform, move);
+
+            // SVD rotation
+            Matrix rotation = Procrustes3D::getOptimalRotation(pointsToTransform, referencePoints);
+            Procrustes3D::transform(pointsToTransform, rotation);
+
+            double d = Procrustes3D::diff(pointsToTransform, referencePoints);
+
+            if (d < minD && d < totalMinD)
+            {
+                improve = true;
+                minD = d;
+                totalMinD = d;
+                minTheta = theta;
+                minRotation = rotation.clone();
+                minMove = move;
             }
         }
 
@@ -180,7 +166,6 @@ void FaceAligner::align(Mesh &face, int maxIterations)
 
         if (improve)
         {
-            face.translate(-cv::Point3d(minShiftX, minShiftY, 0));
             face.rotate(0, 0, -minTheta);
             face.translate(minMove);
             face.transform(minRotation);
