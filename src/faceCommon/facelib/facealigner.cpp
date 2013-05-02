@@ -136,7 +136,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
             Map testMap = SurfaceProcessor::depthmap(sampledFace, testMC, 1, ZCoord);
             cv::imshow("test", testMap.toMatrix());
             cv::imshow("testDepth", testDepth);
-            cv::waitKey();
+            cv::waitKey(30);
 
             Matrix rotationCandidate = Procrustes3D::getOptimalRotation(sampledFace.points, referencePoints);
             Procrustes3D::transform(sampledFace.points, rotationCandidate);
