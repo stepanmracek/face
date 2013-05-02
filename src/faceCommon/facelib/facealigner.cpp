@@ -93,8 +93,6 @@ void FaceAligner::align(Mesh &face, int maxIterations)
     qDebug()<< "FaceAligner::align - nose" << lm.get(Landmarks::Nosetip).x << lm.get(Landmarks::Nosetip).y << lm.get(Landmarks::Nosetip).z;
     face.move(-lm.get(Landmarks::Nosetip));
 
-    return;
-
     Matrix smoothKernel = KernelGenerator::gaussianKernel(5);
     double totalMinD = 1e300;
     for (int iteration = 0; iteration < maxIterations; iteration ++)
