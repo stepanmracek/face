@@ -152,7 +152,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
             }
         }
 
-        face.rotate(0, 0, -minTheta);
+        //face.rotate(0, 0, -minTheta);
         face.move(minMove);
         face.transform(minRotation);
 
