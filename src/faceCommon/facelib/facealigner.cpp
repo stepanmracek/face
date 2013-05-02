@@ -130,9 +130,9 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
         sampledFace.calculateTriangles();
         MapConverter testMC;
         Map testMap = SurfaceProcessor::depthmap(sampledFace, testMC, 1, ZCoord);
-        cv::imshow("test", testMap.toMatrix());
-        cv::imshow("testDepth", testDepth);
-        cv::waitKey(1);
+        //cv::imshow("test", testMap.toMatrix());
+        //cv::imshow("testDepth", testDepth);
+        //cv::waitKey(1);
 
         //Matrix rotationCandidate = Procrustes3D::getOptimalRotation(sampledFace.points, referencePoints);
         //Procrustes3D::transform(sampledFace.points, rotationCandidate);
