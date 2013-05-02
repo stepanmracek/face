@@ -87,7 +87,7 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
 
 void FaceAligner::align(Mesh &face, int maxIterations)
 {
-    assert(maxIterations >= 1);
+    //assert(maxIterations >= 1);
     LandmarkDetector lmDetector(face);
     Landmarks lm = lmDetector.detect();
     qDebug()<< "FaceAligner::align - nose" << lm.get(Landmarks::Nosetip).x << lm.get(Landmarks::Nosetip).y << lm.get(Landmarks::Nosetip).z;
