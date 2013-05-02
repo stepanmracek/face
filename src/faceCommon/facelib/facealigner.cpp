@@ -87,6 +87,7 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
 
 void FaceAligner::align(Mesh &face, int maxIterations)
 {
+    face.printStats();
     //assert(maxIterations >= 1);
     LandmarkDetector lmDetector(face);
     Landmarks lm = lmDetector.detect();
@@ -110,7 +111,7 @@ void FaceAligner::align(Mesh &face, int maxIterations)
         cv::Point3d minMove;
         bool improve = false;
 
-        for (double theta = -0.15; theta <= 0.15; theta += 0.005)
+        for (double theta = -0.15; theta <= 0.15; theta += 0.01)
         {
             double cosT = cos(theta);
             double sinT = sin(theta);
