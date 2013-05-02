@@ -92,7 +92,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
     Landmarks lm = lmDetector.detect();
 
     Matrix smoothKernel = KernelGenerator::gaussianKernel(5);
-
+    double totalMinD = 1e300;
     for (int iteration = 0; iteration < iterations; iteration ++)
     {
         qDebug() << "FaceAligner::align" << (iteration+1) << "/" << iterations;
