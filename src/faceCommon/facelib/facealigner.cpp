@@ -103,6 +103,8 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
         Matrix rotation;
         for (double theta = -0.15; theta <= 0.15; theta += 0.005)
         {
+            Matrix testDepth = depth.toMatrix();
+
             Mesh sampledFace;
             VectorOfPoints referencePoints;
             double cosT = cos(theta);
@@ -121,6 +123,7 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
                     {
                         sampledFace.points << meshPoint;
                         referencePoints << meanFace.points[index];
+                        cv::circle(testDepth, mapPoint, 2, 0);
                     }
                     index++;
                 }
@@ -132,7 +135,8 @@ Landmarks FaceAligner::align(Mesh &face, int iterations)
             MapConverter testMC;
             Map testMap = SurfaceProcessor::depthmap(sampledFace, testMC, 1, ZCoord);
             cv::imshow("test", testMap.toMatrix());
-            cv::waitKey(1);
+            cv::imshow("testDepth", testDepth);
+            cv::waitKey(100);
 
             Matrix rotationCandidate = Procrustes3D::getOptimalRotation(sampledFace.points, referencePoints);
             Procrustes3D::transform(sampledFace.points, rotationCandidate);

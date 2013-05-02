@@ -250,16 +250,7 @@ public:
 
     static int  testAlign(int argc, char *argv[], QString dirPath, QString fileName)
     {
-        Mesh face = Mesh::fromXYZFile(dirPath + QDir::separator() + fileName);
-        face.rotate(0,0,-1);
-        QApplication app(argc, argv);
-        GLWidget widget;
-        widget.setWindowTitle("GL Widget");
-        widget.addFace(&face);
-        widget.show();
-        return app.exec();
-
-        /*Mesh mean = Mesh::fromOBJ(dirPath + QDir::separator() + "mean.obj");
+        Mesh mean = Mesh::fromOBJ(dirPath + QDir::separator() + "mean.obj");
         FaceAligner aligner(mean);
         Mesh face = Mesh::fromXYZFile(dirPath + QDir::separator() + fileName);
         Mesh old = face;
@@ -277,7 +268,7 @@ public:
         widget.addFace(&face);
         widget.addFace(&old);
         widget.show();
-        return app.exec();*/
+        return app.exec();
     }
 
     static int testHorizontalProfileLines(int argc, char *argv[])
