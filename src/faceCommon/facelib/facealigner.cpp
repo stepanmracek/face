@@ -116,7 +116,7 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
                 if (d < minDistance)
                 {
                     minDistance = d;
-                    minDistanceIndex = -1;
+                    minDistanceIndex = j;
                 }
             }
 
