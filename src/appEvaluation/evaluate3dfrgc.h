@@ -44,7 +44,6 @@ public:
         QFileInfoList infoList = dir.entryInfoList(nameFilter, QDir::Files, QDir::Name);
         foreach (const QFileInfo &info, infoList)
         {
-            qDebug() << info.baseName();
             if (info.baseName().compare("04202d566") != 0) continue;
 
             Mesh face = Mesh::fromXYZFile(info.absoluteFilePath());
@@ -57,6 +56,7 @@ public:
             CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(depth);
             //cv::imwrite((dirPath + "xyz/shapeIndex/" + info.baseName() + ".png").toStdString(),
             //            cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
+            cv::imshow("not-aligned", cs.curvatureIndex.toMatrix());
 
             FaceAligner aligner(meanFace);
             aligner.align(face, 10);
@@ -65,6 +65,8 @@ public:
             cs = SurfaceProcessor::calculateCurvatures(depth);
             //cv::imwrite((dirPath + "xyz-aligned/shapeIndex/" + info.baseName() + ".png").toStdString(),
             //            cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
+            cv::imshow("aligned", cs.curvatureIndex.toMatrix());
+            cv::waitKey();
         }
     }
 
