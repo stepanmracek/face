@@ -44,6 +44,9 @@ public:
         QFileInfoList infoList = dir.entryInfoList(nameFilter, QDir::Files, QDir::Name);
         foreach (const QFileInfo &info, infoList)
         {
+            qDebug() << info.baseName();
+            if (info.baseName().compare("04202d566") != 0) continue;
+
             Mesh face = Mesh::fromXYZFile(info.absoluteFilePath());
             LandmarkDetector detector(face);
             Landmarks l = detector.detect();
@@ -52,16 +55,16 @@ public:
             Map depth = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
             depth.applyFilter(gaussKernel, 3, true);
             CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(depth);
-            cv::imwrite((dirPath + "xyz/shapeIndex/" + info.baseName() + ".png").toStdString(),
-                        cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
+            //cv::imwrite((dirPath + "xyz/shapeIndex/" + info.baseName() + ".png").toStdString(),
+            //            cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
 
             FaceAligner aligner(meanFace);
             aligner.align(face, 10);
             depth = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
             depth.applyFilter(gaussKernel, 3, true);
             cs = SurfaceProcessor::calculateCurvatures(depth);
-            cv::imwrite((dirPath + "xyz-aligned/shapeIndex/" + info.baseName() + ".png").toStdString(),
-                        cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
+            //cv::imwrite((dirPath + "xyz-aligned/shapeIndex/" + info.baseName() + ".png").toStdString(),
+            //            cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
         }
     }
 
