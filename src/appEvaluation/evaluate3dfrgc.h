@@ -63,7 +63,7 @@ public:
 
             // aligned
             FaceAligner aligner(meanFace);
-            aligner.align(face2, 10);
+            aligner.icpAlign(face2, 20);
             Map depth2 = SurfaceProcessor::depthmap(face2, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
             depth2.applyFilter(gaussKernel, 3, true);
             CurvatureStruct cs2 = SurfaceProcessor::calculateCurvatures(depth2);
