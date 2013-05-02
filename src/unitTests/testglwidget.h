@@ -14,7 +14,7 @@ class TestGlWidget
 public:
     static int test(int argc, char *argv[], const QString &dir)
     {
-        Mesh mesh = Mesh::fromXYZ(dir + QDir::separator() + "02463d652.abs.xyz", false);
+        Mesh mesh = Mesh::fromOBJ(dir + "xyz/mean.obj", false);
         mesh.printStats();
 
         //Landmarks landmarks(dir + "02463d652.xml");
