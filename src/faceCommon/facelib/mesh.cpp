@@ -403,17 +403,20 @@ Mesh::Mesh()
     maxz = -1e300;
 }
 
-Mesh::Mesh(Mesh *src)
+Mesh::Mesh(Mesh &src)
 {
-    minx = src->minx;
-    maxx = src->maxx;
-    miny = src->miny;
-    maxy = src->maxy;
-    minz = src->minz;
-    maxz = src->maxz;
+    minx = src.minx;
+    maxx = src.maxx;
+    miny = src.miny;
+    maxy = src.maxy;
+    minz = src.minz;
+    maxz = src.maxz;
 
-    points = src->points;
-    triangles = src->triangles;
+    points = src.points;
+    triangles = src.triangles;
+    normals = src.normals;
+    colors = src.colors;
+    curvatures = src.curvatures;
 }
 
 Mesh::~Mesh()
