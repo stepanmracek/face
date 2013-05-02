@@ -153,7 +153,7 @@ void FaceAligner::align(Mesh &face, int maxIterations)
 
             double d = Procrustes3D::diff(pointsToTransform, referencePoints);
 
-            if (d < minD && d < totalMinD)
+            if (d < minD) // && d < totalMinD)
             {
                 improve = true;
                 minD = d;
