@@ -49,7 +49,7 @@ public:
             Mesh face = Mesh::fromXYZFile(info.absoluteFilePath());
             LandmarkDetector detector(face);
             Landmarks l = detector.detect();
-            face.move(-l.get(Landmarks::Nosetip));
+            //face.move(-l.get(Landmarks::Nosetip));
             MapConverter mapConverter;
             Map depth = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
             depth.applyFilter(gaussKernel, 3, true);
