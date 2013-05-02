@@ -102,7 +102,7 @@ void FaceAligner::align(Mesh &face, int maxIterations)
         cv::imshow("smooth1", depth.toMatrix());
         depth.applyFilter(smoothKernel, 3, true);
         //cv::imshow("smooth2", depth.toMatrix());
-        cv::waitKey(1);
+        cv::waitKey();
 
         double minTheta;
         double minD = 1e300;
