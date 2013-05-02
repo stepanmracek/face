@@ -34,10 +34,11 @@ public:
 
     static void createShapeIndexMaps()
     {
-        QString dirPath = "/mnt/data/frgc/";
+        QString dirPath = "/home/stepo/data/frgc/spring2004/";
         QDir dir(dirPath + "xyz");
 
         Mesh meanFace = Mesh::fromOBJ(dirPath + "xyz/mean.obj");
+        Matrix gaussKernel = KernelGenerator::gaussianKernel(11);
 
         QStringList nameFilter; nameFilter << "*.abs.xyz";
         QFileInfoList infoList = dir.entryInfoList(nameFilter, QDir::Files, QDir::Name);
@@ -49,18 +50,17 @@ public:
             face.move(-l.get(Landmarks::Nosetip));
             MapConverter mapConverter;
             Map depth = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
-            Matrix gaussKernel = KernelGenerator::gaussianKernel(11);
             depth.applyFilter(gaussKernel, 3, true);
             CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(depth);
-            cv::imwrite((dirPath + "shapeIndex-notAligned/" + info.baseName() + ".png").toStdString(),
+            cv::imwrite((dirPath + "xyz/shapeIndex/" + info.baseName() + ".png").toStdString(),
                         cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
 
             FaceAligner aligner(meanFace);
-            aligner.align(face, 3);
+            aligner.align(face, 10);
             depth = SurfaceProcessor::depthmap(face, mapConverter, cv::Point2d(-80,-60), cv::Point2d(80,120), 2.0, ZCoord);
             depth.applyFilter(gaussKernel, 3, true);
             cs = SurfaceProcessor::calculateCurvatures(depth);
-            cv::imwrite((dirPath + "shapeIndex-aligned/" + info.baseName() + ".png").toStdString(),
+            cv::imwrite((dirPath + "xyz-aligned/shapeIndex/" + info.baseName() + ".png").toStdString(),
                         cs.curvatureIndex.toMatrix(0, 0, 1) * 255);
         }
     }
