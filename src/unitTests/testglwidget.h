@@ -17,6 +17,8 @@ public:
         Mesh mesh = Mesh::fromOBJ(dir + "xyz/mean.obj", false);
         mesh.printStats();
 
+        Landmarks landmarks;
+
         //Landmarks landmarks(dir + "02463d652.xml");
         /*mesh.move(-landmarks.Nosetip);
         landmarks.LeftInnerEye -= landmarks.Nosetip;
@@ -31,7 +33,7 @@ public:
         GLWidget widget;
         widget.setWindowTitle("GL Widget");
         widget.addFace(&mesh);
-        //widget.addLandmarks(&landmarks);
+        widget.addLandmarks(&landmarks);
         widget.show();
         return app.exec();
     }
