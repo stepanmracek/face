@@ -495,7 +495,7 @@ VectorOfPoints Mesh::getNearestPoints(VectorOfPoints input)
         features.at<float>(i, 1) = points[i].y;
         features.at<float>(i, 2) = points[i].z;
     }
-    cv::flann::KDTreeIndexParams indexParams;
+    cv::flann::LinearIndexParams indexParams; //KDTreeIndexParams
     cv::flann::Index index(features, indexParams);
 
     VectorOfPoints resultPoints;
@@ -514,4 +514,29 @@ VectorOfPoints Mesh::getNearestPoints(VectorOfPoints input)
     }
 
     return resultPoints;
+}
+
+Mesh Mesh::zLevelSelect(double zValue)
+{
+    qDebug() << "Mesh::zLevelSelect";
+    Mesh result;
+    for (int i = 0; i < points.count(); i++)
+    {
+        if (points[i].z >= zValue)
+        {
+            result.points << points[i];
+            if (colors.count() > 0)
+            {
+                result.colors << colors[i];
+            }
+            if (normals.count() > 0)
+            {
+                result.normals << normals[i];
+            }
+        }
+    }
+    result.recalculateMinMax();
+    result.calculateTriangles();
+    qDebug() << points.count() << result.points.count();
+    return result;
 }

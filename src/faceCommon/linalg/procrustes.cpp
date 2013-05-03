@@ -243,37 +243,19 @@ cv::Point3d Procrustes3D::centralizedTranslation(const QVector<cv::Point3d> &sha
     return shift;
 }
 
-Matrix Procrustes3D::alignRigid(QVector<cv::Point3d> &from, QVector<cv::Point3d> &to, bool centralize)
+Matrix Procrustes3D::alignRigid(QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to)
 {
-    int n = from.count();
-    assert(n == to.count());
+    cv::Point3d centralizeFrom = centralizedTranslation(from);
+    cv::Point3d centralizeTo = centralizedTranslation(to);
 
-    // centralize
-    if (centralize)
-    {
-        cv::Point3d cumulativeA(0, 0, 0);
-        cv::Point3d cumulativeB(0, 0, 0);
-        for (int i = 0; i < n; i++)
-        {
-            cumulativeA += from[i];
-            cumulativeB += to[i];
-        }
-        cumulativeA.x = cumulativeA.x/n;
-        cumulativeA.y = cumulativeA.y/n;
-        cumulativeA.z = cumulativeA.z/n;
-        cumulativeB.x = cumulativeB.x/n;
-        cumulativeB.y = cumulativeB.y/n;
-        cumulativeB.z = cumulativeB.z/n;
+    QVector<cv::Point3d> toCopy = to;
+    translate(from, centralizeFrom);
+    translate(toCopy, centralizeTo);
 
-        for (int i = 0; i < n; i++)
-        {
-            from[i] = from[i] - cumulativeA;
-            to[i] = to[i] - cumulativeB;
-        }
-    }
-
-    Matrix R = getOptimalRotation(from, to);
+    Matrix R = getOptimalRotation(from, toCopy);
     transform(from, R);
+
+    translate(from, -centralizeTo);
     return R;
 }
 

@@ -38,6 +38,7 @@ public:
     void transform(Matrix &m);
     void printStats();
     VectorOfPoints getNearestPoints(VectorOfPoints input);
+    Mesh zLevelSelect(double zValue);
 
     Mesh();
     Mesh(const Mesh &src);

@@ -37,7 +37,7 @@ public:
         QString dirPath = "/home/stepo/data/frgc/spring2004/";
         QDir dir(dirPath + "xyz");
 
-        Mesh meanFace = Mesh::fromOBJ(dirPath + "xyz/mean.obj");
+        Mesh meanFace = Mesh::fromOBJ("../../test/meanForAlign.obj");
         Matrix gaussKernel = KernelGenerator::gaussianKernel(11);
 
         QStringList nameFilter; nameFilter << "*.abs.xyz";

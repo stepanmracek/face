@@ -250,9 +250,10 @@ public:
 
     static int  testAlign(int argc, char *argv[], QString dirPath, QString fileName)
     {
-        Mesh mean = Mesh::fromOBJ(dirPath + "xyz/mean.obj");
+        Mesh mean = Mesh::fromOBJ("../../test/meanForAlign.obj");
         FaceAligner aligner(mean);
-        Mesh face = Mesh::fromABS(dirPath + "abs/" + fileName);
+        Mesh face = Mesh::fromXYZ(dirPath + "xyz/" + fileName, false);
+        //face = face.zLevelSelect(0);
         Mesh old = face;
         //aligner.meanFace.writeOBJ(dirPath + QDir::separator() + "mean.obj", '.');
         aligner.icpAlign(face, 20);
