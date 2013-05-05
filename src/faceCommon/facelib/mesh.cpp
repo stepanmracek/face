@@ -367,10 +367,15 @@ Mesh Mesh::fromABS(const QString &filename, const QString &texture, bool central
 
             if (x == 639) continue;
             if (y == 479) continue;
-
             if (flags[i+1] && flags[i+640])
             {
                 mesh.triangles << cv::Vec3i(totalToUsed[i], totalToUsed[i+1], totalToUsed[i+640]);
+            }
+
+            if (y == 0) continue;
+            if (flags[i+639] && flags[i+640])
+            {
+                mesh.triangles << cv::Vec3i(totalToUsed[i], totalToUsed[i+640], totalToUsed[i+639]);
             }
         }
     }
