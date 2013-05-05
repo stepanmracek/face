@@ -257,7 +257,7 @@ public:
         foreach (const QFileInfo &in, inFiles)
         {
             int id = in.baseName().split('d')[1].toInt() + 1;
-            QString texture = in.absolutePath() + QDir::separator() + in.baseName().split('d')[0] + 'd' + id + ".ppm";
+            QString texture = in.absolutePath() + QDir::separator() + in.baseName().split('d')[0] + "d" + id + ".ppm";
             qDebug() << in.absoluteFilePath() << id << texture;
         }
     }
