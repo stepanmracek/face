@@ -47,6 +47,7 @@ public:
     void writeBIN(const QString &path);
 
     static Mesh fromABS(const QString &filename, bool centralizeLoadedMesh = false);
+    static Mesh fromABS(const QString &filename, const QString &texture, bool centralizeLoadedMesh = false);
     static Mesh fromBIN(const QString &filename, bool centralizeLoadedMesh = false);
     static Mesh fromOBJ(const QString &filename, bool centralizeLoadedMesh = false);
     static Mesh fromXYZ(const QString &filename, bool centralizeLoadedMesh = false);
