@@ -288,6 +288,89 @@ Mesh Mesh::fromABS(const QString &filename, bool centralizeLoadedMesh)
     return mesh;
 }
 
+Mesh Mesh::fromABS(const QString &filename, const QString &texture, bool centralizeLoadedMesh)
+{
+    cv::Mat_<cv::Vec3b> image = cv::imread(texture.toStdString());
+
+    qDebug() << "loading" << filename;
+    QFile f(filename);
+    bool exists = f.exists();
+    assert(exists);
+    bool opened = f.open(QIODevice::ReadOnly);
+    assert(opened);
+    QTextStream in(&f);
+
+    int mapHeight;
+    in >> mapHeight;
+    in.readLine();
+    int mapwidth;
+    in >> mapwidth;
+
+    Mesh mesh;
+
+    in.readLine();
+    in.readLine();
+
+    int total = mapwidth*mapHeight;
+    qDebug() << "total points" << total;
+
+    int flags[total];
+    double *xPoints = new double[total];
+    double *yPoints = new double[total];
+    double *zPoints = new double[total];
+
+    for (int i = 0; i < total; i++)
+    {
+        in >> (flags[i]);
+    }
+    qDebug() << "flags loaded";
+
+    for (int i = 0; i < total; i++)
+    {
+        in >> (xPoints[i]);
+    }
+    qDebug() << "x points loaded";
+
+    for (int i = 0; i < total; i++)
+    {
+        in >> (yPoints[i]);
+    }
+    qDebug() << "y points loaded";
+
+    for (int i = 0; i < total; i++)
+    {
+        in >> (zPoints[i]);
+    }
+    qDebug() << "z points loaded";
+
+    for (int i = 0; i < total; i++)
+    {
+        if (flags[i])
+        {
+            cv::Point3d p;
+            p.x = xPoints[i];
+            p.y = yPoints[i];
+            p.z = zPoints[i];
+            mesh.points.append(p);
+
+            int x = i % 640;
+            int y = i / 640;
+            mesh.colors << image(y, x);
+        }
+    }
+
+    delete [] xPoints;
+    delete [] yPoints;
+    delete [] zPoints;
+
+    mesh.recalculateMinMax();
+    if (centralizeLoadedMesh)
+        mesh.centralize();
+    mesh.calculateTriangles();
+
+    return mesh;
+}
+
 Mesh Mesh::fromPointcloud(VectorOfPoints &pointcloud, bool centralizeLoadedMesh)
 {
     Mesh m;
