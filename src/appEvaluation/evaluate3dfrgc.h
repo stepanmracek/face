@@ -248,6 +248,17 @@ public:
         Matrix backProjectedImg = MatrixConverter::columnVectorToMatrix(backProjected, 200)*255;
         cv::imwrite("backprojected.png", backProjectedImg);
 	}
+
+    static void createBIN()
+    {
+        QString inDirPath = "/run/media/stepo/My Book/3D-FRGC-data/nd1/Spring2004range";
+        QDir inDir(inDirPath, "*.abs");
+        QFileInfoList inFiles = inDir.entryInfoList();
+        foreach (const QFileInfo &in, inFiles)
+        {
+            qDebug() << in.absolutePath();
+        }
+    }
 };
 
 #endif
