@@ -257,7 +257,9 @@ public:
         foreach (const QFileInfo &in, inFiles)
         {
             int id = in.baseName().split('d')[1].toInt() + 1;
-            qDebug() << in.absoluteFilePath() << id;
+            qDebug() << in.absoluteFilePath() << id << in.absolutePath();
+
+            //QString texture = in.absolutePath()
         }
     }
 };
