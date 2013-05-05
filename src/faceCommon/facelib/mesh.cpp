@@ -371,6 +371,7 @@ Mesh Mesh::fromABS(const QString &filename, const QString &texture, bool central
             if (flags[i+1] && flags[i+640])
             {
                 qDebug() << i << totalToUsed[flags[i]] << totalToUsed[flags[i+1]] << totalToUsed[flags[i+640]];
+                qDebug() << i << flags[i] << flags[i+1] << [flags[i+640];
                 mesh.triangles << cv::Vec3i(totalToUsed[flags[i]], totalToUsed[flags[i+1]], totalToUsed[flags[i+640]]);
             }
         }
