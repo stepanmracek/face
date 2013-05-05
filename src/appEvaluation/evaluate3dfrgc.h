@@ -252,6 +252,7 @@ public:
     static void createBIN()
     {
         QString inDirPath = "/run/media/stepo/My Book/3D-FRGC-data/nd1/Spring2004range";
+        QString outDirPath = "/home/stepo/data/frgc/spring2004/bin/";
         QDir inDir(inDirPath, "*.abs");
         QFileInfoList inFiles = inDir.entryInfoList();
         foreach (const QFileInfo &in, inFiles)
@@ -259,6 +260,9 @@ public:
             int id = in.baseName().split('d')[1].toInt() + 1;
             QString texture = in.absolutePath() + QDir::separator() + in.baseName().split('d')[0] + "d" + QString::number(id) + ".ppm";
             qDebug() << in.absoluteFilePath() << id << texture;
+
+            Mesh m = Mesh::fromABS(in.absoluteFilePath(), texture);
+            m.writeBIN(outDirPath + in.baseName() + ".bin");
         }
     }
 };
