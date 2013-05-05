@@ -256,7 +256,7 @@ public:
         QFileInfoList inFiles = inDir.entryInfoList();
         foreach (const QFileInfo &in, inFiles)
         {
-            qDebug() << in.absolutePath();
+            qDebug() << in.absoluteFilePath();
         }
     }
 };
