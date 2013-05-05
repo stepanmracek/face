@@ -103,7 +103,8 @@ int main(int argc, char *argv[])
     //TestGlWidget::test(argc, argv, frgcPath());
 
     //TestMesh::testXYZLodaderOBJWriter("/media/data/frgc/xyz/Spring2004", "/media/data/frgc/obj-centralized/Spring2004");
-    TestMesh::testBinReadWrite(argc, argv, frgcPath());
+    //TestMesh::testBinReadWrite(argc, argv, frgcPath());
+    TestMesh::readAbsWithTexture(argc, argv);
 
     //TestLandmarks::testReadWrite();
 
