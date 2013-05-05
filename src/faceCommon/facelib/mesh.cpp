@@ -319,17 +319,17 @@ Mesh Mesh::fromABS(const QString &filename, const QString &texture, bool central
     double *yPoints = new double[total];
     double *zPoints = new double[total];
 
-    QMap<int, int> totalToUsed;
+    //QMap<int, int> totalToUsed;
     int used = 0;
     for (int i = 0; i < total; i++)
     {
         in >> (flags[i]);
 
-        if (flags[i])
+        /*if (flags[i])
         {
             totalToUsed[i] = used;
             used++;
-        }
+        }*/
     }
     qDebug() << "flags loaded";
 
@@ -365,7 +365,7 @@ Mesh Mesh::fromABS(const QString &filename, const QString &texture, bool central
             int y = i / 640;
             mesh.colors << image(y, x);
 
-            if (x == 639) continue;
+            /*if (x == 639) continue;
             if (y == 479) continue;
             if (flags[i+1] && flags[i+640])
             {
@@ -376,7 +376,7 @@ Mesh Mesh::fromABS(const QString &filename, const QString &texture, bool central
             if (flags[i+639] && flags[i+640])
             {
                 mesh.triangles << cv::Vec3i(totalToUsed[i], totalToUsed[i+640], totalToUsed[i+639]);
-            }
+            }*/
         }
     }
 
