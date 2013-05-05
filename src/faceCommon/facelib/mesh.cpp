@@ -659,6 +659,12 @@ Mesh Mesh::fromBIN(const QString &filename, bool centralizeLoadedMesh)
         result.colors[i] = cv::Vec3b(r, g, b);
     }*/
 
+
+    if (centralizeLoadedMesh)
+    {
+        result.centralize();
+    }
+
     qDebug() << "...done";
     return result;
 }
