@@ -14,7 +14,7 @@ class TestGlWidget
 public:
     static int test(int argc, char *argv[], const QString &dir)
     {
-        Mesh mesh = Mesh::fromXYZ(dir + "xyz/02463d652.abs.xyz", false);
+        Mesh mesh = Mesh::fromXYZ(dir + "bin/02463d652.bin", false);
 
         QApplication app(argc, argv);
         GLWidget widget;
