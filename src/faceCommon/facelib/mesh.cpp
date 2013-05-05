@@ -388,6 +388,7 @@ Mesh Mesh::fromABS(const QString &filename, const QString &texture, bool central
     if (centralizeLoadedMesh)
         mesh.centralize();
 
+    calculateTriangles();
     return mesh;
 }
 
