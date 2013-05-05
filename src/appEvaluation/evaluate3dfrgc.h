@@ -251,8 +251,8 @@ public:
 
     static void createBIN()
     {
-        QString inDirPath = "/run/media/stepo/My Book/3D-FRGC-data/nd1/Spring2003range";
-        QString outDirPath = "/home/stepo/data/frgc/spring2003/bin/";
+        QString inDirPath = "/run/media/stepo/My Book/3D-FRGC-data/nd1/Fall2003range";
+        QString outDirPath = "/home/stepo/data/frgc/fall2003/bin/";
         QDir inDir(inDirPath, "*.abs");
         QFileInfoList inFiles = inDir.entryInfoList();
         foreach (const QFileInfo &in, inFiles)
