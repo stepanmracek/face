@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 	//Evaluate3dFrgc::pcaSubspace();
     //Evaluate3dFrgc::evaluateFusion();
     //Evaluate3dFrgc::createShapeIndexMaps();
-    Evaluate3dFrgc::createBIN()
+    Evaluate3dFrgc::createBIN();
 
     return 0;
 }
