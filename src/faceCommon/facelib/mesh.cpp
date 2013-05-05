@@ -370,7 +370,7 @@ Mesh Mesh::fromABS(const QString &filename, const QString &texture, bool central
 
             if (flags[i+1] && flags[i+640])
             {
-                mesh.triangles <<
+                mesh.triangles << cv::Vec3i(flags[i], flags[i+1], flags[i+640]);
             }
         }
     }
@@ -382,7 +382,6 @@ Mesh Mesh::fromABS(const QString &filename, const QString &texture, bool central
     mesh.recalculateMinMax();
     if (centralizeLoadedMesh)
         mesh.centralize();
-    mesh.calculateTriangles();
 
     return mesh;
 }
