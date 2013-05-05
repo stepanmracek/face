@@ -649,7 +649,7 @@ Mesh Mesh::fromBIN(const QString &filename, bool centralizeLoadedMesh)
         result.triangles[i] = cv::Vec3i(p1, p2, p3);
     }
 
-    /*int cCount;
+    int cCount;
     in >> cCount;
     result.colors = VectorOfColors(cCount);
     for (int i = 0; i < cCount; i++)
@@ -657,8 +657,7 @@ Mesh Mesh::fromBIN(const QString &filename, bool centralizeLoadedMesh)
         uchar r,g,b;
         in >> r; in >> g; in >> b;
         result.colors[i] = cv::Vec3b(r, g, b);
-    }*/
-
+    }
 
     if (centralizeLoadedMesh)
     {
