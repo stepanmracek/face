@@ -26,8 +26,6 @@ public:
     QVector<double> curvatures;
 
     double minx, maxx, miny, maxy, minz, maxz;
-    void writeOFF(const QString &path);
-    void writeOBJ(const QString &path, char decimalPoint);
     void calculateTriangles();
     void recalculateMinMax();
     void centralize();
@@ -44,7 +42,12 @@ public:
     Mesh(const Mesh &src);
     virtual ~Mesh();
 
+    void writeOFF(const QString &path);
+    void writeOBJ(const QString &path, char decimalPoint);
+    void writeBIN(const QString &path);
+
     static Mesh fromABS(const QString &filename, bool centralizeLoadedMesh = false);
+    static Mesh fromBIN(const QString &filename, bool centralizeLoadedMesh = false);
     static Mesh fromOBJ(const QString &filename, bool centralizeLoadedMesh = false);
     static Mesh fromXYZ(const QString &filename, bool centralizeLoadedMesh = false);
     static Mesh fromMap(Map &map, bool centralizeLoadedMesh = false);

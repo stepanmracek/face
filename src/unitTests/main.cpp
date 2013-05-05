@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     //TestFaceFeatuesDetection::testDepthmapProcessing(argc, argv, "/home/stepo/face.obj");
     //return TestFaceFeatuesDetection::testFilters(argc, argv, "/home/stepo/face.obj");
     //TestFaceFeatuesDetection::testLandmarkDetection(argc, argv, frgcPath() + "02463d652.abs.xyz");
-    TestFaceFeatuesDetection::testAlign(argc, argv, frgcPath(), "04265d345.abs.xyz");
+    //TestFaceFeatuesDetection::testAlign(argc, argv, frgcPath(), "04265d345.abs.xyz");
     //TestFaceFeatuesDetection::testBatchLandmarkDetection(argc, argv, frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::testSuccessBatchLandmarkDetection(frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::testIsoGeodeticCurves(argc, argv);
@@ -103,6 +103,7 @@ int main(int argc, char *argv[])
     //TestGlWidget::test(argc, argv, frgcPath());
 
     //TestMesh::testXYZLodaderOBJWriter("/media/data/frgc/xyz/Spring2004", "/media/data/frgc/obj-centralized/Spring2004");
+    TestMesh::testBinReadWrite(argc, argv, frgcPath());
 
     //TestLandmarks::testReadWrite();
 

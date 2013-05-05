@@ -476,6 +476,88 @@ void Mesh::writeOFF(const QString &path)
     }
 }
 
+void Mesh::writeBIN(const QString &path)
+{
+    qDebug() << "writing to" << path << "...";
+    QFile outFile(path);
+    outFile.open(QFile::WriteOnly);
+    QDataStream stream(&outFile);
+
+    stream << points.count();
+    foreach (const cv::Point3d &p, points)
+    {
+        stream << p.x;
+        stream << p.y;
+        stream << p.z;
+    }
+
+    stream << triangles.count();
+    foreach (const cv::Vec3i &t, triangles)
+    {
+        stream << t[0];
+        stream << t[1];
+        stream << t[2];
+    }
+
+    stream << colors.count();
+    foreach (const Color &c, colors)
+    {
+        stream << c[0];
+        stream << c[1];
+        stream << c[2];
+    }
+
+    outFile.flush();
+    outFile.close();
+
+    qDebug() << "...done";
+}
+
+Mesh Mesh::fromBIN(const QString &filename, bool centralizeLoadedMesh)
+{
+    qDebug() << "loading" << filename << "...";
+    QFile f(filename);
+    bool exists = f.exists();
+    assert(exists);
+    bool opened = f.open(QIODevice::ReadOnly);
+    assert(opened);
+    QDataStream in(&f);
+
+    Mesh result;
+
+    int pCount;
+    in >> pCount;
+    result.points = VectorOfPoints(pCount);
+    for (int i = 0; i < pCount; i++)
+    {
+        double x,y,z;
+        in >> x; in >> y; in >> z;
+        result.points[i] = cv::Point3d(x, y, z);
+    }
+
+    int tCount;
+    in >> tCount;
+    result.triangles = VectorOfTriangles(tCount);
+    for (int i = 0; i < tCount; i++)
+    {
+        int p1, p2, p3;
+        in >> p1; in >> p2; in >> p3;
+        result.triangles[i] = cv::Vec3i(p1, p2, p3);
+    }
+
+    int cCount;
+    in >> cCount;
+    for (int i = 0; i < cCount; i++)
+    {
+        uchar r,g,b;
+        in >> r; in >> g; in >> b;
+        result.colors[i] = cv::Vec3b(r, g, b);
+    }
+
+    qDebug() << "...done";
+    return result;
+}
+
 void Mesh::printStats()
 {
     qDebug() << "x-range: " << minx << maxx;
