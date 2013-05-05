@@ -39,6 +39,16 @@ public:
         widget.show();
         return app.exec();
     }
+
+    static int readAbsWithTexture(int argc, char *argv[])
+    {
+        QApplication app(argc, argv);
+        GLWidget widget;
+        widget.setWindowTitle("GL Widget");
+        //widget.addFace(&mesh2);
+        widget.show();
+        return app.exec();
+    }
 };
 
 #endif // TESTMESH_H
