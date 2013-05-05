@@ -42,10 +42,13 @@ public:
 
     static int readAbsWithTexture(int argc, char *argv[])
     {
+        Mesh mesh = Mesh::fromABS("/run/media/stepo/My Book/3D-FRGC-data/nd1/Spring2004range/02463d652.abs",
+                                  "/run/media/stepo/My Book/3D-FRGC-data/nd1/Spring2004range/02463d653.ppm", true);
+
         QApplication app(argc, argv);
         GLWidget widget;
         widget.setWindowTitle("GL Widget");
-        //widget.addFace(&mesh2);
+        widget.addFace(&mesh);
         widget.show();
         return app.exec();
     }
