@@ -651,6 +651,7 @@ Mesh Mesh::fromBIN(const QString &filename, bool centralizeLoadedMesh)
 
     int cCount;
     in >> cCount;
+    result.colors = VectorOfColors(cCount);
     for (int i = 0; i < cCount; i++)
     {
         uchar r,g,b;
