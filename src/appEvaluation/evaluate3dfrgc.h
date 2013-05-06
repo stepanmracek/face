@@ -260,8 +260,9 @@ public:
         {
             if (QFile::exists(outDirPath + in.baseName() + ".bin")) continue;
 
+            bool zeroPadding = in.baseName().split('d')[1].startsWith("0");
             int id = in.baseName().split('d')[1].toInt() + 1;
-            QString texture = in.absolutePath() + QDir::separator() + in.baseName().split('d')[0] + "d" + QString::number(id) + ".ppm";
+            QString texture = in.absolutePath() + QDir::separator() + in.baseName().split('d')[0] + "d" + (zeroPadding ? "0" : "") + QString::number(id) + ".ppm";
             qDebug() << in.absoluteFilePath() << id << texture;
 
             Mesh m = Mesh::fromABS(in.absoluteFilePath(), texture);
