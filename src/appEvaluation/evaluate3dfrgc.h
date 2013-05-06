@@ -255,8 +255,20 @@ public:
         QString outDirPath = "/home/stepo/data/frgc/fall2003/bin/";
         QDir inDir(inDirPath, "*.abs");
         QFileInfoList inFiles = inDir.entryInfoList();
+
+        bool proceed = false;
         foreach (const QFileInfo &in, inFiles)
         {
+            if (in.baseName().compare("04693d58") != 0)
+            {
+                continue;
+            }
+            else
+            {
+                proceed = true;
+            }
+            if (!proceed) continue;
+
             int id = in.baseName().split('d')[1].toInt() + 1;
             QString texture = in.absolutePath() + QDir::separator() + in.baseName().split('d')[0] + "d" + QString::number(id) + ".ppm";
             qDebug() << in.absoluteFilePath() << id << texture;
