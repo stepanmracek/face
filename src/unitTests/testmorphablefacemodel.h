@@ -86,7 +86,7 @@ public:
 
     static void testCreate(const QString &dirPath, const QString &meanLadmarksFile,
                            const QString &pcaForZcoordFile, const QString &pcaForTextureFile,
-                           const QString &flagsFile)
+                           const QString &pcaFile, const QString &flagsFile)
     {
         Map mask(200,200);
         cv::Point f1(100, 75);
@@ -125,7 +125,8 @@ public:
             meshesVec.append(mesh);
         }
 
-        Morphable3DFaceModel::create(meshesVec, landmarksVec, 1, pcaForZcoordFile, pcaForTextureFile, flagsFile, meanLadmarksFile, mask);
+        Morphable3DFaceModel::create(meshesVec, landmarksVec, 1, pcaForZcoordFile, pcaForTextureFile, pcaFile,
+                                     flagsFile, meanLadmarksFile, mask);
     }
 };
 

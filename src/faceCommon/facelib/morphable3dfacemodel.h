@@ -16,6 +16,8 @@ class Morphable3DFaceModel
 public:
     PCA pcaForZcoord;
     PCA pcaForTexture;
+    PCA pca;
+
     Mesh mesh;
     Landmarks landmarks;
     Matrix mask;
@@ -41,6 +43,7 @@ public:
                        int iterations,
                        const QString &pcaForZcoordFile,
                        const QString &pcaForTextureFile,
+                       const QString &pcaFile,
                        const QString &flagsFile,
                        const QString &meanControlPointsFile,
                        Map &mapMask);
