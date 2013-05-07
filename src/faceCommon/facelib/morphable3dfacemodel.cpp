@@ -260,7 +260,8 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
         common << projectedZcoords[i].toQVector();
         common << projectedTextures[i].toQVector();
 
-        commonParams << Vector(common);
+        Vector commonVec(common);
+        commonParams << commonVec;
     }
     PCA pca(commonParams);
     pca.modesSelectionThreshold(0.95);
