@@ -24,7 +24,7 @@ public:
     Morphable3DFaceModel(const QString &pcaPathForZcoord, const QString &pcaPathForTexture,
                          const QString &maskPath, const QString &landmarksPath, int width);
 
-    void setModelParams(Vector &zcoordParams);
+    //void setModelParams(Vector &zcoordParams);
     void setModelParams(Vector &zcoordParams, Vector &textureParams);
 
     Procrustes3DResult align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations);

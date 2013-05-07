@@ -39,11 +39,11 @@ Morphable3DFaceModel::Morphable3DFaceModel(const QString &pcaPathForZcoord, cons
     mesh = Mesh::fromMap(faceDepth, faceTexture, true);
 }
 
-void Morphable3DFaceModel::setModelParams(Vector &zcoordParams)
+/*void Morphable3DFaceModel::setModelParams(Vector &zcoordParams)
 {
     Vector textureParams(pcaForTexture.getModes());
     setModelParams(zcoordParams, textureParams);
-}
+}*/
 
 void Morphable3DFaceModel::setModelParams(Vector &zcoordParams, Vector &textureParams)
 {
