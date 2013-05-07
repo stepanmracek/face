@@ -30,7 +30,17 @@ void Morphable3DFaceModelWidget::recalculateModel()
         return;
     }
 
-    int zcoordModesCount = model->pcaForZcoord.getModes();
+    Vector params(model->pca.getModes());
+    for (int i = 0; i < model->pca.getModes(); i++)
+    {
+        QSlider *slider = sliders[i];
+        double newValue = (slider->value() - 50.0)/100.0 * 3 * sqrt(model->pca.getVariation(i));
+        params(i) = newValue;
+    }
+
+    model->setModelParams(params);
+
+    /*int zcoordModesCount = model->pcaForZcoord.getModes();
     Vector zcoordParams(zcoordModesCount);
     for (int i = 0; i < zcoordModesCount; i++)
     {
@@ -48,13 +58,31 @@ void Morphable3DFaceModelWidget::recalculateModel()
         textureParams(i) = newValue;
     }
 
-    model->setModelParams(zcoordParams, textureParams);
+    model->setModelParams(zcoordParams, textureParams);*/
     ui->glWidget->repaint();
 }
 
 void Morphable3DFaceModelWidget::setModel(Morphable3DFaceModel *model)
 {
-    slidersForZcoord.clear();
+    sliders.clear();
+    int modesCount = model->pca.getModes();
+
+    QVBoxLayout *slidersLayout = new QVBoxLayout();
+    for (int i = 0; i < modesCount; i++)
+    {
+        QSlider *slider = new QSlider(Qt::Horizontal);
+        slider->setMinimum(0);
+        slider->setMaximum(100);
+        slider->setPageStep(10);
+        slider->setValue(50);
+        slidersLayout->addWidget(slider);
+        sliders << slider;
+
+        connect(slider, SIGNAL(valueChanged(int)), this, SLOT(recalculateModel()));
+    }
+    ui->scrollAreaContent->setLayout(zcoordSlidersLayout);
+
+    /*slidersForZcoord.clear();
     int zCoordModesCount = model->pcaForZcoord.getModes();
 
     QVBoxLayout *zcoordSlidersLayout = new QVBoxLayout();
@@ -87,7 +115,7 @@ void Morphable3DFaceModelWidget::setModel(Morphable3DFaceModel *model)
 
         connect(slider, SIGNAL(valueChanged(int)), this, SLOT(recalculateModel()));
     }
-    ui->sacTexture->setLayout(textureSlidersLayout);
+    ui->sacTexture->setLayout(textureSlidersLayout);*/
 
     this->model = model;
     ui->glWidget->addFace(&(model->mesh));
@@ -105,7 +133,15 @@ void Morphable3DFaceModelWidget::on_btnRandomize_clicked()
     }
 
     updateModel = false;
-    int n = model->pcaForZcoord.getModes();
+    int n = model->pca.getModes();
+    for (int i = 0; i < n; i++)
+    {
+        double u = ((qrand() % 1000) + 1)/1000.0;
+        double v = ((qrand() % 1000) + 1)/1000.0;
+        double x = sqrt(-2.0 * log(u)) * cos(2.0 * M_PI * v);
+        sliders[i]->setValue( x * 20 + 50 );
+    }
+    /*int n = model->pcaForZcoord.getModes();
     for (int i = 0; i < n; i++)
     {
         double u = ((qrand() % 1000) + 1)/1000.0;
@@ -120,7 +156,7 @@ void Morphable3DFaceModelWidget::on_btnRandomize_clicked()
         double v = ((qrand() % 1000) + 1)/1000.0;
         double x = sqrt(-2.0 * log(u)) * cos(2.0 * M_PI * v);
         slidersForTexture[i]->setValue( x * 20 + 50 );
-    }
+    }*/
     updateModel = true;
     recalculateModel();
 }
@@ -134,7 +170,12 @@ void Morphable3DFaceModelWidget::on_btnInvert_clicked()
     }
 
     updateModel = false;
-    int n = model->pcaForZcoord.getModes();
+    int n = model->pca.getModes();
+    for (int i = 0; i < n; i++)
+    {
+        sliders[i]->setValue( 100 - sliders[i]->value() );
+    }
+    /*int n = model->pcaForZcoord.getModes();
     for (int i = 0; i < n; i++)
     {
         slidersForZcoord[i]->setValue( 100 - slidersForZcoord[i]->value() );
@@ -143,7 +184,7 @@ void Morphable3DFaceModelWidget::on_btnInvert_clicked()
     for (int i = 0; i < n; i++)
     {
         slidersForTexture[i]->setValue( 100 - slidersForTexture[i]->value() );
-    }
+    }*/
     updateModel = true;
     recalculateModel();
 }
@@ -174,7 +215,13 @@ void Morphable3DFaceModelWidget::on_btnReset_clicked()
 
     updateModel = false;
 
-    int n = model->pcaForZcoord.getModes();
+    int n = model->pca.getModes();
+    for (int i = 0; i < n; i++)
+    {
+        sliders[i]->setValue(50);
+    }
+
+    /*int n = model->pcaForZcoord.getModes();
     for (int i = 0; i < n; i++)
     {
         slidersForZcoord[i]->setValue(50);
@@ -184,7 +231,7 @@ void Morphable3DFaceModelWidget::on_btnReset_clicked()
     for (int i = 0; i < n; i++)
     {
         slidersForTexture[i]->setValue(50);
-    }
+    }*/
 
     updateModel = true;
     recalculateModel();

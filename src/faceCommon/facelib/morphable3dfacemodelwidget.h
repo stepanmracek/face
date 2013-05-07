@@ -25,8 +25,9 @@ public:
 private:
     Ui::Morphable3DFaceModelWidget *ui;
     Morphable3DFaceModel *model;
-    QList<QSlider*> slidersForZcoord;
-    QList<QSlider*> slidersForTexture;
+    QList<QSlider*> sliders;
+    //QList<QSlider*> slidersForZcoord;
+    //QList<QSlider*> slidersForTexture;
     bool updateModel;
 
 public slots:
