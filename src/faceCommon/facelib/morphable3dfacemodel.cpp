@@ -214,9 +214,9 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
         resultTextureMap.add(texture);
         textureMaps.append(texture);
 
-        cv::imshow("depth", depth.toMatrix());
+        /*cv::imshow("depth", depth.toMatrix());
         cv::imshow("texture", texture.toMatrix());
-        cv::waitKey(100);
+        cv::waitKey(100);*/
     }
 
     resultZcoordMap.linearTransform(1.0/meshes.count(), 1.0);
