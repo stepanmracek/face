@@ -9,7 +9,7 @@
 class FaceFeaturesAnotation
 {
 public:  
-    static void anotateXYZ(const QString &dirPath, bool uniqueIDsOnly);
+    static void anotateBINs(const QString &dirPath, bool uniqueIDsOnly, bool overwrite);
 
     static Landmarks anotate(Mesh &mesh, int desiredLandmarksCount, bool &success);
 };

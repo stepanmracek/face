@@ -18,10 +18,11 @@ class TestMorphableFaceModel
 {
 public:
 
-    static int testModel(int argc, char *argv[], const QString &pca, const QString &flags, const QString &landmarksPath)
+    static int testModel(int argc, char *argv[], const QString &pcaForZcoord, const QString &pcaForTexture,
+                         const QString &flags, const QString &landmarksPath)
     {
         //Morphable3DFaceModel model(pca, flags, 200);
-        Morphable3DFaceModel model(pca, flags, landmarksPath, 200);
+        Morphable3DFaceModel model(pcaForZcoord, pcaForTexture, flags, landmarksPath, 200);
 
         QApplication app(argc, argv);
         Morphable3DFaceModelWidget widget;
@@ -32,10 +33,10 @@ public:
         return app.exec();
     }
 
-    static int testMorph(int argc, char *argv[], const QString &pca, const QString &flags,
-                          const QString &landmarksPath, const QString &probeOBJPath)
+    static int testMorph(int argc, char *argv[], const QString &pcaForZcoord, const QString &pcaForTexture,
+                         const QString &flags, const QString &landmarksPath, const QString &probeOBJPath)
     {
-        Morphable3DFaceModel model(pca, flags, landmarksPath, 200);
+        Morphable3DFaceModel model(pcaForZcoord, pcaForTexture, flags, landmarksPath, 200);
 
         QFileInfo inputObjInfo(probeOBJPath);
         assert(inputObjInfo.exists());
@@ -84,7 +85,8 @@ public:
     }*/
 
     static void testCreate(const QString &dirPath, const QString &meanLadmarksFile,
-                           const QString &pcaFile, const QString &flagsFile)
+                           const QString &pcaForZcoordFile, const QString &pcaForTextureFile,
+                           const QString &flagsFile)
     {
         Map mask(200,200);
         cv::Point f1(100, 75);
@@ -110,18 +112,20 @@ public:
         QFileInfoList entries = dir.entryInfoList();
         foreach (const QFileInfo &fileInfo, entries)
         {
+            qDebug() << fileInfo.baseName();
             QString id = fileInfo.baseName().mid(0, 5);
             if (usedIDs.contains(id)) continue;
             usedIDs.insert(id);
 
             Landmarks landmarks(fileInfo.absoluteFilePath());
-            Mesh mesh = Mesh::fromOBJ(dirPath + QDir::separator() + fileInfo.baseName() + ".obj");
+            assert(landmarks.check());
+            Mesh mesh = Mesh::fromBIN(dirPath + QDir::separator() + fileInfo.baseName() + ".bin");
 
             landmarksVec.append(landmarks.points);
             meshesVec.append(mesh);
         }
 
-        Morphable3DFaceModel::create(meshesVec, landmarksVec, 10, pcaFile, flagsFile, meanLadmarksFile, mask);
+        Morphable3DFaceModel::create(meshesVec, landmarksVec, 1, pcaForZcoordFile, pcaForTextureFile, flagsFile, meanLadmarksFile, mask);
     }
 };
 

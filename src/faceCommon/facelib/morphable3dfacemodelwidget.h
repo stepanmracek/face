@@ -25,7 +25,8 @@ public:
 private:
     Ui::Morphable3DFaceModelWidget *ui;
     Morphable3DFaceModel *model;
-    QList<QSlider*> sliders;
+    QList<QSlider*> slidersForZcoord;
+    QList<QSlider*> slidersForTexture;
     bool updateModel;
 
 public slots:
@@ -34,6 +35,7 @@ private slots:
     void on_btnRandomize_clicked();
     void on_btnExport_clicked();
     void on_btnReset_clicked();
+    void on_btnInvert_clicked();
 };
 
 #endif // MORPHABLE3DFACEMODELWIDGET_H

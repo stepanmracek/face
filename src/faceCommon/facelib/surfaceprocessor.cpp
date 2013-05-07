@@ -244,9 +244,13 @@ void SurfaceProcessor::depthmap(Mesh &mesh, Map &map, cv::Point2d meshStart, cv:
             z3d = mesh.points[t[2]].z;
             break;
         case Texture:
-            z1d = 0.299*mesh.colors[t[0]][2] + 0.587*mesh.colors[t[0]][1] + 0.114*mesh.colors[t[0]][0];
+            /*z1d = 0.299*mesh.colors[t[0]][2] + 0.587*mesh.colors[t[0]][1] + 0.114*mesh.colors[t[0]][0];
             z2d = 0.299*mesh.colors[t[1]][2] + 0.587*mesh.colors[t[1]][1] + 0.114*mesh.colors[t[1]][0];
-            z3d = 0.299*mesh.colors[t[2]][2] + 0.587*mesh.colors[t[2]][1] + 0.114*mesh.colors[t[2]][0];
+            z3d = 0.299*mesh.colors[t[2]][2] + 0.587*mesh.colors[t[2]][1] + 0.114*mesh.colors[t[2]][0];*/
+
+            z1d = 0.999*mesh.colors[t[0]][2] + 0.0*mesh.colors[t[0]][1] + 0.0*mesh.colors[t[0]][0];
+            z2d = 0.999*mesh.colors[t[1]][2] + 0.0*mesh.colors[t[1]][1] + 0.0*mesh.colors[t[1]][0];
+            z3d = 0.999*mesh.colors[t[2]][2] + 0.0*mesh.colors[t[2]][1] + 0.0*mesh.colors[t[2]][0];
             break;
         case Curvature:
             z1d = mesh.curvatures[t[0]];

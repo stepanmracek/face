@@ -405,20 +405,27 @@ Mesh Mesh::fromPointcloud(VectorOfPoints &pointcloud, bool centralizeLoadedMesh)
     return m;
 }
 
-Mesh Mesh::fromMap(Map &map, bool centralizeLoadedMesh)
+Mesh Mesh::fromMap(Map &depth, Map &intensities, bool centralizeLoadedMesh)
 {
+    assert(depth.w == intensities.w);
+    assert(depth.h == intensities.h);
     QMap<int, int> coordToIndex;
 
     Mesh mesh;
     int index = 0;
-    for (int y = 0; y < map.h; y++)
+    for (int y = 0; y < depth.h; y++)
     {
-        for (int x = 0; x < map.w; x++)
+        for (int x = 0; x < depth.w; x++)
         {
-            if (map.isSet(x,y))
+            if (depth.isSet(x,y))
             {
-                mesh.points << cv::Point3d(x, map.h-y-1, map.get(x,y));
-                int coord = map.coordToIndex(x,y);
+                assert(intensities.isSet(x,y));
+
+                mesh.points << cv::Point3d(x, depth.h-y-1, depth.get(x,y));
+                uchar intensity = intensities.get(x, y);
+                mesh.colors << cv::Vec3b(intensity, intensity, intensity);
+
+                int coord = depth.coordToIndex(x,y);
                 coordToIndex[coord] = index;
                 index++;
             }
@@ -431,23 +438,23 @@ Mesh Mesh::fromMap(Map &map, bool centralizeLoadedMesh)
     mesh.recalculateMinMax();
 
     // triangles
-    for (int y = 0; y < map.h; y++)
+    for (int y = 0; y < depth.h; y++)
     {
-        for (int x = 0; x < map.w; x++)
+        for (int x = 0; x < depth.w; x++)
         {
-            if (map.isSet(x,y) &&
-                map.isValidCoord(x, y+1) && map.isSet(x, y+1) &&
-                map.isValidCoord(x+1, y+1) && map.isSet(x+1, y+1))
+            if (depth.isSet(x,y) &&
+                depth.isValidCoord(x, y+1) && depth.isSet(x, y+1) &&
+                depth.isValidCoord(x+1, y+1) && depth.isSet(x+1, y+1))
             {
-                mesh.triangles << cv::Vec3i(coordToIndex[map.coordToIndex(x,y)], coordToIndex[map.coordToIndex(x,y+1)], coordToIndex[map.coordToIndex(x+1,y+1)]);
+                mesh.triangles << cv::Vec3i(coordToIndex[depth.coordToIndex(x,y)], coordToIndex[depth.coordToIndex(x,y+1)], coordToIndex[depth.coordToIndex(x+1,y+1)]);
                 //mesh.triangles.append(cv::Vec3i(map.coordToIndex(x,y), map.coordToIndex(x,y+1), map.coordToIndex(x+1,y+1)));
             }
 
-            if (map.isSet(x,y) &&
-                map.isValidCoord(x+1, y+1) && map.isSet(x+1, y+1) &&
-                map.isValidCoord(x+1, y) && map.isSet(x+1, y))
+            if (depth.isSet(x,y) &&
+                depth.isValidCoord(x+1, y+1) && depth.isSet(x+1, y+1) &&
+                depth.isValidCoord(x+1, y) && depth.isSet(x+1, y))
             {
-                mesh.triangles << cv::Vec3i(coordToIndex[map.coordToIndex(x,y)], coordToIndex[map.coordToIndex(x+1,y+1)], coordToIndex[map.coordToIndex(x+1,y)]);
+                mesh.triangles << cv::Vec3i(coordToIndex[depth.coordToIndex(x,y)], coordToIndex[depth.coordToIndex(x+1,y+1)], coordToIndex[depth.coordToIndex(x+1,y)]);
                 //mesh.triangles.append(cv::Vec3i(map.coordToIndex(x,y), map.coordToIndex(x+1,y+1), map.coordToIndex(x+1,y)));
             }
         }
@@ -664,6 +671,7 @@ Mesh Mesh::fromBIN(const QString &filename, bool centralizeLoadedMesh)
         result.centralize();
     }
 
+    result.recalculateMinMax();
     qDebug() << "...done";
     return result;
 }
@@ -687,7 +695,7 @@ VectorOfPoints Mesh::getNearestPoints(VectorOfPoints input)
         features.at<float>(i, 1) = points[i].y;
         features.at<float>(i, 2) = points[i].z;
     }
-    cv::flann::LinearIndexParams indexParams; //KDTreeIndexParams
+    cv::flann::KDTreeIndexParams indexParams; //KDTreeIndexParams
     cv::flann::Index index(features, indexParams);
 
     VectorOfPoints resultPoints;

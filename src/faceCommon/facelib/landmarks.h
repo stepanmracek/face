@@ -12,7 +12,7 @@ class Landmarks
 public:
     QVector<cv::Point3d> points;
 
-    Landmarks() : points(QVector<cv::Point3d>(9, cv::Point3d())) { } // 15!!!!!
+    Landmarks() : points(QVector<cv::Point3d>(9, cv::Point3d())) { } // 15
     Landmarks(QVector<cv::Point3d> points) : points(points) { }
     Landmarks(const QString &path);
 

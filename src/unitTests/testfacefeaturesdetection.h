@@ -252,13 +252,21 @@ public:
     {
         Mesh mean = Mesh::fromOBJ("../../test/meanForAlign.obj");
         FaceAligner aligner(mean);
-        Mesh face = Mesh::fromXYZ(dirPath + "xyz/" + fileName, false);
-        //face = face.zLevelSelect(0);
-        Mesh old = face;
-        //aligner.meanFace.writeOBJ(dirPath + QDir::separator() + "mean.obj", '.');
-        aligner.icpAlign(face, 20);
+        Mesh face = Mesh::fromBIN(dirPath + "bin/" + fileName, true);
 
-        old.translate(cv::Point3d(100,0,0));
+        MapConverter c;
+        Map before = SurfaceProcessor::depthmap(face, c, 2, Texture);
+
+        //Mesh old = face;
+        aligner.icpAlign(face, 10);
+
+        Map after = SurfaceProcessor::depthmap(face, c, 2, Texture);
+
+        cv::imshow("before", before.toMatrix());
+        cv::imshow("after", after.toMatrix());
+        cv::waitKey(0);
+
+        /*old.translate(cv::Point3d(100,0,0));
         face.translate(cv::Point3d(-100,0,0));
         aligner.meanFace.translate(cv::Point3d(-100,0,0));
 
@@ -269,7 +277,7 @@ public:
         widget.addFace(&face);
         widget.addFace(&old);
         widget.show();
-        return app.exec();
+        return app.exec();*/
     }
 
     static int testHorizontalProfileLines(int argc, char *argv[])
@@ -337,14 +345,11 @@ public:
         foreach (const QFileInfo &e, entries)
         {
             Landmarks l(e.absoluteFilePath());
-            qDebug() << "Checking:" << e.absoluteFilePath();
             if (!l.check())
             {
                 qDebug() << e.fileName() << "didn't pass the landmark.check()";
-                return;
             }
         }
-        qDebug() << "All" << entries.count() << "entries passed";
     }
 };
 

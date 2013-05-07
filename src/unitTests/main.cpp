@@ -78,29 +78,25 @@ int main(int argc, char *argv[])
     //TestFaceFeatuesDetection::testDepthmapProcessing(argc, argv, "/home/stepo/face.obj");
     //return TestFaceFeatuesDetection::testFilters(argc, argv, "/home/stepo/face.obj");
     //TestFaceFeatuesDetection::testLandmarkDetection(argc, argv, frgcPath() + "02463d652.abs.xyz");
-    //TestFaceFeatuesDetection::testAlign(argc, argv, frgcPath(), "04265d345.abs.xyz");
+    //TestFaceFeatuesDetection::testAlign(argc, argv, frgcPath(), "04265d345.bin");
     //TestFaceFeatuesDetection::testBatchLandmarkDetection(argc, argv, frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::testSuccessBatchLandmarkDetection(frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::testIsoGeodeticCurves(argc, argv);
     //TestFaceFeatuesDetection::testIsoGeodeticCurvesAlign(argc, argv);
     //TestFaceFeatuesDetection::testHorizontalProfileLines(argc, argv);
     //TestFaceFeatuesDetection::testCombine();
-    //bool uniqueIDs = false;
-    //TestFaceFeatuesDetection::testAnotation(frgcPath() + "frgc-spring2004-obj-centralized", uniqueIDs);
     //TestFaceFeatuesDetection::exportForVOSM(frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::exportInitialEstimationsForVOSM(frgcPath() + "frgc-spring2004-obj-centralized");
-    //TestFaceFeatuesDetection::testGoodAnotation("/media/data/frgc/obj-centralized/Spring2004");
-    //TestFaceFeatuesDetection::testAlign("test/align-simple-mean.png", "test/align-simple-pca.xml", "test/align-simple-flags", simple);
-    //TestFaceFeatuesDetection::testAlign("test/align-triangle-mean.png", "test/align-triangle-pca.xml", "test/align-triangle-flags", triangle);
 
-    //TestMorphableFaceModel::testCreate("/media/data/frgc/obj-centralized/Spring2004",
-    //                                   "test/align-landmarks.xml", "test/align-pca.xml", "test/align-flags");
-    //TestMorphableFaceModel::testModel(argc, argv, "../test/align-pca.xml", "../test/align-flags", "../test/align-landmarks.xml");
+    //TestMorphableFaceModel::testCreate(frgcPath() + "bin/", "../../test/morph-landmarks.xml",
+    //                                   "../../test/morph-pca-zcoord.xml", "../../test/morph-pca-texture.xml",
+    //                                   "../../test/morph-flags");
+    TestMorphableFaceModel::testModel(argc, argv, "../../test/morph-pca-zcoord.xml", "../../test/morph-pca-texture.xml", "../../test/morph-flags", "../../test/morph-landmarks.xml");
     //TestMorphableFaceModel::testMorph(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml",
     //                                  "/run/media/stepo/frgc/frgc-spring2004-obj-centralized/04200d74.obj");
     //TestMorphableFaceModel::testMorphFromKinect(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml");
 
-    TestGlWidget::test(argc, argv, frgcPath());
+    //TestGlWidget::test(argc, argv, frgcPath());
 
     //TestMesh::testXYZLodaderOBJWriter("/media/data/frgc/xyz/Spring2004", "/media/data/frgc/obj-centralized/Spring2004");
     //TestMesh::testBinReadWrite(argc, argv, frgcPath());
@@ -110,7 +106,8 @@ int main(int argc, char *argv[])
 
     //TestSurfaceProcessing::testNormals();
 
-    //TestAnotation::test("/home/stepo/frgc/spring2004/xyz");
+    //TestAnotation::test("/home/stepo/data/frgc/spring2004/bin");
+    //TestFaceFeatuesDetection::testGoodAnotation(frgcPath() + "bin/");
 
     //TestMap::testSerialization(frgcPath() + "04225d402.abs.xyz");
 

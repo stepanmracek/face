@@ -91,14 +91,11 @@ void FaceFeaturesAnotationMouseCallback(int event, int x, int y, int flags, void
 Landmarks FaceFeaturesAnotation::anotate(Mesh &mesh, int desiredLandmarksCount, bool &success)
 {
     std::string windowName = "face";
-    MapConverter depthConverter;
-    Map depth = SurfaceProcessor::depthmap(mesh, depthConverter, 2.0, ZCoord);
-    Matrix gauss = KernelGenerator::gaussianKernel(5);
-    depth.applyFilter(gauss, 3, true);
-    CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(depth);
+    MapConverter textureConverter;
+    Map texture = SurfaceProcessor::depthmap(mesh, textureConverter, 2.0, Texture);
 
     FaceFeaturesAnotationStruct anotationStruct;
-    anotationStruct.texture = cs.curvatureIndex.toMatrix();
+    anotationStruct.texture = texture.toMatrix();
     anotationStruct.windowName = windowName;
 
     cv::namedWindow(windowName);
@@ -111,11 +108,15 @@ Landmarks FaceFeaturesAnotation::anotate(Mesh &mesh, int desiredLandmarksCount, 
     Landmarks l;
     if (anotationStruct.points.count() == desiredLandmarksCount)
     {
+        MapConverter depthConverter;
+        Map depth = SurfaceProcessor::depthmap(mesh, depthConverter, 2.0, ZCoord);
+
         success = true;
         for (int i = 0; i < desiredLandmarksCount; i++)
         {
             l.points[i] = depthConverter.MapToMeshCoords(depth, anotationStruct.points[i]);
         }
+        success = l.check();
     }
     else
     {
@@ -124,22 +125,27 @@ Landmarks FaceFeaturesAnotation::anotate(Mesh &mesh, int desiredLandmarksCount, 
     return l;
 }
 
-void FaceFeaturesAnotation::anotateXYZ(const QString &dirPath, bool uniqueIDsOnly)
+void FaceFeaturesAnotation::anotateBINs(const QString &dirPath, bool uniqueIDsOnly, bool overwrite)
 {
-    QDir dir(dirPath, "*.xyz");
+    QDir dir(dirPath, "*.bin");
     assert(dir.exists());
-
-    dir.setSorting(QDir::Name);
     QFileInfoList entries = dir.entryInfoList();
-    //QSet<QString> usedIDs;
 
     foreach(const QFileInfo &fileInfo, entries)
     {
+        qDebug() << fileInfo.baseName();
+
         QString filePath = fileInfo.absoluteFilePath();
         QString landmarksPath = dirPath + QDir::separator() + fileInfo.baseName() + ".xml";
 
-        if (QFile::exists(landmarksPath)) continue;
-        QString id = fileInfo.baseName().mid(0, 5);
+        if (!overwrite && QFile::exists(landmarksPath))
+        {
+            // overwrite only if landmarks don't pass the check
+            Landmarks lm(landmarksPath);
+            if (lm.check()) continue;
+        }
+
+        QString id = fileInfo.baseName().split("d")[0];
         if (uniqueIDsOnly)
         {
             QDir landmarksDir(dirPath, id + "*.xml");
@@ -149,7 +155,7 @@ void FaceFeaturesAnotation::anotateXYZ(const QString &dirPath, bool uniqueIDsOnl
             }
         }
 
-        Mesh mesh = Mesh::fromXYZ(filePath, false);
+        Mesh mesh = Mesh::fromBIN(filePath, false);
         bool success;
         Landmarks lm = anotate(mesh, 9, success);
         if (success) lm.serialize(landmarksPath);

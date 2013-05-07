@@ -51,7 +51,7 @@ public:
     static Mesh fromBIN(const QString &filename, bool centralizeLoadedMesh = false);
     static Mesh fromOBJ(const QString &filename, bool centralizeLoadedMesh = false);
     static Mesh fromXYZ(const QString &filename, bool centralizeLoadedMesh = false);
-    static Mesh fromMap(Map &map, bool centralizeLoadedMesh = false);
+    static Mesh fromMap(Map &depth, Map &intensities, bool centralizeLoadedMesh = false);
     static Mesh fromPointcloud(VectorOfPoints &pointcloud, bool centralizeLoadedMesh = false);
 };
 

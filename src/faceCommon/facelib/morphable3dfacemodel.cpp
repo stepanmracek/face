@@ -4,44 +4,60 @@
 #include "facelib/surfaceprocessor.h"
 #include "landmarks.h"
 
-Morphable3DFaceModel::Morphable3DFaceModel(const QString &pcaPath, const QString &maskPath,
+Morphable3DFaceModel::Morphable3DFaceModel(const QString &pcaPathForZcoord, const QString &pcaPathForTexture, const QString &maskPath,
                                            const QString &landmarksPath, int width)
 {
-    pca = PCA(pcaPath);
+    pcaForZcoord = PCA(pcaPathForZcoord);
+    pcaForTexture = PCA(pcaPathForTexture);
     landmarks = Landmarks(landmarksPath);
 
     mask = Vector::fromFile(maskPath);
     int maskRows = mask.rows;
     Map faceDepth(width, maskRows/width);
+    Map faceTexture(width, maskRows/width);
     for (int i = 0; i < maskRows; i++)
     {
         faceDepth.flags[i] = mask(i) ? true : false;
+        faceTexture.flags[i] = mask(i) ? true : false;
     }
 
-    Matrix mean = pca.getMean();
-    assert(mean.rows == faceDepth.flags.count(1));
+    Matrix zcoordMean = pcaForZcoord.getMean();
+    Matrix textureMean = pcaForTexture.getMean();
+    assert(zcoordMean.rows == faceDepth.flags.count(1));
+    assert(zcoordMean.rows == textureMean.rows);
     int depthIndex = 0;
     for (int i = 0; i < maskRows; i++)
     {
         if (faceDepth.flags[i])
         {
-            faceDepth.values[i] = mean(depthIndex);
+            faceDepth.values[i] = zcoordMean(depthIndex);
+            faceTexture.values[i] = textureMean(depthIndex);
             depthIndex++;
         }
     }
 
-    mesh = Mesh::fromMap(faceDepth, true);
+    mesh = Mesh::fromMap(faceDepth, faceTexture, true);
 }
 
-void Morphable3DFaceModel::setModelParams(Vector &params)
+void Morphable3DFaceModel::setModelParams(Vector &zcoordParams)
 {
-    Matrix newValuesMatrix = pca.backProject(params);
-    int n = newValuesMatrix.rows;
+    Vector textureParams(pcaForTexture.getModes());
+    setModelParams(zcoordParams, textureParams);
+}
+
+void Morphable3DFaceModel::setModelParams(Vector &zcoordParams, Vector &textureParams)
+{
+    Vector newZcoords = pcaForZcoord.backProject(zcoordParams);
+    Vector newIntensities = pcaForTexture.backProject(textureParams);
+    int n = newZcoords.rows;
     assert(n == mesh.points.count());
+    assert(n == newIntensities.rows);
 
     for (int i = 0; i < n; i++)
     {
-        mesh.points[i].z = newValuesMatrix(i);
+        mesh.points[i].z = newZcoords(i);
+        uchar intensity = newIntensities(i);
+        mesh.colors[i] = cv::Vec3b(intensity, intensity, intensity);
     }
 }
 
@@ -93,9 +109,9 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
 
     QVector<double> usedValues = depthmap.getUsedValues();
     Vector inputValues(usedValues);
-    Vector params = pca.project(inputValues);
-    Vector normalizedParams = pca.normalizeParams(params, 1);
-    setModelParams(normalizedParams);
+    Vector zcoordParams = pcaForZcoord.project(inputValues);
+    Vector normalizedZcoordParams = pcaForZcoord.normalizeParams(zcoordParams, 1);
+    setModelParams(normalizedZcoordParams);
 }
 
 void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
@@ -138,12 +154,18 @@ void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
 
         meanShape = Procrustes3D::getMeanShape(controlPoints);
         qDebug() << "Iteration:" << iteration << "after scaling:" << Procrustes3D::getShapeVariation(controlPoints, meanShape);
+
+        /*MapConverter c;
+        Map map = SurfaceProcessor::depthmap(meshes[0], c, 1, Texture);
+        cv::imshow("face", map.toMatrix());
+        cv::waitKey(0);*/
     }
 }
 
 void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints> &controlPoints, int iterations,
-                                  const QString &pcaFile, const QString &flagsFile, const QString &meanControlPointsFile,
-                                  Map &depthMapMask)
+                                  const QString &pcaForZcoordFile, const QString &pcaForTextureFile,
+                                  const QString &flagsFile, const QString &meanControlPointsFile,
+                                  Map &mapMask)
 {
     align(meshes, controlPoints, iterations);
     VectorOfPoints meanControlPoints = Procrustes3D::getMeanShape(controlPoints);
@@ -151,51 +173,74 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
     l.serialize(meanControlPointsFile);
 
     QVector<Map> depthMaps;
-    Map resultMap(depthMapMask.w, depthMapMask.h);
-    resultMap.setAll(0);
-    resultMap.add(depthMapMask);
+    QVector<Map> textureMaps;
+
+    Map resultZcoordMap(mapMask.w, mapMask.h);
+    resultZcoordMap.setAll(0);
+    resultZcoordMap.add(mapMask);
+
+    Map resultTextureMap(mapMask.w, mapMask.h);
+    resultTextureMap.setAll(0);
+    resultTextureMap.add(mapMask);
+
     for (int index = 0; index < meshes.count(); index++)
     {
         Mesh &mesh = meshes[index];
         MapConverter converter;
         Map depth = SurfaceProcessor::depthmap(mesh, converter,
-                                               cv::Point2d(-depthMapMask.w/2, -depthMapMask.h/2),
-                                               cv::Point2d(depthMapMask.w/2, depthMapMask.h/2),
+                                               cv::Point2d(-mapMask.w/2, -mapMask.h/2),
+                                               cv::Point2d(mapMask.w/2, mapMask.h/2),
                                                1.0, ZCoord);
-        resultMap.add(depth);
+        resultZcoordMap.add(depth);
         depthMaps.append(depth);
 
-        if (index == 0)
-        {
-            cv::imshow("First Aligned mesh", depth.toMatrix());
-            cv::waitKey(0);
-        }
+        Map texture = SurfaceProcessor::depthmap(mesh, converter,
+                                               cv::Point2d(-mapMask.w/2, -mapMask.h/2),
+                                               cv::Point2d(mapMask.w/2, mapMask.h/2),
+                                               1.0, Texture);
+        resultTextureMap.add(texture);
+        textureMaps.append(texture);
+
+        cv::imshow("depth", depth.toMatrix());
+        cv::imshow("texture", texture.toMatrix());
+        cv::waitKey(100);
     }
 
-    resultMap.linearTransform(1.0/meshes.count(), 1.0);
+    resultZcoordMap.linearTransform(1.0/meshes.count(), 1.0);
     //Matrix resultMatrix = resultMap.toMatrix() * 255;
     //cv::imwrite(meanImageFile.toStdString(), resultMatrix);
 
-    QVector<Vector> vectors;
+    QVector<Vector> zcoordVectors;
+    QVector<Vector> textureVectors;
     for (int index = 0; index < meshes.count(); index++)
     {
         Map &depth = depthMaps[index];
         SurfaceProcessor::smooth(depth, 1, 2);
-        depth.flags = resultMap.flags;
+        depth.flags = resultZcoordMap.flags;
+        QVector<double> zcoords = depth.getUsedValues();
+        Vector zcoordsVec(zcoords);
+        zcoordVectors << zcoordsVec;
 
-        QVector<double> values = depth.getUsedValues();
-        Vector vec(values);
-        vectors << vec;
+        Map &texture = textureMaps[index];
+        texture.flags = resultTextureMap.flags;
+        QVector<double> intensities = texture.getUsedValues();
+        Vector intensitiesVec(intensities);
+        textureVectors << intensitiesVec;
+
+        assert(zcoords.count() == intensities.count());
     }
 
-    PCA pca(vectors);
-    pca.serialize(pcaFile);
+    PCA pcaForZcoord(zcoordVectors);
+    pcaForZcoord.serialize(pcaForZcoordFile);
 
-    int n = resultMap.flags.count();
+    PCA pcaForTexture(textureVectors);
+    pcaForTexture.serialize(pcaForTextureFile);
+
+    int n = resultZcoordMap.flags.count();
     QVector<double> flags(n, 0.0);
     for (int i = 0; i < n; i++)
     {
-        if (resultMap.flags[i])
+        if (resultZcoordMap.flags[i])
         {
             flags[i] = 1.0;
         }

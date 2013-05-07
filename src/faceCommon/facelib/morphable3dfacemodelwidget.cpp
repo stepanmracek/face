@@ -30,38 +30,64 @@ void Morphable3DFaceModelWidget::recalculateModel()
         return;
     }
 
-    int n = model->pca.getModes();
-    Vector params(n);
-    for (int i = 0; i < n; i++)
+    int zcoordModesCount = model->pcaForZcoord.getModes();
+    Vector zcoordParams(zcoordModesCount);
+    for (int i = 0; i < zcoordModesCount; i++)
     {
-        QSlider *slider = sliders[i];
-        double newValue = (slider->value() - 50.0)/100.0 * 3 * sqrt(model->pca.getVariation(i));
-        params(i) = newValue;
+        QSlider *slider = slidersForZcoord[i];
+        double newValue = (slider->value() - 50.0)/100.0 * 3 * sqrt(model->pcaForZcoord.getVariation(i));
+        zcoordParams(i) = newValue;
     }
 
-    model->setModelParams(params);
+    int textureModesCount = model->pcaForTexture.getModes();
+    Vector textureParams(textureModesCount);
+    for (int i = 0; i < textureModesCount; i++)
+    {
+        QSlider *slider = slidersForTexture[i];
+        double newValue = (slider->value() - 50.0)/100.0 * 3 * sqrt(model->pcaForTexture.getVariation(i));
+        textureParams(i) = newValue;
+    }
+
+    model->setModelParams(zcoordParams, textureParams);
     ui->glWidget->repaint();
 }
 
 void Morphable3DFaceModelWidget::setModel(Morphable3DFaceModel *model)
 {
-    int count = model->pca.getModes();
-    sliders.clear();
+    slidersForZcoord.clear();
+    int zCoordModesCount = model->pcaForZcoord.getModes();
 
-    QVBoxLayout *layout = new QVBoxLayout();
-    for (int i = 0; i < count; i++)
+    QVBoxLayout *zcoordSlidersLayout = new QVBoxLayout();
+    for (int i = 0; i < zCoordModesCount; i++)
     {
         QSlider *slider = new QSlider(Qt::Horizontal);
         slider->setMinimum(0);
         slider->setMaximum(100);
         slider->setPageStep(10);
         slider->setValue(50);
-        layout->addWidget(slider);
-        sliders << slider;
+        zcoordSlidersLayout->addWidget(slider);
+        slidersForZcoord << slider;
 
         connect(slider, SIGNAL(valueChanged(int)), this, SLOT(recalculateModel()));
     }
-    ui->scrollAreaContents->setLayout(layout);
+    ui->sacZcoord->setLayout(zcoordSlidersLayout);
+
+    slidersForTexture.clear();
+    int textureModesCount = model->pcaForTexture.getModes();
+    QVBoxLayout *textureSlidersLayout = new QVBoxLayout();
+    for (int i = 0; i < textureModesCount; i++)
+    {
+        QSlider *slider = new QSlider(Qt::Horizontal);
+        slider->setMinimum(0);
+        slider->setMaximum(100);
+        slider->setPageStep(10);
+        slider->setValue(50);
+        textureSlidersLayout->addWidget(slider);
+        slidersForTexture << slider;
+
+        connect(slider, SIGNAL(valueChanged(int)), this, SLOT(recalculateModel()));
+    }
+    ui->sacTexture->setLayout(textureSlidersLayout);
 
     this->model = model;
     ui->glWidget->addFace(&(model->mesh));
@@ -79,14 +105,44 @@ void Morphable3DFaceModelWidget::on_btnRandomize_clicked()
     }
 
     updateModel = false;
-    int n = model->pca.getModes();
+    int n = model->pcaForZcoord.getModes();
     for (int i = 0; i < n; i++)
     {
         double u = ((qrand() % 1000) + 1)/1000.0;
         double v = ((qrand() % 1000) + 1)/1000.0;
         double x = sqrt(-2.0 * log(u)) * cos(2.0 * M_PI * v);
-        sliders[i]->setValue( x * 20 + 50 );
-        //params(i) = ((qrand() % 100) - 50.0)/100.0 * 3 * sqrt(model->pca.getVariation(i));
+        slidersForZcoord[i]->setValue( x * 20 + 50 );
+    }
+    n = model->pcaForTexture.getModes();
+    for (int i = 0; i < n; i++)
+    {
+        double u = ((qrand() % 1000) + 1)/1000.0;
+        double v = ((qrand() % 1000) + 1)/1000.0;
+        double x = sqrt(-2.0 * log(u)) * cos(2.0 * M_PI * v);
+        slidersForTexture[i]->setValue( x * 20 + 50 );
+    }
+    updateModel = true;
+    recalculateModel();
+}
+
+void Morphable3DFaceModelWidget::on_btnInvert_clicked()
+{
+    if (!model)
+    {
+        qDebug() << "Model not set";
+        return;
+    }
+
+    updateModel = false;
+    int n = model->pcaForZcoord.getModes();
+    for (int i = 0; i < n; i++)
+    {
+        slidersForZcoord[i]->setValue( 100 - slidersForZcoord[i]->value() );
+    }
+    n = model->pcaForTexture.getModes();
+    for (int i = 0; i < n; i++)
+    {
+        slidersForTexture[i]->setValue( 100 - slidersForTexture[i]->value() );
     }
     updateModel = true;
     recalculateModel();
@@ -118,12 +174,19 @@ void Morphable3DFaceModelWidget::on_btnReset_clicked()
 
     updateModel = false;
 
-    int n = model->pca.getModes();
+    int n = model->pcaForZcoord.getModes();
     for (int i = 0; i < n; i++)
     {
-        sliders[i]->setValue(50);
+        slidersForZcoord[i]->setValue(50);
+    }
+
+    n = model->pcaForTexture.getModes();
+    for (int i = 0; i < n; i++)
+    {
+        slidersForTexture[i]->setValue(50);
     }
 
     updateModel = true;
     recalculateModel();
 }
+
