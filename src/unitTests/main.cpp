@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
     TestMorphableFaceModel::testCreate(frgcPath() + "bin/", "../../test/morph-landmarks.xml",
                                        "../../test/morph-pca-zcoord.xml", "../../test/morph-pca-texture.xml",
                                        "../../test/morph-pca.xml", "../../test/morph-flags");
-    TestMorphableFaceModel::testModel(argc, argv, "../../test/morph-pca-zcoord.xml", "../../test/morph-pca-texture.xml", "../../test/morph-flags", "../../test/morph-landmarks.xml");
+    //TestMorphableFaceModel::testModel(argc, argv, "../../test/morph-pca-zcoord.xml", "../../test/morph-pca-texture.xml", "../../test/morph-flags", "../../test/morph-landmarks.xml");
     //TestMorphableFaceModel::testMorph(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml",
     //                                  "/run/media/stepo/frgc/frgc-spring2004-obj-centralized/04200d74.obj");
     //TestMorphableFaceModel::testMorphFromKinect(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml");
