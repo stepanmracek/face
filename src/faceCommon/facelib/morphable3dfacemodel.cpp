@@ -244,15 +244,15 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
     }
 
     PCA pcaForZcoord(zcoordVectors);
-    //pcaForZcoord.modesSelectionThreshold(0.98);
+    pcaForZcoord.modesSelectionThreshold(0.98);
     pcaForZcoord.serialize(pcaForZcoordFile);
 
     PCA pcaForTexture(textureVectors);
-    //pcaForTexture.modesSelectionThreshold(0.98);
+    pcaForTexture.modesSelectionThreshold(0.98);
     pcaForTexture.serialize(pcaForTextureFile);
 
     QVector<Vector> projectedZcoords = pcaForZcoord.batchProject(zcoordVectors);
-    QVector<Vector> projectedTextures = pcaForZcoord.batchProject(textureVectors);
+    QVector<Vector> projectedTextures = pcaForTexture.batchProject(textureVectors);
     QVector<Vector> commonParams;
     for (int i = 0; i < meshes.count(); i++)
     {
@@ -264,7 +264,7 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
         commonParams << commonVec;
     }
     PCA pca(commonParams);
-    //pca.modesSelectionThreshold(0.98);
+    pca.modesSelectionThreshold(0.98);
     pca.serialize(pcaFile);
 
     int n = resultZcoordMap.flags.count();

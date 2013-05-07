@@ -124,7 +124,7 @@ public:
             meshesVec.append(mesh);
         }
 
-        Morphable3DFaceModel::create(meshesVec, landmarksVec, 1, pcaForZcoordFile, pcaForTextureFile, pcaFile,
+        Morphable3DFaceModel::create(meshesVec, landmarksVec, 20, pcaForZcoordFile, pcaForTextureFile, pcaFile,
                                      flagsFile, meanLadmarksFile, mask);
     }
 };
