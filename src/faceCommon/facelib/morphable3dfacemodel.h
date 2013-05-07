@@ -23,10 +23,10 @@ public:
     Matrix mask;
     //Map depthMapMask;
 
-    Morphable3DFaceModel(const QString &pcaPathForZcoord, const QString &pcaPathForTexture,
+    Morphable3DFaceModel(const QString &pcaPathForZcoord, const QString &pcaPathForTexture, const QString &pcaFile,
                          const QString &maskPath, const QString &landmarksPath, int width);
 
-    //void setModelParams(Vector &zcoordParams);
+    void setModelParams(Vector &commonParams);
     void setModelParams(Vector &zcoordParams, Vector &textureParams);
 
     Procrustes3DResult align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations);

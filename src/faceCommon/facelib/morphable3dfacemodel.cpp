@@ -4,11 +4,12 @@
 #include "facelib/surfaceprocessor.h"
 #include "landmarks.h"
 
-Morphable3DFaceModel::Morphable3DFaceModel(const QString &pcaPathForZcoord, const QString &pcaPathForTexture, const QString &maskPath,
+Morphable3DFaceModel::Morphable3DFaceModel(const QString &pcaPathForZcoord, const QString &pcaPathForTexture, const QString &pcaFile, const QString &maskPath,
                                            const QString &landmarksPath, int width)
 {
     pcaForZcoord = PCA(pcaPathForZcoord);
     pcaForTexture = PCA(pcaPathForTexture);
+    pca = PCA(pcaFile);
     landmarks = Landmarks(landmarksPath);
 
     mask = Vector::fromFile(maskPath);
@@ -39,11 +40,22 @@ Morphable3DFaceModel::Morphable3DFaceModel(const QString &pcaPathForZcoord, cons
     mesh = Mesh::fromMap(faceDepth, faceTexture, true);
 }
 
-/*void Morphable3DFaceModel::setModelParams(Vector &zcoordParams)
+void Morphable3DFaceModel::setModelParams(Vector &commonParams)
 {
+    Vector backProjectedCommonParams = pca.backProject(commonParams);
+    Vector zcoordParams(pcaForZcoord.getModes());
     Vector textureParams(pcaForTexture.getModes());
+
+    for (int i = 0; i < pcaForZcoord.getModes(); i++)
+    {
+        zcoordParams(i) = backProjectedCommonParams(i);
+    }
+    for (int i = 0; i < pcaForTexture.getModes(); i++)
+    {
+        textureParams(i) = backProjectedCommonParams(i + pcaForZcoord.getModes());
+    }
     setModelParams(zcoordParams, textureParams);
-}*/
+}
 
 void Morphable3DFaceModel::setModelParams(Vector &zcoordParams, Vector &textureParams)
 {
