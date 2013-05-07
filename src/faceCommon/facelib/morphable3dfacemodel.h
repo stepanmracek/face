@@ -21,7 +21,6 @@ public:
     Mesh mesh;
     Landmarks landmarks;
     Matrix mask;
-    //Map depthMapMask;
 
     Morphable3DFaceModel(const QString &pcaPathForZcoord, const QString &pcaPathForTexture, const QString &pcaFile,
                          const QString &maskPath, const QString &landmarksPath, int width);

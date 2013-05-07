@@ -21,7 +21,6 @@ public:
     static int testModel(int argc, char *argv[], const QString &pcaForZcoord, const QString &pcaForTexture, const QString &pca,
                          const QString &flags, const QString &landmarksPath)
     {
-        //Morphable3DFaceModel model(pca, flags, 200);
         Morphable3DFaceModel model(pcaForZcoord, pcaForTexture, pca, flags, landmarksPath, 200);
 
         QApplication app(argc, argv);
