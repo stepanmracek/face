@@ -33,10 +33,10 @@ public:
         return app.exec();
     }
 
-    static int testMorph(int argc, char *argv[], const QString &pcaForZcoord, const QString &pcaForTexture,
+    static int testMorph(int argc, char *argv[], const QString &pcaForZcoord, const QString &pcaForTexture, const QString &pca,
                          const QString &flags, const QString &landmarksPath, const QString &probeOBJPath)
     {
-        Morphable3DFaceModel model(pcaForZcoord, pcaForTexture, flags, landmarksPath, 200);
+        Morphable3DFaceModel model(pcaForZcoord, pcaForTexture, pca, flags, landmarksPath, 200);
 
         QFileInfo inputObjInfo(probeOBJPath);
         assert(inputObjInfo.exists());
