@@ -80,7 +80,7 @@ void Morphable3DFaceModelWidget::setModel(Morphable3DFaceModel *model)
 
         connect(slider, SIGNAL(valueChanged(int)), this, SLOT(recalculateModel()));
     }
-    ui->scrollAreaContent->setLayout(zcoordSlidersLayout);
+    ui->scrollAreaContent->setLayout(slidersLayout);
 
     /*slidersForZcoord.clear();
     int zCoordModesCount = model->pcaForZcoord.getModes();
