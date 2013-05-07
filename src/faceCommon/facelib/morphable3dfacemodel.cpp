@@ -111,7 +111,8 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     Vector inputValues(usedValues);
     Vector zcoordParams = pcaForZcoord.project(inputValues);
     Vector normalizedZcoordParams = pcaForZcoord.normalizeParams(zcoordParams, 1);
-    setModelParams(normalizedZcoordParams);
+    Vector textureParams(pcaForTexture.getModes());
+    setModelParams(normalizedZcoordParams, textureParams);
 }
 
 void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
