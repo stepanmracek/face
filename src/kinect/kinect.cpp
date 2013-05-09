@@ -246,7 +246,7 @@ Mesh Kinect::scanFace()
             {
                 for (int c = 0; c < 640; c++)
                 {
-                    mask[maskIndex] = faces[0].contains(cv::Point(c, r));
+                    mask[maskIndex] = faces[i].contains(cv::Point(c, r));
                     maskIndex++;
                 }
             }
