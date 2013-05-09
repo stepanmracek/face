@@ -130,7 +130,7 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     Map textureR = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_R);
     Map textureG = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_G);
     Map textureB = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_B);
-    int n = texture.values.count();
+    int n = textureR.values.count();
     assert(n == mask.rows);
     mesh.colors.clear();
     for (int i = 0; i < n; i++)
