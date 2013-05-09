@@ -149,9 +149,9 @@ Procrustes3DResult FaceAligner::icpAlignRotAndScale(Mesh &face, int maxIteration
         face.transform(rotation);
 
         // Scale
-        cv::Point3d scale = Procrustes3D::getOptimalScale(pointsToTransform, referencePoints);
-        Procrustes3D::scale(pointsToTransform, scale);
-        face.scale(scale);
+        //cv::Point3d scale = Procrustes3D::getOptimalScale(pointsToTransform, referencePoints);
+        //Procrustes3D::scale(pointsToTransform, scale);
+        //face.scale(scale);
 
         Procrustes3D::translate(referencePoints, -centralizeReferences);
         Procrustes3D::translate(pointsToTransform, -centralizeReferences);
