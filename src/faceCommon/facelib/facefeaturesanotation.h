@@ -11,7 +11,7 @@ class FaceFeaturesAnotation
 public:  
     static void anotateBINs(const QString &dirPath, bool uniqueIDsOnly, bool overwrite);
 
-    static Landmarks anotate(Mesh &mesh, int desiredLandmarksCount, bool &success);
+    static Landmarks anotate(Mesh &mesh, bool &success);
 };
 
 #endif // FACEFEATURESANOTATION_H

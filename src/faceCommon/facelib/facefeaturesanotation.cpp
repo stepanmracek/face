@@ -88,7 +88,7 @@ void FaceFeaturesAnotationMouseCallback(int event, int x, int y, int flags, void
     }
 }
 
-Landmarks FaceFeaturesAnotation::anotate(Mesh &mesh, int desiredLandmarksCount, bool &success)
+Landmarks FaceFeaturesAnotation::anotate(Mesh &mesh, bool &success)
 {
     std::string windowName = "face";
     MapConverter textureConverter;
@@ -106,13 +106,13 @@ Landmarks FaceFeaturesAnotation::anotate(Mesh &mesh, int desiredLandmarksCount, 
     cv::destroyWindow(windowName);
 
     Landmarks l;
-    if (anotationStruct.points.count() == desiredLandmarksCount)
+    if (anotationStruct.points.count() == l.points.count())
     {
         MapConverter depthConverter;
         Map depth = SurfaceProcessor::depthmap(mesh, depthConverter, 2.0, ZCoord);
 
         success = true;
-        for (int i = 0; i < desiredLandmarksCount; i++)
+        for (int i = 0; i < l.points.count(); i++)
         {
             l.points[i] = depthConverter.MapToMeshCoords(depth, anotationStruct.points[i]);
         }
@@ -157,7 +157,7 @@ void FaceFeaturesAnotation::anotateBINs(const QString &dirPath, bool uniqueIDsOn
 
         Mesh mesh = Mesh::fromBIN(filePath, false);
         bool success;
-        Landmarks lm = anotate(mesh, 9, success);
+        Landmarks lm = anotate(mesh, success);
         if (success) lm.serialize(landmarksPath);
 
         char key = cv::waitKey();
