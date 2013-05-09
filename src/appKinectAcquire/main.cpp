@@ -6,7 +6,7 @@
 #include "facelib/morphable3dfacemodel.h"
 #include "facelib/facefeaturesanotation.h"
 
-int scan(int argc, char *argv[], const QString &outputPath)
+int scan(int argc, char *argv[], const QString &outputPath, const QString &lmPath)
 {
     Mesh m = Kinect::scanFace();
 

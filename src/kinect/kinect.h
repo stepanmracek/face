@@ -21,6 +21,8 @@ public:
 
     static bool getRGB(uint8_t *rgb);
 
+    static bool getRGB(uint8_t *rgb, int scansCount);
+
     static VectorOfPoints depthToVectorOfPoints(double *depth);
 
     static Mesh createMesh(double *depth, uint8_t *rgb);
@@ -29,7 +31,7 @@ public:
 
     static ImageGrayscale RGBToGrayscale(uint8_t *rgb);
 
-    static Mesh scanFace();
+    static Mesh scanFace(int scanIterations);
 
     static void PCL()
     {

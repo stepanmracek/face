@@ -84,6 +84,36 @@ bool Kinect::getRGB(uint8_t *rgb)
     return true;
 }
 
+bool Kinect::getRGB(uint8_t *rgb, int scansCount)
+{
+    uint8_t *buffer;
+    uint32_t ts;
+
+    double cumulativeBuffer[640*480];
+    for (int i = 0; i < 640*480; i++)
+    {
+        cumulativeBuffer[i] = 0;
+    }
+
+    for (int iteration = 0; iteration < scansCount; iteration++)
+    {
+        if (freenect_sync_get_video((void**)&buffer, &ts, 0, FREENECT_VIDEO_RGB) != 0)
+            return false;
+
+        for (int i = 0; i < n*3; i++)
+        {
+            cumulativeBuffer[i] += buffer[i];
+        }
+    }
+
+    for (int i = 0; i < 640*480; i++)
+    {
+        rgb[i] = cumulativeBuffer[i]/scansCount;
+    }
+
+    return true;
+}
+
 VectorOfPoints Kinect::depthToVectorOfPoints(double *depth)
 {
     VectorOfPoints result;
@@ -213,7 +243,7 @@ ImageGrayscale Kinect::RGBToGrayscale(uint8_t *rgb)
     return result;
 }
 
-Mesh Kinect::scanFace()
+Mesh Kinect::scanFace(int scanIterations)
 {
     RealTimeTrack rtTrack;
     int minDistanceFromSensor = 200;
@@ -292,17 +322,7 @@ Mesh Kinect::scanFace()
         exit(1);
     }
 
-    /*int maskIndex = 0;
-    for (int r = 0; r < 480; r++)
-    {
-        for (int c = 0; c < 640; c++)
-        {
-            mask[maskIndex] = faceRect.contains(cv::Point(c, r));
-            maskIndex++;
-        }
-    }*/
-
-    if (!Kinect::getDepth(depth, 5, mask, minDistanceFromSensor, maxDistanceFromSensor))
+    if (!Kinect::getDepth(depth, scanIterations, mask, minDistanceFromSensor, maxDistanceFromSensor))
     {
         qDebug() << "Kinect depth error";
         exit(1);
