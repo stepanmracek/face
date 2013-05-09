@@ -84,7 +84,7 @@ bool Kinect::getRGB(uint8_t *rgb)
     return true;
 }
 
-bool Kinect::getRGBIter(unsigned char *rgb)
+bool Kinect::getRGBIter(uint8_t *rgb)
 {
     uint8_t *buffer;
     uint32_t ts;
