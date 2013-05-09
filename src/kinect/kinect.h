@@ -32,11 +32,6 @@ public:
     static ImageGrayscale RGBToGrayscale(uint8_t *rgb);
 
     static Mesh scanFace(int scanIterations);
-
-    static void PCL()
-    {
-
-    }
 };
 
 #endif /* KINECT_H_ */
