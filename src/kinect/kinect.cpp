@@ -315,15 +315,15 @@ Mesh Kinect::scanFace(int scanIterations)
     }
     cv::destroyWindow(testWinName);
 
-    if (!Kinect::getRGB(rgb)) // Iter(rgb, scanIterations))
-    {
-        qDebug() << "Kinect RGB error";
-        exit(1);
-    }
-
     if (!Kinect::getDepth(depth, scanIterations, mask, minDistanceFromSensor, maxDistanceFromSensor))
     {
         qDebug() << "Kinect depth error";
+        exit(1);
+    }
+
+    if (!Kinect::getRGBIter(rgb, scanIterations))
+    {
+        qDebug() << "Kinect RGB error";
         exit(1);
     }
 
