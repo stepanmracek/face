@@ -66,7 +66,7 @@ Landmarks LandmarkDetector::detect()
     Landmarks l;
 
     nosetip(l);
-    innerEyeCorners(l);
+    //innerEyeCorners(l);
 
     return l;
 }
