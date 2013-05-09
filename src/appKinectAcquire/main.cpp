@@ -43,9 +43,9 @@ int align(int argc, char *argv[])
 
     Mesh morphedMesh = model.morph(inputMesh, landmarks, 10);
 
-    //Mesh meanForAlign = Mesh::fromOBJ("../../test/meanForAlign.obj");
-    //FaceAligner aligner(meanForAlign);
-    //aligner.icpAlign(morphedMesh, 10);
+    Mesh meanForAlign = Mesh::fromOBJ("../../test/meanForAlign.obj");
+    FaceAligner aligner(meanForAlign);
+    aligner.icpAlign(morphedMesh, 10);
 
     QApplication app(argc, argv);
     GLWidget widget;
