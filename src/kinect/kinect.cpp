@@ -321,7 +321,7 @@ Mesh Kinect::scanFace(int scanIterations)
     //uint8_t rgb2[640*480*3];
     //Kinect::getRGBIter(rgb2, scanIterations);
 
-    Mesh mesh = Kinect::createMesh(depth, rgb2);
+    Mesh mesh = Kinect::createMesh(depth, rgb);
     mesh.centralize();
     mesh.calculateTriangles();
     return mesh;
