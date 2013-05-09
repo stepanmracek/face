@@ -27,7 +27,7 @@ int align(int argc, char *argv[])
     QString pca = "../../test/align-pca.xml";
     QString flags = "../../test/align-flags";
     QString landmarksPath = "../../test/align-landmarks.xml";
-    Morphable3DFaceModel model(pca, flags, landmarksPath, 200);
+    Morphable3DFaceModel model(pca flags, landmarksPath, 200);
 
     bool success;
     Landmarks landmarks = FaceFeaturesAnotation::anotate(m, 8, success);
