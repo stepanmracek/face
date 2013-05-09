@@ -150,6 +150,18 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     }
 }
 
+Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations)
+{
+    Procrustes3DResult procrustesResult = align(inputMesh, landmarks, iterations);
+    morphModel(inputMesh);
+    Mesh result(mesh);
+    Procrustes3D::applyInversedProcrustesResult(inputLandmarks.points, procrustesResult);
+    Procrustes3D::applyInversedProcrustesResult(inputMesh, procrustesResult);
+    Procrustes3D::applyInversedProcrustesResult(result, procrustesResult);
+    result.recalculateMinMax();
+    inputMesh.recalculateMinMax();
+}
+
 void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
                                  QVector<VectorOfPoints> &controlPoints,
                                  int iterations)
