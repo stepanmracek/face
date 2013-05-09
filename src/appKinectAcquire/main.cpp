@@ -49,7 +49,7 @@ int align(int argc, char *argv[])
 
     QApplication app(argc, argv);
     GLWidget widget;
-    widget.addFace(&inputMesh);
+    widget.addFace(&morphedMesh);
     widget.show();
 
     return app.exec();
