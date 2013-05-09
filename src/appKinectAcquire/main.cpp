@@ -33,6 +33,11 @@ int align(int argc, char *argv[])
 
     bool success;
     Landmarks landmarks = FaceFeaturesAnotation::anotate(m, success);
+    if (!success)
+    {
+        qDebug() << "Bad anotation";
+        return 1;
+    }
 
     Procrustes3DResult procrustesResult = model.align(m, landmarks, 10);
     model.morphModel(m);
