@@ -104,11 +104,13 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
 {
     MapConverter converter;
     Map depthmap = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, ZCoord);
+    Map intensities = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_I);
     for (int i = 0; i < mask.rows; i++)
     {
         if (mask(i) == 0)
         {
             depthmap.flags[i] = false;
+            intensities.flags[i] = false;
         }
         else if (!depthmap.flags[i])
         {
@@ -119,12 +121,19 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
         }
     }
 
-    QVector<double> usedValues = depthmap.getUsedValues();
-    Vector inputValues(usedValues);
-    Vector zcoordParams = pcaForZcoord.project(inputValues);
+    QVector<double> usedZValues = depthmap.getUsedValues();
+    Vector inputZValues(usedZValues);
+    Vector zcoordParams = pcaForZcoord.project(inputZValues);
     Vector normalizedZcoordParams = pcaForZcoord.normalizeParams(zcoordParams, 1);
-    Vector textureParams(pcaForTexture.getModes()); // no texture generation => texture params are just zeros
-    setModelParams(normalizedZcoordParams, textureParams);
+
+    QVector<double> usedIValues = intensities.getUsedValues();
+    Vector inputIValues(usedIValues);
+    Vector textureParams = pcaForTexture.project(inputIValues);
+    Vector normalizedTextureParams = pcaForTexture.normalizeParams(textureParams, 1);
+    //Vector textureParams(pcaForTexture.getModes()); // no texture generation => texture params are just zeros
+
+    setModelParams(normalizedZcoordParams, normalizedTextureParams);
+    return;
 
     // direct copy of input mesh texture to the model
     Map textureR = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_R);
