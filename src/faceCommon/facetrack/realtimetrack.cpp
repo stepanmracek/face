@@ -16,7 +16,7 @@ RealTimeTrack::RealTimeTrack()
 std::vector<cv::Rect>  RealTimeTrack::trackFace(ImageGrayscale &img)
 {
     std::vector<cv::Rect> result;
-    faceDetect.detectMultiScale(img, result, 2.0);
+    faceDetect.detectMultiScale(img, result);
     return result;
 }
 
