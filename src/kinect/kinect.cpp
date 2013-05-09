@@ -269,7 +269,11 @@ Mesh Kinect::scanFace()
                     depthIndex++;
                 }
             }
-            cv::rectangle(grayScaleImg, faces[0], cv::Scalar(255));
+
+            for (int i = 0; i < faceCount; i++)
+            {
+                cv::rectangle(grayScaleImg, faces[i], cv::Scalar(255));
+            }
         }
         cv::imshow(testWinName, grayScaleImg);
 
