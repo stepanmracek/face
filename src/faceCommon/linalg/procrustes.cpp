@@ -378,6 +378,7 @@ void Procrustes3D::applyInversedProcrustesResult(QVector<cv::Point3d> &pointClou
         cv::Point3d s = procrustesResult.scaleParams[i];
         cv::Point3d invScale(1.0/s.x, 1.0/s.y, 1.0/s.z);
         scale(pointCloud, invScale);
+        qDebug() << i << s.x << s.y << s.z;
 
         Matrix invRot = procrustesResult.rotations[i].inv();
         transform(pointCloud, invRot);
