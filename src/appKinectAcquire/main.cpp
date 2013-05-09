@@ -41,20 +41,15 @@ int align(int argc, char *argv[])
     QString landmarksPath = "../../test/morph-landmarks.xml";
     Morphable3DFaceModel model(pcaZcoord, pcaTexture, pca, flags, landmarksPath, 200);
 
-    Procrustes3DResult procrustesResult = model.align(inputMesh, landmarks, 10);
-    model.morphModel(inputMesh);
-    Procrustes3D::applyInversedProcrustesResult(model.mesh.points, procrustesResult);
-    Procrustes3D::applyInversedProcrustesResult(inputMesh.points, procrustesResult);
-    model.mesh.recalculateMinMax();
-    inputMesh.recalculateMinMax();
+    Mesh morphedMesh = model.morph(inputMesh, landmarks, 10);
 
     Mesh meanForAlign = Mesh::fromOBJ("../../test/meanForAlign.obj");
     FaceAligner aligner(meanForAlign);
-    aligner.icpAlign(model.mesh, 10);
+    aligner.icpAlign(morphedMesh, 10);
 
     QApplication app(argc, argv);
     GLWidget widget;
-    widget.addFace(&model.mesh);
+    widget.addFace(&morphedMesh);
     widget.show();
 
     return app.exec();
