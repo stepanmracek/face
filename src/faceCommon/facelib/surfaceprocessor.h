@@ -12,7 +12,7 @@ class MapConverter;
 
 enum SurfaceDataToProcess
 {
-    ZCoord, Texture, Curvature
+    ZCoord, Curvature, Texture_I, Texture_R, Texture_G, Texture_B
 };
 
 class SurfaceProcessor
