@@ -50,7 +50,7 @@ int align(int argc, char *argv[])
 
     Mesh meanForAlign = Mesh::fromOBJ("../../test/meanForAlign.obj");
     FaceAligner aligner(meanForAlign);
-    aligner.icpAlign(model.mesh);
+    aligner.icpAlign(model.mesh, 10);
 
     QApplication app(argc, argv);
     GLWidget widget;
