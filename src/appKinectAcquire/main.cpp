@@ -24,10 +24,12 @@ int align(int argc, char *argv[])
 {
     Mesh m = Mesh::fromOBJ("../../test/obj/stepan.obj"); // Kinect::scanFace();
 
-    QString pca = "../../test/align-pca.xml";
-    QString flags = "../../test/align-flags";
-    QString landmarksPath = "../../test/align-landmarks.xml";
-    Morphable3DFaceModel model(pca flags, landmarksPath, 200);
+    QString pca = "../../test/morph-pca.xml";
+    QString pcaZcoord = "../../test/morph-pca-zcoord.xml";
+    QString pcaTexture = "../../test/morph-pca-texture.xml";
+    QString flags = "../../test/morph-flags";
+    QString landmarksPath = "../../test/morph-landmarks.xml";
+    Morphable3DFaceModel model(pcaZcoord, pcaTexture, pca, flags, landmarksPath, 200);
 
     bool success;
     Landmarks landmarks = FaceFeaturesAnotation::anotate(m, 8, success);
