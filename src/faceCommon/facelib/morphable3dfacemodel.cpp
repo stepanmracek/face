@@ -225,7 +225,7 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
         Map texture = SurfaceProcessor::depthmap(mesh, converter,
                                                cv::Point2d(-mapMask.w/2, -mapMask.h/2),
                                                cv::Point2d(mapMask.w/2, mapMask.h/2),
-                                               1.0, Texture);
+                                               1.0, Texture_I);
         resultTextureMap.add(texture);
         textureMaps.append(texture);
 
