@@ -315,18 +315,9 @@ Mesh Kinect::scanFace(int scanIterations)
     }
     cv::destroyWindow(testWinName);
 
-    if (!Kinect::getDepth(depth, scanIterations, mask, minDistanceFromSensor, maxDistanceFromSensor))
-    {
-        qDebug() << "Kinect depth error";
-        exit(1);
-    }
-
     uint8_t rgb2[640*480*3];
-    if (!Kinect::getRGBIter(rgb2, scanIterations))
-    {
-        qDebug() << "Kinect RGB error";
-        exit(1);
-    }
+    Kinect::getDepth(depth, scanIterations, mask, minDistanceFromSensor, maxDistanceFromSensor);
+    Kinect::getRGBIter(rgb2, scanIterations);
 
     Mesh mesh = Kinect::createMesh(depth, rgb2);
     mesh.centralize();
