@@ -92,17 +92,8 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
     Landmarks lm = lmDetector.detect();
     face.translate(-lm.get(Landmarks::Nosetip));
 
-    //Matrix smoothKernel = KernelGenerator::gaussianKernel(5);
-
-    double bestD = 1e300;
     for (int iteration = 0; iteration < maxIterations; iteration++)
     {
-        //MapConverter converter;
-        //Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
-        //depth.applyFilter(smoothKernel, 3, true);
-        //cv::imshow("depth", depth.toMatrix());
-        //cv::waitKey(1);
-
         // Find correspondence
         VectorOfPoints referencePoints = meanFace.points;
         VectorOfPoints pointsToTransform = face.getNearestPoints(referencePoints);
@@ -112,10 +103,6 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
         Procrustes3D::translate(referencePoints, centralizeReferences);
         cv::Point3d centralizePointsToTransform = Procrustes3D::centralizedTranslation(pointsToTransform);
         Procrustes3D::translate(pointsToTransform, centralizePointsToTransform);
-
-        //cv::Point3d move = Procrustes3D::getOptimalTranslation(pointsToTransform, referencePoints);
-        //Procrustes3D::translate(pointsToTransform, move);
-        //face.translate(move);
 
         // SVD rotation
         Matrix rotation = Procrustes3D::getOptimalRotation(pointsToTransform, referencePoints);
@@ -127,106 +114,46 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
 
         double d = Procrustes3D::diff(pointsToTransform, referencePoints);
         qDebug() << "FaceAligner::icpAlign" << (iteration+1) << d;
-
-        if (d < bestD)
-        {
-            bestD = d;
-        }
     }
 }
 
-/*void FaceAligner::align(Mesh &face, int maxIterations)
+Procrustes3DResult FaceAligner::icpAlignRotAndScale(Mesh &face, int maxIterations)
 {
     assert(maxIterations >= 1);
     LandmarkDetector lmDetector(face);
     Landmarks lm = lmDetector.detect();
-    qDebug()<< "FaceAligner::align - nose" << lm.get(Landmarks::Nosetip).x << lm.get(Landmarks::Nosetip).y << lm.get(Landmarks::Nosetip).z;
     face.translate(-lm.get(Landmarks::Nosetip));
 
-    Matrix smoothKernel = KernelGenerator::gaussianKernel(5);
-    double totalMinD = 1e300;
-    for (int iteration = 0; iteration < maxIterations; iteration ++)
+    Procrustes3DResult result;
+
+    for (int iteration = 0; iteration < maxIterations; iteration++)
     {
-        MapConverter converter;
-        Map depth = SurfaceProcessor::depthmap(face, converter, 1.0, ZCoord);
-        cv::imshow("smooth1", depth.toMatrix());
-        depth.applyFilter(smoothKernel, 3, true);
-        //cv::imshow("smooth2", depth.toMatrix());
-        cv::waitKey();
+        // Find correspondence
+        VectorOfPoints referencePoints = meanFace.points;
+        VectorOfPoints pointsToTransform = face.getNearestPoints(referencePoints);
 
-        double minTheta;
-        double minD = 1e300;
-        Matrix minRotation;
-        cv::Point3d minMove;
-        bool improve = false;
+        // translation
+        cv::Point3d centralizeReferences = Procrustes3D::centralizedTranslation(referencePoints);
+        Procrustes3D::translate(referencePoints, centralizeReferences);
+        cv::Point3d centralizePointsToTransform = Procrustes3D::centralizedTranslation(pointsToTransform);
+        Procrustes3D::translate(pointsToTransform, centralizePointsToTransform);
 
-        for (double theta = -0.15; theta <= 0.15; theta += 0.01)
-        {
-            double cosT = cos(theta);
-            double sinT = sin(theta);
+        // SVD rotation
+        Matrix rotation = Procrustes3D::getOptimalRotation(pointsToTransform, referencePoints);
+        Procrustes3D::transform(pointsToTransform, rotation);
+        face.transform(rotation);
 
-            VectorOfPoints pointsToTransform;
-            VectorOfPoints referencePoints;
+        // Scale
+        cv::Point3d scale = Procrustes3D::getOptimalScale(pointsToTransform, referencePoints);
+        Procrustes3D::scale(pointsToTransform, scale);
+        face.scale(scale);
 
-            int index = 0;
-            for (int y = sampleStartY; y <= sampleEndY; y += sampleStep)
-            {
-                for (int x = sampleStartX; x <= sampleEndX; x += sampleStep)
-                {
-                    double xr = x * cosT - y * sinT;
-                    double yr = x * sinT + y * cosT;
+        Procrustes3D::translate(referencePoints, -centralizeReferences);
+        Procrustes3D::translate(pointsToTransform, -centralizeReferences);
 
-                    cv::Point2d mapPoint = converter.MeshToMapCoords(depth, cv::Point2d(xr, yr));
-                    bool success;
-                    cv::Point3d meshPoint = converter.MapToMeshCoords(depth, mapPoint, &success);
-                    if (success)
-                    {
-                        pointsToTransform << meshPoint;
-                        referencePoints << meanFace.points[index];
-                    }
-                    index++;
-                }
-            }
-
-            // theta rotation
-            Procrustes3D::rotate(pointsToTransform, 0, 0, -theta);
-
-            // translation
-            cv::Point3d move = Procrustes3D::getOptimalTranslation(pointsToTransform, referencePoints);
-            Procrustes3D::translate(pointsToTransform, move);
-
-            // SVD rotation
-            Matrix rotation = Procrustes3D::getOptimalRotation(pointsToTransform, referencePoints);
-            Procrustes3D::transform(pointsToTransform, rotation);
-
-            double d = Procrustes3D::diff(pointsToTransform, referencePoints);
-
-            if (d < minD && d < totalMinD)
-            {
-                improve = true;
-                minD = d;
-                totalMinD = d;
-                minTheta = theta;
-                minRotation = rotation.clone();
-                minMove = move;
-            }
-        }
-
-        qDebug() << "FaceAligner::align" << (iteration+1) << minD;
-
-        if (improve)
-        {
-            face.rotate(0, 0, -minTheta);
-            face.translate(minMove);
-            face.transform(minRotation);
-
-            //Procrustes3D::rotate(lm.points, 0, 0, -minTheta);
-            //Procrustes3D::translate(lm.points, minMove);
-            //Procrustes3D::transform(lm.points, minRotation);
-        }
-        else
-        {
-            break;
-        }
+        double d = Procrustes3D::diff(pointsToTransform, referencePoints);
+        qDebug() << "FaceAligner::icpAlign" << (iteration+1) << d;
     }
-}*/
+
+    return result;
+}
