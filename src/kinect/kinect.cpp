@@ -259,7 +259,7 @@ Mesh Kinect::scanFace(int scanIterations)
     cv::namedWindow(testWinName);
     while (iterate)
     {
-        if (!Kinect::getRGBIter(rgb))
+        if (!Kinect::getRGBIter(rgb, scanIterations))
         {
             qDebug() << "Kinect RGB error";
             exit(1);
