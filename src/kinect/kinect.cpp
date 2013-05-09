@@ -86,6 +86,8 @@ bool Kinect::getRGB(uint8_t *rgb)
 
 bool Kinect::getRGBIter(uint8_t *rgb, int scansCount)
 {
+    qDebug() << "getRGBIter() entered";
+
     uint8_t *buffer;
     uint32_t ts;
 
@@ -259,7 +261,6 @@ Mesh Kinect::scanFace(int scanIterations)
     cv::namedWindow(testWinName);
     while (iterate)
     {
-        qDebug() << "iterating";
         if (!Kinect::getRGBIter(rgb, scanIterations))
         {
             qDebug() << "Kinect RGB error";
