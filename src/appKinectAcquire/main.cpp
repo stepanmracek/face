@@ -5,6 +5,7 @@
 #include "facelib/glwidget.h"
 #include "facelib/morphable3dfacemodel.h"
 #include "facelib/facefeaturesanotation.h"
+#include "facelib/facealigner.h"
 
 int scan(int argc, char *argv[], const QString &outputPath, const QString &lmPath)
 {
@@ -30,7 +31,7 @@ int scan(int argc, char *argv[], const QString &outputPath, const QString &lmPat
 
 int align(int argc, char *argv[])
 {
-    Mesh m = Mesh::fromBIN("../../test/kinect-face.bin", false);
+    Mesh inputMesh = Mesh::fromBIN("../../test/kinect-face.bin", false);
     Landmarks landmarks("../../test/kinect-face.xml");
 
     QString pca = "../../test/morph-pca.xml";
@@ -40,24 +41,20 @@ int align(int argc, char *argv[])
     QString landmarksPath = "../../test/morph-landmarks.xml";
     Morphable3DFaceModel model(pcaZcoord, pcaTexture, pca, flags, landmarksPath, 200);
 
-    Procrustes3DResult procrustesResult = model.align(m, landmarks, 10);
-    model.morphModel(m);
+    Procrustes3DResult procrustesResult = model.align(inputMesh, landmarks, 10);
+    model.morphModel(inputMesh);
+    Procrustes3D::applyInversedProcrustesResult(model.mesh.points, procrustesResult);
+    Procrustes3D::applyInversedProcrustesResult(inputMesh.points, procrustesResult);
+    model.mesh.recalculateMinMax();
+    inputMesh.recalculateMinMax();
+
+    Mesh meanForAlign = Mesh::fromOBJ("../../test/meanForAlign.obj");
+    FaceAligner aligner(meanForAlign);
+    aligner.icpAlign(model.mesh);
 
     QApplication app(argc, argv);
     GLWidget widget;
-
-    Procrustes3D::applyInversedProcrustesResult(model.mesh.points, procrustesResult);
-    Procrustes3D::applyInversedProcrustesResult(m.points, procrustesResult);
-    model.mesh.recalculateMinMax();
-    m.recalculateMinMax();
-
-    //model.mesh.translate(cv::Point3d(75,0,0));
-    //m.translate(cv::Point3d(-75,0,0));
-
-    //widget.addFace(&m);
     widget.addFace(&model.mesh);
-    //widget.addLandmarks(&landmarks);
-    //widget.addLandmarks(&model.landmarks);
     widget.show();
 
     return app.exec();
