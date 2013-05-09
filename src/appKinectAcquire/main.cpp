@@ -66,5 +66,5 @@ int align(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
     return align(argc, argv);
-    //return scan(argc, argv, "face.bin");
+    return scan(argc, argv, "../../test/kinect-face.bin");
 }
