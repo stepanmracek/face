@@ -20,10 +20,8 @@ int scan(int argc, char *argv[], const QString &outputPath)
     return app.exec();
 }
 
-int main(int argc, char *argv[])
+int align(int argc, char *argv[])
 {
-    //scan(argc, argv, "face.obj");
-
     Mesh m = Mesh::fromOBJ("../../test/obj/stepan.obj"); // Kinect::scanFace();
 
     QString pca = "../../test/align-pca.xml";
@@ -56,4 +54,9 @@ int main(int argc, char *argv[])
     widget.show();
 
     return app.exec();
+}
+
+int main(int argc, char *argv[])
+{
+    return scan(argc, argv, "face.obj");
 }
