@@ -22,7 +22,7 @@ int scan(int argc, char *argv[], const QString &outputPath)
 
 int align(int argc, char *argv[])
 {
-    Mesh m = Kinect::scanFace();
+    Mesh m = Mesh::fromBIN("../../test/kinect-face.bin", false);
 
     QString pca = "../../test/morph-pca.xml";
     QString pcaZcoord = "../../test/morph-pca-zcoord.xml";
@@ -65,6 +65,6 @@ int align(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    //return align(argc, argv);
-    return scan(argc, argv, "../../test/kinect-face.bin");
+    return align(argc, argv);
+    //return scan(argc, argv, "../../test/kinect-face.bin");
 }
