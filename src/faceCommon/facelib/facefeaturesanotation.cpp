@@ -92,7 +92,7 @@ Landmarks FaceFeaturesAnotation::anotate(Mesh &mesh, bool &success)
 {
     std::string windowName = "face";
     MapConverter textureConverter;
-    Map texture = SurfaceProcessor::depthmap(mesh, textureConverter, 2.0, Texture);
+    Map texture = SurfaceProcessor::depthmap(mesh, textureConverter, 2.0, Texture_I);
 
     FaceFeaturesAnotationStruct anotationStruct;
     anotationStruct.texture = texture.toMatrix();
