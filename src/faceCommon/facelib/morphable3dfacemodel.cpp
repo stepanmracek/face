@@ -127,7 +127,9 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     setModelParams(normalizedZcoordParams, textureParams);
 
     // direct copy of input mesh texture to the model
-    Map texture = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture);
+    Map textureR = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_R);
+    Map textureG = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_G);
+    Map textureB = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_B);
     int n = texture.values.count();
     assert(n == mask.rows);
     mesh.colors.clear();
@@ -135,7 +137,7 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     {
         if (texture.flags[i] && mask(i))
         {
-            mesh.colors << Color(texture.values[i], texture.values[i], texture.values[i]);
+            mesh.colors << Color(textureB.values[i], textureG.values[i], textureR.values[i]);
         }
     }
 }
