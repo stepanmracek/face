@@ -89,8 +89,8 @@ bool Kinect::getRGB(uint8_t *rgb, int scansCount)
     uint8_t *buffer;
     uint32_t ts;
 
-    double cumulativeBuffer[640*480];
-    for (int i = 0; i < 640*480; i++)
+    double cumulativeBuffer[n*3];
+    for (int i = 0; i < n*3; i++)
     {
         cumulativeBuffer[i] = 0;
     }
@@ -106,7 +106,7 @@ bool Kinect::getRGB(uint8_t *rgb, int scansCount)
         }
     }
 
-    for (int i = 0; i < 640*480; i++)
+    for (int i = 0; i < n*3; i++)
     {
         rgb[i] = cumulativeBuffer[i]/scansCount;
     }
