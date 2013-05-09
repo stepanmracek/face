@@ -55,7 +55,6 @@ int align(int argc, char *argv[])
     QApplication app(argc, argv);
     GLWidget widget;
     widget.addFace(&model.mesh);
-    widget.addFace(&meanForAlign);
     widget.show();
 
     return app.exec();
