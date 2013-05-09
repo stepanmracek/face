@@ -86,26 +86,10 @@ bool Kinect::getRGB(uint8_t *rgb)
 
 bool Kinect::getRGBIter(uint8_t *rgb, int scansCount)
 {
+    uint8_t *buffer;
+    uint32_t ts;
+
     double *cumulativeBuffer = new double[n*3];
-
-    uint8_t *buffer;
-    uint32_t ts;
-    if (freenect_sync_get_video((void**)&buffer, &ts, 0, FREENECT_VIDEO_RGB) != 0)
-        return false;
-
-    for (int i = 0; i < n*3; i++)
-    {
-        rgb[i] = buffer[i];
-    }
-
-    return true;
-
-    /*qDebug() << "getRGBIter() entered";
-
-    uint8_t *buffer;
-    uint32_t ts;
-
-    double cumulativeBuffer[n*3];
     for (int i = 0; i < n*3; i++)
     {
         cumulativeBuffer[i] = 0;
@@ -127,7 +111,8 @@ bool Kinect::getRGBIter(uint8_t *rgb, int scansCount)
         rgb[i] = cumulativeBuffer[i]/scansCount;
     }
 
-    return true;*/
+    delete [] cumulativeBuffer;
+    return true;
 }
 
 VectorOfPoints Kinect::depthToVectorOfPoints(double *depth)
