@@ -94,6 +94,7 @@ bool Kinect::getRGB(uint8_t *rgb, int scansCount)
 
     for (int iteration = 0; iteration < scansCount; iteration++)
     {
+        qDebug() << "getRGB iteration" << iteration;
         uint8_t *buffer;
         uint32_t ts;
 
