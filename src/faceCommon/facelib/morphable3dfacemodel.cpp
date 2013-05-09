@@ -123,8 +123,21 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     Vector inputValues(usedValues);
     Vector zcoordParams = pcaForZcoord.project(inputValues);
     Vector normalizedZcoordParams = pcaForZcoord.normalizeParams(zcoordParams, 1);
-    Vector textureParams(pcaForTexture.getModes());
+    Vector textureParams(pcaForTexture.getModes()); // no texture generation => texture params are just zeros
     setModelParams(normalizedZcoordParams, textureParams);
+
+    // direct copy of input mesh texture to the model
+    Map texture = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture);
+    int n = texture.values.count();
+    assert(n == mask.rows);
+    mesh.colors.clear();
+    for (int i = 0; i < n; i++)
+    {
+        if (texture.flags[i] && mask(i))
+        {
+            mesh.colors << Color(texture[i], texture[i], texture[i]);
+        }
+    }
 }
 
 void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
