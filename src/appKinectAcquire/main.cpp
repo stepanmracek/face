@@ -41,7 +41,7 @@ int align(int argc, char *argv[])
     QString landmarksPath = "../../test/morph-landmarks.xml";
     Morphable3DFaceModel model(pcaZcoord, pcaTexture, pca, flags, landmarksPath, 200);
 
-    Mesh morphedMesh = model.morph(inputMesh, landmarks, 10);
+    Mesh morphedMesh = model.morph(inputMesh, 10); // landmarks, 10);
 
     Mesh meanForAlign = Mesh::fromOBJ("../../test/meanForAlign.obj");
     FaceAligner aligner(meanForAlign);
