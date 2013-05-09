@@ -2,6 +2,7 @@
 
 #include "linalg/procrustes.h"
 #include "facelib/surfaceprocessor.h"
+#include "facelib/facealigner.h"
 #include "landmarks.h"
 
 Morphable3DFaceModel::Morphable3DFaceModel(const QString &pcaPathForZcoord, const QString &pcaPathForTexture, const QString &pcaFile, const QString &maskPath,
@@ -148,6 +149,24 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
             mesh.colors << Color(textureB.values[i], textureG.values[i], textureR.values[i]);
         }
     }
+}
+
+Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, int iterations)
+{
+    Vector zeroParams(pca.getModes());
+    setModelParams(zeroParams);
+    FaceAligner aligner(this->mesh);
+    aligner.icpAlign(inputMesh, iterations);
+
+    morphModel(inputMesh);
+    Mesh result(mesh);
+    //Procrustes3D::applyInversedProcrustesResult(inputLandmarks.points, procrustesResult);
+    //Procrustes3D::applyInversedProcrustesResult(inputMesh.points, procrustesResult);
+    //Procrustes3D::applyInversedProcrustesResult(result.points, procrustesResult);
+    result.recalculateMinMax();
+    inputMesh.recalculateMinMax();
+
+    return result;
 }
 
 Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations)

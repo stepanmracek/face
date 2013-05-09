@@ -29,6 +29,7 @@ public:
     void setModelParams(Vector &zcoordParams, Vector &textureParams);
 
     Mesh morph(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations);
+    Mesh morph(Mesh &inputMesh, int iterations);
 
     static void align(QVector<Mesh> &meshes,
                       QVector<VectorOfPoints> &controlPoints,
