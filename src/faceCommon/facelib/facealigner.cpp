@@ -126,8 +126,13 @@ Procrustes3DResult FaceAligner::icpAlignRotAndScale(Mesh &face, int maxIteration
 
     Procrustes3DResult result;
 
+    MapConverter c;
     for (int iteration = 0; iteration < maxIterations; iteration++)
     {
+        cv::imshow("reference", SurfaceProcessor::depthmap(meanFace, c, 1, ZCoord).toMatrix());
+        cv::imshow("reference", SurfaceProcessor::depthmap(face, c, 1, ZCoord).toMatrix());
+        cv::waitKey(0);
+
         // Find correspondence
         VectorOfPoints referencePoints = meanFace.points;
         VectorOfPoints pointsToTransform = face.getNearestPoints(referencePoints);
