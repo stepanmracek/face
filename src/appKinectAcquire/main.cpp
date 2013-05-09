@@ -32,7 +32,7 @@ int align(int argc, char *argv[])
     Morphable3DFaceModel model(pcaZcoord, pcaTexture, pca, flags, landmarksPath, 200);
 
     bool success;
-    Landmarks landmarks = FaceFeaturesAnotation::anotate(m, 8, success);
+    Landmarks landmarks = FaceFeaturesAnotation::anotate(m, success);
 
     Procrustes3DResult procrustesResult = model.align(m, landmarks, 10);
     model.morphModel(m);
