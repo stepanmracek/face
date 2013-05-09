@@ -86,7 +86,7 @@ bool Kinect::getRGB(uint8_t *rgb)
 
 bool Kinect::getRGBIter(uint8_t *rgb, int scansCount)
 {
-    double cumulativeBuffer[n*3];
+    double *cumulativeBuffer = new double[n*3];
 
     uint8_t *buffer;
     uint32_t ts;
