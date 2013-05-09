@@ -15,7 +15,7 @@ int scan(int argc, char *argv[], const QString &outputPath)
     widget.addFace(&m);
     widget.show();
 
-    m.writeOBJ(outputPath, ',');
+    m.writeBIN(outputPath);
 
     return app.exec();
 }
@@ -60,5 +60,5 @@ int align(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    return scan(argc, argv, "face.obj");
+    return scan(argc, argv, "face.bin");
 }
