@@ -321,7 +321,7 @@ Mesh Kinect::scanFace(int scanIterations)
         exit(1);
     }
 
-    if (!Kinect::getDepth(depth, 1, mask, minDistanceFromSensor, maxDistanceFromSensor))
+    if (!Kinect::getDepth(depth, scanIterations, mask, minDistanceFromSensor, maxDistanceFromSensor))
     {
         qDebug() << "Kinect depth error";
         exit(1);
