@@ -28,10 +28,7 @@ public:
     void setModelParams(Vector &commonParams);
     void setModelParams(Vector &zcoordParams, Vector &textureParams);
 
-    Procrustes3DResult align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations);
-
-    void morphModel(Mesh &alignedMesh);
-
+    void morph(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations);
 
     static void align(QVector<Mesh> &meshes,
                       QVector<VectorOfPoints> &controlPoints,
@@ -46,6 +43,10 @@ public:
                        const QString &flagsFile,
                        const QString &meanControlPointsFile,
                        Map &mapMask);
+
+private:
+    Procrustes3DResult align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations);
+    void morphModel(Mesh &alignedMesh);
 };
 
 #endif // MORPHABLE3DFACEMODEL_H
