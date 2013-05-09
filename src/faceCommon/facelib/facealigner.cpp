@@ -125,6 +125,7 @@ Procrustes3DResult FaceAligner::icpAlignRotAndScale(Mesh &face, int maxIteration
     face.translate(-lm.get(Landmarks::Nosetip));
 
     Procrustes3DResult result;
+    return result;
 
     meanFace.printStats();
     MapConverter c;
