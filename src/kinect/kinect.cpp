@@ -321,13 +321,14 @@ Mesh Kinect::scanFace(int scanIterations)
         exit(1);
     }
 
-    if (!Kinect::getRGBIter(rgb, scanIterations))
+    uint8_t rgb2[640*480*3];
+    if (!Kinect::getRGBIter(rgb2, scanIterations))
     {
         qDebug() << "Kinect RGB error";
         exit(1);
     }
 
-    Mesh mesh = Kinect::createMesh(depth, rgb);
+    Mesh mesh = Kinect::createMesh(depth, rgb2);
     mesh.centralize();
     mesh.calculateTriangles();
     return mesh;
