@@ -21,7 +21,7 @@ public:
 
     static bool getRGB(uint8_t *rgb);
 
-    static bool getRGBIter(uint8_t *rgb);
+    static bool getRGBIter(uint8_t *rgb, int scansCount);
 
     static VectorOfPoints depthToVectorOfPoints(double *depth);
 
