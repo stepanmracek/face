@@ -86,6 +86,8 @@ bool Kinect::getRGB(uint8_t *rgb)
 
 bool Kinect::getRGBIter(uint8_t *rgb, int scansCount)
 {
+    double cumulativeBuffer[n*3];
+
     uint8_t *buffer;
     uint32_t ts;
     if (freenect_sync_get_video((void**)&buffer, &ts, 0, FREENECT_VIDEO_RGB) != 0)
