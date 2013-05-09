@@ -31,6 +31,7 @@ int scan(int argc, char *argv[], const QString &outputPath, const QString &lmPat
 int align(int argc, char *argv[])
 {
     Mesh m = Mesh::fromBIN("../../test/kinect-face.bin", false);
+    Landmarks landmarks("../../test/kinect-face.xml");
 
     QString pca = "../../test/morph-pca.xml";
     QString pcaZcoord = "../../test/morph-pca-zcoord.xml";
@@ -38,14 +39,6 @@ int align(int argc, char *argv[])
     QString flags = "../../test/morph-flags";
     QString landmarksPath = "../../test/morph-landmarks.xml";
     Morphable3DFaceModel model(pcaZcoord, pcaTexture, pca, flags, landmarksPath, 200);
-
-    bool success;
-    Landmarks landmarks = FaceFeaturesAnotation::anotate(m, success);
-    if (!success)
-    {
-        qDebug() << "Bad anotation";
-        return 1;
-    }
 
     Procrustes3DResult procrustesResult = model.align(m, landmarks, 10);
     model.morphModel(m);
@@ -73,6 +66,6 @@ int align(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    //return align(argc, argv);
-    return scan(argc, argv, "../../test/kinect-face.bin", "../../test/kinect-face.xml");
+    return align(argc, argv);
+    //return scan(argc, argv, "../../test/kinect-face.bin", "../../test/kinect-face.xml");
 }
