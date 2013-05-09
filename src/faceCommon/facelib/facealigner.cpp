@@ -126,6 +126,7 @@ Procrustes3DResult FaceAligner::icpAlignRotAndScale(Mesh &face, int maxIteration
 
     Procrustes3DResult result;
 
+    meanFace.printStats();
     MapConverter c;
     for (int iteration = 0; iteration < maxIterations; iteration++)
     {
