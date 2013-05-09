@@ -120,12 +120,11 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
 Procrustes3DResult FaceAligner::icpAlignRotAndScale(Mesh &face, int maxIterations)
 {
     assert(maxIterations >= 1);
-    LandmarkDetector lmDetector(face);
-    Landmarks lm = lmDetector.detect();
-    face.translate(-lm.get(Landmarks::Nosetip));
+    //LandmarkDetector lmDetector(face);
+    //Landmarks lm = lmDetector.detect();
+    //face.translate(-lm.get(Landmarks::Nosetip));
 
     Procrustes3DResult result;
-    return result;
 
     meanFace.printStats();
     MapConverter c;
