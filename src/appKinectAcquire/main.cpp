@@ -53,8 +53,8 @@ int align(int argc, char *argv[])
     model.mesh.recalculateMinMax();
     m.recalculateMinMax();
 
-    model.mesh.translate(cv::Point3d(50,0,0));
-    m.translate(cv::Point3d(-50,0,0));
+    model.mesh.translate(cv::Point3d(75,0,0));
+    m.translate(cv::Point3d(-75,0,0));
 
     widget.addFace(&m);
     widget.addFace(&model.mesh);
