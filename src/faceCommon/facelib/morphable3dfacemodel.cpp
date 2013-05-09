@@ -135,7 +135,7 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     mesh.colors.clear();
     for (int i = 0; i < n; i++)
     {
-        if (texture.flags[i] && mask(i))
+        if (textureR.flags[i] && mask(i))
         {
             mesh.colors << Color(textureB.values[i], textureG.values[i], textureR.values[i]);
         }
