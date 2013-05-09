@@ -69,7 +69,7 @@ void Morphable3DFaceModel::setModelParams(Vector &zcoordParams, Vector &textureP
     {
         mesh.points[i].z = newZcoords(i);
         uchar intensity = newIntensities(i);
-        mesh.colors[i] = cv::Vec3b(intensity, intensity, intensity);
+        mesh.colors[i] = Color(intensity, intensity, intensity);
     }
 }
 
