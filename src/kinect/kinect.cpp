@@ -316,7 +316,7 @@ Mesh Kinect::scanFace(int scanIterations)
     cv::destroyWindow(testWinName);
 
     Kinect::getDepth(depth, scanIterations, mask, minDistanceFromSensor, maxDistanceFromSensor);
-    Kinect::getRGB(rgb);
+    //Kinect::getRGB(rgb);
 
     //uint8_t rgb2[640*480*3];
     //Kinect::getRGBIter(rgb2, scanIterations);
