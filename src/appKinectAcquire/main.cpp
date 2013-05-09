@@ -46,10 +46,8 @@ int align(int argc, char *argv[])
     QApplication app(argc, argv);
     GLWidget widget;
 
-
-    //m.move(cv::Point3d(0,0,-50));
-    Procrustes3D::applyInversedProcrustesResult(model.mesh.points, procrustesResult);
-    Procrustes3D::applyInversedProcrustesResult(m.points, procrustesResult);
+    //Procrustes3D::applyInversedProcrustesResult(model.mesh.points, procrustesResult);
+    //Procrustes3D::applyInversedProcrustesResult(m.points, procrustesResult);
     model.mesh.recalculateMinMax();
     m.recalculateMinMax();
 
