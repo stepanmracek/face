@@ -9,13 +9,21 @@
 int scan(int argc, char *argv[], const QString &outputPath, const QString &lmPath)
 {
     Mesh m = Kinect::scanFace(10);
+    bool success;
+    Landmarks lm = FaceFeaturesAnotation::anotate(m, &success);
+    if (!success)
+    {
+        return 0;
+    }
 
     QApplication app(argc, argv);
     GLWidget widget;
     widget.addFace(&m);
+    widget.addLandmarks(&lm);
     widget.show();
 
     m.writeBIN(outputPath);
+    lm.serialize(lmPath);
 
     return app.exec();
 }
