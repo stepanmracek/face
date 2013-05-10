@@ -263,30 +263,30 @@ public:
         FaceAligner aligner(mean);
         Mesh face = Mesh::fromBIN(dirPath + "bin/" + fileName, true);
 
-        MapConverter c;
-        Map before = SurfaceProcessor::depthmap(face, c, 2, Texture_I);
+        //MapConverter c;
+        //Map before = SurfaceProcessor::depthmap(face, c, 2, Texture_I);
 
         //Mesh old = face;
         aligner.icpAlign(face, 10);
 
-        Map after = SurfaceProcessor::depthmap(face, c, 2, Texture_I);
+        //Map after = SurfaceProcessor::depthmap(face, c, 2, Texture_I);
 
-        cv::imshow("before", before.toMatrix());
-        cv::imshow("after", after.toMatrix());
-        cv::waitKey(0);
+        //cv::imshow("before", before.toMatrix());
+        //cv::imshow("after", after.toMatrix());
+        //cv::waitKey(0);
 
-        /*old.translate(cv::Point3d(100,0,0));
-        face.translate(cv::Point3d(-100,0,0));
-        aligner.meanFace.translate(cv::Point3d(-100,0,0));
+        //old.translate(cv::Point3d(100,0,0));
+        //face.translate(cv::Point3d(-100,0,0));
+        //aligner.meanFace.translate(cv::Point3d(-100,0,0));
 
         QApplication app(argc, argv);
         GLWidget widget;
         widget.setWindowTitle("GL Widget");
         widget.addFace(&aligner.meanFace);
         widget.addFace(&face);
-        widget.addFace(&old);
+        //widget.addFace(&old);
         widget.show();
-        return app.exec();*/
+        return app.exec();
     }
 
     static int testHorizontalProfileLines(int argc, char *argv[])
