@@ -17,7 +17,14 @@ public:
         QFileInfoList binFiles = dir.entryInfoList();
         foreach(const QFileInfo &info, binFiles)
         {
-            //SurfaceProcessor::isoGeodeticCurve()
+            Mesh face = Mesh::fromBIN(info.absoluteFilePath());
+            MapConverter converter;
+            Map depth = SurfaceProcessor::depthmap(face, converter, 2, ZCoord);
+            cv::Point3d nosetip(0,0,0);
+            for (int distance = 20; distance <= 100; distance += 20)
+            {
+                VectorOfPoints = SurfaceProcessor::isoGeodeticCurve(depth, converter, nosetip, distance, 100, 2);
+            }
         }
     }
 };
