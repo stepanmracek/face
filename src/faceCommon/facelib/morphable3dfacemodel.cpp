@@ -184,7 +184,7 @@ Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, int iterations)
 
 Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations)
 {
-    Procrustes3DResult procrustesResult = align(inputMesh, inputLandmarks, iterations);
+    Procrustes3DResult procrustesResult = align(inputMesh, inputLandmarks, iterations, true);
     morphModel(inputMesh);
     Mesh result(mesh);
     Procrustes3D::applyInversedProcrustesResult(inputLandmarks.points, procrustesResult);
