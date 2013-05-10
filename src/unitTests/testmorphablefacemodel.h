@@ -119,12 +119,15 @@ public:
             assert(landmarks.check());
             Mesh mesh = Mesh::fromBIN(dirPath + QDir::separator() + fileInfo.baseName() + ".bin");
 
+            mesh.translate(-landmarks.get(Landmarks::Nosetip));
+            Procrustes3D::translate(landmarks.points, -landmarks.get(Landmarks::Nosetip));
+
             landmarksVec.append(landmarks.points);
             meshesVec.append(mesh);
         }
 
         Morphable3DFaceModel::create(meshesVec, landmarksVec, 3, pcaForZcoordFile, pcaForTextureFile, pcaFile,
-                                     flagsFile, meanLadmarksFile, mask, false);
+                                     flagsFile, meanLadmarksFile, mask, false, false);
     }
 };
 

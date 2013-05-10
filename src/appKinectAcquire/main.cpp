@@ -32,7 +32,7 @@ int scan(int argc, char *argv[], const QString &outputPath, const QString &lmPat
 int align(int argc, char *argv[])
 {
     Mesh inputMesh = Mesh::fromBIN("../../test/kinect-face.bin", false);
-    //Landmarks landmarks("../../test/kinect-face.xml");
+    Landmarks landmarks("../../test/kinect-face.xml");
 
     QString pca = "../../test/morph-pca.xml";
     QString pcaZcoord = "../../test/morph-pca-zcoord.xml";
@@ -41,7 +41,7 @@ int align(int argc, char *argv[])
     QString landmarksPath = "../../test/morph-landmarks.xml";
     Morphable3DFaceModel model(pcaZcoord, pcaTexture, pca, flags, landmarksPath, 200);
 
-    Mesh morphedMesh = model.morph(inputMesh, 10); // landmarks, 10);
+    Mesh morphedMesh = model.morph(inputMesh, 10); //landmarks, 10);
 
     QApplication app(argc, argv);
     GLWidget widget;

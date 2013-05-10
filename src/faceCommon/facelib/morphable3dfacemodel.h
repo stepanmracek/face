@@ -33,7 +33,7 @@ public:
 
     static void align(QVector<Mesh> &meshes,
                       QVector<VectorOfPoints> &controlPoints,
-                      int iterations, bool scale);
+                      int iterations, bool scale, bool centralize);
 
     static void create(QVector<Mesh> &meshes,
                        QVector<VectorOfPoints> &controlPoints,
@@ -43,7 +43,7 @@ public:
                        const QString &pcaFile,
                        const QString &flagsFile,
                        const QString &meanControlPointsFile,
-                       Map &mapMask, bool scale);
+                       Map &mapMask, bool scale, bool centralize);
 
 private:
     Procrustes3DResult align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations, bool scale);

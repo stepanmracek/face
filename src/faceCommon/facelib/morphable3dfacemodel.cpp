@@ -132,7 +132,7 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     QVector<double> usedZValues = depthmap.getUsedValues();
     Vector inputZValues(usedZValues);
     Vector zcoordParams = pcaForZcoord.project(inputZValues);
-    Vector normalizedZcoordParams = pcaForZcoord.normalizeParams(zcoordParams);
+    Vector normalizedZcoordParams = pcaForZcoord.normalizeParams(zcoordParams, 1);
 
     /*QVector<double> usedIValues = intensities.getUsedValues();
     Vector inputIValues(usedIValues);
@@ -165,9 +165,10 @@ Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, int iterations)
     setModelParams(zeroParams);
 
     // instantiate aligner and move the reference face, such the nosetip is at (0,0,0)
+    qDebug() << landmarks.get(Landmarks::Nosetip).x << landmarks.get(Landmarks::Nosetip).y << landmarks.get(Landmarks::Nosetip).z;
     FaceAligner aligner(this->mesh);
     aligner.referenceFace.translate(-this->landmarks.get(Landmarks::Nosetip));
-    aligner.icpAlign(inputMesh, iterations);
+    Procrustes3DResult procrustesResult = aligner.icpAlign(inputMesh, iterations);
     inputMesh.translate(this->landmarks.get(Landmarks::Nosetip));
 
     // morph
@@ -184,7 +185,7 @@ Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, int iterations)
 
 Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations)
 {
-    Procrustes3DResult procrustesResult = align(inputMesh, inputLandmarks, iterations, true);
+    Procrustes3DResult procrustesResult = align(inputMesh, inputLandmarks, iterations, false);
     morphModel(inputMesh);
     Mesh result(mesh);
     Procrustes3D::applyInversedProcrustesResult(inputLandmarks.points, procrustesResult);
@@ -198,18 +199,21 @@ Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, Landmarks &inputLandmarks, int
 
 void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
                                  QVector<VectorOfPoints> &controlPoints,
-                                 int iterations, bool scale)
+                                 int iterations, bool scale, bool centralize)
 {
     int meshCount = meshes.count();
 
     // centralize
-    for (int i = 0; i < meshCount; i++)
+    if (centralize)
     {
-        VectorOfPoints &pointcloud = controlPoints[i];
-        cv::Point3d shift = Procrustes3D::centralizedTranslation(pointcloud);
+        for (int i = 0; i < meshCount; i++)
+        {
+            VectorOfPoints &pointcloud = controlPoints[i];
+            cv::Point3d shift = Procrustes3D::centralizedTranslation(pointcloud);
 
-        Procrustes3D::translate(pointcloud, shift);
-        meshes[i].translate(shift);
+            Procrustes3D::translate(pointcloud, shift);
+            meshes[i].translate(shift);
+        }
     }
 
     VectorOfPoints meanShape = Procrustes3D::getMeanShape(controlPoints);
@@ -252,9 +256,9 @@ void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
 void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints> &controlPoints, int iterations,
                                   const QString &pcaForZcoordFile, const QString &pcaForTextureFile, const QString &pcaFile,
                                   const QString &flagsFile, const QString &meanControlPointsFile,
-                                  Map &mapMask, bool scale)
+                                  Map &mapMask, bool scale, bool centralize)
 {
-    align(meshes, controlPoints, iterations, scale);
+    align(meshes, controlPoints, iterations, scale, centralize);
     VectorOfPoints meanControlPoints = Procrustes3D::getMeanShape(controlPoints);
     Landmarks l(meanControlPoints);
     l.serialize(meanControlPointsFile);
