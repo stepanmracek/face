@@ -255,7 +255,7 @@ public:
         Morphable3DFaceModel model("../../test/morph-pca-zcoord.xml",
                                    "../../test/morph-pca-texture.xml",
                                    "../../test/morph-pca.xml",
-                                   "../../test/morph-morph-flags",
+                                   "../../test/morph-flags",
                                    "../../test/morph-landmarks.xml",
                                    200);
         Mesh mean = model.mesh;
