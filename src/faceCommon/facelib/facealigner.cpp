@@ -123,7 +123,7 @@ Procrustes3DResult FaceAligner::icpAlign(Mesh &face, int maxIterations)
         double d = Procrustes3D::diff(pointsToTransform, referencePoints) / referencePoints.count();
         qDebug() << "FaceAligner::icpAlign" << (iteration+1) << d;
     }
-    return Procrustes3DResult;
+    return result;
 }
 
 /*Procrustes3DResult FaceAligner::icpAlignRotAndScale(Mesh &face, int maxIterations, int rotationAfter)
