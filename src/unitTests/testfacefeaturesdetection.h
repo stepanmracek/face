@@ -24,6 +24,7 @@
 #include "linalg/kernelgenerator.h"
 #include "linalg/gabor.h"
 #include "linalg/gausslaguerre.h"
+#include "facelib/morphable3dfacemodel.h"
 
 enum AlignType
 {
@@ -250,7 +251,15 @@ public:
 
     static int  testAlign(int argc, char *argv[], QString dirPath, QString fileName)
     {
-        Mesh mean = Mesh::fromOBJ("../../test/meanForAlign.obj");
+        //Mesh mean = Mesh::fromOBJ("../../test/meanForAlign.obj");
+        Morphable3DFaceModel model("../../test/morph-pca-zcoord.xml",
+                                   "../../test/morph-pca-texture.xml",
+                                   "../../test/morph-pca.xml",
+                                   "../../test/morph-morph-flags",
+                                   "../../test/morph-landmarks.xml",
+                                   200);
+        Mesh mean = model.mesh;
+
         FaceAligner aligner(mean);
         Mesh face = Mesh::fromBIN(dirPath + "bin/" + fileName, true);
 
