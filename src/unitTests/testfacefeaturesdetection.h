@@ -255,12 +255,12 @@ public:
         Mesh face = Mesh::fromBIN(dirPath + "bin/" + fileName, true);
 
         MapConverter c;
-        Map before = SurfaceProcessor::depthmap(face, c, 2, Texture);
+        Map before = SurfaceProcessor::depthmap(face, c, 2, Texture_I);
 
         //Mesh old = face;
         aligner.icpAlign(face, 10);
 
-        Map after = SurfaceProcessor::depthmap(face, c, 2, Texture);
+        Map after = SurfaceProcessor::depthmap(face, c, 2, Texture_I);
 
         cv::imshow("before", before.toMatrix());
         cv::imshow("after", after.toMatrix());
