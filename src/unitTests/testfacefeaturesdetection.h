@@ -259,6 +259,7 @@ public:
                                    "../../test/morph-landmarks.xml",
                                    200);
         Mesh mean = model.mesh;
+        mean.translate(-model.landmarks.get(Landmarks::Nosetip));
 
         FaceAligner aligner(mean);
         Mesh face = Mesh::fromBIN(dirPath + "bin/" + fileName, true);
