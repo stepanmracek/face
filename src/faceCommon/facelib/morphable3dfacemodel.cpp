@@ -156,7 +156,9 @@ Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, int iterations)
     Vector zeroParams(pca.getModes());
     setModelParams(zeroParams);
     FaceAligner aligner(this->mesh);
-    aligner.icpAlignRotAndScale(inputMesh, iterations, 0);
+    aligner.referenceFace.translate(-this->landmarks.get(Landmarks::Nosetip));
+    aligner.icpAlign(inputMesh, iterations);
+    inputMesh.translate(this->landmarks.get(Landmarks::Nosetip));
 
     morphModel(inputMesh);
     Mesh result(mesh);
