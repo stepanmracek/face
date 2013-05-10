@@ -130,7 +130,7 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     /*QVector<double> usedIValues = intensities.getUsedValues();
     Vector inputIValues(usedIValues);
     Vector textureParams = pcaForTexture.project(inputIValues);
-    Vector normalizedTextureParams = pcaForTexture.normalizeParams(textureParams, 1);*/
+    Vector normalizedTextureParams = pcaForTexture.normalizeParams(textureParams);*/
     Vector textureParams(pcaForTexture.getModes()); // no texture generation => texture params are just zeros
 
     setModelParams(normalizedZcoordParams, textureParams);
@@ -153,13 +153,17 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
 
 Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, int iterations)
 {
+    // reset model
     Vector zeroParams(pca.getModes());
     setModelParams(zeroParams);
+
+    // instantiate aligner and move the reference face, such the nosetip is at (0,0,0)
     FaceAligner aligner(this->mesh);
     aligner.referenceFace.translate(-this->landmarks.get(Landmarks::Nosetip));
     aligner.icpAlign(inputMesh, iterations);
     inputMesh.translate(this->landmarks.get(Landmarks::Nosetip));
 
+    // morph
     morphModel(inputMesh);
     Mesh result(mesh);
     //Procrustes3D::applyInversedProcrustesResult(inputLandmarks.points, procrustesResult);

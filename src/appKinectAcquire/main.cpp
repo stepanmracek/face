@@ -32,7 +32,7 @@ int scan(int argc, char *argv[], const QString &outputPath, const QString &lmPat
 int align(int argc, char *argv[])
 {
     Mesh inputMesh = Mesh::fromBIN("../../test/kinect-face.bin", false);
-    Landmarks landmarks("../../test/kinect-face.xml");
+    //Landmarks landmarks("../../test/kinect-face.xml");
 
     QString pca = "../../test/morph-pca.xml";
     QString pcaZcoord = "../../test/morph-pca-zcoord.xml";
@@ -43,13 +43,10 @@ int align(int argc, char *argv[])
 
     Mesh morphedMesh = model.morph(inputMesh, 10); // landmarks, 10);
 
-    //Mesh meanForAlign = Mesh::fromOBJ("../../test/meanForAlign.obj");
-    //FaceAligner aligner(meanForAlign);
-    //aligner.icpAlign(morphedMesh, 10);
-
     QApplication app(argc, argv);
     GLWidget widget;
     widget.addFace(&morphedMesh);
+    widget.addFace(&inputMesh);
     widget.show();
 
     return app.exec();
