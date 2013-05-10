@@ -46,7 +46,7 @@ public:
                        Map &mapMask, bool scale);
 
 private:
-    Procrustes3DResult align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations);
+    Procrustes3DResult align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations, bool scale);
     void morphModel(Mesh &alignedMesh);
 };
 

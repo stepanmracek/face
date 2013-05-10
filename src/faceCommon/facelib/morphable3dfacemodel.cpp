@@ -74,7 +74,7 @@ void Morphable3DFaceModel::setModelParams(Vector &zcoordParams, Vector &textureP
     }
 }
 
-Procrustes3DResult Morphable3DFaceModel::align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations)
+Procrustes3DResult Morphable3DFaceModel::align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations, bool scale)
 {
     Procrustes3DResult result;
 
@@ -92,10 +92,17 @@ Procrustes3DResult Morphable3DFaceModel::align(Mesh &inputMesh, Landmarks &input
         result.rotations << rotation;
 
         // scale
-        cv::Point3d scaleParams = Procrustes3D::getOptimalScale(inputLandmarks.points, this->landmarks.points);
-        Procrustes3D::scale(inputLandmarks.points, scaleParams);
-        inputMesh.scale(scaleParams);
-        result.scaleParams << scaleParams;
+        if (scale)
+        {
+            cv::Point3d scaleParams = Procrustes3D::getOptimalScale(inputLandmarks.points, this->landmarks.points);
+            Procrustes3D::scale(inputLandmarks.points, scaleParams);
+            inputMesh.scale(scaleParams);
+            result.scaleParams << scaleParams;
+        }
+        else
+        {
+            result.scaleParams << cv::Point3d(1, 1, 1);
+        }
     }
 
     return result;
@@ -177,7 +184,7 @@ Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, int iterations)
 
 Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations)
 {
-    Procrustes3DResult procrustesResult = align(inputMesh, inputLandmarks, iterations, true);
+    Procrustes3DResult procrustesResult = align(inputMesh, inputLandmarks, iterations);
     morphModel(inputMesh);
     Mesh result(mesh);
     Procrustes3D::applyInversedProcrustesResult(inputLandmarks.points, procrustesResult);
