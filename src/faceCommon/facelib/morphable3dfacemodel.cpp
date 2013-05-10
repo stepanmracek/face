@@ -177,7 +177,7 @@ Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, int iterations)
 
 Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations)
 {
-    Procrustes3DResult procrustesResult = align(inputMesh, inputLandmarks, iterations);
+    Procrustes3DResult procrustesResult = align(inputMesh, inputLandmarks, iterations, true);
     morphModel(inputMesh);
     Mesh result(mesh);
     Procrustes3D::applyInversedProcrustesResult(inputLandmarks.points, procrustesResult);
@@ -191,7 +191,7 @@ Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, Landmarks &inputLandmarks, int
 
 void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
                                  QVector<VectorOfPoints> &controlPoints,
-                                 int iterations)
+                                 int iterations, bool scale)
 {
     int meshCount = meshes.count();
 
@@ -220,11 +220,14 @@ void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
         qDebug() << "Iteration:" << iteration << "after SVD:" << Procrustes3D::getShapeVariation(controlPoints, meanShape);
 
         // scale
-        for (int meshIndex = 0; meshIndex < meshCount; meshIndex++)
+        if (scale)
         {
-            cv::Point3d scaleParams = Procrustes3D::getOptimalScale(controlPoints[meshIndex], meanShape);
-            Procrustes3D::scale(controlPoints[meshIndex], scaleParams);
-            meshes[meshIndex].scale(scaleParams);
+            for (int meshIndex = 0; meshIndex < meshCount; meshIndex++)
+            {
+                cv::Point3d scaleParams = Procrustes3D::getOptimalScale(controlPoints[meshIndex], meanShape);
+                Procrustes3D::scale(controlPoints[meshIndex], scaleParams);
+                meshes[meshIndex].scale(scaleParams);
+            }
         }
 
         meanShape = Procrustes3D::getMeanShape(controlPoints);
@@ -240,9 +243,9 @@ void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
 void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints> &controlPoints, int iterations,
                                   const QString &pcaForZcoordFile, const QString &pcaForTextureFile, const QString &pcaFile,
                                   const QString &flagsFile, const QString &meanControlPointsFile,
-                                  Map &mapMask)
+                                  Map &mapMask, bool scale)
 {
-    align(meshes, controlPoints, iterations);
+    align(meshes, controlPoints, iterations, scale);
     VectorOfPoints meanControlPoints = Procrustes3D::getMeanShape(controlPoints);
     Landmarks l(meanControlPoints);
     l.serialize(meanControlPointsFile);

@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
     //TestFaceFeatuesDetection::testDepthmapProcessing(argc, argv, "/home/stepo/face.obj");
     //return TestFaceFeatuesDetection::testFilters(argc, argv, "/home/stepo/face.obj");
     //TestFaceFeatuesDetection::testLandmarkDetection(argc, argv, frgcPath() + "02463d652.abs.xyz");
-    TestFaceFeatuesDetection::testAlign(argc, argv, frgcPath(), "04265d345.bin");
+    //TestFaceFeatuesDetection::testAlign(argc, argv, frgcPath(), "04265d345.bin");
     //TestFaceFeatuesDetection::testBatchLandmarkDetection(argc, argv, frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::testSuccessBatchLandmarkDetection(frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::testIsoGeodeticCurves(argc, argv);
@@ -86,11 +86,11 @@ int main(int argc, char *argv[])
     //TestFaceFeatuesDetection::exportForVOSM(frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::exportInitialEstimationsForVOSM(frgcPath() + "frgc-spring2004-obj-centralized");
 
-    //TestMorphableFaceModel::testCreate(frgcPath() + "bin/", "../../test/morph-landmarks.xml",
-    //                                   "../../test/morph-pca-zcoord.xml", "../../test/morph-pca-texture.xml",
-    //                                   "../../test/morph-pca.xml", "../../test/morph-flags");
-    //TestMorphableFaceModel::testModel(argc, argv, "../../test/morph-pca-zcoord.xml", "../../test/morph-pca-texture.xml",
-    //                                  "../../test/morph-pca.xml", "../../test/morph-flags", "../../test/morph-landmarks.xml");
+    TestMorphableFaceModel::testCreate(frgcPath() + "bin/", "../../test/morph-landmarks.xml",
+                                       "../../test/morph-pca-zcoord.xml", "../../test/morph-pca-texture.xml",
+                                       "../../test/morph-pca.xml", "../../test/morph-flags");
+    TestMorphableFaceModel::testModel(argc, argv, "../../test/morph-pca-zcoord.xml", "../../test/morph-pca-texture.xml",
+                                      "../../test/morph-pca.xml", "../../test/morph-flags", "../../test/morph-landmarks.xml");
     //TestMorphableFaceModel::testMorph(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml",
     //                                  "/run/media/stepo/frgc/frgc-spring2004-obj-centralized/04200d74.obj");
     //TestMorphableFaceModel::testMorphFromKinect(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml");
