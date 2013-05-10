@@ -38,7 +38,8 @@ Morphable3DFaceModel::Morphable3DFaceModel(const QString &pcaPathForZcoord, cons
         }
     }
 
-    mesh = Mesh::fromMap(faceDepth, faceTexture, true);
+    mesh = Mesh::fromMap(faceDepth, faceTexture, false);
+    mesh.translate(cv::Point3d(-width/2, -width/2, 0));
 }
 
 void Morphable3DFaceModel::setModelParams(Vector &commonParams)
@@ -208,10 +209,10 @@ void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
     {
         for (int i = 0; i < meshCount; i++)
         {
-            VectorOfPoints &pointcloud = controlPoints[i];
-            cv::Point3d shift = Procrustes3D::centralizedTranslation(pointcloud);
+            VectorOfPoints &landmarks = controlPoints[i];
+            cv::Point3d shift = Procrustes3D::centralizedTranslation(landmarks);
 
-            Procrustes3D::translate(pointcloud, shift);
+            Procrustes3D::translate(landmarks, shift);
             meshes[i].translate(shift);
         }
     }
@@ -221,8 +222,6 @@ void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
 
     for (int iteration = 0; iteration < iterations; iteration++)
     {
-        meanShape = Procrustes3D::getMeanShape(controlPoints);
-
         // rotate
         Procrustes3DResult rotResult = Procrustes3D::SVDAlign(controlPoints);
         for (int i = 0; i < meshCount; i++)
@@ -241,10 +240,10 @@ void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
                 Procrustes3D::scale(controlPoints[meshIndex], scaleParams);
                 meshes[meshIndex].scale(scaleParams);
             }
-        }
 
-        meanShape = Procrustes3D::getMeanShape(controlPoints);
-        qDebug() << "Iteration:" << iteration << "after scaling:" << Procrustes3D::getShapeVariation(controlPoints, meanShape);
+            meanShape = Procrustes3D::getMeanShape(controlPoints);
+            qDebug() << "Iteration:" << iteration << "after scaling:" << Procrustes3D::getShapeVariation(controlPoints, meanShape);
+        }
 
         /*MapConverter c;
         Map map = SurfaceProcessor::depthmap(meshes[0], c, 1, Texture);
@@ -274,6 +273,7 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
     resultTextureMap.setAll(0);
     resultTextureMap.add(mapMask);
 
+    qDebug() << "Creating depthmaps and textures";
     for (int index = 0; index < meshes.count(); index++)
     {
         Mesh &mesh = meshes[index];
@@ -301,12 +301,13 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
     //Matrix resultMatrix = resultMap.toMatrix() * 255;
     //cv::imwrite(meanImageFile.toStdString(), resultMatrix);
 
+    qDebug() << "Creating input projection vectors for depthmaps and textures";
     QVector<Vector> zcoordVectors;
     QVector<Vector> textureVectors;
     for (int index = 0; index < meshes.count(); index++)
     {
         Map &depth = depthMaps[index];
-        SurfaceProcessor::smooth(depth, 1, 2);
+        //SurfaceProcessor::smooth(depth, 1, 2);
         depth.flags = resultZcoordMap.flags;
         QVector<double> zcoords = depth.getUsedValues();
         Vector zcoordsVec(zcoords);
@@ -321,6 +322,7 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
         assert(zcoords.count() == intensities.count());
     }
 
+    qDebug() << "PCA learning";
     PCA pcaForZcoord(zcoordVectors);
     pcaForZcoord.modesSelectionThreshold(0.95);
     pcaForZcoord.serialize(pcaForZcoordFile);

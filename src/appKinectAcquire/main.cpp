@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QString>
+#include <QInputDialog>
 
 #include "kinect.h"
 #include "facelib/glwidget.h"
@@ -31,8 +32,8 @@ int scan(int argc, char *argv[], const QString &outputPath, const QString &lmPat
 
 int align(int argc, char *argv[])
 {
-    Mesh inputMesh = Mesh::fromBIN("../../test/kinect-face.bin", false);
-    Landmarks landmarks("../../test/kinect-face.xml");
+    Mesh inputMesh = Kinect::scanFace(5); // Mesh::fromBIN("../../test/kinect-face.bin", false);
+    //Landmarks landmarks("../../test/kinect-face.xml");
 
     QString pca = "../../test/morph-pca.xml";
     QString pcaZcoord = "../../test/morph-pca-zcoord.xml";
@@ -44,12 +45,19 @@ int align(int argc, char *argv[])
     Mesh morphedMesh = model.morph(inputMesh, 10); //landmarks, 10);
 
     QApplication app(argc, argv);
+
     GLWidget widget;
-    morphedMesh.translate(cv::Point3d(-50,0,0));
+    QString scanName = QInputDialog::getText(&widget, "Scan name", "Scan name:", QLineEdit::Normal, "");
+    widget.setWindowTitle(scanName);
+    morphedMesh.writeBIN("../../test/kinect/" + scanName + ".bin");
+
+    //morphedMesh.translate(cv::Point3d(-50,0,0));
+    //morphedMesh.colors.clear();
     widget.addFace(&morphedMesh);
-    inputMesh.translate(cv::Point3d(50,0,0));
-    widget.addFace(&inputMesh);
-    widget.show();
+
+    //inputMesh.translate(cv::Point3d(50,0,0));
+    //widget.addFace(&inputMesh);
+    widget.show();   
 
     return app.exec();
 }

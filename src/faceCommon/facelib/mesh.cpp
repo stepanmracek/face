@@ -175,6 +175,7 @@ void Mesh::calculateTriangles()
 Mesh Mesh::fromXYZ(const QString &filename, bool centralizeLoadedMesh)
 {
     qDebug() << "loading" << filename;
+    assert(filename.endsWith(".xyz", Qt::CaseInsensitive));
     QFile f(filename);
     bool exists = f.exists();
     assert(exists);
@@ -214,6 +215,7 @@ Mesh Mesh::fromXYZ(const QString &filename, bool centralizeLoadedMesh)
 Mesh Mesh::fromABS(const QString &filename, bool centralizeLoadedMesh)
 {
     qDebug() << "loading" << filename;
+    assert(filename.endsWith(".abs", Qt::CaseInsensitive));
     QFile f(filename);
     bool exists = f.exists();
     assert(exists);
@@ -290,6 +292,8 @@ Mesh Mesh::fromABS(const QString &filename, bool centralizeLoadedMesh)
 
 Mesh Mesh::fromABS(const QString &filename, const QString &texture, bool centralizeLoadedMesh)
 {
+    assert(filename.endsWith(".abs", Qt::CaseInsensitive));
+
     cv::Mat_<cv::Vec3b> image = cv::imread(texture.toStdString());
 
     qDebug() << "loading" << filename;
@@ -466,6 +470,7 @@ Mesh Mesh::fromMap(Map &depth, Map &intensities, bool centralizeLoadedMesh)
 Mesh Mesh::fromOBJ(const QString &filename, bool centralizeLoadedMesh)
 {
     qDebug() << "loading" << filename;
+    assert(filename.endsWith(".obj", Qt::CaseInsensitive));
     QFile f(filename);
     bool fileExists = f.exists();
     assert(fileExists);
@@ -627,6 +632,7 @@ void Mesh::writeBIN(const QString &path)
 Mesh Mesh::fromBIN(const QString &filename, bool centralizeLoadedMesh)
 {
     qDebug() << "loading" << filename << "...";
+    assert(filename.endsWith(".bin", Qt::CaseInsensitive));
     QFile f(filename);
     bool exists = f.exists();
     assert(exists);
