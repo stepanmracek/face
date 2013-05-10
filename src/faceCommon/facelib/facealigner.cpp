@@ -117,7 +117,7 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
     }
 }
 
-Procrustes3DResult FaceAligner::icpAlignRotAndScale(Mesh &face, int maxIterations, int rotationAfter)
+/*Procrustes3DResult FaceAligner::icpAlignRotAndScale(Mesh &face, int maxIterations, int rotationAfter)
 {
     assert(maxIterations >= 1);
     LandmarkDetector lmDetector(face);
@@ -163,4 +163,4 @@ Procrustes3DResult FaceAligner::icpAlignRotAndScale(Mesh &face, int maxIteration
     }
 
     return result;
-}
+}*/
