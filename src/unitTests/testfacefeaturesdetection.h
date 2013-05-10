@@ -268,7 +268,7 @@ public:
         //Map before = SurfaceProcessor::depthmap(face, c, 2, Texture_I);
 
         //Mesh old = face;
-        aligner.icpAlignRotAndScale(face, 10);
+        aligner.icpAlignRotAndScale(face, 20, 10);
 
         //Map after = SurfaceProcessor::depthmap(face, c, 2, Texture_I);
 
