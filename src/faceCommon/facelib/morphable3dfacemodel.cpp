@@ -125,7 +125,7 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     QVector<double> usedZValues = depthmap.getUsedValues();
     Vector inputZValues(usedZValues);
     Vector zcoordParams = pcaForZcoord.project(inputZValues);
-    Vector normalizedZcoordParams = pcaForZcoord.normalizeParams(zcoordParams, 1);
+    Vector normalizedZcoordParams = pcaForZcoord.normalizeParams(zcoordParams);
 
     /*QVector<double> usedIValues = intensities.getUsedValues();
     Vector inputIValues(usedIValues);
