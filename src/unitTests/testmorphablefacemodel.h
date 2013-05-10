@@ -124,7 +124,7 @@ public:
         }
 
         Morphable3DFaceModel::create(meshesVec, landmarksVec, 3, pcaForZcoordFile, pcaForTextureFile, pcaFile,
-                                     flagsFile, meanLadmarksFile, mask);
+                                     flagsFile, meanLadmarksFile, mask, false);
     }
 };
 
