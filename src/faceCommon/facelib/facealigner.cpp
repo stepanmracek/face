@@ -17,7 +17,7 @@ void FaceAligner::init()
     sampleStep = 5;
 }
 
-FaceAligner::FaceAligner(Mesh &meanFace) : meanFace(meanFace)
+FaceAligner::FaceAligner(Mesh &referenceFace) : referenceFace(referenceFace)
 {
     init();
 }
@@ -77,12 +77,12 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
         {
             cv::Point2d mapPoint = converter.MeshToMapCoords(meanDepth, cv::Point2d(x, y));
             cv::Point3d meshPoint = converter.MapToMeshCoords(meanDepth, mapPoint);
-            meanFace.points << meshPoint;
+            referenceFace.points << meshPoint;
         }
     }
-    meanFace.scale(cv::Point3d(1.0, 1.0, 1.0/vecOfLandmarks.count()));
-    meanFace.recalculateMinMax();
-    meanFace.calculateTriangles();
+    referenceFace.scale(cv::Point3d(1.0, 1.0, 1.0/vecOfLandmarks.count()));
+    referenceFace.recalculateMinMax();
+    referenceFace.calculateTriangles();
 }
 
 Procrustes3DResult FaceAligner::icpAlign(Mesh &face, int maxIterations)
@@ -96,7 +96,7 @@ Procrustes3DResult FaceAligner::icpAlign(Mesh &face, int maxIterations)
     for (int iteration = 0; iteration < maxIterations; iteration++)
     {
         // Find correspondence
-        VectorOfPoints referencePoints = meanFace.points;
+        VectorOfPoints referencePoints = referenceFace.points;
         VectorOfPoints pointsToTransform = face.getNearestPoints(referencePoints);
 
         // translation
@@ -123,6 +123,7 @@ Procrustes3DResult FaceAligner::icpAlign(Mesh &face, int maxIterations)
         double d = Procrustes3D::diff(pointsToTransform, referencePoints) / referencePoints.count();
         qDebug() << "FaceAligner::icpAlign" << (iteration+1) << d;
     }
+    return Procrustes3DResult;
 }
 
 /*Procrustes3DResult FaceAligner::icpAlignRotAndScale(Mesh &face, int maxIterations, int rotationAfter)
