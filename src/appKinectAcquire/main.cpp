@@ -45,7 +45,9 @@ int align(int argc, char *argv[])
 
     QApplication app(argc, argv);
     GLWidget widget;
+    morphedMesh.translate(cv::Point3d(-50,0,0));
     widget.addFace(&morphedMesh);
+    inputMesh.translate(cv::Point3d(50,0,0));
     widget.addFace(&inputMesh);
     widget.show();
 
