@@ -217,6 +217,8 @@ void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
 
     for (int iteration = 0; iteration < iterations; iteration++)
     {
+        meanShape = Procrustes3D::getMeanShape(controlPoints);
+
         // rotate
         Procrustes3DResult rotResult = Procrustes3D::SVDAlign(controlPoints);
         for (int i = 0; i < meshCount; i++)
