@@ -125,8 +125,6 @@ Procrustes3DResult FaceAligner::icpAlignRotAndScale(Mesh &face, int maxIteration
     face.translate(-lm.get(Landmarks::Nosetip));
 
     Procrustes3DResult result;
-
-    meanFace.printStats();
     MapConverter c;
     for (int iteration = 0; iteration < maxIterations; iteration++)
     {
@@ -150,9 +148,12 @@ Procrustes3DResult FaceAligner::icpAlignRotAndScale(Mesh &face, int maxIteration
         face.transform(rotation);
 
         // Scale
-        //cv::Point3d scale = Procrustes3D::getOptimalScale(pointsToTransform, referencePoints);
-        //Procrustes3D::scale(pointsToTransform, scale);
-        //face.scale(scale);
+        if (iteration > 5)
+        {
+            cv::Point3d scale = Procrustes3D::getOptimalScale(pointsToTransform, referencePoints);
+            Procrustes3D::scale(pointsToTransform, scale);
+            face.scale(scale);
+        }
 
         Procrustes3D::translate(referencePoints, -centralizeReferences);
         Procrustes3D::translate(pointsToTransform, -centralizeReferences);
