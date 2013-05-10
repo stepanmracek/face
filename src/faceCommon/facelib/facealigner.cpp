@@ -92,8 +92,6 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
     Landmarks lm = lmDetector.detect();
     face.translate(-lm.get(Landmarks::Nosetip));
 
-    return;
-
     for (int iteration = 0; iteration < maxIterations; iteration++)
     {
         // Find correspondence
