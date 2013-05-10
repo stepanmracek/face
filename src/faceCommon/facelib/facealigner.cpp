@@ -85,13 +85,14 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
     meanFace.calculateTriangles();
 }
 
-void FaceAligner::icpAlign(Mesh &face, int maxIterations)
+Procrustes3DResult FaceAligner::icpAlign(Mesh &face, int maxIterations)
 {
     assert(maxIterations >= 1);
     LandmarkDetector lmDetector(face);
     Landmarks lm = lmDetector.detect();
     face.translate(-lm.get(Landmarks::Nosetip));
 
+    Procrustes3DResult result;
     for (int iteration = 0; iteration < maxIterations; iteration++)
     {
         // Find correspondence
@@ -104,13 +105,20 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations)
         cv::Point3d centralizePointsToTransform = Procrustes3D::centralizedTranslation(pointsToTransform);
         Procrustes3D::translate(pointsToTransform, centralizePointsToTransform);
 
+        result.preTranslations << centralizePointsToTransform;
+
         // SVD rotation
         Matrix rotation = Procrustes3D::getOptimalRotation(pointsToTransform, referencePoints);
         Procrustes3D::transform(pointsToTransform, rotation);
         face.transform(rotation);
 
+        result.rotations << rotation;
+        result.scaleParams << cv::Point3d(1,1,1);
+
         Procrustes3D::translate(referencePoints, -centralizeReferences);
         Procrustes3D::translate(pointsToTransform, -centralizeReferences);
+
+        result.postTranslations << -centralizeReferences;
 
         double d = Procrustes3D::diff(pointsToTransform, referencePoints) / referencePoints.count();
         qDebug() << "FaceAligner::icpAlign" << (iteration+1) << d;

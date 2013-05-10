@@ -21,7 +21,7 @@ public:
     FaceAligner(Mesh &meanFace);
     FaceAligner(const QString &dirWithLandmarksAndXYZfiles);
 
-    void icpAlign(Mesh &face, int maxIterations);
+    Procrustes3DResult icpAlign(Mesh &face, int maxIterations);
     //Procrustes3DResult icpAlignRotAndScale(Mesh &face, int maxIterations, int rotationAfter);
 };
 
