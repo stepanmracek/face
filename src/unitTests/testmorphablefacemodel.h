@@ -42,8 +42,7 @@ public:
         Mesh inputMesh = Mesh::fromOBJ(probeOBJPath);
         Landmarks inputLandmarks(inputObjInfo.absolutePath() + QDir::separator() + inputObjInfo.baseName() + ".xml");
 
-        model.align(inputMesh, inputLandmarks, 10);
-        model.morphModel(inputMesh);
+        Mesh result = model.morph(inputMesh, inputLandmarks, 10);
 
         QApplication app(argc, argv);
 
@@ -52,7 +51,7 @@ public:
         widgetInput.show();
 
         GLWidget widget;
-        widget.addFace(&(model.mesh));
+        widget.addFace(&result);
         widget.show();
 
         return app.exec();
