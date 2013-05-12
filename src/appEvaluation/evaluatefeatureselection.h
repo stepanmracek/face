@@ -83,7 +83,7 @@ public:
     static void createFRGCShapeIndexPCATemplates()
     {
         QVector<int> allClasses;
-        QVector<Matrix> allImages;
+        QVector<Vector> allImages;
         Loader::loadImages("/media/frgc/frgc-norm-iterative/shapeindex-roi2",
                            allImages, &allClasses, "*.png", "d", false);
 
