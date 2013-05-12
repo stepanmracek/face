@@ -3,7 +3,7 @@
 
 #include <QVector>
 
-#include "template.h"
+#include "biometrics/template.h"
 #include "biodataprocessing.h"
 #include "eerpotential.h"
 #include "discriminativepotential.h"
