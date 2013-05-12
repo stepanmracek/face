@@ -7,6 +7,7 @@
 
 #include "facelib/mesh.h"
 #include "facelib/surfaceprocessor.h"
+#include "faceCommon/linalg/common.h"
 
 class EvaluateKinect
 {
@@ -23,8 +24,11 @@ public:
             cv::Point3d nosetip(0,0,0);
             for (int distance = 20; distance <= 100; distance += 20)
             {
-                VectorOfPoints = SurfaceProcessor::isoGeodeticCurve(depth, converter, nosetip, distance, 100, 2);
+                VectorOfPoints isoCurve = SurfaceProcessor::isoGeodeticCurve(depth, converter, nosetip, distance, 100, 2);
+                QString path = "isoCurve-" + QString::number(distance);
+                Common::savePlot(isoCurve, path);
             }
+            break;
         }
     }
 };
