@@ -77,6 +77,20 @@ void Common::savePlot(QVector<double> &x, QVector<double> &y, QVector<double> &z
     }
 }
 
+void Common::savePlot(QVector<cv::Point3d> &values, const QString &path)
+{
+    int n = values.count();
+
+    QFile file(path);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+
+    for (int i = 0; i < n; i++)
+    {
+        out << values[i].x << " " << values[i].y << " " << values[i].z << "\n";
+    }
+}
+
 void Common::savePlot(QVector<double> &x, QVector<double> &y, const QString &path)
 {
     int n = x.count();
