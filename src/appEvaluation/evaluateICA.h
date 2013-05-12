@@ -5,15 +5,15 @@
 
 #include <opencv/cv.h>
 
-#include "loader.h"
-#include "biodataprocessing.h"
-#include "icaofpca.h"
-#include "ica.h"
-#include "evaluation.h"
-#include "metrics.h"
-#include "pca.h"
-#include "normalization.h"
-#include "eerpotential.h"
+#include "linalg//loader.h"
+#include "biometrics/biodataprocessing.h"
+#include "linalg/icaofpca.h"
+#include "linalg/ica.h"
+#include "biometrics/evaluation.h"
+#include "linalg/metrics.h"
+#include "linalg/pca.h"
+#include "linalg/normalization.h"
+#include "biometrics/eerpotential.h"
 
 class EvaluateICA
 {
