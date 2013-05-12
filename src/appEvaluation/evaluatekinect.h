@@ -7,7 +7,7 @@
 
 #include "facelib/mesh.h"
 #include "facelib/surfaceprocessor.h"
-#include "faceCommon/linalg/common.h"
+#include "linalg/common.h"
 
 class EvaluateKinect
 {
