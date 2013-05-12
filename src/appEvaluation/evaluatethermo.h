@@ -27,13 +27,13 @@ class EvaluateThermo
 public:
     static void evaluateDifferentMetrics()
     {
-        QVector<Matrix> allImages;
+        QVector<Vector> allImages;
         QVector<int> allClasses;
         Loader::loadImages("/home/stepo/SVN/disp-stepan-mracek/databases/thermo/germany",
-                           allImages, &allClasses, "*.png", true, "-", false);
+                           allImages, &allClasses, "*.png", "-", false);
 
         // Divide data
-        QList<QVector<Matrix> > images;
+        QList<QVector<Vector> > images;
         QList<QVector<int> > classes;
         BioDataProcessing::divide(allImages, allClasses, 10, images, classes);
 
