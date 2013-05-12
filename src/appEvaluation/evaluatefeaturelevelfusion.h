@@ -21,7 +21,7 @@
 #include "biometrics/biodataprocessing.h"
 #include "biometrics/featureextractor.h"
 #include "biometrics/evaluation.h"
-#include "biometrics/featurevectorfusion.h"
+//#include "biometrics/featurevectorfusion.h"
 #include "biometrics/scorelevefusion.h"
 
 class EvaluateFeatureLevelFusion
