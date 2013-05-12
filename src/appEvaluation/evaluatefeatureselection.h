@@ -85,7 +85,7 @@ public:
         QVector<int> allClasses;
         QVector<Matrix> allImages;
         Loader::loadImages("/media/frgc/frgc-norm-iterative/shapeindex-roi2",
-                           allImages, &allClasses, "*.png", true, "d", false);
+                           allImages, &allClasses, "*.png", "d", false);
 
         QList<QVector<int> > classClusters;
         QList<QVector<Matrix> > imagesClusters;
