@@ -88,7 +88,7 @@ public:
                            allImages, &allClasses, "*.png", "d", false);
 
         QList<QVector<int> > classClusters;
-        QList<QVector<Matrix> > imagesClusters;
+        QList<QVector<Vector> > imagesClusters;
         BioDataProcessing::divide(allImages, allClasses, 25, imagesClusters, classClusters);
         //classClusters.removeLast(); imagesClusters.removeLast();
 
