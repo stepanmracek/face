@@ -5,7 +5,7 @@
 
 #include <opencv/cv.h>
 
-#include "linalg//loader.h"
+#include "linalg/loader.h"
 #include "biometrics/biodataprocessing.h"
 #include "linalg/icaofpca.h"
 #include "linalg/ica.h"
@@ -30,7 +30,7 @@ public:
         QList<QVector<Vector> > images;
         QList<QVector<int> > classes;
         BioDataProcessing::divide(allImages, allClasses, 25, images, classes);
-        QVector<Matrix> &trainSet = images[0];
+        QVector<Vector> &trainSet = images[0];
 
         // ICA
         //ICA ica(trainSet, 50);
