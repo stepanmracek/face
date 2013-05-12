@@ -22,12 +22,12 @@ public:
     {
         // Load images
         QString path("/home/stepo/SVN/frgc/frgc-norm-iterative/small-index");
-        QVector<Matrix> allImages;
+        QVector<Vector> allImages;
         QVector<int> allClasses;
-        Loader::loadImages(path, allImages, &allClasses, "*.png", true, "-", false);
+        Loader::loadImages(path, allImages, &allClasses, "*.png", "-", false);
 
         // Divide
-        QList<QVector<Matrix> > images;
+        QList<QVector<Vector> > images;
         QList<QVector<int> > classes;
         BioDataProcessing::divide(allImages, allClasses, 25, images, classes);
         QVector<Matrix> &trainSet = images[0];
