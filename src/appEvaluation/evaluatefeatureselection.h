@@ -115,7 +115,7 @@ public:
         Template::saveTemplates(templates, "/media/frgc/frgc-norm-iterative/shapeindex-roi2-pca2");
     }
 
-    static void compareEERandDPSelectionOnFRGCAnatomical()
+    /*static void compareEERandDPSelectionOnFRGCAnatomical()
     {
         QVector<Template> templates = Template::loadTemplates("/home/stepo/SVN/frgc/frgc-norm-iterative/anatomical","-");
         QList<QVector<Template> > clusters = BioDataProcessing::divide(templates, 25);
@@ -134,7 +134,7 @@ public:
         }
 
         QVector<Template> trainTemplates = clusters[0];
-        clusters.removeFirst();
+        clusters.removeFirst();*/
 
         /*// evaluate DP
         double step = (discriminativePotential.maxScore - discriminativePotential.minScore)/20;
@@ -177,8 +177,8 @@ public:
         }
         qDebug() << "DP: train:" << bestTrain << "validation:" << bestValidation;*/
 
-        FeatureSelection selection(trainTemplates, metrics, &clusters);
+        /*FeatureSelection selection(trainTemplates, metrics, &clusters);
     }
-};
+};*/
 
 #endif // EVALUATEFEATURESELECTION_H
