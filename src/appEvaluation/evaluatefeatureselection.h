@@ -4,14 +4,14 @@
 #include <QVector>
 
 #include "biometrics/template.h"
-#include "biodataprocessing.h"
-#include "eerpotential.h"
-#include "discriminativepotential.h"
+#include "biometrics/biodataprocessing.h"
+#include "biometrics/eerpotential.h"
+#include "biometrics/discriminativepotential.h"
 #include "linalg/vector.h"
-#include "metrics.h"
-#include "featureselection.h"
-#include "loader.h"
-#include "pca.h"
+#include "linalg/metrics.h"
+#include "biometrics/featureselection.h"
+#include "linalg/loader.h"
+#include "linalg/pca.h"
 
 class EvaluateFeatureSelection
 {
