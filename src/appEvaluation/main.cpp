@@ -1,10 +1,10 @@
-#include "evaluatefeatureselection.h"
+/*#include "evaluatefeatureselection.h"
 #include "evaluateICA.h"
 #include "evaluatethermo.h"
 #include "evaluatefeaturelevelfusion.h"
 #include "evaluatefeaturestability.h"
 #include "evaluatethermo2.h"
-#include "evaluate3dfrgc.h"
+#include "evaluate3dfrgc.h"*/
 #include "evaluatekinect.h"
 
 int main(int argc, char *argv[])
@@ -38,7 +38,8 @@ int main(int argc, char *argv[])
 	//Evaluate3dFrgc::pcaSubspace();
     //Evaluate3dFrgc::evaluateFusion();
     //Evaluate3dFrgc::createShapeIndexMaps();
-    Evaluate3dFrgc::createBIN();
+    //Evaluate3dFrgc::createBIN();
+    EvaluateKinect::isoCurves();
 
     return 0;
 }

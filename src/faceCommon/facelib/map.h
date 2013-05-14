@@ -81,14 +81,19 @@ public:
     double get(int x, int y, bool *success = 0) const
     {
         int i = coordToIndex(x, y);
-        assert(isValidCoord(x,y));
         if (success == 0)
         {
+            assert(isValidCoord(x,y));
             assert(flags[i]);
         }
         else
         {
-            (*success) = flags[i];
+            if (!isValidCoord(x,y) || !flags[i])
+            {
+                *success = false;
+                return 0;
+            }
+            *success = true;
         }
         return values[i];
     }

@@ -33,6 +33,7 @@
 #include "biometrics/eerpotential.h"
 #include "biometrics/discriminativepotential.h"
 
+/*
 typedef QVector<double> Doubles;
 
 class EvaluateThermo2
@@ -483,10 +484,10 @@ public:
 					}
 
 					// Fusion
-					/*QList<QVector<Matrix> > fusionTrainData;
-					fusionTrainData << globalGaborData[1] << globalGaborData[1] << localGaborData[1] << localGaborData[1]
-									<< globalLaguerreData[1] << globalLaguerreData[1] << localLaguerreData[1] << localLaguerreData[1]
-									<< globalVectorizationData[1] << globalVectorizationData[1];*/
+                    //QList<QVector<Matrix> > fusionTrainData;
+                    //fusionTrainData << globalGaborData[1] << globalGaborData[1] << localGaborData[1] << localGaborData[1]
+                    //				<< globalLaguerreData[1] << globalLaguerreData[1] << localLaguerreData[1] << localLaguerreData[1]
+                    //				<< globalVectorizationData[1] << globalVectorizationData[1];
 
 					QList<QVector<Matrix> > fusionTestData;
 					fusionTestData << globalGaborData[2] << globalGaborData[2] << localGaborData[2] << localGaborData[2]
@@ -494,28 +495,28 @@ public:
 					               << globalVectorizationData[2] << globalVectorizationData[2];
 
 					// feature level fusion
-					/*FeatureVectorFusionConcatenation featureFusion;
-					featureFusion.addComponent(globalGaborData[1], globalGaborClasses[1], ZPcaExtractorGlobalGabor, cos);
-					featureFusion.addComponent(globalGaborData[1], globalGaborClasses[1], ZIcaExtractorGlobalGabor, cos);
-					featureFusion.addComponent(globalLaguerreData[1], globalLaguerreClasses[1], ZPcaExtractorGlobalLaguerre, cos);
-					featureFusion.addComponent(globalLaguerreData[1], globalLaguerreClasses[1], ZIcaExtractorGlobalLaguerre, cos);
-					featureFusion.addComponent(globalVectorizationData[1], globalVectorizationClasses[1], ZPcaExtractorGlobalVectorization, cos);
-					featureFusion.addComponent(globalVectorizationData[1], globalVectorizationClasses[1], ZIcaExtractorGlobalVectorization, cos);
-					featureFusion.learn();
+                    //FeatureVectorFusionConcatenation featureFusion;
+                    //featureFusion.addComponent(globalGaborData[1], globalGaborClasses[1], ZPcaExtractorGlobalGabor, cos);
+                    //featureFusion.addComponent(globalGaborData[1], globalGaborClasses[1], ZIcaExtractorGlobalGabor, cos);
+                    //featureFusion.addComponent(globalLaguerreData[1], globalLaguerreClasses[1], ZPcaExtractorGlobalLaguerre, cos);
+                    //featureFusion.addComponent(globalLaguerreData[1], globalLaguerreClasses[1], ZIcaExtractorGlobalLaguerre, cos);
+                    //featureFusion.addComponent(globalVectorizationData[1], globalVectorizationClasses[1], ZPcaExtractorGlobalVectorization, cos);
+                    //featureFusion.addComponent(globalVectorizationData[1], globalVectorizationClasses[1], ZIcaExtractorGlobalVectorization, cos);
+                    //featureFusion.learn();
 
-					QVector<Matrix> fusedFeaturesTrain = featureFusion.batchFuse(fusionTrainData);
-					QVector<Matrix> fusedFeaturesTest = featureFusion.batchFuse(fusionTestData);
-					PassExtractor pass;
-					//LDAofPCA ldaOfFusedVectors(fusedFeaturesTrain, globalVectorizationClasses[1]);
-					//ZScoreLDAofPCAExtractor ldaOfFusedVectorsExtractor(ldaOfFusedVectors, fusedFeaturesTrain);
-					CosineWeightedMetric cosWFeatureFusion;
-					Templates featureFusionTrainTemplates =
-							Template::createTemplates(fusedFeaturesTrain, globalVectorizationClasses[1], pass);
-					DiscriminativePotential dpFeatureFusion(featureFusionTrainTemplates);
-					cosWFeatureFusion.w = dpFeatureFusion.createWeights();
+                    //QVector<Matrix> fusedFeaturesTrain = featureFusion.batchFuse(fusionTrainData);
+                    //QVector<Matrix> fusedFeaturesTest = featureFusion.batchFuse(fusionTestData);
+                    //PassExtractor pass;
+                    // //LDAofPCA ldaOfFusedVectors(fusedFeaturesTrain, globalVectorizationClasses[1]);
+                    // //ZScoreLDAofPCAExtractor ldaOfFusedVectorsExtractor(ldaOfFusedVectors, fusedFeaturesTrain);
+                    //CosineWeightedMetric cosWFeatureFusion;
+                    //Templates featureFusionTrainTemplates =
+                    //		Template::createTemplates(fusedFeaturesTrain, globalVectorizationClasses[1], pass);
+                    //DiscriminativePotential dpFeatureFusion(featureFusionTrainTemplates);
+                    //cosWFeatureFusion.w = dpFeatureFusion.createWeights();
 
-					Evaluation featureFusionEval(fusedFeaturesTest, globalVectorizationClasses[2], pass, cosWFeatureFusion);
-					resultsFeatureFusion << featureFusionEval.eer;*/
+                    //Evaluation featureFusionEval(fusedFeaturesTest, globalVectorizationClasses[2], pass, cosWFeatureFusion);
+                    //resultsFeatureFusion << featureFusionEval.eer;
 
 					// score level fusion
 					{
@@ -725,34 +726,34 @@ public:
 			dpSelectionEERs << dpSelectionEvaluationTest.eer;
 
 			// EERPotential
-			/*EERPotential ep(trainTemplates);
-			Matrix epWeights = ep.createWeights();
-			Matrix epSelectionWeights = ep.createSelectionWeights((ep.maxScore+ep.minScore)/2.0);
+            //EERPotential ep(trainTemplates);
+            //Matrix epWeights = ep.createWeights();
+            //Matrix epSelectionWeights = ep.createSelectionWeights((ep.maxScore+ep.minScore)/2.0);
 
-			w.w = epWeights;
-			Evaluation epWeightEvaluationTrain(trainTemplates, w);
-			Evaluation epWeightEvaluationTest(testTemplates, w);
-			qDebug() << "ep weights" << epWeightEvaluationTrain.eer << epWeightEvaluationTest.eer;
-			epWeightEERs << epWeightEvaluationTest.eer;
+            //w.w = epWeights;
+            //Evaluation epWeightEvaluationTrain(trainTemplates, w);
+            //Evaluation epWeightEvaluationTest(testTemplates, w);
+            //qDebug() << "ep weights" << epWeightEvaluationTrain.eer << epWeightEvaluationTest.eer;
+            //epWeightEERs << epWeightEvaluationTest.eer;
 
-			w.w = epSelectionWeights;
-			Evaluation epSelectionEvaluationTrain(trainTemplates, w);
-			Evaluation epSelectionEvaluationTest(testTemplates, w);
-			qDebug() << "ep selection" << epSelectionEvaluationTrain.eer << epSelectionEvaluationTest.eer;
-			epSelectionEERs << epSelectionEvaluationTest.eer;*/
+            //w.w = epSelectionWeights;
+            //Evaluation epSelectionEvaluationTrain(trainTemplates, w);
+            //Evaluation epSelectionEvaluationTest(testTemplates, w);
+            //qDebug() << "ep selection" << epSelectionEvaluationTrain.eer << epSelectionEvaluationTest.eer;
+            //epSelectionEERs << epSelectionEvaluationTest.eer;
 
-			/*if (run == 1)
-			{
-				Matrix dpMask = MatrixConverter::columnVectorToMatrix(dpWeights, 60);
-				cv::imshow("dp mask", dpMask);
-				cv::imwrite("dpMask.png", dpMask*255);
+            //if (run == 1)
+            //{
+            //	Matrix dpMask = MatrixConverter::columnVectorToMatrix(dpWeights, 60);
+            //	cv::imshow("dp mask", dpMask);
+            //	cv::imwrite("dpMask.png", dpMask*255);
 
-				Matrix epMask = MatrixConverter::columnVectorToMatrix(epWeights, 60);
-				cv::imshow("ep mask", epMask);
-				cv::imwrite("epMask.png", epMask*255);
-				//cv::waitKey(0);
-				//return;
-			}*/
+            //	Matrix epMask = MatrixConverter::columnVectorToMatrix(epWeights, 60);
+            //	cv::imshow("ep mask", epMask);
+            //	cv::imwrite("epMask.png", epMask*255);
+            //	//cv::waitKey(0);
+            //	//return;
+            //}
 		}
 
 		Common::savePlot(runs, rawEERs, "rawEERs");
@@ -768,6 +769,6 @@ public:
 		//qDebug() << "epSelectionEERs" << Vector::meanValue(epSelectionEERs);
 	}
 };
-
+*/
 
 #endif /* EVALUATIONTHERMO2_H_ */

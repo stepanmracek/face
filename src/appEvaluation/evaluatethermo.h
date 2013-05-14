@@ -25,7 +25,7 @@
 class EvaluateThermo
 {
 public:
-    static void evaluateDifferentMetrics()
+    /*static void evaluateDifferentMetrics()
     {
         QVector<Vector> allImages;
         QVector<int> allClasses;
@@ -299,15 +299,15 @@ public:
             qDebug() << "  zScorePcaEval-cos" << zScorePcaEval.eer;
             zScorePcaResults << zScorePcaEval.eer;
 
-            /*Evaluation whitenedPcaEval(images[1], classes[1], whitenedPCAExtractor, m);
-            evaluations << whitenedPcaEval;
-            usedMetrics << mPtr;
-            usedExtractors << &whitenedPCAExtractor;
+            //Evaluation whitenedPcaEval(images[1], classes[1], whitenedPCAExtractor, m);
+            //evaluations << whitenedPcaEval;
+            //usedMetrics << mPtr;
+            //usedExtractors << &whitenedPCAExtractor;
 
-            Evaluation zScoreWhitenedPcaEval(images[1], classes[1], zscoreWhitenedPCAExtractor, m);
-            evaluations << zScoreWhitenedPcaEval;
-            usedMetrics << mPtr;
-            usedExtractors << &zscoreWhitenedPCAExtractor;*/
+            //Evaluation zScoreWhitenedPcaEval(images[1], classes[1], zscoreWhitenedPCAExtractor, m);
+            //evaluations << zScoreWhitenedPcaEval;
+            //usedMetrics << mPtr;
+            //usedExtractors << &zscoreWhitenedPCAExtractor;
 
             Evaluation ldaEval(images[1], classes[1], ldaOfPcaExtractor, eucl);
             //evaluations << ldaEval;
@@ -316,10 +316,10 @@ public:
             qDebug() << "  ldaEval-eucl" << ldaEval.eer;
             ldaResults << ldaEval.eer;
 
-            /*Evaluation zScoreLdaEval(images[1], classes[1], zscoreLdaOfPcaExtractor, m);
-            evaluations << zScoreLdaEval;
-            usedMetrics << mPtr;
-            usedExtractors << &zscoreLdaOfPcaExtractor;*/
+            //Evaluation zScoreLdaEval(images[1], classes[1], zscoreLdaOfPcaExtractor, m);
+            //evaluations << zScoreLdaEval;
+            //usedMetrics << mPtr;
+            //usedExtractors << &zscoreLdaOfPcaExtractor;
 
             Evaluation icaEval(images[1], classes[1], icaOfPcaExtractor, cos);
             evaluations << icaEval;
@@ -335,10 +335,10 @@ public:
             qDebug() << "  icaEval2-corr" << icaEval2.eer;
             icaCorrResults << icaEval2.eer;
 
-            /*Evaluation zScoreIcaEval(images[1], classes[1], zscoreIcaOfPcaExtractor, m);
-            evaluations << zScoreIcaEval;
-            usedMetrics << mPtr;
-            usedExtractors << &zscoreIcaOfPcaExtractor;*/
+            //Evaluation zScoreIcaEval(images[1], classes[1], zscoreIcaOfPcaExtractor, m);
+            //evaluations << zScoreIcaEval;
+            //usedMetrics << mPtr;
+            //usedExtractors << &zscoreIcaOfPcaExtractor;
 
             // output graph
             QString impPlot = QString::number(testIndex) + "-impostor";
@@ -697,7 +697,7 @@ public:
             Common::saveMap(whitenEucl, QString("whitenEucl") + QString::number(test));
             Common::saveMap(whitenCos,  QString("whitenCos")  + QString::number(test));
         }
-    }
+    }*/
 };
 
 #endif // EVALUATETHERMO_H

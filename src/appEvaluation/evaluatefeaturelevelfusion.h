@@ -27,7 +27,7 @@
 class EvaluateFeatureLevelFusion
 {
 public:
-		static void evaluateBestSelectionThreshold()
+    /*static void evaluateBestSelectionThreshold()
 	{
 		QVector<Matrix> allImages;
 		QVector<int> allClasses;
@@ -56,7 +56,7 @@ public:
 				for (int run = 0; run < 5; run++)
 				{
 					// Divide data
-					QList<QVector<Matrix> > images;
+                    QList<QVector<Vector> > images;
 					QList<QVector<int> > classes;
 					BioDataProcessing::divideToNClusters(allImages, allClasses, 3, images, classes);
 
@@ -94,12 +94,12 @@ public:
 			stdDevs << Vector::stdDeviation(thresholdToEERs[keys[i]]);
 		}
 		Common::savePlot(keysVec, means, stdDevs, "zPcaCorr");
-	}
+    }*/
 };
 
 
 #endif /* EVALUATEFVFUSION_H_ */
-static void evaluate()
+/*static void evaluate()
 	{
 		QVector<Matrix> allImages;
 		QVector<int> allClasses;
@@ -213,4 +213,4 @@ static void evaluate()
 			//qDebug() << "scorelevel fusion of fusions" << fusion.eer;
  		}
 	}
-
+*/

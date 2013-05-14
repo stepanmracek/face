@@ -513,6 +513,8 @@ QVector<cv::Point3d> SurfaceProcessor::isoGeodeticCurve(Map &map, MapConverter &
         double prevZ = map.get(mapCenter.x, mapCenter.y) * mapScaleFactor;
         double currentZ = prevZ;
         double cumulativeDistance = 0.0;
+
+        bool hitOutsideMap = false;
         while (cumulativeDistance < distance)
         {
             prevZ = currentZ;
@@ -520,14 +522,28 @@ QVector<cv::Point3d> SurfaceProcessor::isoGeodeticCurve(Map &map, MapConverter &
 
             currentPoint.x += dx;
             currentPoint.y += dy;
-            currentZ = map.get(currentPoint.x, currentPoint.y) * mapScaleFactor;
+            bool success;
+            currentZ = map.get(currentPoint.x, currentPoint.y, &success) * mapScaleFactor;
+            if (!success)
+            {
+                hitOutsideMap = true;
+                break;
+            }
 
             double d = sqrt((currentZ-prevZ)*(currentZ-prevZ) +
                             (currentPoint.x - prevPoint.x)*(currentPoint.x - prevPoint.x) +
                             (currentPoint.y - prevPoint.y)*(currentPoint.y - prevPoint.y)) / mapScaleFactor;
             cumulativeDistance += d;
         }
-        result << converter.MapToMeshCoords(map, currentPoint);
+
+        if (hitOutsideMap)
+        {
+            result << cv::Point3d(0,0,0);
+        }
+        else
+        {
+            result << converter.MapToMeshCoords(map, currentPoint);
+        }
     }
 
     return result;

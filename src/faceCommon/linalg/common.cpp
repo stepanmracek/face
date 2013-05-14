@@ -2,6 +2,7 @@
 
 #include <QFile>
 #include <QTextStream>
+#include <QDebug>
 
 #include <iostream>
 #include <assert.h>
@@ -77,13 +78,27 @@ void Common::savePlot(QVector<double> &x, QVector<double> &y, QVector<double> &z
     }
 }
 
-void Common::savePlot(QVector<cv::Point3d> &values, const QString &path)
+void Common::savePlot(QVector<cv::Point3d> &values, const QString &path, bool append)
 {
     int n = values.count();
 
     QFile file(path);
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
+
+    if (append)
+    {
+        file.open(QIODevice::Append);
+    }
+    else
+    {
+        file.open(QIODevice::WriteOnly);
+    }
+
     QTextStream out(&file);
+
+    if (append)
+    {
+        out << "\n";
+    }
 
     for (int i = 0; i < n; i++)
     {

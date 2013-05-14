@@ -22,11 +22,10 @@ public:
             MapConverter converter;
             Map depth = SurfaceProcessor::depthmap(face, converter, 2, ZCoord);
             cv::Point3d nosetip(0,0,0);
-            for (int distance = 20; distance <= 100; distance += 20)
+            for (int distance = 20; distance <= 60; distance += 5)
             {
                 VectorOfPoints isoCurve = SurfaceProcessor::isoGeodeticCurve(depth, converter, nosetip, distance, 100, 2);
-                QString path = "isoCurve-" + QString::number(distance);
-                Common::savePlot(isoCurve, path);
+                Common::savePlot(isoCurve, "isoCurves", distance != 20);
             }
             break;
         }

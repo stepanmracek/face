@@ -34,7 +34,7 @@
 class EvaluateFeatureStability
 {
 public:
-	static void evaluate()
+    /*static void evaluate()
 	{
 		QVector<Matrix> allImages;
 		QVector<int> allClasses;
@@ -107,7 +107,7 @@ public:
 		cv::imshow("EER potential", eerPotMatrix);
 		cv::waitKey(0);
 
-	}
+    }*/
 };
 
 #endif /* EVALUATEFEATURESTABILITY_H_ */

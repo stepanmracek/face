@@ -21,7 +21,7 @@ public:
     static void getMinMax(Matrix &m, double &min, double &max);
 
     static void savePlot(QVector<double> &x, QVector<double> &y, QVector<double> &z, const QString &path);
-    static void savePlot(QVector<cv::Point3d> &values, const QString &path);
+    static void savePlot(QVector<cv::Point3d> &values, const QString &path, bool append);
     static void savePlot(QVector<double> &x, QVector<double> &y, const QString &path);
     static void savePlot(QVector<double> values[], int axisCount, const QString &path);
 
