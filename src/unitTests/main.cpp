@@ -86,9 +86,9 @@ int main(int argc, char *argv[])
     //TestFaceFeatuesDetection::exportForVOSM(frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::exportInitialEstimationsForVOSM(frgcPath() + "frgc-spring2004-obj-centralized");
 
-    TestMorphableFaceModel::testCreate(frgcPath() + "bin/", "../../test/morph-landmarks.xml",
-                                       "../../test/morph-pca-zcoord.xml", "../../test/morph-pca-texture.xml",
-                                       "../../test/morph-pca.xml", "../../test/morph-flags");
+    //TestMorphableFaceModel::testCreate(frgcPath() + "bin/", "../../test/morph-landmarks.xml",
+    //                                   "../../test/morph-pca-zcoord.xml", "../../test/morph-pca-texture.xml",
+    //                                   "../../test/morph-pca.xml", "../../test/morph-flags");
     TestMorphableFaceModel::testModel(argc, argv, "../../test/morph-pca-zcoord.xml", "../../test/morph-pca-texture.xml",
                                       "../../test/morph-pca.xml", "../../test/morph-flags", "../../test/morph-landmarks.xml");
     //TestMorphableFaceModel::testMorph(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml",
