@@ -191,7 +191,7 @@ public:
     static void test()
     {
         GaborParams gParams(20);
-        cv::namedWindow("wavelet generator", cv::WINDOW_NORMAL);
+        cv::namedWindow("wavelet generator");
         cv::createTrackbar("size", "wavelet generator", &gParams.size, 100, onSizeChange, &gParams);
         cv::createTrackbar("wave size", "wavelet generator", &gParams.waveSize, 5, onWaveSizeChange, &gParams);
         cv::createTrackbar("orientation", "wavelet generator", &gParams.orientation, 7, onOrientationChange, &gParams);
