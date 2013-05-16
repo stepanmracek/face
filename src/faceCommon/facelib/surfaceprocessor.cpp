@@ -538,6 +538,7 @@ QVector<cv::Point3d> SurfaceProcessor::isoGeodeticCurve(Map &map, MapConverter &
 
         if (hitOutsideMap)
         {
+            double nan = std::numeric_limits<double>::quiet_NaN();
             result << cv::Point3d(nan, nan, nan);
         }
         else
