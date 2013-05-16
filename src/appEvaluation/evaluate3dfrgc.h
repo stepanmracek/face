@@ -41,7 +41,7 @@ public:
         QFileInfoList srcFiles = srcDir.entryInfoList();
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
-            Mesh srcMesh = Mesh::fromBIN(srcFileInfo.path());
+            Mesh srcMesh = Mesh::fromBIN(srcFileInfo.filePath());
         }
     }
 
