@@ -43,8 +43,8 @@ public:
     static int testReadBinWriteBinzReadBinz(int argc, char *argv[], const QString &dir)
     {
         Mesh mesh = Mesh::fromBIN(dir + "bin/02463d652.bin", true);
-        mesh.writeBIN("mesh.bin");
-        mesh = Mesh::fromBIN("mesh.bin");
+        mesh.writeBINZ("mesh.binz");
+        mesh = Mesh::fromBINZ("mesh.binz");
         mesh.printStats();
 
         QApplication app(argc, argv);
