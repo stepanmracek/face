@@ -71,7 +71,8 @@ public:
             QApplication app(0, 0);
             GLWidget w;
             w.addFace(&mesh);
-            return app.exec();
+            app.exec();
+            return;
         }
     }
 
