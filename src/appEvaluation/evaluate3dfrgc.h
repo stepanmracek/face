@@ -67,7 +67,12 @@ public:
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
             Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
-            mesh.printStats();
+            LandmarkDetector detector(mesh);
+            Landmarks lm = detector.detect();
+            cv::Point3d nosetip = lm.get(Landmarks::Nosetip);
+            mesh.translate(-nosetip);
+
+            qDebug() << nosetip.x << nosetip.y << nosetip.z;
 
             QApplication app(0, 0);
             GLWidget w;
