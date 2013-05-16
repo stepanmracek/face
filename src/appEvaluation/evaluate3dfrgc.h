@@ -16,6 +16,7 @@
 #include "biometrics/discriminativepotential.h"
 #include "biometrics/scorelevefusion.h"
 #include "facelib/mesh.h"
+#include "facelib/surfaceprocessor.h"
 #include "facelib/landmarkdetector.h"
 #include "facelib/landmarks.h"
 #include "facelib/facealigner.h"
@@ -37,12 +38,23 @@ public:
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/bin/";
         QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
 
+        Mesh mean = Mesh::fromOBJ("../../meanForAlign.obj");
+        FaceAligner aligner(mean);
+        MapConverter converter;
+
         QDir srcDir(srcDirPath, "*.bin");
         QFileInfoList srcFiles = srcDir.entryInfoList();
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
-            Mesh srcMesh = Mesh::fromBIN(srcFileInfo.absoluteFilePath());
-            srcMesh.printStats();
+            Mesh mesh = Mesh::fromBIN(srcFileInfo.absoluteFilePath());
+            aligner.icpAlign(mesh, 15);
+
+            Qstring resultPath = outDirPath + srcFileInfo.baseName() + ".binz";
+            mesh.writeBINZ(resultPath);
+
+            Map texture = SurfaceProcessor::depthmap(mesh, c, cv::Point2d(-100,-100), cv::Point2d(100,100), Texture_I);
+            QString resultTexturePath = outDirPath + srcFileInfo.baseName() + ".png";
+            cv::imwrite(resultTexturePath.toStdString(), texture.toMatrix());
         }
     }
 
