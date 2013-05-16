@@ -38,7 +38,7 @@ public:
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/bin/";
         QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
 
-        Mesh mean = Mesh::fromOBJ("../../meanForAlign.obj");
+        Mesh mean = Mesh::fromOBJ("../../test/meanForAlign.obj");
         FaceAligner aligner(mean);
         MapConverter converter;
 
