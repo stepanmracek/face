@@ -538,7 +538,7 @@ QVector<cv::Point3d> SurfaceProcessor::isoGeodeticCurve(Map &map, MapConverter &
 
         if (hitOutsideMap)
         {
-            result << cv::Point3d(0,0,0);
+            result << cv::Point3d(nan, nan, nan);
         }
         else
         {
