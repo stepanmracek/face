@@ -63,7 +63,7 @@ public:
     static int createIsoCurves()
     {
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
-        QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/isocurves";
+        QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/isocurves/";
         QDir srcDir(srcDirPath, "*.binz");
         QFileInfoList srcFiles = srcDir.entryInfoList();
         foreach (const QFileInfo &srcFileInfo, srcFiles)
@@ -90,17 +90,8 @@ public:
                 isoCurves << isoCurve;
             }
 
-            Serialization::serializeVectorOfPointclouds(isoCurves, "isoCurves.yml");
-
-            isoCurves = Serialization::readVectorOfPointclouds("isoCurves.yml");
-            foreach (VectorOfPoints pc, isoCurves)
-            {
-                w.addCurve(pc);
-            }
-
-            w.addFace(&mesh);
-            w.show();
-            return app.exec();
+            QString resultPath = outDirPath + srcFileInfo.baseName() + ".xml";
+            Serialization::serializeVectorOfPointclouds(isoCurves, resultPath);
         }
     }
 
