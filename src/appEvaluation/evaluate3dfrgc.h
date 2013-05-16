@@ -67,6 +67,7 @@ public:
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
             Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
+            mesh.printStats();
 
             QApplication app(0, 0);
             GLWidget w;
