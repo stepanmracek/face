@@ -75,7 +75,8 @@ public:
             MapConverter converter;
             Map depth = SurfaceProcessor::depthmap(mesh, converter, 2, ZCoord);
             Map texture = SurfaceProcessor::depthmap(mesh, converter, 2, Texture_I);
-            Mesh m2 = Mesh::fromMap(depth, texture);
+            Mesh m2 = Mesh::fromMap(depth, texture, true);
+            m2.scale(cv::Point3d(0.5, 0.5, 0.5));
 
             QApplication app(0, 0);
             GLWidget w;
