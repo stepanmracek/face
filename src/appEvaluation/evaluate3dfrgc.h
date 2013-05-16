@@ -83,6 +83,7 @@ public:
             QApplication app(0, 0);
             GLWidget w;
             w.addFace(&m2);
+            w.addFace(&mesh);
             w.show();
             return app.exec();
         }
