@@ -645,8 +645,7 @@ void Mesh::writeBINZ(const QString &path)
     qDebug() << "writing to" << path << "...";
     QFile outFile(path);
     outFile.open(QFile::WriteOnly);
-    QDataStream fileStream(&outFile);
-    fileStream << compressed;
+    outFile.write(compressed);
 
     qDebug() << "...done";
 }
