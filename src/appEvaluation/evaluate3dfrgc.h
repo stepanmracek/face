@@ -63,6 +63,7 @@ public:
     static int createIsoCurves()
     {
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
+        QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/isocurves";
         QDir srcDir(srcDirPath, "*.binz");
         QFileInfoList srcFiles = srcDir.entryInfoList();
         foreach (const QFileInfo &srcFileInfo, srcFiles)
