@@ -66,6 +66,9 @@ public:
         QFileInfoList srcFiles = srcDir.entryInfoList();
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
+            QApplication app(0, 0);
+            GLWidget w;
+
             Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
             LandmarkDetector detector(mesh);
             Landmarks lm = detector.detect();
@@ -77,13 +80,13 @@ public:
             Matrix gaussKernel = KernelGenerator::gaussianKernel(5);
             depth.applyFilter(gaussKernel, 3, true);
 
-            VectorOfPoints isoCurve = SurfaceProcessor::isoGeodeticCurve(depth, converter, cv::Point3d(0,0,0), 50, 100, 2);
+            for (int d = 10; d <= 100; d++)
+            {
+                VectorOfPoints isoCurve = SurfaceProcessor::isoGeodeticCurve(depth, converter, cv::Point3d(0,0,0), d, 100, 2);
+                w.addCurve(isoCurve);
+            }
 
-
-            QApplication app(0, 0);
-            GLWidget w;
             w.addFace(&mesh);
-            w.addCurve(isoCurve);
             w.show();
             return app.exec();
         }
