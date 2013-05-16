@@ -45,6 +45,7 @@ public:
         Mesh mesh = Mesh::fromBIN(dir + "bin/02463d652.bin", true);
         mesh.writeBINZ("mesh.binz");
         mesh = Mesh::fromBINZ("mesh.binz");
+        mesh.printStats();
 
         QApplication app(argc, argv);
         GLWidget widget;
