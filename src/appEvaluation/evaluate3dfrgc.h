@@ -74,6 +74,7 @@ public:
 
             MapConverter converter;
             Map depth = SurfaceProcessor::depthmap(mesh, converter, 2, ZCoord);
+            depth.linearScale(2, 0);
             Matrix gaussKernel = KernelGenerator::gaussianKernel(5);
             //depth.applyFilter(gaussKernel, 3, true);
             Map texture = SurfaceProcessor::depthmap(mesh, converter, 2, Texture_I);
