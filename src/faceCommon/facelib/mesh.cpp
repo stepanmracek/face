@@ -639,7 +639,7 @@ void Mesh::writeBINZ(const QString &path)
     writeToDataStream(stream);
 
     qDebug() << "compressing...";
-    QByteArray compressed = qCompress(uncompressed, 9);
+    QByteArray compressed = qCompress(uncompressed, 1);
     qDebug() << "compress ratio" << uncompressed.size() << "/" << compressed.size();
 
     qDebug() << "writing to" << path << "...";
