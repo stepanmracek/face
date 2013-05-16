@@ -59,7 +59,7 @@ public:
         }
     }
 
-    static void createIsoCurves()
+    static int createIsoCurves()
     {
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
         QDir srcDir(srcDirPath, "*.zbin");
@@ -72,8 +72,7 @@ public:
             GLWidget w;
             w.addFace(&mesh);
             w.show();
-            app.exec();
-            return;
+            return app.exec();
         }
     }
 
