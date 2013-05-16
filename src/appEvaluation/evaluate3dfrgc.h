@@ -80,10 +80,12 @@ public:
             Matrix gaussKernel = KernelGenerator::gaussianKernel(7);
             depth.applyFilter(gaussKernel, 3, true);
 
-            for (int d = 10; d <= 200; d += 10)
+            int startD = 10;
+            for (int d = startD; d <= 100; d += 10)
             {
                 VectorOfPoints isoCurve = SurfaceProcessor::isoGeodeticCurve(depth, converter, cv::Point3d(0,0,0), d, 100, 2);
                 w.addCurve(isoCurve);
+                Common::savePlot(isoCurve, "isoCurves", d == startD);
             }
 
             w.addFace(&mesh);
