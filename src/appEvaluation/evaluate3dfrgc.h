@@ -22,6 +22,7 @@
 #include "facelib/facealigner.h"
 #include "facelib/glwidget.h"
 #include "linalg/kernelgenerator.h"
+#include "linalg/serialization.h"
 
 class Evaluate3dFrgc
 {
@@ -80,13 +81,15 @@ public:
             Matrix gaussKernel = KernelGenerator::gaussianKernel(7);
             depth.applyFilter(gaussKernel, 3, true);
 
+            QVector<VectorOfPoints> isoCurves;
             int startD = 10;
             for (int d = startD; d <= 200; d += 10)
             {
                 VectorOfPoints isoCurve = SurfaceProcessor::isoGeodeticCurve(depth, converter, cv::Point3d(0,0,0), d, 100, 2);
-                w.addCurve(isoCurve);
-                Common::savePlot(isoCurve, "isoCurves", d != startD);
+                isoCurves << isoCurve;
             }
+
+            Serialization::serializeVectorOfPointClouds(isoCurves, "isoCurves.yml");
 
             w.addFace(&mesh);
             w.show();
