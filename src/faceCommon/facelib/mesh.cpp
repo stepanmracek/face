@@ -592,13 +592,8 @@ void Mesh::writeOFF(const QString &path)
     }
 }
 
-void Mesh::writeBIN(const QString &path)
+void Mesh::writeToDataStream(QDataStream &stream)
 {
-    qDebug() << "writing to" << path << "...";
-    QFile outFile(path);
-    outFile.open(QFile::WriteOnly);
-    QDataStream stream(&outFile);
-
     stream << points.count();
     foreach (const cv::Point3d &p, points)
     {
@@ -622,11 +617,76 @@ void Mesh::writeBIN(const QString &path)
         stream << c[1];
         stream << c[2];
     }
+}
+
+void Mesh::writeBIN(const QString &path)
+{
+    qDebug() << "writing to" << path << "...";
+    QFile outFile(path);
+    outFile.open(QFile::WriteOnly);
+    QDataStream stream(&outFile);
+
+    writeToDataStream(stream);
 
     outFile.flush();
     outFile.close();
 
     qDebug() << "...done";
+}
+
+void Mesh::writeBINZ(const QString &path)
+{
+    qDebug() << "writing to buffer";
+    QByteArray uncompressed;
+    QDataStream stream(&uncompressed, QIODevice::WriteOnly);
+    writeToDataStream(stream);
+
+    qDebug() << "compressing...";
+    QByteArray compressed = qCompress(uncompressed, 10);
+    qDebug() << "compress ratio" << uncompressed.size() << "/" << compressed.size();
+
+    qDebug() << "writing to" << path << "...";
+    QFile outFile(path);
+    outFile.open(QFile::WriteOnly);
+    QDataStream fileStream(&outFile);
+    fileStream << compressed;
+    outFile.flush();
+    outFile.close();
+
+    qDebug() << "...done";
+}
+
+void Mesh::fromDataStream(QDataStream &stream, Mesh &mesh)
+{
+    int pCount;
+    stream >> pCount;
+    mesh.points = VectorOfPoints(pCount);
+    for (int i = 0; i < pCount; i++)
+    {
+        double x,y,z;
+        stream >> x; stream >> y; stream >> z;
+        mesh.points[i] = cv::Point3d(x, y, z);
+    }
+
+    int tCount;
+    stream >> tCount;
+    mesh.triangles = VectorOfTriangles(tCount);
+    for (int i = 0; i < tCount; i++)
+    {
+        int p1, p2, p3;
+        stream >> p1; stream >> p2; stream >> p3;
+        mesh.triangles[i] = cv::Vec3i(p1, p2, p3);
+    }
+
+    int cCount;
+    stream >> cCount;
+    mesh.colors = VectorOfColors(cCount);
+    for (int i = 0; i < cCount; i++)
+    {
+        uchar r,g,b;
+        stream >> r; stream >> g; stream >> b;
+        mesh.colors[i] = cv::Vec3b(r, g, b);
+    }
 }
 
 Mesh Mesh::fromBIN(const QString &filename, bool centralizeLoadedMesh)
@@ -641,36 +701,36 @@ Mesh Mesh::fromBIN(const QString &filename, bool centralizeLoadedMesh)
     QDataStream in(&f);
 
     Mesh result;
+    fromDataStream(in, result);
 
-    int pCount;
-    in >> pCount;
-    result.points = VectorOfPoints(pCount);
-    for (int i = 0; i < pCount; i++)
+    if (centralizeLoadedMesh)
     {
-        double x,y,z;
-        in >> x; in >> y; in >> z;
-        result.points[i] = cv::Point3d(x, y, z);
+        result.centralize();
     }
 
-    int tCount;
-    in >> tCount;
-    result.triangles = VectorOfTriangles(tCount);
-    for (int i = 0; i < tCount; i++)
-    {
-        int p1, p2, p3;
-        in >> p1; in >> p2; in >> p3;
-        result.triangles[i] = cv::Vec3i(p1, p2, p3);
-    }
+    result.recalculateMinMax();
+    qDebug() << "...done";
+    return result;
+}
 
-    int cCount;
-    in >> cCount;
-    result.colors = VectorOfColors(cCount);
-    for (int i = 0; i < cCount; i++)
-    {
-        uchar r,g,b;
-        in >> r; in >> g; in >> b;
-        result.colors[i] = cv::Vec3b(r, g, b);
-    }
+Mesh Mesh::fromBINZ(const QString &filename, bool centralizeLoadedMesh)
+{
+    qDebug() << "loading" << filename << "...";
+    assert(filename.endsWith(".binz", Qt::CaseInsensitive));
+    QFile f(filename);
+    bool exists = f.exists();
+    assert(exists);
+    bool opened = f.open(QIODevice::ReadOnly);
+    assert(opened);
+    QByteArray compressed = f.readAll();
+
+    qDebug() << "uncompressing...";
+    QByteArray uncompressed = qUncompress(compressed);
+
+    qDebug() << "reading from buffer";
+    QDataStream stream(&uncompressed, QIODevice::ReadOnly);
+    Mesh result;
+    fromDataStream(stream, result);
 
     if (centralizeLoadedMesh)
     {

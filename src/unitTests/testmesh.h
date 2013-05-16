@@ -40,6 +40,20 @@ public:
         return app.exec();
     }
 
+    static int testReadBinWriteBinzReadBinz(int argc, char *argv[], const QString &dir)
+    {
+        Mesh mesh = Mesh::fromBIN(dir + "bin/02463d652.bin", true);
+        mesh.writeBINZ("mesh.binz");
+        mesh = Mesh::fromBINZ("mesh.binz");
+
+        QApplication app(argc, argv);
+        GLWidget widget;
+        widget.setWindowTitle("GL Widget");
+        widget.addFace(&mesh);
+        widget.show();
+        return app.exec();
+    }
+
     static int readAbsWithTexture(int argc, char *argv[])
     {
         Mesh mesh = Mesh::fromABS("/run/media/stepo/My Book/3D-FRGC-data/nd1/Spring2004range/02463d652.abs",

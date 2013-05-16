@@ -45,10 +45,14 @@ public:
     void writeOFF(const QString &path);
     void writeOBJ(const QString &path, char decimalPoint);
     void writeBIN(const QString &path);
+    void writeBINZ(const QString &path);
+    void writeToDataStream(QDataStream &stream);
 
+    static void fromDataStream(QDataStream &stream, Mesh &mesh);
     static Mesh fromABS(const QString &filename, bool centralizeLoadedMesh = false);
     static Mesh fromABS(const QString &filename, const QString &texture, bool centralizeLoadedMesh = false);
     static Mesh fromBIN(const QString &filename, bool centralizeLoadedMesh = false);
+    static Mesh fromBINZ(const QString &filename, bool centralizeLoadedMesh = false);
     static Mesh fromOBJ(const QString &filename, bool centralizeLoadedMesh = false);
     static Mesh fromXYZ(const QString &filename, bool centralizeLoadedMesh = false);
     static Mesh fromMap(Map &depth, Map &intensities, bool centralizeLoadedMesh = false);
