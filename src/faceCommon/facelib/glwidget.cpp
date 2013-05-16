@@ -188,7 +188,11 @@ void GLWidget::paintGL()
             int n = curve.count();
             for (int i = 0; i <= n; i++)
             {
-                glVertex3d(curve[i%n].x, curve[i%n].y, curve[i%n].z+3);
+                cv::Point3d &p = curve[i%n];
+                if (p.x == p.x && p.y == p.y && p.z == p.z)
+                {
+                    glVertex3d(p.x, p.y, p.z+3);
+                }
             }
             glEnd();
         }
