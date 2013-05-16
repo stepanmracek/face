@@ -92,7 +92,7 @@ public:
             Serialization::serializeVectorOfPointclouds(isoCurves, "isoCurves.yml");
 
             isoCurves = Serialization::readVectorOfPointclouds("isoCurves.yml");
-            foreach (VectorOfPoints &pc, isoCurves)
+            foreach (VectorOfPoints pc, isoCurves)
             {
                 w.addCurve(pc);
             }
