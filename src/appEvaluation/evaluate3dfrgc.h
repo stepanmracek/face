@@ -42,6 +42,7 @@ public:
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
             Mesh srcMesh = Mesh::fromBIN(srcFileInfo.absoluteFilePath());
+            srcMesh.printStats();
         }
     }
 
