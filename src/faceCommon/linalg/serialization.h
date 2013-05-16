@@ -10,7 +10,8 @@
 class Serialization
 {
 public:
-    static void serializeVectorOfPointClouds(QVector<VectorOfPoints> &data, const QString &path);
+    static void serializeVectorOfPointclouds(QVector<VectorOfPoints> &data, const QString &path);
+    static QVector<VectorOfPoints> readVectorOfPointclouds(const QString &path);
 };
 
 #endif // SERIALIZATION_H
