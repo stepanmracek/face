@@ -68,6 +68,9 @@ public:
         QFileInfoList srcFiles = srcDir.entryInfoList();
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
+            QString resultPath = outDirPath + srcFileInfo.baseName() + ".xml";
+            if (QFile::exists(resultPath)) continue;
+
             Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
             LandmarkDetector detector(mesh);
             Landmarks lm = detector.detect();
@@ -87,7 +90,6 @@ public:
                 isoCurves << isoCurve;
             }
 
-            QString resultPath = outDirPath + srcFileInfo.baseName() + ".xml";
             Serialization::serializeVectorOfPointclouds(isoCurves, resultPath);
         }
     }
