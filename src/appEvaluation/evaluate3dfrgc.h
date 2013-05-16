@@ -49,10 +49,10 @@ public:
             Mesh mesh = Mesh::fromBIN(srcFileInfo.absoluteFilePath());
             aligner.icpAlign(mesh, 15);
 
-            Qstring resultPath = outDirPath + srcFileInfo.baseName() + ".binz";
+            QString resultPath = outDirPath + srcFileInfo.baseName() + ".binz";
             mesh.writeBINZ(resultPath);
 
-            Map texture = SurfaceProcessor::depthmap(mesh, c, cv::Point2d(-100,-100), cv::Point2d(100,100), Texture_I);
+            Map texture = SurfaceProcessor::depthmap(mesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), Texture_I);
             QString resultTexturePath = outDirPath + srcFileInfo.baseName() + ".png";
             cv::imwrite(resultTexturePath.toStdString(), texture.toMatrix());
         }
