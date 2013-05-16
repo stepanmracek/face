@@ -74,17 +74,14 @@ public:
 
             MapConverter converter;
             Map depth = SurfaceProcessor::depthmap(mesh, converter, 2, ZCoord);
-            depth.linearScale(2, 0);
-            Matrix gaussKernel = KernelGenerator::gaussianKernel(5);
-            depth.applyFilter(gaussKernel, 3, true);
-            Map texture = SurfaceProcessor::depthmap(mesh, converter, 2, Texture_I);
-            Mesh m2 = Mesh::fromMap(depth, texture, true);
-            m2.scale(cv::Point3d(0.5, 0.5, 0.5));
+
+            VectorOfPoints isoCurve = SurfaceProcessor::isoGeodeticCurve(depth, converter, cv::Point3d(0,0,0), 50, 100, 2);
+
 
             QApplication app(0, 0);
             GLWidget w;
-            w.addFace(&m2);
             w.addFace(&mesh);
+            w.addCurve(isoCurve);
             w.show();
             return app.exec();
         }
