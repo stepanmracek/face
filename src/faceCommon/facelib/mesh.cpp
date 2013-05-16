@@ -649,7 +649,7 @@ void Mesh::writeBINZ(const QString &path)
     QFile outFile(path);
     outFile.open(QFile::WriteOnly);
     QDataStream fileStream(&outFile);
-    foreach (const char *c, compressed)
+    foreach (char c, compressed)
     {
         fileStream << c;
     }
