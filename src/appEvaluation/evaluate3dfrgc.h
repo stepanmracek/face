@@ -72,11 +72,14 @@ public:
             cv::Point3d nosetip = lm.get(Landmarks::Nosetip);
             mesh.translate(-nosetip);
 
-            qDebug() << nosetip.x << nosetip.y << nosetip.z;
+            MapConverter converter;
+            Map depth = SurfaceProcessor::depthmap(mesh, converter, 2, ZCoord);
+            Map texture = SurfaceProcessor::depthmap(mesh, converter, 2, Texture_I);
+            Mesh m2 = Mesh::fromMap(depth, texture);
 
             QApplication app(0, 0);
             GLWidget w;
-            w.addFace(&mesh);
+            w.addFace(&m2);
             w.show();
             return app.exec();
         }
