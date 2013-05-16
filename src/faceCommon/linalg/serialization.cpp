@@ -4,7 +4,7 @@
 
 void Serialization::serializeVectorOfPointClouds(QVector<VectorOfPoints> &data, const QString &path)
 {
-    cv::FileStorage storage(path.toStdString());
+    cv::FileStorage storage(path.toStdString(), cv::FileStorage::WRITE);
     storage << "data" << "[";
 
     foreach (const VectorOfPoints &pointcloud, data)
