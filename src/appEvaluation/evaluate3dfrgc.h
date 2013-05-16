@@ -89,7 +89,7 @@ public:
                 isoCurves << isoCurve;
             }
 
-            Serialization::serializeVectorOfPointClouds(isoCurves, "isoCurves.yml");
+            Serialization::serializeVectorOfPointclouds(isoCurves, "isoCurves.yml");
 
             isoCurves = Serialization::readVectorOfPointclouds("isoCurves.yml");
             foreach (VectorOfPoints &pc, isoCurves)
