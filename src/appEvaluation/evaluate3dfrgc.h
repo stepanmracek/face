@@ -85,7 +85,7 @@ public:
             {
                 VectorOfPoints isoCurve = SurfaceProcessor::isoGeodeticCurve(depth, converter, cv::Point3d(0,0,0), d, 100, 2);
                 w.addCurve(isoCurve);
-                Common::savePlot(isoCurve, "isoCurves", d == startD);
+                Common::savePlot(isoCurve, "isoCurves", d != startD);
             }
 
             w.addFace(&mesh);
