@@ -91,6 +91,12 @@ public:
 
             Serialization::serializeVectorOfPointClouds(isoCurves, "isoCurves.yml");
 
+            isoCurves = Serialization::readVectorOfPointclouds("isoCurves.yml");
+            foreach (VectorOfPoints &pc, isoCurves)
+            {
+                w.addCurve(pc);
+            }
+
             w.addFace(&mesh);
             w.show();
             return app.exec();
