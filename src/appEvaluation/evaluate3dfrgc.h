@@ -32,6 +32,19 @@ public:
 			assert(first[i] == second[i]);
 	}
 
+    static void align()
+    {
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/bin/";
+        QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
+
+        QDir srcDir(srcDirPath, "*.bin");
+        QFileInfoList srcFiles = srcDir.entryInfoList();
+        foreach (const QFileInfo &srcFileInfo, srcFiles)
+        {
+            Mesh srcMesh = Mesh::fromBIN(srcFileInfo.path());
+        }
+    }
+
     static void createShapeIndexMaps()
     {
         QString dirPath = "/home/stepo/data/frgc/spring2004/";

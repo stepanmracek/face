@@ -6,6 +6,7 @@
 #include "evaluatethermo2.h"
 #include "evaluate3dfrgc.h"*/
 #include "evaluatekinect.h"
+#include "evaluate3dfrgc.h"
 
 int main(int argc, char *argv[])
 {
@@ -39,7 +40,8 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::evaluateFusion();
     //Evaluate3dFrgc::createShapeIndexMaps();
     //Evaluate3dFrgc::createBIN();
-    EvaluateKinect::isoCurves();
+    Evaluate3dFrgc::align();
+    //EvaluateKinect::isoCurves();
 
     return 0;
 }
