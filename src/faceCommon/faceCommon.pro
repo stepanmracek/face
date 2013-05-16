@@ -51,7 +51,8 @@ SOURCES += \
     linalg/gabor.cpp \
     linalg/filterbank.cpp \
     linalg/gausslaguerre.cpp \
-    facelib/facealigner.cpp
+    facelib/facealigner.cpp \
+    linalg/serialization.cpp
 
 HEADERS += \
     kinect/kinnect.h \
@@ -112,7 +113,8 @@ HEADERS += \
     linalg/gabor.h \
     linalg/filterbank.h \
     linalg/gausslaguerre.h \
-    facelib/facealigner.h
+    facelib/facealigner.h \
+    linalg/serialization.h
 
 FORMS += \
     facelib/morphable3dfacemodelwidget.ui \
