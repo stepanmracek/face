@@ -68,9 +68,6 @@ public:
         QFileInfoList srcFiles = srcDir.entryInfoList();
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
-            QApplication app(0, 0);
-            GLWidget w;
-
             Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
             LandmarkDetector detector(mesh);
             Landmarks lm = detector.detect();
