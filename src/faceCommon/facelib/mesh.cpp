@@ -628,9 +628,6 @@ void Mesh::writeBIN(const QString &path)
 
     writeToDataStream(stream);
 
-    outFile.flush();
-    outFile.close();
-
     qDebug() << "...done";
 }
 
