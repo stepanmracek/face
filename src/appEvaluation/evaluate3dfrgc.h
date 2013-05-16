@@ -74,6 +74,8 @@ public:
 
             MapConverter converter;
             Map depth = SurfaceProcessor::depthmap(mesh, converter, 2, ZCoord);
+            Matrix gaussKernel = KernelGenerator::gaussianKernel(5);
+            depth.applyFilter(gaussKernel, 3, true);
 
             VectorOfPoints isoCurve = SurfaceProcessor::isoGeodeticCurve(depth, converter, cv::Point3d(0,0,0), 50, 100, 2);
 
