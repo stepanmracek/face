@@ -151,6 +151,60 @@ void BioDataProcessing::divideToNClusters(
     }
 }
 
+void BioDataProcessing::divideToNClusters(QVector<Vector> &vectors, QVector<int> &classMembership, int numberOfClusters,
+                                          QList<QVector<Vector> > &resultVectors, QList<QVector<int> > &resultClasses)
+{
+    static bool randomized = false;
+    if (!randomized)
+    {
+        //qDebug() << "randomizing";
+        qsrand(time(NULL));
+        randomized = true;
+    }
+
+    int n = vectors.count();
+    assert(n == classMembership.count());
+    assert(numberOfClusters > 1);
+
+    QMultiMap<int, Vector> classToVectors;
+    for (int i = 0; i < n; i++)
+        classToVectors.insertMulti(classMembership[i], vectors[i]);
+
+    QList<int> keys = classToVectors.uniqueKeys();
+    for (int i = keys.count()-1; i > 0; --i)
+    {
+        int randIndex = qrand() % (i+1);
+        qSwap(keys[i], keys[randIndex]);
+    }
+
+    int countPerCluster = keys.count()/numberOfClusters;
+    int currentCluster = 0;
+    for (int i = 0; i < numberOfClusters; i++)
+    {
+        QVector<Vector> m;
+        QVector<int> c;
+        resultVectors.append(m);
+        resultClasses.append(c);
+    }
+
+    for (int i = 0; i < keys.count(); i++)
+    {
+        QList<int> tmpList = QList<int>::fromVector(resultClasses[currentCluster]);
+        QSet<int> currentClasses = QSet<int>::fromList(tmpList);
+        int currentCount = currentClasses.count();
+        if (currentCluster != (numberOfClusters-1) && currentCount >= countPerCluster)
+            currentCluster++;
+
+        int key = keys[i];
+        QList<Vector> curClassVectors = classToVectors.values(key);
+        for (int j = 0; j < curClassVectors.count(); j++)
+        {
+            resultClasses[currentCluster].append(key);
+            resultVectors[currentCluster].append(curClassVectors[j]);
+        }
+    }
+}
+
 QList<QSet<int> > BioDataProcessing::divideToNClusters(
 		QVector<int> &classMembership,
 		int numberOfClusters)

@@ -23,6 +23,7 @@
 #include "facelib/glwidget.h"
 #include "linalg/kernelgenerator.h"
 #include "linalg/serialization.h"
+#include "biometrics/isocurveprocessing.h"
 
 class Evaluate3dFrgc
 {
@@ -91,6 +92,43 @@ public:
             }
 
             Serialization::serializeVectorOfPointclouds(isoCurves, resultPath);
+        }
+    }
+
+    static void evaluateIsoCurves()
+    {
+        QString dirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/isocurves/";
+        QVector<SubjectIsoCurves> data = IsoCurveProcessing::readDirectory(dirPath, "d", "*.xml");
+        IsoCurveProcessing::selectIsoCurves(data, 0, 6);
+        IsoCurveProcessing::sampleIsoCurvePoints(data, 5);
+        QVector<Template> rawData = IsoCurveProcessing::generateTemplates(data);
+        //QVector<Template> rawData = IsoCurveProcessing::generateEuclDistanceTemplates(data);
+
+        QVector<int> classes;
+        QVector<Vector> rawFeatureVectors;
+        Template::splitVectorsAndClasses(rawData, rawFeatureVectors, classes);
+
+        int clusterCount = 5;
+        QList<QVector<int> > classesInClusters;
+        QList<QVector<Vector> > rawVectorsInClusters;
+        BioDataProcessing::divideToNClusters(rawFeatureVectors, classes, clusterCount, rawVectorsInClusters, classesInClusters);
+
+        PCA pca(rawVectorsInClusters[0]);
+        PCAExtractor pcaExtractor(pca);
+        ZScorePCAExtractor zscorePcaExtractor(pca, rawVectorsInClusters[1]);
+        EuclideanMetric euclMetric;
+        CosineMetric cosMetric;
+
+        for (int i = 2; i < clusterCount; i++)
+        {
+            QSet<int> set = QSet<int>::fromList(classesInClusters[i].toList());
+            qDebug() << set.count() << classesInClusters[i].count();
+
+            Evaluation eval1(rawVectorsInClusters[i], classesInClusters[i], pcaExtractor, euclMetric);
+            qDebug() << eval1.eer;
+
+            Evaluation eval2(rawVectorsInClusters[i], classesInClusters[i], zscorePcaExtractor, cosMetric);
+            qDebug() << eval2.eer;
         }
     }
 

@@ -37,7 +37,7 @@ public:
     static QVector<cv::Point3d> isoGeodeticCurve(Map &map, MapConverter &converter, cv::Point3d center,
                                                  double distance, int samples, double mapScaleFactor);
 
-    static QVector<double> isoGeodeticCurveToEuclDistance(QVector<cv::Point3d> &isoCuvre, cv::Point3d &center);
+    static QVector<double> isoGeodeticCurveToEuclDistance(const QVector<cv::Point3d> &isoCuvre, cv::Point3d center);
 
     static void calculateNormals(Mesh &mesh, int knn);
 

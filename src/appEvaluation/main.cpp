@@ -41,7 +41,8 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::createShapeIndexMaps();
     //Evaluate3dFrgc::createBIN();
     //Evaluate3dFrgc::align();
-    Evaluate3dFrgc::createIsoCurves();
+    //Evaluate3dFrgc::createIsoCurves();
+    Evaluate3dFrgc::evaluateIsoCurves();
     //EvaluateKinect::isoCurves();
 
     return 0;

@@ -564,7 +564,7 @@ QVector<cv::Point3d> SurfaceProcessor::isoGeodeticCurve(Mesh &f, cv::Point3d cen
     return isoGeodeticCurve(map, converter, center, distance, samples, mapScaleFactor);
 }
 
-QVector<double> SurfaceProcessor::isoGeodeticCurveToEuclDistance(QVector<cv::Point3d> &isoCuvre, cv::Point3d &center)
+QVector<double> SurfaceProcessor::isoGeodeticCurveToEuclDistance(const QVector<cv::Point3d> &isoCuvre, cv::Point3d center)
 {
     QVector<double> result;
     foreach(const cv::Point3d &p, isoCuvre)

@@ -17,7 +17,10 @@ public:
                        QList<QVector<Vector> > &resultVectors, QList<QVector<int> > &resultClasses);
 
     static void divideToNClusters(QVector<Matrix> &vectors, QVector<int> &classMembership, int numberOfClusters,
-                       QList<QVector<Matrix> > &resultVectors, QList<QVector<int> > &resultClasses);
+                                  QList<QVector<Matrix> > &resultVectors, QList<QVector<int> > &resultClasses);
+
+    static void divideToNClusters(QVector<Vector> &vectors, QVector<int> &classMembership, int numberOfClusters,
+                                  QList<QVector<Vector> > &resultVectors, QList<QVector<int> > &resultClasses);
 
     static QList<QSet<int> > divideToNClusters(QVector<int> &classMembership, int numberOfClusters);
 
