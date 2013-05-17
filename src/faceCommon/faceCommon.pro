@@ -52,7 +52,8 @@ SOURCES += \
     linalg/filterbank.cpp \
     linalg/gausslaguerre.cpp \
     facelib/facealigner.cpp \
-    linalg/serialization.cpp
+    linalg/serialization.cpp \
+    biometrics/isocurveprocessing.cpp
 
 HEADERS += \
     kinect/kinnect.h \
@@ -114,7 +115,8 @@ HEADERS += \
     linalg/filterbank.h \
     linalg/gausslaguerre.h \
     facelib/facealigner.h \
-    linalg/serialization.h
+    linalg/serialization.h \
+    biometrics/isocurveprocessing.h
 
 FORMS += \
     facelib/morphable3dfacemodelwidget.ui \
