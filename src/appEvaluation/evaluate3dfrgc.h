@@ -100,7 +100,7 @@ public:
         QString dirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/isocurves/";
         QVector<SubjectIsoCurves> data = IsoCurveProcessing::readDirectory(dirPath, "d", "*.xml");
         IsoCurveProcessing::selectIsoCurves(data, 0, 6);
-        //IsoCurveProcessing::sampleIsoCurvePoints(data, 5);
+        IsoCurveProcessing::sampleIsoCurvePoints(data, 5);
         QVector<Template> rawData = IsoCurveProcessing::generateTemplates(data);
         //QVector<Template> rawData = IsoCurveProcessing::generateEuclDistanceTemplates(data);
 
