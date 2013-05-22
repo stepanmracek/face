@@ -44,7 +44,7 @@ int scan(int argc, char *argv[], const QString &outputPath, const QString &lmPat
 
 int align(int argc, char *argv[])
 {
-    Mesh inputMesh = Kinect::scanFace(5); // Mesh::fromBIN("../../test/kinect-face.bin", false);
+    Mesh inputMesh = Kinect::scanFace(10); // Mesh::fromBIN("../../test/kinect-face.bin", false);
     //Landmarks landmarks("../../test/kinect-face.xml");
 
     QString pca = "../../test/morph-pca.xml";
