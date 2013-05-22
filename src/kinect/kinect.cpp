@@ -61,6 +61,7 @@ bool Kinect::getDepth(double *depth, int scansCount, bool *mask, double minDista
         {
             cv::waitKey(100);
         }
+        qDebug() << "Depth" << s;
     }
 
     for (int i = 0; i < n; i++)
