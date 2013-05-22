@@ -8,6 +8,18 @@
 #include "facelib/facefeaturesanotation.h"
 #include "facelib/facealigner.h"
 
+int scan(int argc, char *argv[])
+{
+    Mesh m = Kinect::scanFace(10);
+
+    QApplication app(argc, argv);
+    GLWidget widget;
+    widget.addFace(&m);
+    widget.show();
+
+    return app.exec();
+}
+
 int scan(int argc, char *argv[], const QString &outputPath, const QString &lmPath)
 {
     Mesh m = Kinect::scanFace(10);
@@ -64,6 +76,7 @@ int align(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    return align(argc, argv);
+    scan(argc, argv);
+    //return align(argc, argv);
     //return scan(argc, argv, "../../test/kinect-face.bin", "../../test/kinect-face.xml");
 }
