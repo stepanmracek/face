@@ -10,7 +10,7 @@
 
 int scan(int argc, char *argv[])
 {
-    Mesh m = Kinect::scanFace(10);
+    Mesh m = Mesh::fromBIN("../../test/kinect/01-01.bin"); //Kinect::scanFace(10);
 
     QApplication app(argc, argv);
     GLWidget widget;
