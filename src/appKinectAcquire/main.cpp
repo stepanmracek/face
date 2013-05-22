@@ -10,7 +10,7 @@
 
 int scan(int argc, char *argv[])
 {
-    Mesh m = Kinect::scanFace(1);
+    Mesh m = Kinect::scanFace(10);
 
     QApplication app(argc, argv);
     GLWidget widget;
@@ -22,7 +22,7 @@ int scan(int argc, char *argv[])
 
 int scan(int argc, char *argv[], const QString &outputPath, const QString &lmPath)
 {
-    Mesh m = Kinect::scanFace(1);
+    Mesh m = Kinect::scanFace(10);
     bool success;
     Landmarks lm = FaceFeaturesAnotation::anotate(m, success);
     if (!success)
