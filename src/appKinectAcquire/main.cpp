@@ -22,7 +22,7 @@ int scan(int argc, char *argv[])
 
 int scan(int argc, char *argv[], const QString &outputPath, const QString &lmPath)
 {
-    Mesh m = Kinect::scanFace(10);
+    Mesh m = Kinect::scanFace(1);
     bool success;
     Landmarks lm = FaceFeaturesAnotation::anotate(m, success);
     if (!success)
