@@ -64,7 +64,7 @@ public:
     static int createIsoCurves()
     {
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
-        QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/isocurves/";
+        QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/isocurves2/";
         QDir srcDir(srcDirPath, "*.binz");
         QFileInfoList srcFiles = srcDir.entryInfoList();
         foreach (const QFileInfo &srcFileInfo, srcFiles)
@@ -87,7 +87,7 @@ public:
             int startD = 10;
             for (int d = startD; d <= 100; d += 10)
             {
-                VectorOfPoints isoCurve = SurfaceProcessor::isoGeodeticCurve(depth, converter, cv::Point3d(0,0,0), d, 100, 2);
+                VectorOfPoints isoCurve = SurfaceProcessor::isoGeodeticCurve(depth, converter, cv::Point3d(0,20,0), d, 100, 2);
                 isoCurves << isoCurve;
             }
 
@@ -97,9 +97,10 @@ public:
 
     static void evaluateIsoCurves()
     {
-        QString dirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/isocurves/";
+        QString dirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/isocurves2/";
         QVector<SubjectIsoCurves> data = IsoCurveProcessing::readDirectory(dirPath, "d", "*.xml");
-        IsoCurveProcessing::selectIsoCurves(data, 0, 6);
+        IsoCurveProcessing::selectIsoCurves(data, 0, 5);
+        IsoCurveProcessing::stats(data);
         IsoCurveProcessing::sampleIsoCurvePoints(data, 5);
         QVector<Template> rawData = IsoCurveProcessing::generateTemplates(data);
         //QVector<Template> rawData = IsoCurveProcessing::generateEuclDistanceTemplates(data);
@@ -114,21 +115,28 @@ public:
         BioDataProcessing::divideToNClusters(rawFeatureVectors, classes, clusterCount, rawVectorsInClusters, classesInClusters);
 
         PCA pca(rawVectorsInClusters[0]);
-        PCAExtractor pcaExtractor(pca);
+        //PCAExtractor pcaExtractor(pca);
         ZScorePCAExtractor zscorePcaExtractor(pca, rawVectorsInClusters[1]);
-        EuclideanMetric euclMetric;
+        zscorePcaExtractor.serialize("../../test/isocurves/shifted-pca.yml", "../../test/isocurves/shifted-normparams.yml");
+        //EuclideanMetric euclMetric;
         CosineMetric cosMetric;
 
-        for (int i = 2; i < clusterCount; i++)
+        BatchEvaluationResult batchResult = Evaluation::batch(rawVectorsInClusters, classesInClusters, zscorePcaExtractor, cosMetric, 2);
+        qDebug() << batchResult.meanEER << batchResult.stdDevOfEER;
+    }
+
+    static int createIsoCurves()
+    {
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
+        QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/isocurves2/";
+        QDir srcDir(srcDirPath, "*.binz");
+        QFileInfoList srcFiles = srcDir.entryInfoList();
+        foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
-            QSet<int> set = QSet<int>::fromList(classesInClusters[i].toList());
-            qDebug() << set.count() << classesInClusters[i].count();
+            QString resultPath = outDirPath + srcFileInfo.baseName() + ".xml";
+            if (QFile::exists(resultPath)) continue;
 
-            Evaluation eval1(rawVectorsInClusters[i], classesInClusters[i], pcaExtractor, euclMetric);
-            qDebug() << eval1.eer;
-
-            Evaluation eval2(rawVectorsInClusters[i], classesInClusters[i], zscorePcaExtractor, cosMetric);
-            qDebug() << eval2.eer;
+            Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
         }
     }
 

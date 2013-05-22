@@ -49,7 +49,8 @@ void IsoCurveProcessing::sampleIsoCurvePoints(QVector<SubjectIsoCurves> &data, i
     for (int i = 0; i < data.count(); i++)
     {
         SubjectIsoCurves &subj = data[i];
-        VectorOfIsocurves newIsoCurves;
+        sampleIsoCurvePoints(subj.vectorOfIsocurves, modulo);
+        /*VectorOfIsocurves newIsoCurves;
         for (int j = 0; j < subj.vectorOfIsocurves.count(); j++)
         {
             VectorOfPoints &isocurve = subj.vectorOfIsocurves[j];
@@ -60,8 +61,26 @@ void IsoCurveProcessing::sampleIsoCurvePoints(QVector<SubjectIsoCurves> &data, i
             }
             newIsoCurves << newIsoCurve;
         }
-        subj.vectorOfIsocurves = newIsoCurves;
+        subj.vectorOfIsocurves = newIsoCurves;*/
     }
+}
+
+void IsoCurveProcessing::sampleIsoCurvePoints(VectorOfIsocurves &isocurves, int modulo)
+{
+    for (int i = 0; i < isocurves.count(); i++)
+    {
+        sampleIsoCurvePoints(isocurves[i], modulo);
+    }
+}
+
+void IsoCurveProcessing::sampleIsoCurvePoints(VectorOfPoints &isocurve, int modulo)
+{
+    VectorOfPoints newIsoCurve;
+    for (int i = 0; i < isocurve.count(); i += modulo)
+    {
+        newIsoCurve << isocurve[i];
+    }
+    isocurve = newIsoCurve;
 }
 
 void IsoCurveProcessing::selectIsoCurves(QVector<SubjectIsoCurves> &data, int start, int end)
@@ -90,7 +109,7 @@ void IsoCurveProcessing::stats(QVector<SubjectIsoCurves> &data)
 
     for (int curveIndex = 0; curveIndex < curvesCount; curveIndex++)
     {
-        bool allSamplesValid = true;
+        int nanCount = 0;
         for (int subjectIndex = 0; subjectIndex < subjectCount; subjectIndex++)
         {
             for (int sampleIndex = 0; sampleIndex < samplesCount; sampleIndex++)
@@ -98,12 +117,16 @@ void IsoCurveProcessing::stats(QVector<SubjectIsoCurves> &data)
                 cv::Point3d &p = data[subjectIndex].vectorOfIsocurves[curveIndex][sampleIndex];
                 if (p.x != p.x || p.y != p.y || p.z != p.z)
                 {
-                    allSamplesValid = false;
+                    nanCount += 1;
                 }
             }
+            /*if (nanCount > 0)
+            {
+                qDebug() << data[subjectIndex].subjectID;
+            }*/
         }
 
-        qDebug() << "curveIndex:" << curveIndex << "All samples valid:" << allSamplesValid;
+        qDebug() << "curveIndex:" << curveIndex << "All samples valid:" << (nanCount == 0);
     }
 }
 
@@ -112,25 +135,37 @@ QVector<Template> IsoCurveProcessing::generateTemplates(QVector<SubjectIsoCurves
     QVector<Template> result;
     foreach (const SubjectIsoCurves &subjectIsoCurves, data)
     {
-        Template t;
-        t.subjectID = subjectIsoCurves.subjectID;
-
-        QVector<double> fv;
-        foreach (const VectorOfPoints &isocurve, subjectIsoCurves.vectorOfIsocurves)
-        {
-            foreach (const cv::Point3d &p, isocurve)
-            {
-                fv << p.x;
-                fv << p.y;
-                fv << p.z;
-            }
-        }
-
-        t.featureVector = Vector(fv);
-        result << t;
+        result << generateTemplate(subjectIsoCurves);
     }
 
     return result;
+}
+
+Template IsoCurveProcessing::generateTemplate(const SubjectIsoCurves &subj)
+{
+    Template t;
+    t.subjectID = subj.subjectID;
+    t.featureVector = generateFeatureVector(subj.vectorOfIsocurves);
+    return t;
+}
+
+Vector IsoCurveProcessing::generateFeatureVector(const VectorOfIsocurves &isocurves)
+{
+    QVector<double> fv;
+    foreach (const VectorOfPoints &isocurve, isocurves)
+    {
+        foreach (const cv::Point3d &p, isocurve)
+        {
+            if (p.x != p.x || p.y != p.y || p.z != p.z)
+            {
+                qDebug() << "NaN";
+            }
+            fv << p.x;
+            fv << p.y;
+            fv << p.z;
+        }
+    }
+    return Vector(fv);
 }
 
 QVector<Template> IsoCurveProcessing::generateEuclDistanceTemplates(QVector<SubjectIsoCurves> &data)

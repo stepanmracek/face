@@ -10,10 +10,15 @@
 
 int scan(int argc, char *argv[])
 {
-    Mesh m = Mesh::fromBIN("../../test/kinect/01-01.bin"); //Kinect::scanFace(10);
+    Mesh m = Kinect::scanFace(10);
 
     QApplication app(argc, argv);
+
     GLWidget widget;
+    QString scanName = QInputDialog::getText(&widget, "Scan name", "Scan name:", QLineEdit::Normal, "");
+    widget.setWindowTitle(scanName);
+    m.writeBIN("../../test/kinect/" + scanName + ".bin");
+
     widget.addFace(&m);
     widget.show();
 

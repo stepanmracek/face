@@ -15,14 +15,15 @@ class TestGlWidget
 public:
     static int test(int argc, char *argv[], const QString &dir)
     {
-        Mesh mesh = Mesh::fromBINZ(dir + "zbin-aligned/02463d652.binz", false);
-        QVector<VectorOfPoints> isoCurves = Serialization::readVectorOfPointclouds(dir + "zbin-aligned/isocurves/02463d652.xml");
+        Mesh mesh = Mesh::fromBINZ(dir + "zbin-aligned/04765d158.binz", false);
+        QVector<VectorOfPoints> isoCurves = Serialization::readVectorOfPointclouds(dir + "zbin-aligned/isocurves2/04765d158.xml");
 
         QApplication app(argc, argv);
         GLWidget widget;
         widget.setWindowTitle("GL Widget");
         widget.addFace(&mesh);
-        widget.addCurve(isoCurves[5]);
+        for (int i = 0; i < isoCurves.count(); i++)
+            widget.addCurve(isoCurves[i]);
         widget.show();
         return app.exec();
     }

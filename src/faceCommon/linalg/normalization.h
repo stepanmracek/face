@@ -18,6 +18,11 @@ class ZScoreNormalizationResult
 public:
     QVector<double> mean;
     QVector<double> stdDev;
+
+    ZScoreNormalizationResult() {}
+    ZScoreNormalizationResult(const QString &path);
+
+    void serialize(const QString &path);
 };
 
 class Normalization

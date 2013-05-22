@@ -1,0 +1,5 @@
+Center of isocurves: (0,20,0) - 2cm above nosetip
+Distances: 10,20,30,40,50
+Samples: 100, sampled with modulo 5 => 20
+PCA mean: 5*20*3 = 300
+PCA eigenvalues: 209

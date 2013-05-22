@@ -94,3 +94,29 @@ void Normalization::zScoreNormalization(QVector<Vector> &vectors, ZScoreNormaliz
         zScoreNormalization(vectors[vectorIndex], params);
     }
 }
+
+void ZScoreNormalizationResult::serialize(const QString &path)
+{
+    Vector means(mean);
+    Vector stdDevs(stdDev);
+
+    cv::FileStorage storage(path.toStdString(), cv::FileStorage::WRITE);
+    assert(storage.isOpened());
+    storage << "mean" << means;
+    storage << "stdDev" << stdDevs;
+    storage.release();
+}
+
+ZScoreNormalizationResult::ZScoreNormalizationResult(const QString &path)
+{
+    cv::FileStorage storage(path.toStdString(), cv::FileStorage::READ);
+    assert(storage.isOpened());
+
+    Vector means;
+    storage["mean"] >> means;
+    Vector stdDevs;
+    storage["stdDev"] >> stdDevs;
+    mean = means.toQVector();
+    stdDev = stdDevs.toQVector();
+    storage.release();
+}

@@ -53,7 +53,8 @@ SOURCES += \
     linalg/gausslaguerre.cpp \
     facelib/facealigner.cpp \
     linalg/serialization.cpp \
-    biometrics/isocurveprocessing.cpp
+    biometrics/isocurveprocessing.cpp \
+    biometrics/featureextractor.cpp
 
 HEADERS += \
     kinect/kinnect.h \

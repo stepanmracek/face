@@ -53,17 +53,20 @@ public:
 
 class ZScorePCAExtractor : public ZScoreFeatureExtractor
 {
-private:
+public:
     PCA pca;
     ZScoreNormalizationResult normParams;
 
-public:
     ZScorePCAExtractor(PCA pca, QVector<Vector> &rawData )
     {
         this->pca = pca;
         QVector<Vector> projectedData = pca.batchProject(rawData);
         normParams = Normalization::zScoreNormalization(projectedData);
     }
+
+    ZScorePCAExtractor(const QString &pcaPath, const QString &normParamsPath);
+
+    void serialize(const QString &pcaPath, const QString &normParamsPath);
 
     Vector extract(Vector &rawData)
     {
