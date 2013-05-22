@@ -108,7 +108,7 @@ public:
         QVector<Vector> rawFeatureVectors;
         Template::splitVectorsAndClasses(rawData, rawFeatureVectors, classes);
 
-        int clusterCount = 5;
+        int clusterCount = 10;
         QList<QVector<int> > classesInClusters;
         QList<QVector<Vector> > rawVectorsInClusters;
         BioDataProcessing::divideToNClusters(rawFeatureVectors, classes, clusterCount, rawVectorsInClusters, classesInClusters);
