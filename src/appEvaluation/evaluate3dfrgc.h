@@ -24,6 +24,7 @@
 #include "linalg/kernelgenerator.h"
 #include "linalg/serialization.h"
 #include "biometrics/isocurveprocessing.h"
+#include "linalg/histogram.h"
 
 class Evaluate3dFrgc
 {
@@ -125,19 +126,70 @@ public:
         qDebug() << batchResult.meanEER << batchResult.stdDevOfEER;
     }
 
-    static int createIsoCurves()
+    static int createMaps()
     {
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
-        QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/isocurves2/";
         QDir srcDir(srcDirPath, "*.binz");
         QFileInfoList srcFiles = srcDir.entryInfoList();
+        MapConverter converter;
+
+        Matrix smoothKernel2 = KernelGenerator::gaussianKernel(7);
+        //QVector<double> allZValues;
+        //bool first = true;
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
-            QString resultPath = outDirPath + srcFileInfo.baseName() + ".xml";
-            if (QFile::exists(resultPath)) continue;
+            if (QFile::exists(srcDirPath + "depth2/" + srcFileInfo.baseName() + ".png") &&
+                QFile::exists(srcDirPath + "mean2/" + srcFileInfo.baseName() + ".png") &&
+                QFile::exists(srcDirPath + "gauss2/" + srcFileInfo.baseName() + ".png") &&
+                QFile::exists(srcDirPath + "index2/" + srcFileInfo.baseName() + ".png") &&
+                QFile::exists(srcDirPath + "eigencur2/" + srcFileInfo.baseName() + ".png"))
+            {
+                continue;
+            }
 
             Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
+            Map depthmap = SurfaceProcessor::depthmap(mesh, converter,
+                                                      cv::Point2d(-75, -75),
+                                                      cv::Point2d(75, 75),
+                                                      2, ZCoord);
+            //allZValues << depthmap.getUsedValues();
+
+            depthmap.bandPass(-75, 0, false, false);
+            Matrix depthImage = depthmap.toMatrix(0, -75, 0);
+            QString out = srcDirPath + "depth2/" + srcFileInfo.baseName() + ".png";
+            cv::imwrite(out.toStdString(), depthImage*255);
+
+            Map smoothedDepthmap = depthmap;
+            smoothedDepthmap.applyFilter(smoothKernel2, 7, true);
+            CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(smoothedDepthmap);
+
+            cs.curvatureMean.bandPass(-0.1, 0.1, false, false);
+            Matrix meanImage = cs.curvatureMean.toMatrix(0, -0.1, 0.1);
+            out = srcDirPath + "mean2/" + srcFileInfo.baseName() + ".png";
+            cv::imwrite(out.toStdString(), meanImage*255);
+
+            cs.curvatureGauss.bandPass(-0.01, 0.01, false, false);
+            Matrix gaussImage = cs.curvatureGauss.toMatrix(0, -0.01, 0.01);
+            out = srcDirPath + "gauss2/" + srcFileInfo.baseName() + ".png";
+            cv::imwrite(out.toStdString(), gaussImage*255);
+
+            cs.curvatureIndex.bandPass(0, 1, false, false);
+            Matrix indexImage = cs.curvatureIndex.toMatrix(0, 0, 1);
+            out = srcDirPath + "index2/" + srcFileInfo.baseName() + ".png";
+            cv::imwrite(out.toStdString(), indexImage*255);
+
+            cs.curvaturePcl.bandPass(0, 0.0025, false, false);
+            Matrix pclImage = cs.curvaturePcl.toMatrix(0, 0, 0.0025);
+            out = srcDirPath + "eigencur2/" + srcFileInfo.baseName() + ".png";
+            cv::imwrite(out.toStdString(), pclImage*255);
         }
+
+        /*Histogram zValuesHistogram(allZValues, 20, false);
+        qDebug() << "mean" << zValuesHistogram.mean;
+        qDebug() << "stdDev" << zValuesHistogram.stdDev;
+        qDebug() << "min" << zValuesHistogram.minValue;
+        qDebug() << "max" << zValuesHistogram.maxValue;
+        Common::savePlot(zValuesHistogram.histogramValues, zValuesHistogram.histogramCounter, "zValuesHistogram");*/
     }
 
 	static void evaluateFusion()

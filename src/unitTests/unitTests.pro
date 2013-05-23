@@ -37,4 +37,5 @@ HEADERS += \
     testbiodataprocessing.h \
     testsurfaceprocessing.h \
     testanotation.h \
-    testmap.h
+    testmap.h \
+    TestHistogramFeatures.h

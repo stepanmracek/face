@@ -721,7 +721,7 @@ Mesh Mesh::fromBINZ(const QString &filename, bool centralizeLoadedMesh)
     qDebug() << "uncompressing...";
     QByteArray uncompressed = qUncompress(compressed);
 
-    qDebug() << "reading from buffer";
+    qDebug() << "reading from buffer...";
     QDataStream stream(&uncompressed, QIODevice::ReadOnly);
     Mesh result;
     fromDataStream(stream, result);

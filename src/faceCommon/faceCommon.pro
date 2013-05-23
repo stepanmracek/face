@@ -19,7 +19,6 @@ SOURCES += \
     linalg/ldaofpca.cpp \
     linalg/vector.cpp \
     linalg/loader.cpp \
-    linalg/cvgabor.cpp \
     linalg/delaunay.cpp \
     linalg/common.cpp \
     linalg/logisticregression.cpp \
@@ -54,7 +53,9 @@ SOURCES += \
     facelib/facealigner.cpp \
     linalg/serialization.cpp \
     biometrics/isocurveprocessing.cpp \
-    biometrics/featureextractor.cpp
+    biometrics/featureextractor.cpp \
+    linalg/histogram.cpp \
+    biometrics/histogramfeatures.cpp
 
 HEADERS += \
     kinect/kinnect.h \
@@ -73,7 +74,6 @@ HEADERS += \
     linalg/haardetect.h \
     linalg/metrics.h \
     linalg/procrustes.h \
-    linalg/cvgabor.h \
     linalg/random.h \
     linalg/icaofpca.h \
     linalg/projectionbase.h \
@@ -117,7 +117,9 @@ HEADERS += \
     linalg/gausslaguerre.h \
     facelib/facealigner.h \
     linalg/serialization.h \
-    biometrics/isocurveprocessing.h
+    biometrics/isocurveprocessing.h \
+    linalg/histogram.h \
+    biometrics/histogramfeatures.h
 
 FORMS += \
     facelib/morphable3dfacemodelwidget.ui \

@@ -7,10 +7,17 @@
 #include "facelib/morphable3dfacemodel.h"
 #include "facelib/facefeaturesanotation.h"
 #include "facelib/facealigner.h"
+#include "facelib/surfaceprocessor.h"
 
 int scan(int argc, char *argv[])
 {
     Mesh m = Kinect::scanFace(10);
+    Mesh mean = Mesh::fromOBJ("../../test/meanForAlign.obj");
+    FaceAligner aligner(mean);
+    aligner.icpAlign(m, 10);
+
+    MapConverter c;
+    cv::imshow("scan", SurfaceProcessor::depthmap(m, c, cv::Point2d(-75,-75), cv::Point2d(75,75), 2, Texture_I).toMatrix());
 
     QApplication app(argc, argv);
 

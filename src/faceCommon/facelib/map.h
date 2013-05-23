@@ -124,6 +124,8 @@ public:
 
     void levelSelect(double zLevel);
 
+    void bandPass(double minValue, double maxValue, bool unsetBelowMin, bool unsetAboveMax);
+
     void erode(int kernelSize);
 
     void linearScale(double multiply, double add);

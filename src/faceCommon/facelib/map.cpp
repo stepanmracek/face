@@ -68,6 +68,29 @@ void Map::levelSelect(double zLevel)
     }
 }
 
+void Map::bandPass(double minValue, double maxValue, bool unsetBelowMin, bool unsetAboveMax)
+{
+    int n = w*h;
+    for (int i = 0; i < n; i++)
+    {
+        if (flags[i] && values[i] < minValue)
+        {
+            if (unsetBelowMin)
+                unset(i);
+            else
+                values[i] = minValue;
+        }
+
+        if (flags[i] && values[i] > maxValue)
+        {
+            if (unsetAboveMax)
+                unset(i);
+            else
+                values[i] = maxValue;
+        }
+    }
+}
+
 void Map::linearScale(double multiply, double add)
 {
     int n = w*h;

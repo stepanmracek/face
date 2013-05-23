@@ -35,7 +35,7 @@ Vector::Vector(const Vector &src) : Matrix(src.rows, 1)
     }
 }
 
-Vector::Vector(QVector<double> &vec) : Matrix(vec.count(), 1)
+Vector::Vector(const QVector<double> &vec) : Matrix(vec.count(), 1)
 {
     int r = vec.count();
     for (int i = 0; i < r; i++)

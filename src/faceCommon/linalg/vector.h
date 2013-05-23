@@ -26,7 +26,7 @@ public:
 
     Vector(const Vector &src);
 
-    Vector(QVector<double> &vec);
+    Vector(const QVector<double> &vec);
 
     static Vector fromFile(const QString &path);
 

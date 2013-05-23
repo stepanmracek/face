@@ -21,12 +21,9 @@ private:
     SurfaceProcessor() {}
 
 public:
-    //static void smooth(Mesh *f, double alpha, int steps);
     static void smooth(Map &map, double alpha, int steps);
     static void smooth(Mesh &mesh, double alpha, int steps);
-    /*static void smooth(Mesh &mesh, int knn, double alpha, int steps, const cv::flann::IndexParams &indexParams);*/
 
-    //static void interpolate(Mesh &f);
     static CurvatureStruct calculateCurvatures(Map &depthmap);
 
     static Map depthmap(Mesh &mesh, MapConverter &converter, double scaleCoef, SurfaceDataToProcess dataToProcess);
@@ -53,25 +50,12 @@ public:
     Map curvatureGauss;
     Map curvatureMean;
     Map curvatureIndex;
+    Map curvaturePcl;
 
     Map peaks;
     Map pits;
     Map saddles;
     Map valleys;
-
-    /*virtual ~CurvatureStruct()
-    {
-        qDebug() << "deleting CurvatureStruct";
-        if (curvatureK1) delete curvatureK1;
-        if (curvatureK2) delete curvatureK2;
-        if (curvatureGauss) delete curvatureGauss;
-        if (curvatureMean) delete curvatureMean;
-        if (curvatureIndex) delete curvatureIndex;
-        if (peaks) delete peaks;
-        if (pits) delete pits;
-        if (saddles) delete saddles;
-        if (valleys) delete valleys;
-    }*/
 };
 
 class MapConverter

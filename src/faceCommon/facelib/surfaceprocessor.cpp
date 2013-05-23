@@ -67,58 +67,6 @@ void SurfaceProcessor::smooth(Map &map, double alpha, int steps)
     }
 }
 
-/*void SurfaceProcessor::smooth(Mesh &mesh, int knn, double alpha, int steps, const cv::flann::IndexParams &indexParams)
-{
-    assert(knn >= 3);
-    int n = mesh.points.size();
-
-    qDebug() << "Smoothing";
-    qDebug() << "  features matrix";
-    cv::Mat features(n, 3, CV_32F);
-    for (int i = 0; i < n; i++)
-    {
-        features.at<float>(i, 0) = mesh.points[i].x;
-        features.at<float>(i, 1) = mesh.points[i].y;
-        features.at<float>(i, 2) = mesh.points[i].z;
-    }
-    qDebug() << "  kd tree";
-    cv::flann::Index kdTree(features, indexParams);
-
-    qDebug() << "  smoothing";
-    VectorOfPoints newValues(n);
-    QVector<double> newZValues(n);
-    std::vector<int> resultIndicies;
-    std::vector<float> resultDistances;
-    cv::Mat query(1, 3, CV_32F);
-    for (int i = 0; i < n; i++)
-    {
-        query.at<float>(0, 0) = mesh.points[i].x;
-        query.at<float>(0, 1) = mesh.points[i].y;
-        query.at<float>(0, 2) = mesh.points[i].z;
-
-        kdTree.knnSearch(query, resultIndicies, resultDistances, knn);
-
-        cv::Point3d sum(0, 0, 0);
-        for (int j = 1; j < knn; j++)
-        {
-            int pIndex = resultIndicies[j];
-            sum += mesh.points[pIndex];
-        }
-        sum.x /= knn;
-        sum.y /= knn;
-        sum.z /= knn;
-        newZValues[i] += (alpha * sum.z);
-    }
-
-    for (int i = 0; i < n; i++)
-    {
-        mesh.points[i].z = newZValues[i];
-    }
-
-    mesh.recalculateMinMax();
-    mesh.calculateTriangles();
-}*/
-
 void SurfaceProcessor::smooth(Mesh &mesh, double alpha, int steps)
 {
     // neighbours initialization
@@ -358,17 +306,6 @@ Map SurfaceProcessor::depthmap(Mesh &mesh, MapConverter &converter, double scale
     return map;
 }
 
-/*Map SurfaceProcessor::depthmap(Mesh &mesh, MapConverter &converter,
-                               int mapWidth, int mapHeight, bool useTexture)
-{
-    converter.meshStart = cv::Point2d(mesh.minx, mesh.miny);
-    converter.meshSize = cv::Point2d(mesh.maxx - mesh.minx, mesh.maxy - mesh.miny);
-
-    Map map(mapWidth, mapHeight);
-    depthmap(mesh, map, converter.meshStart, cv::Point2d(mesh.maxx, mesh.maxy), useTexture);
-    return map;
-}*/
-
 double dist(double x1, double y1, double x2, double y2)
 {
     return sqrt(pow(x1-y1, 2) + pow(x2-y2, 2));
@@ -380,6 +317,7 @@ CurvatureStruct SurfaceProcessor::calculateCurvatures(Map &depthmap)
 
     c.curvatureGauss.init(depthmap.w, depthmap.h);
     c.curvatureIndex.init(depthmap.w, depthmap.h);
+    c.curvaturePcl.init(depthmap.w, depthmap.h);
     c.curvatureK1.init(depthmap.w, depthmap.h);
     c.curvatureK2.init(depthmap.w, depthmap.h);
     c.curvatureMean.init(depthmap.w, depthmap.h);
@@ -391,7 +329,7 @@ CurvatureStruct SurfaceProcessor::calculateCurvatures(Map &depthmap)
     double k1;
     double k2;
 
-    qDebug() << "calculating curvatures - k1 and k2";
+    qDebug() << "calculating curvatures - k1, k2, pcl";
     for (int x = 0; x < depthmap.w; x++)
     {
         for (int y = 0; y < depthmap.h; y++)
@@ -442,6 +380,24 @@ CurvatureStruct SurfaceProcessor::calculateCurvatures(Map &depthmap)
 
                 c.curvatureK1.set(x, y, k1);
                 c.curvatureK2.set(x, y, k2);
+
+                // PCL
+                Matrix pcaData(3, 9);
+                pcaData(0, 0) = x-1; pcaData(1, 0) = y-1; pcaData(2, 0) = depthmap.get(x-1, y-1);
+                pcaData(0, 1) = x  ; pcaData(1, 1) = y-1; pcaData(2, 1) = depthmap.get(x  , y-1);
+                pcaData(0, 2) = x+1; pcaData(1, 2) = y-1; pcaData(2, 2) = depthmap.get(x+1, y-1);
+                pcaData(0, 3) = x-1; pcaData(1, 3) = y  ; pcaData(2, 3) = depthmap.get(x-1, y  );
+                pcaData(0, 4) = x  ; pcaData(1, 4) = y  ; pcaData(2, 4) = depthmap.get(x  , y  );
+                pcaData(0, 5) = x+1; pcaData(1, 5) = y  ; pcaData(2, 5) = depthmap.get(x+1, y  );
+                pcaData(0, 6) = x-1; pcaData(1, 6) = y+1; pcaData(2, 6) = depthmap.get(x-1, y+1);
+                pcaData(0, 7) = x  ; pcaData(1, 7) = y+1; pcaData(2, 7) = depthmap.get(x  , y+1);
+                pcaData(0, 8) = x+1; pcaData(1, 8) = y+1; pcaData(2, 8) = depthmap.get(x+1, y+1);
+                cv::PCA cvPca(pcaData, cv::Mat(), CV_PCA_DATA_AS_COL);
+                double l0 = cvPca.eigenvalues.at<double>(2);
+                double l1 = cvPca.eigenvalues.at<double>(1);
+                double l2 = cvPca.eigenvalues.at<double>(0);
+                double pclCurvature = l0/(l0+l1+l2);
+                c.curvaturePcl.set(x, y, pclCurvature);
             }
         }
     }
@@ -589,7 +545,7 @@ void SurfaceProcessor::calculateNormals(Mesh &mesh, int knn)
         features.at<float>(i, 2) = mesh.points[i].z;
     }
     qDebug() << "  kd tree";
-    cv::flann::KDTreeIndexParams indexParams;
+    cv::flann::LinearIndexParams indexParams;
     cv::flann::Index kdTree(features, indexParams);
 
     qDebug() << "  normals";
