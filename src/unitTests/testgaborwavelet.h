@@ -6,7 +6,7 @@
 #include <opencv2/opencv.hpp>
 #include <cmath>
 
-#include "linalg/cvgabor.h"
+//#include "linalg/cvgabor.h"
 
 /*struct GaborParamsAlt
 {

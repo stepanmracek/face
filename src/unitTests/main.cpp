@@ -19,6 +19,7 @@
 #include "testsurfaceprocessing.h"
 #include "testanotation.h"
 #include "testmap.h"
+#include "testhistogramfeatures.h"
 
 #include <QString>
 
@@ -105,12 +106,14 @@ int main(int argc, char *argv[])
     //TestLandmarks::testReadWrite();
 
     //TestSurfaceProcessing::testNormals();
-    TestSurfaceProcessing::testPclCurvatures();
+    //TestSurfaceProcessing::testPclCurvatures();
 
     //TestAnotation::test("/home/stepo/data/frgc/spring2004/bin");
     //TestFaceFeatuesDetection::testGoodAnotation(frgcPath() + "bin/");
 
     //TestMap::testSerialization(frgcPath() + "04225d402.abs.xyz");
+
+    TestHistogramFeatures::testFeaturesGeneration(frgcPath());
 
 	return 0;
 }
