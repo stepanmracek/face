@@ -61,6 +61,18 @@ QList< QVector<Template> > BioDataProcessing::divideTemplatesToClusters(QVector<
     return result;
 }
 
+/**
+ * @brief Divides vectors and corresponding classes into desired count of clusters. There will be exactly the same count of
+ * individual subjects in each cluster, excluding the last one, where the remain subjects will be stored. The exact
+ * amount of scans within each cluster may vary since the number of scans per one subject may vary.
+ * *NOTE #1*: the method expects that the input vectors are sorted (e.g. [sub1, sub1, sub1, sub2, sub2, sub3,...])
+ * *NOTE #2*: the class membership have to correspond to vector data
+ * @param vectors Input vectors
+ * @param classMembership Input class membership
+ * @param subjectsInOneCluster Desired count of clusters
+ * @param resultVectors Resulting vectors divided to clusters
+ * @param resultClasses Resulting classes divided to clusters
+ */
 void BioDataProcessing::divideVectorsToClusters(QVector<Vector> &vectors, QVector<int> &classMembership, int subjectsInOneCluster,
                                                 QList<QVector<Vector> > &resultVectors, QList<QVector<int> > &resultClasses)
 {
@@ -71,15 +83,17 @@ void BioDataProcessing::divideVectorsToClusters(QVector<Vector> &vectors, QVecto
     int currentResultIndex = 0;
 
     //init
-    QVector<Vector> ms;
+    QVector<Vector> vs;
     QVector<int> cs;
-    resultVectors.append(ms);
+    resultVectors.append(vs);
     resultClasses.append(cs);
 
+    // iterate through the input data
     for (int i = 0; i < n; i++)
     {
         Vector &v = vectors[i];
         int c = classMembership[i];
+        // If the current subject is already stored in current cluster
         if (currentClusterClasses.contains(c))
         {
             // ok, add it
@@ -88,20 +102,25 @@ void BioDataProcessing::divideVectorsToClusters(QVector<Vector> &vectors, QVecto
         }
         else
         {
+            // nope. We have to check count of subjects in current cluster
             if (currentClusterClasses.count() >= subjectsInOneCluster)
             {
-                // new cluster
+                // Subjects count exceeded, we have to crate new cluster
                 currentClusterClasses.clear();
-                QVector<Vector> ms;
+                QVector<Vector> vs;
                 QVector<int> cs;
-                resultVectors.append(ms);
+                resultVectors.append(vs);
                 resultClasses.append(cs);
                 currentResultIndex++;
-                i--;
+
+                // We can add curret subject to current cluster
+                currentClusterClasses << c;
+                resultVectors[currentResultIndex].append(v);
+                resultClasses[currentResultIndex].append(c);
             }
             else
             {
-                // create new class and add the template
+                // We can add curret subject to current cluster
                 currentClusterClasses << c;
                 resultVectors[currentResultIndex].append(v);
                 resultClasses[currentResultIndex].append(c);
@@ -118,7 +137,6 @@ void BioDataProcessing::divideToNClusters(
 	static bool randomized = false;
 	if (!randomized)
 	{
-		//qDebug() << "randomizing";
 		qsrand(time(NULL));
 		randomized = true;
 	}
