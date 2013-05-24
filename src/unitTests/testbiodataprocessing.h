@@ -80,7 +80,10 @@ public:
 
         for (int i = 0; i < 10; i++)
         {
-            qDebug() << (i+1) << vectorsInClusters[i].count();
+            assert(vectorsInClusters[i].count() == classesInClusters[i].count());
+
+            QSet<int> uniqueClassesInCluster = QSet<int>::fromList(classesInClusters[i].toList());
+            qDebug() << (i+1) << "classes:" << uniqueClassesInCluster.count() << "total vectors:" << vectorsInClusters[i].count();
         }
 
     }
