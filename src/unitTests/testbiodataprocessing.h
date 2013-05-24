@@ -37,7 +37,7 @@ public:
             }
             qDebug() << "classes: " << currentClasses.count() << "scans:" << cluster.count();
 
-            allPreviousClasses << currentClasses;
+            allPreviousClasses += currentClasses;
         }
     }
 };
