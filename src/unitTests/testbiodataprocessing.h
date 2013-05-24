@@ -66,6 +66,8 @@ public:
             allPreviousClasses += currentClasses;
         }
     }
+
+
 };
 
 #endif // TESTBIODATAPROCESSING_H
