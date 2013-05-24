@@ -205,7 +205,7 @@ public:
         foreach (const QFileInfo &fileInfo, srcFiles)
         {
             ImageGrayscale full = cv::imread(fileInfo.absoluteFilePath().toStdString(), cv::IMREAD_GRAYSCALE);
-            cv::GaussianBlur(full, full, 7, 0);
+            cv::GaussianBlur(full, full, cv::Size(9,9), 0);
             cv::imshow("smoothed", full);
             cv::waitKey();
             ImageGrayscale cropped = full(cv::Rect(40, 20, 220, 180));
