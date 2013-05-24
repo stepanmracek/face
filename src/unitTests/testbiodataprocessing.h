@@ -24,6 +24,7 @@ public:
         Loader::loadImages(dataPath(), allVectors, &allClasses, "*.png", "d");
         QVector<Template> allTemplates = Template::joinVectorsAndClasses(allVectors, allClasses);
 
+        qDebug() << "dividing...";
         QList<QVector<Template> > templatesInClusters = BioDataProcessing::divide(allTemplates, 20);
         foreach (const QVector<Template> &cluster, templatesInClusters)
         {
