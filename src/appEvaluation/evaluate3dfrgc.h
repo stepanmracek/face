@@ -25,6 +25,7 @@
 #include "linalg/serialization.h"
 #include "biometrics/isocurveprocessing.h"
 #include "linalg/histogram.h"
+#include "biometrics/histogramfeatures.h"
 
 class Evaluate3dFrgc
 {
@@ -190,6 +191,30 @@ public:
         qDebug() << "min" << zValuesHistogram.minValue;
         qDebug() << "max" << zValuesHistogram.maxValue;
         Common::savePlot(zValuesHistogram.histogramValues, zValuesHistogram.histogramCounter, "zValuesHistogram");*/
+    }
+
+    static void evaluateHistogramFeatures()
+    {
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/depth2";
+        QDir srcDir(srcDirPath, "*.png");
+        QFileInfoList srcFiles = srcDir.entryInfoList();
+
+        QVector<Template> templates;
+        foreach (const QFileInfo &fileInfo, srcFiles)
+        {
+            ImageGrayscale full = cv::imread(fileInfo.absoluteFilePath(), cv::IMREAD_GRAYSCALE);
+            ImageGrayscale cropped = full(cv::Rect(40, 20, 220, 180));
+            HistogramFeatures features(cropped, 6, 6);
+
+            Template t;
+            t.subjectID = fileInfo.baseName().split(' ')[0].toInt();
+            t.featureVector = features.toVector();
+            templates << t;
+        }
+
+        CityblockMetric metric;
+        Evaluation e(templates, metric);
+        qDebug() << e.eer;
     }
 
 	static void evaluateFusion()
