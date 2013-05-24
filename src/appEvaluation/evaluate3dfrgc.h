@@ -229,7 +229,7 @@ public:
         cosW.w = dp.createWeights();
 
         qDebug() << "Evaluating";
-        BatchEvaluationResult results = Evaluation::batch(allRawVectors, allClasses, zScorePcaExtractor, cosW, 3);
+        BatchEvaluationResult results = Evaluation::batch(rawVectorsInClusters, classesInClusters, zScorePcaExtractor, cosW, 3);
         qDebug() << results.meanEER << results.stdDevOfEER;
     }
 };
