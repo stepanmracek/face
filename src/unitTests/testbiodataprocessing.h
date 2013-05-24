@@ -33,7 +33,7 @@ public:
             {
                 uniqueClasses << t.subjectID;
             }
-            qDebug() << uniqueClasses.count();
+            qDebug() << "classes: " << uniqueClasses.count() << "scans:" << cluster.count();
         }
     }
 };
