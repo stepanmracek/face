@@ -52,7 +52,8 @@ int main(int argc, char *argv[])
     //TestSVD::testProcrustes();
 
     //TestGAOptimization::testGAOptimizationOnFisherface();
-    //TestBioDataProcessing::testDivideVectors();
+
+    TestBioDataProcessing::testDivide();
 
     //TestDiscriminativePotential::TestOnFRGC();
 
@@ -113,7 +114,7 @@ int main(int argc, char *argv[])
 
     //TestMap::testSerialization(frgcPath() + "04225d402.abs.xyz");
 
-    TestHistogramFeatures::testFeaturesGeneration(frgcPath());
+    //TestHistogramFeatures::testFeaturesGeneration(frgcPath());
 
 	return 0;
 }

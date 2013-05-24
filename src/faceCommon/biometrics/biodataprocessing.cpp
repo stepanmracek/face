@@ -36,7 +36,7 @@ QList< QVector<Template> > BioDataProcessing::divide(QVector<Template> &template
         }
         else
         {
-            // Not there. We have to check count of subjects in current cluster
+            // nope. We have to check count of subjects in current cluster
             if (currentClusterClasses.count() >= subjectsInOneCluster)
             {
                 // Subjects count exceeded, we have to crate new cluster
