@@ -12,7 +12,7 @@
  * @param subjectsInOneCluster Desired count of subjects in each resulting cluster
  * @return Returns templates divided into clusters
  */
-QList< QVector<Template> > BioDataProcessing::divide(QVector<Template> &templates, int subjectsInOneCluster)
+QList< QVector<Template> > BioDataProcessing::divideTemplatesToClusters(QVector<Template> &templates, int subjectsInOneCluster)
 {
     assert(subjectsInOneCluster > 1);
     QSet<int> currentClusterClasses;
@@ -61,8 +61,8 @@ QList< QVector<Template> > BioDataProcessing::divide(QVector<Template> &template
     return result;
 }
 
-void BioDataProcessing::divide(QVector<Vector> &vectors, QVector<int> &classMembership, int subjectsInOneCluster,
-                               QList<QVector<Vector> > &resultVectors, QList<QVector<int> > &resultClasses)
+void BioDataProcessing::divideVectorsToClusters(QVector<Vector> &vectors, QVector<int> &classMembership, int subjectsInOneCluster,
+                                                QList<QVector<Vector> > &resultVectors, QList<QVector<int> > &resultClasses)
 {
     int n = vectors.count();
     assert(n == classMembership.count());

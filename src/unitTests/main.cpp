@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
     //TestGAOptimization::testGAOptimizationOnFisherface();
 
-    TestBioDataProcessing::testDivide();
+    TestBioDataProcessing::testDivideTemplatesToClusters();
 
     //TestDiscriminativePotential::TestOnFRGC();
 

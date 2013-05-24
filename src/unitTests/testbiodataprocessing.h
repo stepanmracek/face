@@ -17,7 +17,7 @@ class TestBioDataProcessing
     static QString dataPath() { return "/home/stepo/data/frgc/spring2004/zbin-aligned/depth1"; }
 
 public:
-    static void testDivide()
+    static void testDivideTemplatesToClusters()
     {
         QVector<Vector> allVectors;
         QVector<int> allClasses;
@@ -25,7 +25,7 @@ public:
         QVector<Template> allTemplates = Template::joinVectorsAndClasses(allVectors, allClasses);
 
         qDebug() << "dividing...";
-        QList<QVector<Template> > templatesInClusters = BioDataProcessing::divide(allTemplates, 20);
+        QList<QVector<Template> > templatesInClusters = BioDataProcessing::divideTemplatesToClusters(allTemplates, 20);
         QSet<int> allPreviousClasses;
         foreach (const QVector<Template> &cluster, templatesInClusters)
         {
