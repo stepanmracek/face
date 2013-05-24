@@ -78,6 +78,11 @@ public:
         QList<QVector<int> > classesInClusters;
         BioDataProcessing::divideToNClusters(allVectors, allClasses, 10, vectorsInClusters, classesInClusters);
 
+        for (int i = 0; i < 10; i++)
+        {
+            qDebug() << (i+1) << vectorsInClusters.count();
+        }
+
     }
 };
 
