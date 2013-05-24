@@ -29,7 +29,7 @@ public:
         // Divide
         QList<QVector<Vector> > images;
         QList<QVector<int> > classes;
-        BioDataProcessing::divide(allImages, allClasses, 25, images, classes);
+        BioDataProcessing::divideTemplatesToClusters(allImages, allClasses, 25, images, classes);
         QVector<Vector> &trainSet = images[0];
 
         // ICA

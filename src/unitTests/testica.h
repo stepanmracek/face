@@ -90,7 +90,7 @@ public:
         // Divide data
         QList<QVector<Vector> > images;
         QList<QVector<int> > classes;
-        BioDataProcessing::divide(allImages, allClasses, 15, images, classes);
+        BioDataProcessing::divideTemplatesToClusters(allImages, allClasses, 15, images, classes);
 
         ica.learn(images[0], 0.99, 20);
 
@@ -136,7 +136,7 @@ public:
         // Divide data
         QList<QVector<Vector> > images;
         QList<QVector<int> > classes;
-        BioDataProcessing::divide(allImages, allClasses, 15, images, classes);
+        BioDataProcessing::divideTemplatesToClusters(allImages, allClasses, 15, images, classes);
 
         ICAofPCA ica(images[0], 0.99, 20);
 

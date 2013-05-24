@@ -18,7 +18,7 @@ public:
     static void TestOnFRGC()
     {
         QVector<Template> templates = Template::loadTemplates("/home/stepo/SVN/frgc/frgc-norm-iterative/anatomical","-");
-        QList< QVector<Template> > clusters = BioDataProcessing::divide(templates, 25);
+        QList< QVector<Template> > clusters = BioDataProcessing::divideTemplatesToClusters(templates, 25);
         clusters.removeLast(); // we do not want that small one with just one class
         DiscriminativePotential dp(clusters[0]);
         CityblockWeightedMetric m;

@@ -21,7 +21,7 @@ public:
     {
         QVector<Template> allTemplates =
                 Template::loadTemplates("/media/frgc/frgc-norm-iterative/shapeindex-roi2-pca","-");
-        QList<QVector<Template> > clusters = BioDataProcessing::divide(allTemplates, 25);
+        QList<QVector<Template> > clusters = BioDataProcessing::divideTemplatesToClusters(allTemplates, 25);
         clusters.removeLast();
 
         //EERPotential eerPotential(clusters[0]);
@@ -45,7 +45,7 @@ public:
     {
         QVector<Template> allTemplates =
                 Template::loadTemplates("/media/frgc/frgc-norm-iterative/shapeindex-roi2-pca","-");
-        QList<QVector<Template> > clusters = BioDataProcessing::divide(allTemplates, 25);
+        QList<QVector<Template> > clusters = BioDataProcessing::divideTemplatesToClusters(allTemplates, 25);
         clusters.removeLast();
 
         CosineMetric cosineMetric;
@@ -89,7 +89,7 @@ public:
 
         QList<QVector<int> > classClusters;
         QList<QVector<Vector> > imagesClusters;
-        BioDataProcessing::divide(allImages, allClasses, 25, imagesClusters, classClusters);
+        BioDataProcessing::divideTemplatesToClusters(allImages, allClasses, 25, imagesClusters, classClusters);
         //classClusters.removeLast(); imagesClusters.removeLast();
 
         PCA pca(imagesClusters[1]);
