@@ -78,14 +78,20 @@ public:
         QList<QVector<int> > classesInClusters;
         BioDataProcessing::divideToNClusters(allVectors, allClasses, 10, vectorsInClusters, classesInClusters);
 
+        QSet<int> allPreviousClasses;
         for (int i = 0; i < 10; i++)
         {
             assert(vectorsInClusters[i].count() == classesInClusters[i].count());
 
             QSet<int> uniqueClassesInCluster = QSet<int>::fromList(classesInClusters[i].toList());
             qDebug() << (i+1) << "classes:" << uniqueClassesInCluster.count() << "total vectors:" << vectorsInClusters[i].count();
-        }
 
+            foreach (int c, uniqueClassesInCluster)
+            {
+                assert(allPreviousClasses.contains(c));
+            }
+            allPreviousClasses += uniqueClassesInCluster;
+        }
     }
 };
 
