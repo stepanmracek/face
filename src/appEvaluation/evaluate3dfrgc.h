@@ -200,18 +200,43 @@ public:
         QFileInfoList srcFiles = srcDir.entryInfoList();
 
         qDebug() << "Loading...";
-        QVector<Vector> allRawVectors;
+        QVector<ImageGrayscale> allImages;
         QVector<int> allClasses;
         foreach (const QFileInfo &fileInfo, srcFiles)
         {
             ImageGrayscale full = cv::imread(fileInfo.absoluteFilePath().toStdString(), cv::IMREAD_GRAYSCALE);
             cv::GaussianBlur(full, full, cv::Size(21,21), 0);
             ImageGrayscale cropped = full(cv::Rect(40, 20, 220, 180));
-            HistogramFeatures features(cropped, 6, 6);
-
+            allImages << cropped;
             allClasses << fileInfo.baseName().split('d')[0].toInt();
-            allRawVectors << features.toVector();
+
+            if (allClasses.count() == 198) break;
         }
+
+        qDebug() << "Evaluating...";
+        for (int stripes = 3; stripes <= 50; stripes++)
+        {
+            for (int bins = 3; bins <= 50; bins++)
+            {
+                QVector<Vector> allRawVectors;
+                foreach(const ImageGrayscale &image, allImages)
+                {
+                    HistogramFeatures features(image, stripes, bins);
+                    allRawVectors << features.toVector();
+                }
+
+                //QList<QVector<int> > classesInClusters;
+                //QList<QVector<Vector> > rawVectorsInClusters;
+                //BioDataProcessing::divideToNClusters(allRawVectors, allClasses, 10, rawVectorsInClusters, classesInClusters);
+                Evaluation e(allRawVectors, allClasses, PassExtractor(), CityblockMetric());
+                //BatchEvaluationResult results = Evaluation::batch(rawVectorsInClusters, classesInClusters, PassExtractor(), CityblockMetric(), 0);
+                qDebug() << stripes << bins << e.eer; //  results.meanEER << "+-" << results.stdDevOfEER;
+            }
+            qDebug() << "";
+        }
+
+        /*HistogramFeatures features(cropped, 6, 6);
+        allRawVectors << features.toVector();
 
         qDebug() << "Dividing...";
         QList<QVector<int> > classesInClusters;
@@ -227,10 +252,11 @@ public:
         DiscriminativePotential dp(trainDataForDiscrPotential);
         CosineWeightedMetric cosW;
         cosW.w = dp.createWeights();
+        CosineMetric cos;
 
         qDebug() << "Evaluating";
-        BatchEvaluationResult results = Evaluation::batch(rawVectorsInClusters, classesInClusters, zScorePcaExtractor, cosW, 3);
-        qDebug() << results.meanEER << results.stdDevOfEER;
+        BatchEvaluationResult results = Evaluation::batch(rawVectorsInClusters, classesInClusters, zScorePcaExtractor, cos, 3);
+        qDebug() << results.meanEER << results.stdDevOfEER;*/
     }
 };
 

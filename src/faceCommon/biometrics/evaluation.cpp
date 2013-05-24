@@ -55,7 +55,7 @@ Evaluation::Evaluation(QHash<QPair<int, int>, double> &distances, bool debugOutp
     commonEvaluation(debugOutput);
 }
 
-Evaluation::Evaluation(QVector<Template> &templates, Metrics &metrics, bool debugOutput)
+Evaluation::Evaluation(QVector<Template> &templates, const Metrics &metrics, bool debugOutput)
 {
     if (debugOutput)
         qDebug() << "Evaluation";
@@ -65,7 +65,7 @@ Evaluation::Evaluation(QVector<Template> &templates, Metrics &metrics, bool debu
 }
 
 Evaluation::Evaluation(QVector<Vector> &rawData, QVector<int> &classes,
-                       FeatureExtractor &extractor, Metrics &metric, bool debugOutput)
+                       const FeatureExtractor &extractor, const Metrics &metric, bool debugOutput)
 {
     QVector<Template> templates = Template::createTemplates(rawData, classes, extractor);
 
@@ -139,7 +139,7 @@ double Evaluation::fnmrAtFmr(double _fmr)
 	return _fnmr;
 }
 
-void Evaluation::commonTemplatesEvaluation(QVector<Template> &templates, Metrics &metrics, bool debugOutput)
+void Evaluation::commonTemplatesEvaluation(QVector<Template> &templates, const Metrics &metrics, bool debugOutput)
 {
     minSameDistance = 1e300;
     minDifferentDistance = 1e300;
@@ -222,7 +222,7 @@ void Evaluation::outputResults(const QString &path)
     outputResultsGenuine(path+"-genuine");
 }
 
-BatchEvaluationResult Evaluation::batch(QList<QVector<Template> > &templates, Metrics &metrics, int startIndex)
+BatchEvaluationResult Evaluation::batch(QList<QVector<Template> > &templates, const Metrics &metrics, int startIndex)
 {
     BatchEvaluationResult batchResult;
     QVector<double> eer;
@@ -243,7 +243,7 @@ BatchEvaluationResult Evaluation::batch(QList<QVector<Template> > &templates, Me
 }
 
 BatchEvaluationResult Evaluation::batch(QList<QVector<Vector> > &images, QList<QVector<int> > &classes,
-        FeatureExtractor &extractor, Metrics &metrics, int startIndex)
+        const FeatureExtractor &extractor, const Metrics &metrics, int startIndex)
 {
     BatchEvaluationResult batchResult;
     QVector<double> eer;

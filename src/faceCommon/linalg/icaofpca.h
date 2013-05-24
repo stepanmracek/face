@@ -29,9 +29,9 @@ public:
                double epsICA = 1e-10,
                bool debug = false);
 
-    Vector project(const Vector &vector);
+    Vector project(const Vector &vector) const;
 
-    Vector whiten(const Vector &vector);
+    Vector whiten(const Vector &vector) const;
 
     QVector<Vector> whiten(const QVector<Vector> &vectors);
 

@@ -18,7 +18,7 @@ class Evaluation
 {
 private:
     void commonEvaluation(bool debugOutput);
-    void commonTemplatesEvaluation(QVector<Template> &templates, Metrics &metrics, bool debugOutput);
+    void commonTemplatesEvaluation(QVector<Template> &templates, const Metrics &metrics, bool debugOutput);
 
 public:
     double minSameDistance;
@@ -43,12 +43,12 @@ public:
 
     Evaluation() {}
 
-    Evaluation(QVector<Template> &templates, Metrics &metrics, bool debugOutput = false);
+    Evaluation(QVector<Template> &templates, const Metrics &metrics, bool debugOutput = false);
 
     Evaluation(QHash<QPair<int, int>, double> &distances, bool debugOutput = false);
 
     Evaluation(QVector<Vector> &rawData, QVector<int> &classes,
-               FeatureExtractor &extractor, Metrics &metric, bool debugOutput = false);
+               const FeatureExtractor &extractor, const Metrics &metric, bool debugOutput = false);
 
     double fnmrAtFmr(double fmr);
 
@@ -57,10 +57,10 @@ public:
     void outputResultsGenuine(const QString &path);
     void outputResultsImpostor(const QString &path);
 
-    static BatchEvaluationResult batch(QList<QVector<Template> > &templates, Metrics &metrics, int startIndex = 0);
+    static BatchEvaluationResult batch(QList<QVector<Template> > &templates, const Metrics &metrics, int startIndex = 0);
 
     static BatchEvaluationResult batch(QList<QVector<Vector> > &images, QList<QVector<int> > &classes,
-    		FeatureExtractor &extractor, Metrics &metrics, int startIndex = 0);
+                                       const FeatureExtractor &extractor, const Metrics &metrics, int startIndex = 0);
 };
 
 class BatchEvaluationResult

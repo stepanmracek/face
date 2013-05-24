@@ -73,7 +73,7 @@ ZScoreNormalizationResult Normalization::zScoreNormalization(QVector<Vector> &ve
     return result;
 }
 
-void Normalization::zScoreNormalization(Vector &vector, ZScoreNormalizationResult &params)
+void Normalization::zScoreNormalization(Vector &vector, const ZScoreNormalizationResult &params)
 {
     for (int componentIndex = 0; componentIndex < vector.rows; componentIndex++)
     {
@@ -87,7 +87,7 @@ void Normalization::zScoreNormalization(Vector &vector, ZScoreNormalizationResul
     }
 }
 
-void Normalization::zScoreNormalization(QVector<Vector> &vectors, ZScoreNormalizationResult &params)
+void Normalization::zScoreNormalization(QVector<Vector> &vectors, const ZScoreNormalizationResult &params)
 {
     for (int vectorIndex = 0; vectorIndex < vectors.count(); vectorIndex++)
     {

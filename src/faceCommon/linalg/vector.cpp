@@ -148,7 +148,7 @@ Vector &Vector::mul(double value)
     return (*this);
 }
 
-Vector &Vector::mul(Vector &other)
+Vector &Vector::mul(const Vector &other)
 {
     int r = this->rows;
     assert(r == other.rows);

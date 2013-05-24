@@ -129,7 +129,7 @@ void LDA::learn(QVector<Vector> &vectors, QVector<int> &classMembership, bool de
     if (debug) qDebug() << "  LDA done";
 }
 
-Vector LDA::project(const Vector &vector)
+Vector LDA::project(const Vector &vector) const
 {
     assert(vector.rows == mean.rows);
     assert(vector.cols == 1);

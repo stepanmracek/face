@@ -35,13 +35,13 @@ void PCA::serialize(const QString &path)
     storage << "mean" << cvPca.mean;
 }
 
-Vector PCA::project(const Vector &in)
+Vector PCA::project(const Vector &in) const
 {
     Matrix m = cvPca.project(in);
     return m;
 }
 
-Vector PCA::scaledProject(const Vector &vector)
+Vector PCA::scaledProject(const Vector &vector) const
 {
     Vector out = project(vector);
     for (int i = 0; i < cvPca.eigenvalues.rows; i++)

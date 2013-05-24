@@ -32,8 +32,8 @@ public:
     static void linearNormalization(QVector<Vector> &vectors, LinearNormalizationResult &params);
 
     static ZScoreNormalizationResult zScoreNormalization(QVector<Vector> &vectors);
-    static void zScoreNormalization(QVector<Vector> &vectors, ZScoreNormalizationResult &params);
-    static void zScoreNormalization(Vector &vector, ZScoreNormalizationResult &params);
+    static void zScoreNormalization(QVector<Vector> &vectors, const ZScoreNormalizationResult &params);
+    static void zScoreNormalization(Vector &vector, const ZScoreNormalizationResult &params);
 };
 
 #endif // NORMALIZATION_H

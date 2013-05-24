@@ -11,7 +11,7 @@
 class FeatureExtractor
 {
 public:
-    virtual Vector extract(Vector &rawData) = 0;
+    virtual Vector extract(Vector &rawData) const = 0;
     virtual int outputLen() = 0;
 
     QVector<Vector> batchExtract(QVector<Vector> &rawData)
@@ -41,7 +41,7 @@ private:
 public:
     PCAExtractor(PCA pca) : pca(pca) {}
 
-    Vector extract(Vector &rawData)
+    Vector extract(Vector &rawData) const
     {
         return pca.project(rawData);
     }
@@ -68,7 +68,7 @@ public:
 
     void serialize(const QString &pcaPath, const QString &normParamsPath);
 
-    Vector extract(Vector &rawData)
+    Vector extract(Vector &rawData) const
     {
         Vector projected = pca.project(rawData);
         Normalization::zScoreNormalization(projected, normParams);
@@ -88,7 +88,7 @@ private:
 public:
     NormPCAExtractor(PCA pca) : pca(pca) {}
 
-    Vector extract(Vector &rawData)
+    Vector extract(Vector &rawData) const
     {
         return pca.scaledProject(rawData);
     }
@@ -106,7 +106,7 @@ private:
 public:
     ICAofPCAExtractor(ICAofPCA icaOfpca) : icaOfpca(icaOfpca) {}
 
-    Vector extract(Vector &rawData)
+    Vector extract(Vector &rawData) const
     {
         return icaOfpca.project(rawData);
     }
@@ -130,7 +130,7 @@ public:
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
-    Vector extract(Vector &rawData)
+    Vector extract(Vector &rawData) const
     {
         Vector projected = icaOfpca.project(rawData);
         Normalization::zScoreNormalization(projected, normParams);
@@ -150,7 +150,7 @@ private:
 public:
     ICAofPCAWhiteningExtractor(ICAofPCA icaOfpca) : icaOfpca(icaOfpca) {}
 
-    Vector extract(Vector &rawData)
+    Vector extract(Vector &rawData) const
     {
         Vector pcaProjected = icaOfpca.pca.project(rawData);
         return icaOfpca.ica.whiten(pcaProjected);
@@ -175,7 +175,7 @@ public:
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
-    Vector extract(Vector &rawData)
+    Vector extract(Vector &rawData) const
     {
         Vector projected = icaOfpca.whiten(rawData);
         Normalization::zScoreNormalization(projected, normParams);
@@ -195,7 +195,7 @@ private:
 public:
     LDAofPCAExtractor(LDAofPCA ldaOfpca) : ldaOfpca(ldaOfpca) {}
 
-    Vector extract(Vector &rawData)
+    Vector extract(Vector &rawData) const
     {
         return ldaOfpca.project(rawData);
     }
@@ -219,7 +219,7 @@ public:
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
-    Vector extract(Vector &rawData)
+    Vector extract(Vector &rawData) const
     {
         Vector projected = ldaOfpca.project(rawData);
         Normalization::zScoreNormalization(projected, normParams);
@@ -239,7 +239,7 @@ private:
 public:
     LDAExtractor(LDA lda) : lda(lda) {}
 
-    Vector extract(Vector &rawData)
+    Vector extract(Vector &rawData) const
     {
         return lda.project(rawData);
     }
@@ -263,7 +263,7 @@ public:
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
-    Vector extract(Vector &rawData)
+    Vector extract(Vector &rawData) const
     {
         Vector projected = lda.project(rawData);
         Normalization::zScoreNormalization(projected, normParams);
@@ -278,7 +278,7 @@ public:
 class PassExtractor : public FeatureExtractor
 {
 public:
-    Vector extract(Vector &rawData)
+    Vector extract(Vector &rawData) const
     {
         return Vector(rawData);
     }
@@ -302,7 +302,7 @@ public:
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
-    Vector extract(Vector &rawData)
+    Vector extract(Vector &rawData) const
     {
         Vector projected(rawData);
         Normalization::zScoreNormalization(projected, normParams);

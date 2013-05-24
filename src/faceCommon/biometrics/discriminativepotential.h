@@ -11,9 +11,6 @@
 class DiscriminativePotential : public FeaturePotentialBase
 {
 public:
-    //QVector<double> minValues;
-    //QVector<double> maxValues;
-
     DiscriminativePotential(QVector<Template> &templates);
 };
 

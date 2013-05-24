@@ -42,7 +42,7 @@ public:
 
     static QVector<Template> createTemplates(QVector<Vector> &rawData,
                                              QVector<int> &IDs,
-                                             FeatureExtractor &extractor);
+                                             const FeatureExtractor &extractor);
 
     static QVector<Template> clone(QVector<Template> &src);
 };

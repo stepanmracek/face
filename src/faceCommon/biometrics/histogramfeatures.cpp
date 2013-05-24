@@ -22,7 +22,7 @@
     }
 }*/
 
-HistogramFeatures::HistogramFeatures(ImageGrayscale &depthmap, int stripes, int binsPerStripe)
+HistogramFeatures::HistogramFeatures(const ImageGrayscale &depthmap, int stripes, int binsPerStripe)
 {
     QVector<QVector<double> > valuesInStripes(stripes);
     for (int y = 0; y < depthmap.rows; y++)

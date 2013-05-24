@@ -29,7 +29,7 @@ void LDAofPCA::learn(QVector<Vector> &vectors, QVector<int> &classMembership, do
     lda.learn(projected, classMembership, debug);
 }
 
-Vector LDAofPCA::project(const Vector &vector)
+Vector LDAofPCA::project(const Vector &vector) const
 {
     // pca projection
     Vector pcaProjection = pca.project(vector);

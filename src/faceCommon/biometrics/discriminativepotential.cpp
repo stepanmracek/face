@@ -21,6 +21,7 @@ DiscriminativePotential::DiscriminativePotential(QVector<Template> &templates)
 
     // Calculate DP
     // for each component
+    scores = Vector(m);
     for (int i = 0; i < m; i++)
     {
         QMap<int, QVector<double> > valuesForSubj;
@@ -69,53 +70,10 @@ DiscriminativePotential::DiscriminativePotential(QVector<Template> &templates)
 
         Vector classMeansVec(classMeans);
         Vector stdDeviationForClassVec(stdDeviationForClass);
-        double s = classMeansVec.stdDeviation() - stdDeviationForClassVec.meanValue();
-        scores << s;
-
-        /*QList<QVector<double> > values = valuesForSubj.values();
-        QVector<double> rangesForSubj;
-        QVector<double> meansForSubj;
-        for (int j = 0; j < values.count(); j++)
-        {
-            double r = Vector::maxValue(values[j]) - Vector::minValue(values[j]);
-            rangesForSubj.append(r);
-
-            meansForSubj.append(Vector::meanValue(values[j]));
-        }
-
-        // create histogram
-        QVector<double> hist(10);
-        for (int j = 0; j < values.count(); j++)
-        {
-            QVector<double> &curSubjVals = values[j];
-
-            for (int k = 0; k < curSubjVals.count(); k++)
-            {
-                double value = curSubjVals[k];
-                int bin = (int)(value * 10);
-                if (bin == 10) bin = 9;
-
-                hist[bin] += 1.0/n;
-            }
-        }
-
-        Matrix uniform = Matrix::ones(10, 1, CV_64F);
-        uniform *= 0.1;
-        Matrix histMat = Vector::fromQVector(hist);
-        Matrix distMat = (uniform-histMat).t() * (uniform-histMat);
-        double dist = distMat(0);
-
-        double mu = Vector::meanValue(rangesForSubj);
-        double s = Vector::stdDeviation(rangesForSubj);
-        double max = Vector::maxValue(rangesForSubj);
-
-        double score = 1 - (mu + s + max) - dist;
-        scores.append(score);*/
+        scores(i) = classMeansVec.stdDeviation() - stdDeviationForClassVec.meanValue();
     }
 
     minScore = scores.minValue();
     maxScore = scores.maxValue();
-
-    //qDebug() << "...done";
 }
 

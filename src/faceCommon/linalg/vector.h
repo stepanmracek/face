@@ -42,7 +42,7 @@ public:
 
     Vector &mul(double value);
 
-    Vector &mul(Vector &other);
+    Vector &mul(const Vector &other);
 
     bool isZero();
 

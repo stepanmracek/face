@@ -22,11 +22,11 @@ public:
 
     void serialize(const char *path);
 
-    Vector whiten(const Vector &vector);
+    Vector whiten(const Vector &vector) const;
 
-    Vector project(const Vector &vector);
+    Vector project(const Vector &vector) const;
 
-    Vector backProject(const Vector &vector);
+    Vector backProject(const Vector &vector) const;
 
     int getModes() { return W.rows; }
 

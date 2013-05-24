@@ -23,7 +23,7 @@ public:
 
     void learn(QVector<Vector> &vectors, QVector<int> &classMembership, double pcaSelectionThreshold = 0.98, bool debug = false);
 
-    Vector project(const Vector &vector);
+    Vector project(const Vector &vector) const;
 
     Vector normalizeParams(const Vector &params) { return params; }
 };

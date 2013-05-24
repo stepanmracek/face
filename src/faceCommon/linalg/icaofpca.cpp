@@ -31,14 +31,14 @@ ICAofPCA::ICAofPCA(QVector<Vector> &vectors,
     learn(vectors, pcaSelectionThreshold, independentComponentCount, epsICA, debug);
 }
 
-Vector ICAofPCA::project(const Vector &vector)
+Vector ICAofPCA::project(const Vector &vector) const
 {
     Vector projected = pca.project(vector);
     Vector result = ica.project(projected);
     return result;
 }
 
-Vector ICAofPCA::whiten(const Vector &vector)
+Vector ICAofPCA::whiten(const Vector &vector) const
 {
     Vector pcaProjected = pca.project(vector);
     Vector result = ica.whiten(pcaProjected);

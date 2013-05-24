@@ -37,9 +37,9 @@ public:
 
     void serialize(const QString &path);
 
-    Vector project(const Vector &vector);
+    Vector project(const Vector &vector) const;
 
-    Vector scaledProject(const Vector &vector);
+    Vector scaledProject(const Vector &vector) const;
 
     Vector backProject(const Vector &vector);
 

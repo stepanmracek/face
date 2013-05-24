@@ -14,7 +14,7 @@ public:
     QVector<Histogram> histograms;
 
     //HistogramFeatures(Map &depthmap, int stripes, int binsPerStripe);
-    HistogramFeatures(ImageGrayscale &depthmap, int stripes, int binsPerStripe);
+    HistogramFeatures(const ImageGrayscale &depthmap, int stripes, int binsPerStripe);
 
     Vector toVector();
 };

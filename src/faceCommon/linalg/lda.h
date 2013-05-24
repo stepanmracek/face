@@ -22,7 +22,7 @@ public:
 
     void learn(QVector<Vector> &vectors, QVector<int> &classMembership, bool debug = false);
 
-    Vector project(const Vector &vector);
+    Vector project(const Vector &vector) const;
 
     void serialize(const char *path);
 

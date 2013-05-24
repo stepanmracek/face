@@ -16,9 +16,9 @@
 class ProjectionBase
 {
 public:
-    virtual Vector project(const Vector &vector) = 0;
+    virtual Vector project(const Vector &vector) const = 0;
 
-    virtual QVector<Vector> batchProject(const QVector<Vector> &vectors)
+    virtual QVector<Vector> batchProject(const QVector<Vector> &vectors) const
     {
         QVector<Vector> result;
         foreach (const Vector &v, vectors)

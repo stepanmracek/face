@@ -167,18 +167,18 @@ ICA::ICA(QVector<Vector> &vectors, int independentComponentCount, double eps, in
     learn(vectors, independentComponentCount, eps, maxIterations, debug);
 }
 
-Vector ICA::whiten(const Vector &vector)
+Vector ICA::whiten(const Vector &vector) const
 {
     return EDET * (vector - mean);
 }
 
-Vector ICA::project(const Vector &vector)
+Vector ICA::project(const Vector &vector) const
 {
     Vector whitened = whiten(vector);
     return W * whitened;
 }
 
-Vector ICA::backProject(const Vector &vector)
+Vector ICA::backProject(const Vector &vector) const
 {
     return (EDETinv * (W.t() * vector)) + mean;
 }
