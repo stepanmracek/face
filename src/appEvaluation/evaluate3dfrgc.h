@@ -224,7 +224,6 @@ public:
         qDebug() << e1.eer;
 
         CityblockMetric metric;
-        CosineMetric cos;
         Evaluation e2(templates, metric);
         qDebug() << e2.eer;
     }
