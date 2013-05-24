@@ -199,38 +199,38 @@ public:
         QDir srcDir(srcDirPath, "*.png");
         QFileInfoList srcFiles = srcDir.entryInfoList();
 
-        QVector<Template> allTemplates;
-        Matrix gaussKernel = KernelGenerator::gaussianKernel(71);
-        cv::imshow("kernel", gaussKernel);
+        qDebug() << "Loading...";
+        QVector<Vector> allRawVectors;
+        QVector<int> allClasses;
         foreach (const QFileInfo &fileInfo, srcFiles)
         {
             ImageGrayscale full = cv::imread(fileInfo.absoluteFilePath().toStdString(), cv::IMREAD_GRAYSCALE);
             cv::GaussianBlur(full, full, cv::Size(21,21), 0);
-            cv::imshow("smoothed", full);
-            cv::waitKey();
             ImageGrayscale cropped = full(cv::Rect(40, 20, 220, 180));
             HistogramFeatures features(cropped, 6, 6);
 
-            Template t;
-            t.subjectID = fileInfo.baseName().split('d')[0].toInt();
-            t.featureVector = features.toVector();
-            allTemplates << t;
-
-            if (allTemplates.count() == 500) break;
+            allClasses << fileInfo.baseName().split('d')[0].toInt();
+            allRawVectors << features.toVector();
         }
 
-        QVector<int> classes;
-        QVector<Vector> vectors;
-        Template::splitVectorsAndClasses(allTemplates, vectors, classes);
-        PCA pca(vectors);
-        ZScorePCAExtractor extractor(pca, vectors);
-        CosineMetric cosMetric;
-        Evaluation e1(vectors, classes, extractor, cosMetric);
-        qDebug() << e1.eer;
+        qDebug() << "Dividing...";
+        Qlist<QVector<int> > classesInClusters;
+        Qlist<QVector<Vector> > rawVectorsInClusters;
+        BioDataProcessing::divideToNClusters(allRawVectors, allClasses, 10, rawVectorsInClusters, classesInClusters);
 
-        CityblockMetric metric;
-        Evaluation e2(allTemplates, metric);
-        qDebug() << e2.eer;
+        qDebug() << "PCA...";
+        PCA pca(rawVectorsInClusters[0]);
+        qDebug() << "Zscore...";
+        ZScorePCAExtractor zScorePcaExtractor(pca, rawVectorsInClusters[1]);
+        qDebug() << "Discriminative potential...";
+        QVector<Template> trainDataForDiscrPotential = Template::createTemplates(rawVectorsInClusters[2], classesInClusters[2], zScorePcaExtractor);
+        DiscriminativePotential dp(trainDataForDiscrPotential);
+        CosineWeightedMetric cosW;
+        cosW.w = dp.createWeights();
+
+        qDebug() << "Evaluating";
+        BatchEvaluationResult results = Evaluation::batch(allRawVectors, allClasses, zScorePcaExtractor, cosW, 3);
+        qDebug() << results.meanEER << results.stdDevOfEER;
     }
 };
 
