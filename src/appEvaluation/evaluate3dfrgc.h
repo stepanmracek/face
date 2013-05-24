@@ -200,9 +200,13 @@ public:
         QFileInfoList srcFiles = srcDir.entryInfoList();
 
         QVector<Template> allTemplates;
+        Matrix gaussKernel = KernelGenerator::gaussianKernel(7);
         foreach (const QFileInfo &fileInfo, srcFiles)
         {
             ImageGrayscale full = cv::imread(fileInfo.absoluteFilePath().toStdString(), cv::IMREAD_GRAYSCALE);
+            cv::filter2D(full, full, CV_8U, gaussKernel);
+            cv::imshow("smoothed", full);
+            cv::waitKey();
             ImageGrayscale cropped = full(cv::Rect(40, 20, 220, 180));
             HistogramFeatures features(cropped, 6, 6);
 
