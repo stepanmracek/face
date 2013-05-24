@@ -129,7 +129,7 @@ void BioDataProcessing::divideVectorsToClusters(QVector<Vector> &vectors, QVecto
     }
 }
 
-void BioDataProcessing::divideToNClusters(
+/*void BioDataProcessing::divideToNClusters(
 		QVector<Matrix> &vectors, QVector<int> &classMembership,
 		int numberOfClusters,
 		QList<QVector<Matrix> > &resultVectors, QList<QVector<int> > &resultClasses)
@@ -308,4 +308,4 @@ void BioDataProcessing::divideAccordingToUniqueClasses(QVector<Vector> &vectors,
 		resultClasses << curClusterClasses;
 		resultVectors << curClusterVectors;
 	}
-}
+}*/
