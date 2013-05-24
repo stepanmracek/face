@@ -199,7 +199,7 @@ public:
         QDir srcDir(srcDirPath, "*.png");
         QFileInfoList srcFiles = srcDir.entryInfoList();
 
-        QVector<Template> templates;
+        QVector<Template> allTemplates;
         foreach (const QFileInfo &fileInfo, srcFiles)
         {
             ImageGrayscale full = cv::imread(fileInfo.absoluteFilePath().toStdString(), cv::IMREAD_GRAYSCALE);
@@ -209,14 +209,14 @@ public:
             Template t;
             t.subjectID = fileInfo.baseName().split('d')[0].toInt();
             t.featureVector = features.toVector();
-            templates << t;
+            allTemplates << t;
 
-            if (templates.count() == 500) break;
+            if (allTemplates.count() == 500) break;
         }
 
         QVector<int> classes;
         QVector<Vector> vectors;
-        Template::splitVectorsAndClasses(templates, vectors, classes);
+        Template::splitVectorsAndClasses(allTemplates, vectors, classes);
         PCA pca(vectors);
         ZScorePCAExtractor extractor(pca, vectors);
         CosineMetric cosMetric;
@@ -224,7 +224,7 @@ public:
         qDebug() << e1.eer;
 
         CityblockMetric metric;
-        Evaluation e2(templates, metric);
+        Evaluation e2(allTemplates, metric);
         qDebug() << e2.eer;
     }
 
