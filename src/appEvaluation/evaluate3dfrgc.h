@@ -210,11 +210,23 @@ public:
             t.subjectID = fileInfo.baseName().split('d')[0].toInt();
             t.featureVector = features.toVector();
             templates << t;
+
+            if (templates.count() == 500) break;
         }
 
+        QVector<int> classes;
+        QVector<Vector> vectors;
+        Template::splitVectorsAndClasses(templates, vectors, classes);
+        PCA pca(vectors);
+        ZScorePCAExtractor extractor(pca, vectors);
+        CosineMetric cos;
+        Evaluation e1(vectors, classes, extractor, cos);
+        qDebug() << e1.eer;
+
         CityblockMetric metric;
-        Evaluation e(templates, metric);
-        qDebug() << e.eer;
+        CosineMetric cos;
+        Evaluation e2(templates, metric);
+        qDebug() << e2.eer;
     }
 
 	static void evaluateFusion()
