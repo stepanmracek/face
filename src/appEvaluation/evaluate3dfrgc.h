@@ -200,7 +200,7 @@ public:
         QFileInfoList srcFiles = srcDir.entryInfoList();
 
         QVector<Template> allTemplates;
-        Matrix gaussKernel = KernelGenerator::gaussianKernel(21);
+        Matrix gaussKernel = KernelGenerator::gaussianKernel(71);
         cv::imshow("kernel", gaussKernel);
         foreach (const QFileInfo &fileInfo, srcFiles)
         {
