@@ -40,6 +40,32 @@ public:
             allPreviousClasses += currentClasses;
         }
     }
+
+    static void testDivideVectorsToClusters()
+    {
+        QVector<Vector> allVectors;
+        QVector<int> allClasses;
+        Loader::loadImages(dataPath(), allVectors, &allClasses, "*.png", "d");
+
+        qDebug() << "dividing...";
+        QList<QVector<Vector> > vectorsInClusters;
+        QList<QVector<int> > classesInClusters;
+        BioDataProcessing::divideVectorsToClusters(allVectors, allClasses, 20, vectorsInClusters, classesInClusters);
+
+        QSet<int> allPreviousClasses;
+        foreach (const QVector<int> &cluster, classesInClusters)
+        {
+            QSet<int> currentClasses;
+            foreach (int c, cluster)
+            {
+                currentClasses << c;
+                assert(!allPreviousClasses.contains(c));
+            }
+            qDebug() << "classes: " << currentClasses.count() << "scans:" << cluster.count();
+
+            allPreviousClasses += currentClasses;
+        }
+    }
 };
 
 #endif // TESTBIODATAPROCESSING_H
