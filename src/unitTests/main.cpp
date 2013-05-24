@@ -54,7 +54,8 @@ int main(int argc, char *argv[])
     //TestGAOptimization::testGAOptimizationOnFisherface();
 
     //TestBioDataProcessing::testDivideTemplatesToClusters();
-    TestBioDataProcessing::testDivideVectorsToClusters();
+    //TestBioDataProcessing::testDivideVectorsToClusters();
+    TestBioDataProcessing::testDivideToNClusters();
 
     //TestDiscriminativePotential::TestOnFRGC();
 
