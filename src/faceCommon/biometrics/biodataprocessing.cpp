@@ -129,7 +129,7 @@ void BioDataProcessing::divideVectorsToClusters(QVector<Vector> &vectors, QVecto
     }
 }
 
-void BioDataProcessing::divideToNClusters(QVector<BioDataProcessing::T> &vectors, QVector<int> &classMembership, int numberOfClusters,
+void BioDataProcessing::divideToNClusters(QVector<T> &vectors, QVector<int> &classMembership, int numberOfClusters,
                                           QList<QVector<BioDataProcessing::T> > &resultVectors, QList<QVector<int> > &resultClasses)
 {
     static bool randomized = false;
