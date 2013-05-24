@@ -67,7 +67,18 @@ public:
         }
     }
 
+    static void testDivideToNClusters()
+    {
+        QVector<Vector> allVectors;
+        QVector<int> allClasses;
+        Loader::loadImages(dataPath(), allVectors, &allClasses, "*.png", "d");
 
+        qDebug() << "dividing...";
+        QList<QVector<Vector> > vectorsInClusters;
+        QList<QVector<int> > classesInClusters;
+        BioDataProcessing::divideToNClusters(allVectors, allClasses, 10, vectorsInClusters, classesInClusters);
+
+    }
 };
 
 #endif // TESTBIODATAPROCESSING_H
