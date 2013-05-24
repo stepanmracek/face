@@ -207,7 +207,7 @@ public:
             HistogramFeatures features(cropped, 6, 6);
 
             Template t;
-            t.subjectID = fileInfo.baseName().split(' ')[0].toInt();
+            t.subjectID = fileInfo.baseName().split('d')[0].toInt();
             t.featureVector = features.toVector();
             templates << t;
         }
