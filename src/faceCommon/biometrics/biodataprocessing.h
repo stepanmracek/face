@@ -20,6 +20,14 @@ public:
                                   QList<QVector<Matrix> > &resultVectors, QList<QVector<int> > &resultClasses);*/
 
     template <class T>
+    /**
+     * @brief Divides input data into desired count of clusters
+     * @param vectors Input vectors
+     * @param classMembership Input classes
+     * @param numberOfClusters Desired count of resulting clusters
+     * @param resultVectors
+     * @param resultClasses
+     */
     static void divideToNClusters(QVector<T> &vectors, QVector<int> &classMembership, int numberOfClusters,
                                   QList<QVector<T> > &resultVectors, QList<QVector<int> > &resultClasses)
     {
