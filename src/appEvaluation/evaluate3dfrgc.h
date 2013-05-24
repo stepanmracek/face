@@ -202,7 +202,7 @@ public:
         QVector<Template> templates;
         foreach (const QFileInfo &fileInfo, srcFiles)
         {
-            ImageGrayscale full = cv::imread(fileInfo.absoluteFilePath(), cv::IMREAD_GRAYSCALE);
+            ImageGrayscale full = cv::imread(fileInfo.absoluteFilePath().toStdString(), cv::IMREAD_GRAYSCALE);
             ImageGrayscale cropped = full(cv::Rect(40, 20, 220, 180));
             HistogramFeatures features(cropped, 6, 6);
 
