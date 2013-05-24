@@ -219,8 +219,8 @@ public:
         Template::splitVectorsAndClasses(templates, vectors, classes);
         PCA pca(vectors);
         ZScorePCAExtractor extractor(pca, vectors);
-        CosineMetric cos;
-        Evaluation e1(vectors, classes, extractor, cos);
+        CosineMetric cosMetric;
+        Evaluation e1(vectors, classes, extractor, cosMetric);
         qDebug() << e1.eer;
 
         CityblockMetric metric;
