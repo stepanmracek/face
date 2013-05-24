@@ -26,14 +26,18 @@ public:
 
         qDebug() << "dividing...";
         QList<QVector<Template> > templatesInClusters = BioDataProcessing::divide(allTemplates, 20);
+        QSet<int> allPreviousClasses;
         foreach (const QVector<Template> &cluster, templatesInClusters)
         {
-            QSet<int> uniqueClasses;
+            QSet<int> currentClasses;
             foreach (const Template &t, cluster)
             {
-                uniqueClasses << t.subjectID;
+                currentClasses << t.subjectID;
+                assert(!allPreviousClasses.contains(t.subjectID));
             }
-            qDebug() << "classes: " << uniqueClasses.count() << "scans:" << cluster.count();
+            qDebug() << "classes: " << currentClasses.count() << "scans:" << cluster.count();
+
+            allPreviousClasses << currentClasses;
         }
     }
 };
