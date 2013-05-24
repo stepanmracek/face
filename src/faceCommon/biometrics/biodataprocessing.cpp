@@ -3,42 +3,57 @@
 #include <cassert>
 //#include <ctime>
 
+/**
+ * @brief Divides templates into desired count of clusters. There will be exactly the same count of individual
+ * subjects in each cluster, excluding the last one, where the remain subjects will be stored. The exact
+ * amount of scans within each cluster may vary since the number of scans per one subject may vary.
+ * *NOTE*: the method expects that the input templates are sorted (e.g. [sub1, sub1, sub1, sub2, sub2, sub3,...])
+ * @param templates Input sorted templates
+ * @param subjectsInOneCluster Desired count of subjects in each resulting cluster
+ * @return Returns templates divided into clusters
+ */
 QList< QVector<Template> > BioDataProcessing::divide(QVector<Template> &templates, int subjectsInOneCluster)
 {
     assert(subjectsInOneCluster > 1);
     QSet<int> currentClusterClasses;
     QList< QVector<Template> > result;
-    int currentResultIndex = 0;
+    int currentClusterIndex = 0;
 
     //init
     QVector<Template> ts;
     result.append(ts);
 
+    // Iterate through the input templates
     int n = templates.count();
     for (int i = 0; i < n; i++)
     {
         Template &t = templates[i];
+        // If the current subject is already stored in current cluster
         if (currentClusterClasses.contains(t.subjectID))
         {
             // ok, add it
-            result[currentResultIndex].append(t);
+            result[currentClusterIndex].append(t);
         }
         else
         {
+            // Not there. We have to check count of subjects in current cluster
             if (currentClusterClasses.count() >= subjectsInOneCluster)
             {
-                // new cluster
+                // Subjects count exceeded, we have to crate new cluster
                 currentClusterClasses.clear();
                 QVector<Template> ts;
                 result.append(ts);
-                currentResultIndex++;
-                i--;
+                currentClusterIndex++;
+
+                // We can add curret subject to new  cluster
+                currentClusterClasses << t.subjectID;
+                result[currentClusterIndex].append(t);
             }
             else
             {
-                // create new class and add the template
+                // We can add curret subject to current cluster
                 currentClusterClasses << t.subjectID;
-                result[currentResultIndex].append(t);
+                result[currentClusterIndex].append(t);
             }
         }
     }
