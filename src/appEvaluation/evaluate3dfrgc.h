@@ -200,7 +200,7 @@ public:
         QFileInfoList srcFiles = srcDir.entryInfoList();
 
         QVector<Template> allTemplates;
-        Matrix gaussKernel = KernelGenerator::gaussianKernel(7) / 10;
+        Matrix gaussKernel = KernelGenerator::gaussianKernel(7);
         foreach (const QFileInfo &fileInfo, srcFiles)
         {
             ImageGrayscale full = cv::imread(fileInfo.absoluteFilePath().toStdString(), cv::IMREAD_GRAYSCALE);
