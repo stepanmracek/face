@@ -10,59 +10,19 @@
 
 DiscriminativePotential::DiscriminativePotential(QVector<Template> &templates)
 {
-    //qDebug() << "Discriminative potential evaluation...";
-
     int n = templates.count();
     assert(n > 0);
 
     int m = templates.at(0).featureVector.rows;
     assert(m > 0);
 
-    /*for (int i = 0; i < m; i++)
-    {
-        minValues.append(1e300);
-        maxValues.append(-1e300);
-    }*/
-
     QVector<Template> normalizedTemplates = Template::clone(templates);
     Template::zScoreNorm(normalizedTemplates);
-
-    /*// get min and max values
-    for (int i = 0; i < n; i++)
-    {
-       const Template &t = templates.at(i);
-       for (int j = 0; j < m; j++)
-       {
-           double val = t.featureVector(j);
-           if (val > maxValues[j])
-               maxValues[j] = val;
-           if (val < minValues[j])
-           {
-               minValues[j] = val;
-           }
-       }
-    }*/
-
-    /*// normalize to range [0..1]
-    for (int i = 0; i < n; i++)
-    {
-       const Template &t = templates.at(i);
-       Template normalized;
-       normalized.subjectID = t.subjectID;
-       normalized.featureVector = Matrix::zeros(m, 1, CV_64F);
-       for (int j = 0; j < m; j++)
-       {
-           double val = t.featureVector(j);
-           normalized.featureVector(j) = (val-minValues[j])/(maxValues[j] - minValues[j]);
-       }
-       normalizedTemplates.append(normalized);
-    }*/
 
     // Calculate DP
     // for each component
     for (int i = 0; i < m; i++)
     {
-        //qDebug() << " Evaluating component" << (i+1) << "/" << m;
         QMap<int, QVector<double> > valuesForSubj;
 
         // for each template
@@ -98,7 +58,8 @@ DiscriminativePotential::DiscriminativePotential(QVector<Template> &templates)
         {
         	if (valuesForSubj[subjID].count() <= 1)
         	{
-        		qDebug() << "Warning, subject" << subjID << "has only one scan!";
+                qDebug() << "Warning, subject" << subjID << "has only one scan!";
+                continue;
         	}
 
             Vector valuesForSubjVec(valuesForSubj[subjID]);
