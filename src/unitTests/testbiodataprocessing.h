@@ -4,6 +4,7 @@
 #include <QVector>
 #include <QList>
 #include <QDebug>
+#include <QSet>
 
 #include "linalg/common.h"
 #include "linalg/loader.h"
@@ -29,7 +30,7 @@ public:
             QSet<int> uniqueClasses;
             foreach (const Template &t, cluster)
             {
-                uniqueClasses << t;
+                uniqueClasses << t.subjectID;
             }
             qDebug() << uniqueClasses.count();
         }
