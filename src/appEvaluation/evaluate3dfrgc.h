@@ -214,8 +214,8 @@ public:
         }
 
         qDebug() << "Dividing...";
-        Qlist<QVector<int> > classesInClusters;
-        Qlist<QVector<Vector> > rawVectorsInClusters;
+        QList<QVector<int> > classesInClusters;
+        QList<QVector<Vector> > rawVectorsInClusters;
         BioDataProcessing::divideToNClusters(allRawVectors, allClasses, 10, rawVectorsInClusters, classesInClusters);
 
         qDebug() << "PCA...";
