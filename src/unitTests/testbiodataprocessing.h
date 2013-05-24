@@ -88,7 +88,7 @@ public:
 
             foreach (int c, uniqueClassesInCluster)
             {
-                assert(allPreviousClasses.contains(c));
+                assert(!allPreviousClasses.contains(c));
             }
             allPreviousClasses += uniqueClassesInCluster;
         }
