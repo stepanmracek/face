@@ -201,6 +201,7 @@ public:
 
         QVector<Template> allTemplates;
         Matrix gaussKernel = KernelGenerator::gaussianKernel(21);
+        cv::imshow("kernel", gaussKernel);
         foreach (const QFileInfo &fileInfo, srcFiles)
         {
             ImageGrayscale full = cv::imread(fileInfo.absoluteFilePath().toStdString(), cv::IMREAD_GRAYSCALE);
