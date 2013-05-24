@@ -43,7 +43,8 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::align();
     //Evaluate3dFrgc::createIsoCurves();
     //Evaluate3dFrgc::evaluateIsoCurves();
-    Evaluate3dFrgc::createMaps();
+    //Evaluate3dFrgc::createMaps();
+    Evaluate3dFrgc::evaluateHistogramFeatures();
 
     //EvaluateKinect::isoCurves();
 
