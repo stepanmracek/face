@@ -129,6 +129,7 @@ void BioDataProcessing::divideVectorsToClusters(QVector<Vector> &vectors, QVecto
     }
 }
 
+template <class T>
 void BioDataProcessing::divideToNClusters(QVector<T> &vectors, QVector<int> &classMembership, int numberOfClusters,
                                           QList<QVector<BioDataProcessing::T> > &resultVectors, QList<QVector<int> > &resultClasses)
 {
