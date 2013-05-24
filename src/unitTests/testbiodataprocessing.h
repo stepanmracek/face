@@ -80,7 +80,7 @@ public:
 
         for (int i = 0; i < 10; i++)
         {
-            qDebug() << (i+1) << vectorsInClusters.count();
+            qDebug() << (i+1) << vectorsInClusters[i].count();
         }
 
     }
