@@ -1,4 +1,4 @@
-QT += core gui opengl
+QT += core gui opengl widgets
 TARGET = faceCommon
 TEMPLATE = lib
 

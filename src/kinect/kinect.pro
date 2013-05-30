@@ -1,4 +1,4 @@
-QT += core gui opengl
+QT += core gui opengl widgets
 TARGET = kinect
 TEMPLATE = lib
 
