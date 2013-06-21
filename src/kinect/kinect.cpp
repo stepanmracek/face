@@ -1,7 +1,7 @@
 #include "kinect.h"
 
-#include <libfreenect/libfreenect.h>
-#include <libfreenect/libfreenect_sync.h>
+#include <libfreenect.h>
+#include <libfreenect_sync.h>
 
 #include "facetrack/realtimetrack.h"
 
