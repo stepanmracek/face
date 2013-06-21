@@ -22,7 +22,7 @@ EERPotential::EERPotential(QVector<Template> &templates)
     QVector<double> scoresQVec;
     for (int i = 0; i < m; i++)
     {
-    	//qDebug() << i << "/" << m;;
+        //qDebug() << i << "/" << m;;
         QVector<Template> currentComponentTemplates;
 
         // for each template
@@ -35,8 +35,16 @@ EERPotential::EERPotential(QVector<Template> &templates)
             currentComponentTemplates.append(t);
         }
 
+        if (i == 27 || i == 63)
+        {
+            QVector<double> curValues;
+            foreach(const Template &t, currentComponentTemplates)
+                curValues << t.featureVector(0);
+        }
+
         Evaluation eval(currentComponentTemplates, metrics, false);
-        double score = (1.0 - eval.eer);
+        double score = (eval.eer < 0.5) ? 2.0*(0.5 - eval.eer) : 0.0;
+        //score = score*score;
         scoresQVec.append(score);
     }
 
