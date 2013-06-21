@@ -16,6 +16,6 @@ HEADERS += \
 #LIBS += -lpcl_visualization -lpcl_io -lpcl_common -lpcl_filters -lpcl_features -lpcl_kdtree -lpcl_search
 #LIBS += -L/usr/lib/vtk-5.10/
 #LIBS += -lvtkCommon -lvtkFiltering -lvtkRendering -lvtkGraphics
-LIBS += -lboost_system -lboost_thread -lOpenNI -lboost_filesystem
+#LIBS += -lboost_system -lboost_thread -lOpenNI -lboost_filesystem
 
 
