@@ -18,7 +18,8 @@ class Evaluation
 {
 private:
     void commonEvaluation(bool debugOutput);
-    void commonTemplatesEvaluation(QVector<Template> &templates, const Metrics &metrics, bool debugOutput);
+    bool commonTemplatesEvaluation(QVector<Template> &templates, const Metrics &metrics, bool debugOutput);
+    void commonInit();
 
 public:
     double minSameDistance;
@@ -41,7 +42,7 @@ public:
     double eer;
     double eerDistance;
 
-    Evaluation() {}
+    Evaluation();
 
     Evaluation(QVector<Template> &templates, const Metrics &metrics, bool debugOutput = false);
 

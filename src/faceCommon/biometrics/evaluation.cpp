@@ -4,8 +4,16 @@
 
 #include <cmath>
 
+void Evaluation::commonInit()
+{
+    eer = 1.0;
+    eerDistance = 0.0;
+}
+
 Evaluation::Evaluation(QHash<QPair<int, int>, double> &distances, bool debugOutput)
 {
+    commonInit();
+
     if (debugOutput)
         qDebug() << "Evaluation";
 
@@ -57,23 +65,26 @@ Evaluation::Evaluation(QHash<QPair<int, int>, double> &distances, bool debugOutp
 
 Evaluation::Evaluation(QVector<Template> &templates, const Metrics &metrics, bool debugOutput)
 {
+    commonInit();
+
     if (debugOutput)
         qDebug() << "Evaluation";
 
-    commonTemplatesEvaluation(templates, metrics, debugOutput);
-    commonEvaluation(debugOutput);
+    if (commonTemplatesEvaluation(templates, metrics, debugOutput))
+        commonEvaluation(debugOutput);
 }
 
 Evaluation::Evaluation(QVector<Vector> &rawData, QVector<int> &classes,
                        const FeatureExtractor &extractor, const Metrics &metric, bool debugOutput)
 {
+    commonInit();
     QVector<Template> templates = Template::createTemplates(rawData, classes, extractor);
 
     if (debugOutput)
         qDebug() << "Evaluation";
 
-    commonTemplatesEvaluation(templates, metric, debugOutput);
-    commonEvaluation(debugOutput);
+    if (commonTemplatesEvaluation(templates, metric, debugOutput))
+        commonEvaluation(debugOutput);
 }
 
 void Evaluation::commonEvaluation(bool debugOutput)
@@ -83,6 +94,7 @@ void Evaluation::commonEvaluation(bool debugOutput)
         qDebug() << "  DET and EER calculation";
     double delta = maxDistance - minDistance;
     double step = delta/1000.0;
+    if (step == 0) return;
 
     double minDiff = 1e300;
 
@@ -139,7 +151,7 @@ double Evaluation::fnmrAtFmr(double _fmr)
 	return _fnmr;
 }
 
-void Evaluation::commonTemplatesEvaluation(QVector<Template> &templates, const Metrics &metrics, bool debugOutput)
+bool Evaluation::commonTemplatesEvaluation(QVector<Template> &templates, const Metrics &metrics, bool debugOutput)
 {
     minSameDistance = 1e300;
     minDifferentDistance = 1e300;
@@ -186,8 +198,13 @@ void Evaluation::commonTemplatesEvaluation(QVector<Template> &templates, const M
 
     //assert(maxDifferentDistance > maxSameDistance); // FIXME: not sure
     //assert(minSameDistance < minDifferentDistance); // FIXME: not sure
-    assert(maxSameDistance > minSameDistance);
-    assert(maxDifferentDistance > minDifferentDistance);
+    if (debugOutput)
+    {
+        qDebug() << "  same distance range:" << minSameDistance << maxSameDistance;
+        qDebug() << "  different distance range" << minDifferentDistance << maxDifferentDistance;
+    }
+
+    return ((maxSameDistance > minSameDistance) && (maxDifferentDistance > minDifferentDistance));
 }
 
 void Evaluation::outputResultsDET(const QString &path)
