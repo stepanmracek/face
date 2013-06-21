@@ -26,6 +26,8 @@
 #include "biometrics/isocurveprocessing.h"
 #include "linalg/histogram.h"
 #include "biometrics/histogramfeatures.h"
+#include "biometrics/geneticweightoptimization.h"
+#include "biometrics/eerpotential.h"
 
 class Evaluate3dFrgc
 {
@@ -193,7 +195,7 @@ public:
         Common::savePlot(zValuesHistogram.histogramValues, zValuesHistogram.histogramCounter, "zValuesHistogram");*/
     }
 
-    static void evaluateHistogramFeatures()
+    static void evaluateHistogramFeaturesGenerateStripesBinsMap()
     {
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/depth2";
         QDir srcDir(srcDirPath, "*.png");
@@ -209,54 +211,95 @@ public:
             ImageGrayscale cropped = full(cv::Rect(40, 20, 220, 180));
             allImages << cropped;
             allClasses << fileInfo.baseName().split('d')[0].toInt();
-
-            if (allClasses.count() == 198) break;
         }
 
-        qDebug() << "Evaluating...";
-        for (int stripes = 3; stripes <= 50; stripes++)
+        QList<QVector<ImageGrayscale> > imagesInClusters;
+        QList<QVector<int> > classesInClusters;
+        BioDataProcessing::divideToNClusters<ImageGrayscale>(allImages, allClasses, 10, imagesInClusters, classesInClusters);
+
+        for (int i = 0; i < 3; i++)
         {
-            for (int bins = 3; bins <= 50; bins++)
+            qDebug() << "Evaluating" << i << imagesInClusters[i].count();
+            for (int stripes = 3; stripes <= 50; stripes++)
             {
-                QVector<Vector> allRawVectors;
-                foreach(const ImageGrayscale &image, allImages)
+                for (int bins = 3; bins <= 50; bins++)
                 {
-                    HistogramFeatures features(image, stripes, bins);
-                    allRawVectors << features.toVector();
-                }
+                    QVector<Vector> rawVectors;
+                    foreach(const ImageGrayscale &image, imagesInClusters[i])
+                    {
+                        HistogramFeatures features(image, stripes, bins);
+                        rawVectors << features.toVector();
+                    }
 
-                //QList<QVector<int> > classesInClusters;
-                //QList<QVector<Vector> > rawVectorsInClusters;
-                //BioDataProcessing::divideToNClusters(allRawVectors, allClasses, 10, rawVectorsInClusters, classesInClusters);
-                Evaluation e(allRawVectors, allClasses, PassExtractor(), CityblockMetric());
-                //BatchEvaluationResult results = Evaluation::batch(rawVectorsInClusters, classesInClusters, PassExtractor(), CityblockMetric(), 0);
-                qDebug() << stripes << bins << e.eer; //  results.meanEER << "+-" << results.stdDevOfEER;
+                    Evaluation e(rawVectors, classesInClusters[i], PassExtractor(), CityblockMetric());
+                    qDebug() << stripes << bins << e.eer; //  results.meanEER << "+-" << results.stdDevOfEER;
+                }
+                qDebug() << "";
             }
-            qDebug() << "";
+        }
+    }
+
+    static void evaluateHistogramFeatures()
+    {
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/depth2";
+        QDir srcDir(srcDirPath, "*.png");
+        QFileInfoList srcFiles = srcDir.entryInfoList();
+
+        qDebug() << "Loading...";
+        QVector<ImageGrayscale> allImages;
+        QVector<int> allClasses;
+        foreach (const QFileInfo &fileInfo, srcFiles)
+        {
+            ImageGrayscale full = cv::imread(fileInfo.absoluteFilePath().toStdString(), cv::IMREAD_GRAYSCALE);
+            cv::GaussianBlur(full, full, cv::Size(21,21), 0);
+            ImageGrayscale cropped = full(cv::Rect(40, 20, 220, 180));
+            allImages << cropped;
+            //cv::imshow("face", cropped);
+            //cv::waitKey(1);
+            allClasses << fileInfo.baseName().split('d')[0].toInt();
         }
 
-        /*HistogramFeatures features(cropped, 6, 6);
-        allRawVectors << features.toVector();
+        int stripes = 20;
+        int bins = 20;
+        qDebug() << "Histogram features...";
+
+        QVector<Vector> allRawVectors;
+        foreach(const ImageGrayscale &image, allImages)
+        {
+            HistogramFeatures features(image, stripes, bins);
+            allRawVectors << features.toVector();
+        }
 
         qDebug() << "Dividing...";
         QList<QVector<int> > classesInClusters;
         QList<QVector<Vector> > rawVectorsInClusters;
         BioDataProcessing::divideToNClusters(allRawVectors, allClasses, 10, rawVectorsInClusters, classesInClusters);
 
-        qDebug() << "PCA...";
-        PCA pca(rawVectorsInClusters[0]);
-        qDebug() << "Zscore...";
-        ZScorePCAExtractor zScorePcaExtractor(pca, rawVectorsInClusters[1]);
-        qDebug() << "Discriminative potential...";
-        QVector<Template> trainDataForDiscrPotential = Template::createTemplates(rawVectorsInClusters[2], classesInClusters[2], zScorePcaExtractor);
-        DiscriminativePotential dp(trainDataForDiscrPotential);
-        CosineWeightedMetric cosW;
-        cosW.w = dp.createWeights();
-        CosineMetric cos;
+        qDebug() << "Initial results...";
+        BatchEvaluationResult results = Evaluation::batch(rawVectorsInClusters, classesInClusters, PassExtractor(), CityblockMetric(), 2);
+        qDebug() << results.meanEER << "+-" << results.stdDevOfEER;
 
-        qDebug() << "Evaluating";
-        BatchEvaluationResult results = Evaluation::batch(rawVectorsInClusters, classesInClusters, zScorePcaExtractor, cos, 3);
-        qDebug() << results.meanEER << results.stdDevOfEER;*/
+        qDebug() << "Train set and validation set...";
+        QVector<Template> trainSet = Template::joinVectorsAndClasses(rawVectorsInClusters[0], classesInClusters[0]);
+        QVector<Template> validationSet = Template::joinVectorsAndClasses(rawVectorsInClusters[1], classesInClusters[1]);
+
+        qDebug() << "EER potential...";
+        EERPotential eerPotential(trainSet);
+        CityblockWeightedMetric cityWeights;
+        cityWeights.w = eerPotential.createWeights();
+
+        qDebug() << "EER potential results...";
+        results = Evaluation::batch(rawVectorsInClusters, classesInClusters, PassExtractor(), cityWeights, 2);
+        qDebug() << results.meanEER << "+-" << results.stdDevOfEER;
+
+        qDebug() << "Genetic optimization...";
+        GeneticWeightOptimizationSettings settings;
+        GeneticWeightOptimization optimization(trainSet, validationSet, cityWeights, settings);
+        optimization.trainWeights();
+
+        qDebug() << "Genetic results...";
+        results = Evaluation::batch(rawVectorsInClusters, classesInClusters, PassExtractor(), cityWeights, 2);
+        qDebug() << results.meanEER << "+-" << results.stdDevOfEER;
     }
 };
 
