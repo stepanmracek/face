@@ -1,12 +1,8 @@
 #include "glwidget.h"
 
 #include <opencv/cv.h>
-#include <GL/freeglut.h>
-#include <GL/freeglut_std.h>
-#include <GL/freeglut_ext.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glut.h>
 
 GLWidget::GLWidget(QWidget* parent) : QGLWidget(parent)
 {

@@ -4,7 +4,6 @@
 #include <QGLWidget>
 #include <QtOpenGL>
 #include <GL/glu.h>
-#include <GL/glut.h>
 
 #include "mesh.h"
 #include "landmarks.h"
