@@ -6,6 +6,26 @@
 
 Histogram::Histogram(const QVector<double> &values, int bins, bool normalize, double minValue, double maxValue)
 {
+    histogramCounter.resize(bins);
+    histogramValues.resize(bins);
+
+    if (values.count() == 0)
+    {
+        this->minValue = 0;
+        this->maxValue = 0;
+        this->mean = 0;
+        this->stdDev = 0;
+        return;
+    }
+    else if (values.count() == 1)
+    {
+        this->minValue = values[0];
+        this->maxValue = values[0];
+        this->mean = values[0];
+        this->stdDev = 0;
+        return;
+    }
+
     Vector vec(values);
 
     if (minValue == 0 && maxValue == 0)
@@ -21,9 +41,6 @@ Histogram::Histogram(const QVector<double> &values, int bins, bool normalize, do
 
     assert(maxValue > minValue);
     assert(bins > 1);
-
-    histogramCounter.resize(bins);
-    histogramValues.resize(bins);
 
     double delta = maxValue - minValue;
     foreach (double v, values)

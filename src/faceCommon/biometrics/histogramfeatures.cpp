@@ -1,6 +1,6 @@
 #include "histogramfeatures.h"
 
-/*HistogramFeatures::HistogramFeatures(Map &depthmap, int stripes, int binsPerStripe)
+HistogramFeatures::HistogramFeatures(const Map &depthmap, int stripes, int binsPerStripe)
 {
     QVector<QVector<double> > valuesInStripes(stripes);
     for (int y = 0; y < depthmap.h; y++)
@@ -20,7 +20,7 @@
     {
         histograms << Histogram(valuesInStripes[i], binsPerStripe, true);
     }
-}*/
+}
 
 HistogramFeatures::HistogramFeatures(const ImageGrayscale &depthmap, int stripes, int binsPerStripe)
 {

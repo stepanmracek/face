@@ -241,45 +241,131 @@ public:
 
     static void evaluateHistogramFeatures()
     {
-        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/depth2";
-        QDir srcDir(srcDirPath, "*.png");
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
+        QDir srcDir(srcDirPath, "*.binz");
         QFileInfoList srcFiles = srcDir.entryInfoList();
 
+        cv::Point2d meshStart(-60,-30);
+        cv::Point2d meshEnd(60,60);
+        int kSize = 9;
+        int gaussTimes = 1;
+        //int stripes = 20;
+        //int bins = 20;
+
+        Matrix gaussKernel = KernelGenerator::gaussianKernel(kSize);
+
         qDebug() << "Loading...";
-        QVector<ImageGrayscale> allImages;
         QVector<int> allClasses;
+        QVector<Map> allMaps;
+        bool first = true;
         foreach (const QFileInfo &fileInfo, srcFiles)
         {
-            ImageGrayscale full = cv::imread(fileInfo.absoluteFilePath().toStdString(), cv::IMREAD_GRAYSCALE);
-            cv::GaussianBlur(full, full, cv::Size(21,21), 0);
-            ImageGrayscale cropped = full(cv::Rect(40, 20, 220, 180));
-            allImages << cropped;
-            //cv::imshow("face", cropped);
-            //cv::waitKey(1);
+            Mesh mesh = Mesh::fromBINZ(fileInfo.absoluteFilePath());
+            MapConverter mapConverter;
+            Map depth = SurfaceProcessor::depthmap(mesh, mapConverter, meshStart, meshEnd, 2.0, ZCoord);
+            depth.applyFilter(gaussKernel, gaussTimes, true);
+
+            if (first)
+            {
+                first = false;
+                cv::imshow("depth", depth.toMatrix());
+                cv::waitKey();
+            }
+            allMaps << depth;
             allClasses << fileInfo.baseName().split('d')[0].toInt();
         }
 
-        int stripes = 20;
-        int bins = 20;
-        qDebug() << "Histogram features...";
-
-        QVector<Vector> allRawVectors;
-        foreach(const ImageGrayscale &image, allImages)
+        double minEER = 1.0;
+        int minEERStripes;
+        int minEERBins;
+        for (int stripes = 26; stripes <= 30; stripes++)
         {
-            HistogramFeatures features(image, stripes, bins);
-            allRawVectors << features.toVector();
+            for (int bins = 5; bins <= 30; bins++)
+            {
+                QVector<Vector> allRawVectors;
+
+                foreach (const Map &map, allMaps)
+                {
+                    HistogramFeatures hf(map, stripes, bins);
+                    allRawVectors << hf.toVector();
+                }
+
+                QList<QVector<int> > classesInClusters;
+                QList<QVector<Vector> > rawVectorsInClusters;
+                BioDataProcessing::divideToNClusters(allRawVectors, allClasses, 5, rawVectorsInClusters, classesInClusters);
+
+                ZScorePassExtractor zPassExtractor(rawVectorsInClusters[1]);
+                //Evaluation result(rawVectorsInClusters[1], classesInClusters[1], zPassExtractor, CosineMetric());
+                BatchEvaluationResult result = Evaluation::batch(rawVectorsInClusters, classesInClusters, zPassExtractor, CosineMetric(), 2);
+                qDebug() << stripes << bins << result.meanEER;
+
+                if (result.meanEER < minEER)
+                {
+                    minEER = result.meanEER;
+                    minEERStripes = stripes;
+                    minEERBins = bins;
+                }
+            }
+            qDebug() << "";
         }
 
-        qDebug() << "Dividing...";
-        QList<QVector<int> > classesInClusters;
-        QList<QVector<Vector> > rawVectorsInClusters;
-        BioDataProcessing::divideToNClusters(allRawVectors, allClasses, 10, rawVectorsInClusters, classesInClusters);
+        qDebug() << "Best results:" << minEERStripes << minEERBins << minEER;
 
-        qDebug() << "Initial results...";
-        BatchEvaluationResult results = Evaluation::batch(rawVectorsInClusters, classesInClusters, PassExtractor(), CityblockMetric(), 2);
-        qDebug() << results.meanEER << "+-" << results.stdDevOfEER;
 
-        qDebug() << "Train set and validation set...";
+        /*double selThresholds[5] = {0.95, 0.96, 0.97, 0.98, 0.99};
+        for (int selThresholdIndex = 0; selThresholdIndex < 5; selThresholdIndex++)
+        {
+            double selThreshold = selThresholds[selThresholdIndex];
+            PCA pca(rawVectorsInClusters[0]);
+            pca.modesSelectionThreshold(selThreshold);
+
+            PCAExtractor pcaExtractor(pca);
+            ZScorePCAExtractor zPcaExtractor(pca, rawVectorsInClusters[1]);
+            ZScorePassExtractor zPassExtractor(rawVectorsInClusters[1]);
+
+            qDebug() << "selThreshold" << selThreshold << "PCA, SAD";
+            BatchEvaluationResult results = Evaluation::batch(rawVectorsInClusters, classesInClusters, pcaExtractor, CityblockMetric(), 2);
+            qDebug() << results.meanEER;
+
+            qDebug() << "selThreshold" << selThreshold << "PCA, SSD";
+            results = Evaluation::batch(rawVectorsInClusters, classesInClusters, pcaExtractor, SumOfSquareDifferences(), 2);
+            qDebug() << results.meanEER;
+
+            qDebug() << "selThreshold" << selThreshold << "PCA, cos";
+            results = Evaluation::batch(rawVectorsInClusters, classesInClusters, pcaExtractor, CosineMetric(), 2);
+            qDebug() << results.meanEER;
+
+            qDebug() << "selThreshold" << selThreshold << "zPCA, SAD";
+            results = Evaluation::batch(rawVectorsInClusters, classesInClusters, zPcaExtractor, CityblockMetric(), 2);
+            qDebug() << results.meanEER;
+
+            qDebug() << "selThreshold" << selThreshold << "zPCA, SSD";
+            results = Evaluation::batch(rawVectorsInClusters, classesInClusters, zPcaExtractor, SumOfSquareDifferences(), 2);
+            qDebug() << results.meanEER;
+
+            qDebug() << "selThreshold" << selThreshold << "zPCA, cos";
+            results = Evaluation::batch(rawVectorsInClusters, classesInClusters, zPcaExtractor, CosineMetric(), 2);
+            qDebug() << results.meanEER;
+
+            qDebug() << "selThreshold" << selThreshold << "zPass, SAD";
+            results = Evaluation::batch(rawVectorsInClusters, classesInClusters, zPassExtractor, CityblockMetric(), 2);
+            qDebug() << results.meanEER;
+
+            qDebug() << "selThreshold" << selThreshold << "zPass, SSD";
+            results = Evaluation::batch(rawVectorsInClusters, classesInClusters, zPassExtractor, SumOfSquareDifferences(), 2);
+            qDebug() << results.meanEER;
+
+            qDebug() << "selThreshold" << selThreshold << "zPass, cos";
+            results = Evaluation::batch(rawVectorsInClusters, classesInClusters, zPassExtractor, CosineMetric(), 2);
+            qDebug() << results.meanEER;
+        }*/
+
+        /*qDebug() << "Initial results...";
+        MahalanobisMetric mahal(rawVectorsInClusters[0]);
+        BatchEvaluationResult results = Evaluation::batch(rawVectorsInClusters, classesInClusters, PassExtractor(), mahal, 2);
+        qDebug() << results.meanEER << "+-" << results.stdDevOfEER;*/
+
+        /*qDebug() << "Train set and validation set...";
         QVector<Template> trainSet = Template::joinVectorsAndClasses(rawVectorsInClusters[0], classesInClusters[0]);
         QVector<Template> validationSet = Template::joinVectorsAndClasses(rawVectorsInClusters[1], classesInClusters[1]);
 
@@ -299,7 +385,7 @@ public:
 
         qDebug() << "Genetic results...";
         results = Evaluation::batch(rawVectorsInClusters, classesInClusters, PassExtractor(), cityWeights, 2);
-        qDebug() << results.meanEER << "+-" << results.stdDevOfEER;
+        qDebug() << results.meanEER << "+-" << results.stdDevOfEER;*/
     }
 };
 

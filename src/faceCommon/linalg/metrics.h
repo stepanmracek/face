@@ -317,6 +317,7 @@ public:
 
 class SumOfSquareDifferences : public Metrics
 {
+public:
     double distance(Vector &v1, Vector &v2) const
     {
         int n = v1.rows;
