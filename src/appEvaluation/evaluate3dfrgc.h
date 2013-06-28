@@ -28,6 +28,7 @@
 #include "biometrics/histogramfeatures.h"
 #include "biometrics/geneticweightoptimization.h"
 #include "biometrics/eerpotential.h"
+#include "linalg/adaboost.h"
 
 class Evaluate3dFrgc
 {
@@ -236,6 +237,73 @@ public:
                 }
                 qDebug() << "";
             }
+        }
+    }
+
+    static void EvaluateHistogramAdaboost()
+    {
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
+        QDir srcDir(srcDirPath, "*.binz");
+        QFileInfoList srcFiles = srcDir.entryInfoList();
+
+        cv::Point2d meshStart(-60,-30);
+        cv::Point2d meshEnd(60,60);
+        int kSize = 9;
+        int gaussTimes = 1;
+        int stripes = 20;
+        int bins = 20;
+
+        Matrix gaussKernel = KernelGenerator::gaussianKernel(kSize);
+
+        qDebug() << "Loading...";
+        QVector<int> classes;
+        QVector<Vector> vectors;
+        foreach (const QFileInfo &fileInfo, srcFiles)
+        {
+            Mesh mesh = Mesh::fromBINZ(fileInfo.absoluteFilePath());
+            MapConverter mapConverter;
+            Map depth = SurfaceProcessor::depthmap(mesh, mapConverter, meshStart, meshEnd, 2.0, ZCoord);
+            depth.applyFilter(gaussKernel, gaussTimes, true);
+
+            HistogramFeatures histogramFeatures(depth, stripes, bins);
+            vectors << histogramFeatures.toVector();
+            classes << fileInfo.baseName().split('d')[0].toInt();
+
+            if (classes.count() >= 40) break;
+        }
+
+        Evaluation eval(vectors, classes, PassExtractor(), CityblockMetric());
+        qDebug() << eval.eer;
+
+        QVector<Vector> trainVectorsForAdaboost;
+        QVector<int> labelsForAdaboost;
+        int n = classes.count();
+        for (int i = 0; i < (n-1); i++)
+        {
+            for (int j = i+1; j < n; j++)
+            {
+                if (classes[i] == classes[j])
+                    labelsForAdaboost << 1;
+                else
+                    labelsForAdaboost << 0;
+
+                int r = vectors[i].rows;
+                Vector trainVector(r*2);
+                vectors[i].copyTo(trainVector.rowRange(0, r));
+                vectors[j].copyTo(trainVector.rowRange(r, 2*r));
+                trainVectorsForAdaboost << trainVector;
+            }
+        }
+
+        // AdabBoost
+        qDebug() << "adaboost";
+        AdaBoostSimple adaBoost;
+        adaBoost.learn(trainVectorsForAdaboost, labelsForAdaboost);
+
+        qDebug() << "testing";
+        for (int i = 0; i < trainVectorsForAdaboost.count(); i++)
+        {
+            qDebug() << labelsForAdaboost[i] << adaBoost.classify(trainVectorsForAdaboost[i]);
         }
     }
 
