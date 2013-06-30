@@ -68,7 +68,7 @@ public:
 
     static double getOptimalRotation(Vector &from, Vector &to);
 
-    static RotateAndScaleCoefs align(Vector &from, Vector &to);
+    static RotateAndScaleCoefs align(const Vector &from, const Vector &to);
 
     static void rotateAndScale(Vector &vector, RotateAndScaleCoefs &coefs);
 

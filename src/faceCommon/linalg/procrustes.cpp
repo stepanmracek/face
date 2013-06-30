@@ -166,15 +166,13 @@ double Procrustes2D::getOptimalRotation(Vector &from, Vector &to)
     return atan(numerator/denumerator);
 }
 
-RotateAndScaleCoefs Procrustes2D::align(Vector &from, Vector &to)
+RotateAndScaleCoefs Procrustes2D::align(const Vector &from, const Vector &to)
 {
-    Vector reference(to);
-    double referenceScale = 1.0/reference.magnitude();
-    reference.mul(referenceScale);
+    double referenceScale = 1.0/to.magnitude();
+    Vector reference = to.mul(referenceScale);
 
-    Vector vector(from);
-    double vectorScale = 1.0/vector.magnitude();
-    vector.mul(vectorScale);
+    double vectorScale = 1.0/from.magnitude();
+    Vector vector = from.mul(vectorScale);
 
     /*int n = vector.rows/2;
     double numerator = 0.0;

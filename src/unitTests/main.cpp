@@ -20,6 +20,7 @@
 #include "testanotation.h"
 #include "testmap.h"
 #include "testhistogramfeatures.h"
+#include "testdistance.h"
 
 #include <QString>
 
@@ -55,7 +56,7 @@ int main(int argc, char *argv[])
 
     //TestBioDataProcessing::testDivideTemplatesToClusters();
     //TestBioDataProcessing::testDivideVectorsToClusters();
-    TestBioDataProcessing::testDivideToNClusters();
+    //TestBioDataProcessing::testDivideToNClusters();
 
     //TestDiscriminativePotential::TestOnFRGC();
 
@@ -117,6 +118,8 @@ int main(int argc, char *argv[])
     //TestMap::testSerialization(frgcPath() + "04225d402.abs.xyz");
 
     //TestHistogramFeatures::testFeaturesGeneration(frgcPath());
+
+    TestDistance::testCosine();
 
 	return 0;
 }

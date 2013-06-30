@@ -11,10 +11,10 @@
 class FeatureExtractor
 {
 public:
-    virtual Vector extract(Vector &rawData) const = 0;
+    virtual Vector extract(const Vector &rawData) const = 0;
     virtual int outputLen() = 0;
 
-    QVector<Vector> batchExtract(QVector<Vector> &rawData)
+    QVector<Vector> batchExtract(const QVector<Vector> &rawData)
     {
         QVector<Vector> result;
         for (int i = 0; i < rawData.count(); i++)
@@ -41,7 +41,7 @@ private:
 public:
     PCAExtractor(PCA pca) : pca(pca) {}
 
-    Vector extract(Vector &rawData) const
+    Vector extract(const Vector &rawData) const
     {
         return pca.project(rawData);
     }
@@ -57,7 +57,7 @@ public:
     PCA pca;
     ZScoreNormalizationResult normParams;
 
-    ZScorePCAExtractor(PCA pca, QVector<Vector> &rawData )
+    ZScorePCAExtractor(PCA pca, const QVector<Vector> &rawData )
     {
         this->pca = pca;
         QVector<Vector> projectedData = pca.batchProject(rawData);
@@ -68,7 +68,7 @@ public:
 
     void serialize(const QString &pcaPath, const QString &normParamsPath);
 
-    Vector extract(Vector &rawData) const
+    Vector extract(const Vector &rawData) const
     {
         Vector projected = pca.project(rawData);
         Normalization::zScoreNormalization(projected, normParams);
@@ -88,7 +88,7 @@ private:
 public:
     NormPCAExtractor(PCA pca) : pca(pca) {}
 
-    Vector extract(Vector &rawData) const
+    Vector extract(const Vector &rawData) const
     {
         return pca.scaledProject(rawData);
     }
@@ -106,7 +106,7 @@ private:
 public:
     ICAofPCAExtractor(ICAofPCA icaOfpca) : icaOfpca(icaOfpca) {}
 
-    Vector extract(Vector &rawData) const
+    Vector extract(const Vector &rawData) const
     {
         return icaOfpca.project(rawData);
     }
@@ -123,14 +123,14 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
-    ZScoreICAofPCAExtractor(ICAofPCA icaOfpca, QVector<Vector> &rawData )
+    ZScoreICAofPCAExtractor(ICAofPCA icaOfpca, const QVector<Vector> &rawData )
     {
         this->icaOfpca = icaOfpca;
         QVector<Vector> projectedData = icaOfpca.batchProject(rawData);
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
-    Vector extract(Vector &rawData) const
+    Vector extract(const Vector &rawData) const
     {
         Vector projected = icaOfpca.project(rawData);
         Normalization::zScoreNormalization(projected, normParams);
@@ -150,7 +150,7 @@ private:
 public:
     ICAofPCAWhiteningExtractor(ICAofPCA icaOfpca) : icaOfpca(icaOfpca) {}
 
-    Vector extract(Vector &rawData) const
+    Vector extract(const Vector &rawData) const
     {
         Vector pcaProjected = icaOfpca.pca.project(rawData);
         return icaOfpca.ica.whiten(pcaProjected);
@@ -168,14 +168,14 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
-    ZScoreICAofPCAWhiteningExtractor(ICAofPCA icaOfpca, QVector<Vector> &rawData )
+    ZScoreICAofPCAWhiteningExtractor(ICAofPCA icaOfpca, const QVector<Vector> &rawData )
     {
         this->icaOfpca = icaOfpca;
         QVector<Vector> projectedData = icaOfpca.whiten(rawData);
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
-    Vector extract(Vector &rawData) const
+    Vector extract(const Vector &rawData) const
     {
         Vector projected = icaOfpca.whiten(rawData);
         Normalization::zScoreNormalization(projected, normParams);
@@ -195,7 +195,7 @@ private:
 public:
     LDAofPCAExtractor(LDAofPCA ldaOfpca) : ldaOfpca(ldaOfpca) {}
 
-    Vector extract(Vector &rawData) const
+    Vector extract(const Vector &rawData) const
     {
         return ldaOfpca.project(rawData);
     }
@@ -212,14 +212,14 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
-    ZScoreLDAofPCAExtractor(LDAofPCA ldaOfpca, QVector<Vector> &rawData )
+    ZScoreLDAofPCAExtractor(LDAofPCA ldaOfpca, const QVector<Vector> &rawData )
     {
         this->ldaOfpca = ldaOfpca;
         QVector<Vector> projectedData = ldaOfpca.batchProject(rawData);
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
-    Vector extract(Vector &rawData) const
+    Vector extract(const Vector &rawData) const
     {
         Vector projected = ldaOfpca.project(rawData);
         Normalization::zScoreNormalization(projected, normParams);
@@ -239,7 +239,7 @@ private:
 public:
     LDAExtractor(LDA lda) : lda(lda) {}
 
-    Vector extract(Vector &rawData) const
+    Vector extract(const Vector &rawData) const
     {
         return lda.project(rawData);
     }
@@ -256,14 +256,14 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
-    ZScoreLDAExtractor(LDA lda, QVector<Vector> &rawData )
+    ZScoreLDAExtractor(LDA lda, const QVector<Vector> &rawData )
     {
         this->lda = lda;
         QVector<Vector> projectedData = lda.batchProject(rawData);
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
-    Vector extract(Vector &rawData) const
+    Vector extract(const Vector &rawData) const
     {
         Vector projected = lda.project(rawData);
         Normalization::zScoreNormalization(projected, normParams);
@@ -278,7 +278,7 @@ public:
 class PassExtractor : public FeatureExtractor
 {
 public:
-    Vector extract(Vector &rawData) const
+    Vector extract(const Vector &rawData) const
     {
         return Vector(rawData);
     }
@@ -292,7 +292,7 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
-    ZScorePassExtractor(QVector<Vector> &rawData )
+    ZScorePassExtractor(const QVector<Vector> &rawData)
     {
         QVector<Vector> projectedData;
         for (int i = 0; i < rawData.count(); i++)
@@ -302,14 +302,40 @@ public:
         normParams = Normalization::zScoreNormalization(projectedData);
     }
 
-    Vector extract(Vector &rawData) const
+    Vector extract(const Vector &rawData) const
     {
         Vector projected(rawData);
         Normalization::zScoreNormalization(projected, normParams);
         return projected;
     }
 
-    int outputLen() { return -1; }
+    int outputLen() { return normParams.mean.count(); }
+};
+
+class MeanNormalizationExtractor : public FeatureExtractor
+{
+private:
+    MeanNormalizationResult params;
+
+public:
+    MeanNormalizationExtractor(const QVector<Vector> &rawData)
+    {
+        QVector<Vector> projectedData;
+        for (int i = 0; i < rawData.count(); i++)
+        {
+             projectedData.append(Vector(rawData[i]));
+        }
+        params = Normalization::meanNormalization(projectedData);
+    }
+
+    Vector extract(const Vector &rawData) const
+    {
+        Vector projected(rawData);
+        Normalization::meanNormalization(projected, params);
+        return projected;
+    }
+
+    int outputLen() { return params.mean.count(); }
 };
 
 #endif // FEATUREEXTRACTOR_H

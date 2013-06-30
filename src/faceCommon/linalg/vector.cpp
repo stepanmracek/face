@@ -79,7 +79,7 @@ Vector Vector::fromFile(const QString &path)
     return vector;
 }
 
-double Vector::sqrMagnitude()
+double Vector::sqrMagnitude() const
 {
     int n = this->rows;
     double sum = 0;
@@ -91,12 +91,12 @@ double Vector::sqrMagnitude()
     return sum;
 }
 
-double Vector::magnitude()
+double Vector::magnitude() const
 {
     return sqrt(sqrMagnitude());
 }
 
-double Vector::dot(Vector &v1, Vector &v2)
+double Vector::dot(const Vector &v1, const Vector &v2)
 {
     int n = v1.rows;
     assert(n == v2.rows);
@@ -122,7 +122,7 @@ Vector &Vector::normalize()
     return (*this);
 }
 
-Vector Vector::normalized()
+Vector Vector::normalized() const
 {
     int n = this->rows;
     double mag = magnitude();
@@ -136,32 +136,34 @@ Vector Vector::normalized()
     return newVector;
 }
 
-Vector &Vector::mul(double value)
+Vector Vector::mul(double value) const
 {
     int n = this->rows;
+    Vector result(n);
 
     for (int i = 0; i < n; i++)
     {
-        (*this)(i) = (*this)(i) * value;
+        result(i) = (*this)(i) * value;
     }
 
-    return (*this);
+    return result;
 }
 
-Vector &Vector::mul(const Vector &other)
+Vector Vector::mul(const Vector &other) const
 {
     int r = this->rows;
     assert(r == other.rows);
+    Vector result(r);
 
     for (int i = 0; i < r; i++)
     {
-        (*this)(i) = (*this)(i) * other(i);
+        result(i) = (*this)(i) * other(i);
     }
 
-    return (*this);
+    return result;
 }
 
-bool Vector::isZero()
+bool Vector::isZero() const
 {
     int n = this->rows;
     for (int i = 0; i < n; i++)
@@ -171,7 +173,7 @@ bool Vector::isZero()
     return true;
 }
 
-void Vector::toFile(const QString &path, bool append)
+void Vector::toFile(const QString &path, bool append) const
 {
     QFile f(path);
     if (append)
@@ -192,7 +194,7 @@ void Vector::toFile(const QString &path, bool append)
     f.close();
 }
 
-void Vector::toFileWithIndicies(const QString &path, bool append)
+void Vector::toFileWithIndicies(const QString &path, bool append) const
 {
     QFile f(path);
     if (append)
@@ -212,7 +214,7 @@ void Vector::toFileWithIndicies(const QString &path, bool append)
     f.close();
 }
 
-void Vector::toFileTwoCols(const QString &path, bool append)
+void Vector::toFileTwoCols(const QString &path, bool append) const
 {
     int n = this->rows;
     assert(n % 2 == 0);
@@ -284,7 +286,7 @@ Vector Vector::fromTwoColsFile(const QString &path)
     return vector;
 }
 
-int Vector::maxIndex()
+int Vector::maxIndex() const
 {
     double max = -1e300;
     int index = -1;
@@ -302,7 +304,7 @@ int Vector::maxIndex()
     return index;
 }
 
-int Vector::maxIndex(int from, int to)
+int Vector::maxIndex(int from, int to) const
 {
     double max = -1e300;
     int index = -1;
@@ -343,7 +345,7 @@ int Vector::maxIndex(int from, int to)
     return index;
 }*/
 
-double Vector::maxValue()
+double Vector::maxValue() const
 {
     return (*this)(maxIndex());
 }
@@ -353,7 +355,7 @@ double Vector::maxValue()
     return vector.at(maxIndex(vector));
 }*/
 
-int Vector::minIndex()
+int Vector::minIndex() const
 {
     double min = 1e300;
     int index = -1;
@@ -393,7 +395,7 @@ int Vector::minIndex()
     return index;
 }*/
 
-double Vector::minValue()
+double Vector::minValue() const
 {
     return (*this)(minIndex());
 }
@@ -404,7 +406,7 @@ double Vector::minValue()
     return vector.at(i);
 }*/
 
-double Vector::meanValue()
+double Vector::meanValue() const
 {
     double sum = 0;
     int r = this->rows;
@@ -428,7 +430,7 @@ double Vector::meanValue()
     return sum/r;
 }*/
 
-double Vector::stdDeviation()
+double Vector::stdDeviation() const
 {
     double mean = meanValue();
     double sum = 0;
@@ -454,7 +456,7 @@ double Vector::stdDeviation()
     return sqrt((1.0/(r - 1.0)) * sum);
 }*/
 
-QVector<double> Vector::toQVector()
+QVector<double> Vector::toQVector() const
 {
     QVector<double> result;
     for (int i = 0; i < this->rows; i++)
@@ -462,7 +464,7 @@ QVector<double> Vector::toQVector()
     return result;
 }
 
-Vector Vector::normalizeComponents(QVector<double> &minValues, QVector<double> &maxValues, bool fixedBounds)
+Vector Vector::normalizeComponents(const QVector<double> &minValues, const QVector<double> &maxValues, bool fixedBounds) const
 {
     int r = this->rows;
     Vector result(r);
@@ -482,7 +484,7 @@ Vector Vector::normalizeComponents(QVector<double> &minValues, QVector<double> &
     return result;
 }
 
-Vector Vector::normalizeComponents()
+Vector Vector::normalizeComponents() const
 {
     double min = minValue();
     double max = maxValue();
@@ -491,7 +493,7 @@ Vector Vector::normalizeComponents()
     return result;
 }
 
-Vector Vector::meanVector(QVector<Vector> &vectors)
+Vector Vector::meanVector(const QVector<Vector> &vectors)
 {
     Vector result(vectors[0].rows);
     int n = vectors.count();
@@ -502,7 +504,7 @@ Vector Vector::meanVector(QVector<Vector> &vectors)
     return result;
 }
 
-Vector Vector::smooth(int kernelSize)
+Vector Vector::smooth(int kernelSize) const
 {
     assert(kernelSize > 1);
     assert(kernelSize % 2 == 1);

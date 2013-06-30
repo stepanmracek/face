@@ -13,7 +13,7 @@ class HistogramFeatures
 public:
     QVector<Histogram> histograms;
 
-    HistogramFeatures(const Map &depthmap, int stripes, int binsPerStripe);
+    HistogramFeatures(const Map &depthmap, int stripes, int binsPerStripe, double minValue = 0, double maxValue = 0);
     HistogramFeatures(const ImageGrayscale &depthmap, int stripes, int binsPerStripe);
 
     Vector toVector();

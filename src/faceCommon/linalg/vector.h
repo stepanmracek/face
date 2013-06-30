@@ -30,49 +30,49 @@ public:
 
     static Vector fromFile(const QString &path);
 
-    double sqrMagnitude();
+    double sqrMagnitude() const;
 
-    double magnitude();
+    double magnitude() const;
 
-    static double dot(Vector &v1, Vector &v2);
+    static double dot(const Vector &v1, const Vector &v2);
 
     Vector &normalize();
 
-    Vector normalized();
+    Vector normalized() const;
 
-    Vector &mul(double value);
+    Vector mul(double value) const;
 
-    Vector &mul(const Vector &other);
+    Vector mul(const Vector &other) const;
 
-    bool isZero();
+    bool isZero() const;
 
-    void toFile(const QString &path, bool append = false);
+    void toFile(const QString &path, bool append = false) const;
 
-    void toFileWithIndicies(const QString &path, bool append = false);
+    void toFileWithIndicies(const QString &path, bool append = false) const;
 
-    void toFileTwoCols(const QString &path, bool append = false);
+    void toFileTwoCols(const QString &path, bool append = false) const;
 
     static Vector fromTwoColsFile(const QString &path);
 
-    double maxValue();
+    double maxValue() const;
 
-    int maxIndex();
+    int maxIndex() const;
 
-    int maxIndex(int from, int to);
+    int maxIndex(int from, int to) const;
 
-    double minValue();
+    double minValue() const;
 
-    int minIndex();
+    int minIndex() const;
 
-    double meanValue();
+    double meanValue() const;
 
-    double stdDeviation();
+    double stdDeviation() const;
 
-    QVector<double> toQVector();
+    QVector<double> toQVector() const;
 
-    Vector normalizeComponents(QVector<double> &minValues, QVector<double> &maxValues, bool fixedBounds = true);
+    Vector normalizeComponents(const QVector<double> &minValues, const QVector<double> &maxValues, bool fixedBounds = true) const;
 
-    Vector normalizeComponents();
+    Vector normalizeComponents() const;
 
     /*static int maxIndex(QVector<double> &vector);
 
@@ -84,11 +84,11 @@ public:
 
     static double meanValue(QVector<double> &vector);*/
 
-    static Vector meanVector(QVector<Vector> &vectors);
+    static Vector meanVector(const QVector<Vector> &vectors);
 
     /*static double stdDeviation(QVector<double> &vector);*/
 
-    Vector smooth(int kernelSize);
+    Vector smooth(int kernelSize) const;
 };
 
 #endif // VECTORN_H

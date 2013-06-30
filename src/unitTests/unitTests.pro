@@ -38,4 +38,5 @@ HEADERS += \
     testsurfaceprocessing.h \
     testanotation.h \
     testmap.h \
-    testhistogramfeatures.h
+    testhistogramfeatures.h \
+    testdistance.h

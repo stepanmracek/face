@@ -31,7 +31,7 @@ LinearNormalizationResult Normalization::linearNormalization(QVector<Vector> &ve
     return res;
 }
 
-void Normalization::linearNormalization(QVector<Vector> &vectors, LinearNormalizationResult &params)
+void Normalization::linearNormalization(QVector<Vector> &vectors, const LinearNormalizationResult &params)
 {
     int n = vectors.count();
     assert(n > 0);
@@ -119,4 +119,45 @@ ZScoreNormalizationResult::ZScoreNormalizationResult(const QString &path)
     mean = means.toQVector();
     stdDev = stdDevs.toQVector();
     storage.release();
+}
+
+MeanNormalizationResult Normalization::meanNormalization(QVector<Vector> &vectors)
+{
+    int n = vectors.count();
+    assert(n > 0);
+    int m = vectors[0].rows;
+
+    // calculate mean and stdDev
+    MeanNormalizationResult result;
+    for (int componentIndex = 0; componentIndex < m; componentIndex++)
+    {
+        QVector<double> values;
+        for (int vectorIndex = 0; vectorIndex < n; vectorIndex++)
+        {
+            values.append(vectors[vectorIndex](componentIndex));
+        }
+
+        Vector valuesVec(values);
+        result.mean.append(valuesVec.meanValue());
+    }
+
+    // normalize
+    meanNormalization(vectors, result);
+    return result;
+}
+
+void Normalization::meanNormalization(Vector &vector, const MeanNormalizationResult &params)
+{
+    for (int componentIndex = 0; componentIndex < vector.rows; componentIndex++)
+    {
+        vector(componentIndex) = vector(componentIndex) - params.mean[componentIndex];
+    }
+}
+
+void Normalization::meanNormalization(QVector<Vector> &vectors, const MeanNormalizationResult &params)
+{
+    for (int vectorIndex = 0; vectorIndex < vectors.count(); vectorIndex++)
+    {
+        meanNormalization(vectors[vectorIndex], params);
+    }
 }

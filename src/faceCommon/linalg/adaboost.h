@@ -23,7 +23,7 @@ private:
     QVector<double> weights;
 
     virtual int weakCount() = 0;
-    virtual Vector createWeakInput(Vector &input) = 0;
+    virtual Vector createWeakInput(int weakClassifierIndex, Vector &input) = 0;
 
 public:
     void learn(QVector<Vector> &trainVectors, QVector<int> &labels);
@@ -33,14 +33,25 @@ public:
 
 class AdaBoostSimple : public AdaBoost
 {
+public:
+    AdaBoostSimple(int stripes, int bins)
+    {
+        wCount = stripes*bins;
+    }
+
 private:
-    int weakCount() { return 1; }
-    Vector createWeakInput(Vector &input)
+    int wCount;
+    int weakCount() { return wCount; }
+
+    Vector createWeakInput(int weakClassifierIndex, Vector &input)
     {
         int rows = input.rows;
         Matrix first = input.rowRange(0, rows/2);
         Matrix second = input.rowRange(rows/2, rows);
-        return first - second;
+        Matrix diff = first - second;
+        Vector result(1);
+        result(0) = fabs(diff(weakClassifierIndex));
+        return result;
     }
 };
 

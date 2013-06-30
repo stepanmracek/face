@@ -265,15 +265,23 @@ public:
             Map depth = SurfaceProcessor::depthmap(mesh, mapConverter, meshStart, meshEnd, 2.0, ZCoord);
             depth.applyFilter(gaussKernel, gaussTimes, true);
 
-            HistogramFeatures histogramFeatures(depth, stripes, bins);
+            //cv::imshow("depth", depth.toMatrix());
+            //cv::waitKey(0);
+            //qDebug() << depth.minValue() << depth.maxIndex() << depth.maxValue() << depth.maxIndex();
+            //return;
+
+            HistogramFeatures histogramFeatures(depth, stripes, bins, -70, 0);
             vectors << histogramFeatures.toVector();
             classes << fileInfo.baseName().split('d')[0].toInt();
 
-            if (classes.count() >= 40) break;
+            //if (classes.count() >= 39) break;
         }
 
-        Evaluation eval(vectors, classes, PassExtractor(), CityblockMetric());
+        ZScorePassExtractor extractor(vectors);
+        //MeanNormalizationExtractor extractor(vectors);
+        Evaluation eval(vectors, classes, extractor, CosineMetric());
         qDebug() << eval.eer;
+        return;
 
         QVector<Vector> trainVectorsForAdaboost;
         QVector<int> labelsForAdaboost;
@@ -297,14 +305,14 @@ public:
 
         // AdabBoost
         qDebug() << "adaboost";
-        AdaBoostSimple adaBoost;
+        AdaBoostSimple adaBoost(stripes, bins);
         adaBoost.learn(trainVectorsForAdaboost, labelsForAdaboost);
 
-        qDebug() << "testing";
-        for (int i = 0; i < trainVectorsForAdaboost.count(); i++)
-        {
-            qDebug() << labelsForAdaboost[i] << adaBoost.classify(trainVectorsForAdaboost[i]);
-        }
+        //qDebug() << "testing";
+        //for (int i = 0; i < trainVectorsForAdaboost.count(); i++)
+        //{
+        //    qDebug() << labelsForAdaboost[i] << adaBoost.classify(trainVectorsForAdaboost[i]);
+        //}
     }
 
     static void evaluateHistogramFeatures()

@@ -56,7 +56,8 @@ SOURCES += \
     biometrics/featureextractor.cpp \
     linalg/histogram.cpp \
     biometrics/histogramfeatures.cpp \
-    linalg/adaboost.cpp
+    linalg/adaboost.cpp \
+    biometrics/system.cpp
 
 HEADERS += \
     kinect/kinnect.h \
@@ -121,7 +122,8 @@ HEADERS += \
     biometrics/isocurveprocessing.h \
     linalg/histogram.h \
     biometrics/histogramfeatures.h \
-    linalg/adaboost.h
+    linalg/adaboost.h \
+    biometrics/system.h
 
 FORMS += \
     facelib/morphable3dfacemodelwidget.ui \

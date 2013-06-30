@@ -41,9 +41,8 @@ void AdaBoost::trainWeakClassifiers(QVector<Vector> &trainVectors, QVector<int> 
         QVector<Vector> trainData;
         for (int i = 0; i < n; i++)
         {
-            trainData << createWeakInput(trainVectors[i]);
+            trainData << createWeakInput(classifier, trainVectors[i]);
         }
-
         weakClassifiers[classifier].learn(trainData, labels);
     }
 }
@@ -95,7 +94,7 @@ void AdaBoost::getBestWeakClassifier(QVector<Vector> &trainVectors, QVector<int>
             e += weights[i] * fabs(h(classifier, trainVectors[i]) - labels[i]);
         }
 
-        qDebug() << e;
+        //qDebug() << e;
 
         if (e < error)
         {
@@ -126,7 +125,7 @@ double AdaBoost::updateWeights(QVector<Vector> &trainVectors, QVector<int> &labe
 
 double AdaBoost::h(int classifier, Vector &input)
 {
-    Vector weakInput = createWeakInput(input);
+    Vector weakInput = createWeakInput(classifier, input);
     return weakClassifiers[classifier].classify(weakInput);
 }
 
@@ -137,4 +136,6 @@ double AdaBoost::classify(Vector &input)
     {
         sum += alpha[classifier] * h(classifier, input);
     }
+
+    return sum;
 }

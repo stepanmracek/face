@@ -14,7 +14,7 @@ class Metrics
 public:
     Metrics() {}
 
-    virtual double distance(Vector &v1, Vector &v2) const = 0;
+    virtual double distance(const Vector &v1, const Vector &v2) const = 0;
 
     virtual ~Metrics() {}
 };
@@ -24,7 +24,7 @@ class WeightedMetric : public Metrics
 public:
     Vector w;
 
-    virtual double distance(Vector &v1, Vector &v2) const = 0;
+    virtual double distance(const Vector &v1, const Vector &v2) const = 0;
 
     void normalizeWeights()
     {
@@ -59,7 +59,7 @@ public:
 class EuclideanMetric : public Metrics
 {
 public:
-    virtual double distance(Vector &v1, Vector &v2) const
+    virtual double distance(const Vector &v1, const Vector &v2) const
     {
         int n = v1.rows;
         assert(n == v2.rows);
@@ -80,7 +80,7 @@ public:
 class EuclideanWeightedMetric : public WeightedMetric
 {
 public:
-    virtual double distance(Vector &v1, Vector &v2) const
+    virtual double distance(const Vector &v1, const Vector &v2) const
     {
         int n = v1.rows;
         assert(n == v2.rows);
@@ -102,7 +102,7 @@ public:
 class CityblockMetric : public Metrics
 {
 public:
-    virtual double distance(Vector &v1, Vector &v2) const
+    virtual double distance(const Vector &v1, const Vector &v2) const
     {
         int n = v1.rows;
         assert(n == v2.rows);
@@ -122,7 +122,7 @@ public:
 class CityblockWeightedMetric : public WeightedMetric
 {
 public:
-    virtual double distance(Vector &v1, Vector &v2) const
+    virtual double distance(const Vector &v1, const Vector &v2) const
     {
         int n = v1.rows;
         assert(n == v2.rows);
@@ -143,12 +143,12 @@ public:
 class CorrelationMetric : public Metrics
 {
 public:
-    virtual double distance(Vector &v1, Vector &v2) const
+    virtual double distance(const Vector &v1, const Vector &v2) const
     {
         return 1.0 - correlation(v1, v2);
     }
 
-    double correlation(Vector &v1, Vector &v2) const
+    double correlation(const Vector &v1, const Vector &v2) const
     {
         int n = v1.rows;
         assert(n == v2.rows);
@@ -173,12 +173,12 @@ public:
 class CorrelationWeightedMetric : public WeightedMetric
 {
 public:
-    virtual double distance(Vector &v1, Vector &v2) const
+    virtual double distance(const Vector &v1, const Vector &v2) const
     {
         return 1.0 - correlation(v1, v2);
     }
 
-    double correlation(Vector &v1, Vector &v2) const
+    double correlation(const Vector &v1, const Vector &v2) const
     {
         int n = v1.rows;
         assert(n == v2.rows);
@@ -206,7 +206,7 @@ public:
 class CosineMetric : public Metrics
 {
 public:
-    virtual double distance(Vector &v1, Vector &v2) const
+    virtual double distance(const Vector &v1, const Vector &v2) const
     {
         int n = v1.rows;
         assert(n == v2.rows);
@@ -216,8 +216,8 @@ public:
 
         if(dist < 0.0)
         {
-        	// qDebug() << "CosineMetric" << dist;
-        	dist = 0.0;
+            //qDebug() << "CosineMetric" << dist;
+            dist = 0.0;
         }
 
         return dist;
@@ -229,7 +229,7 @@ public:
 class CosineWeightedMetric : public WeightedMetric
 {
 public:
-    virtual double distance(Vector &v1, Vector &v2) const
+    virtual double distance(const Vector &v1, const Vector &v2) const
     {
         int n = v1.rows;
         assert(n == v2.rows);
@@ -266,7 +266,7 @@ public:
 
     void learn(QVector<Vector> &samples);
 
-    virtual double distance(Vector &v1, Vector &v2) const
+    virtual double distance(const Vector &v1, const Vector &v2) const
     {
         int n = v1.rows;
         assert(n == v2.rows);
@@ -276,7 +276,7 @@ public:
         return cv::Mahalonobis(v1, v2, invCov);
     }
 
-    double distance(Vector &v)
+    double distance(const Vector &v)
     {
         //qDebug() << "mean:" << mean.rows << mean.cols << "v:" << v.rows << v.cols << "invCov" << invCov.rows << invCov.cols;
         return cv::Mahalanobis(v, mean, invCov);
@@ -297,7 +297,7 @@ public:
 
     MahalanobisWeightedMetric(QVector<Vector> &samples);
 
-    virtual double distance(Vector &v1, Vector &v2) const
+    virtual double distance(const Vector &v1, const Vector &v2) const
     {
         int n = v1.rows;
         assert(n == v2.rows);
@@ -318,7 +318,7 @@ public:
 class SumOfSquareDifferences : public Metrics
 {
 public:
-    double distance(Vector &v1, Vector &v2) const
+    double distance(const Vector &v1, const Vector &v2) const
     {
         int n = v1.rows;
         assert(n == v2.rows);
