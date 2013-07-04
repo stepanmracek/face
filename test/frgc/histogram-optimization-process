@@ -1,0 +1,247 @@
+1. ROI
+======
+(-50,-30) - (50,50): 0.128831
+(-50,-30) - (50,60): 0.133839
+(-60,-30) - (60,60): 0.129567 <==
+(-60,-40) - (60,60): 0.135166
+(-60,-40) - (60,70): 0.142989
+
+2. Smoothing
+============
+kernel size, repeats
+3 1: 0.129914
+3 2: 0.129733
+3 3: 0.129823
+5 1: 0.130172
+5 2: 0.13099
+5 3: 0.13145
+7 1: 0.131019
+7 2: 0.132072
+7 3: 0.131439 
+9 1: 0.131966 <==
+9 2: 0.131473
+9 3: 0.131664
+
+3. Metrics/PCA/z-score
+======================
+cityblock pass		0.14065
+cityblock pca 		0.161168 
+cityblock z-pca		0.203411
+cityblock z-pass	0.13808
+SSD pass 			0.15743
+SSD pca 			0.154851
+SSD z-pca 			0.2146
+SSD z-pass			0.167529
+cos pass 			0.146455
+cos pca 			0.136051
+cos z-pca 			0.138994
+cos z-pass 			0.108481 <==
+
+4. Histogram creation
+=====================
+
+metrtics: cityblock, SSD, cos, correlation
+
+zmin -80 pass 0.1368 
+zmin -80 pca 0.157524 
+zmin -80 z-pca 0.204006 
+zmin -80 z-pass 0.136168 
+zmin -80 pass 0.154857 
+zmin -80 pca 0.153641 
+zmin -80 z-pca 0.214467 
+zmin -80 z-pass 0.175275 
+zmin -80 pass 0.142942 
+zmin -80 pca 0.132147 
+zmin -80 z-pca 0.138577 
+zmin -80 z-pass 0.111644 
+zmin -80 pass 0.138085 
+zmin -80 pca 0.130702 
+zmin -80 z-pca 0.136405 
+zmin -80 z-pass 0.110563 
+zmin -70 pass 0.14065 
+zmin -70 pca 0.161168 
+zmin -70 z-pca 0.203411 
+zmin -70 z-pass 0.13808 
+zmin -70 pass 0.15743 
+zmin -70 pca 0.154851 
+zmin -70 z-pca 0.2146 
+zmin -70 z-pass 0.167529 
+zmin -70 pass 0.146455 
+zmin -70 pca 0.136051 
+zmin -70 z-pca 0.138994 
+zmin -70 z-pass 0.108481 (cos)
+zmin -70 pass 0.140143 
+zmin -70 pca 0.137205 
+zmin -70 z-pca 0.140653 
+zmin -70 z-pass 0.107985 (correlation)
+zmin -60 pass 0.139933 
+zmin -60 pca 0.166115 
+zmin -60 z-pca 0.216799 
+zmin -60 z-pass 0.134814 
+zmin -60 pass 0.158136 
+zmin -60 pca 0.152823 
+zmin -60 z-pca 0.230721 
+zmin -60 z-pass 0.169793 
+zmin -60 pass 0.143239 
+zmin -60 pca 0.13086 
+zmin -60 z-pca 0.145867 
+zmin -60 z-pass 0.109181 
+zmin -60 pass 0.132981 
+zmin -60 pca 0.131862 
+zmin -60 z-pca 0.146791 
+zmin -60 z-pass 0.110012 
+zmin -50 pass 0.143185 
+zmin -50 pca 0.168656 
+zmin -50 z-pca 0.212737 
+zmin -50 z-pass 0.150597 
+zmin -50 pass 0.158763 
+zmin -50 pca 0.151777 
+zmin -50 z-pca 0.222657 
+zmin -50 z-pass 0.190216 
+zmin -50 pass 0.151312 
+zmin -50 pca 0.13097 
+zmin -50 z-pca 0.146248 
+zmin -50 z-pass 0.116123 
+zmin -50 pass 0.139736 
+zmin -50 pca 0.130437 
+zmin -50 z-pca 0.145847 
+zmin -50 z-pass 0.116355
+
+stdMultiplier 1 pass 0.154515 
+stdMultiplier 1 pca 0.160722 
+stdMultiplier 1 z-pca 0.221016 
+stdMultiplier 1 z-pass 0.173294 
+stdMultiplier 1 pass 0.166951 
+stdMultiplier 1 pca 0.160801 
+stdMultiplier 1 z-pca 0.231965 
+stdMultiplier 1 z-pass 0.212301 
+stdMultiplier 1 pass 0.169325 
+stdMultiplier 1 pca 0.147818 
+stdMultiplier 1 z-pca 0.134609 
+stdMultiplier 1 z-pass 0.122544 
+stdMultiplier 1 pass 0.174898 
+stdMultiplier 1 pca 0.147223 
+stdMultiplier 1 z-pca 0.135901 
+stdMultiplier 1 z-pass 0.123544 
+
+stdMultiplier 1.5 pass 0.1426 
+stdMultiplier 1.5 pca 0.168982 
+stdMultiplier 1.5 z-pca 0.219562 
+stdMultiplier 1.5 z-pass 0.155683 
+stdMultiplier 1.5 pass 0.161062 
+stdMultiplier 1.5 pca 0.154733 
+stdMultiplier 1.5 z-pca 0.23338 
+stdMultiplier 1.5 z-pass 0.190388 
+stdMultiplier 1.5 pass 0.1531 
+stdMultiplier 1.5 pca 0.132237 
+stdMultiplier 1.5 z-pca 0.14523 
+stdMultiplier 1.5 z-pass 0.115162 
+stdMultiplier 1.5 pass 0.139223 
+stdMultiplier 1.5 pca 0.132321 
+stdMultiplier 1.5 z-pca 0.145795 
+stdMultiplier 1.5 z-pass 0.115389 
+
+stdMultiplier 2 pass 0.14027 
+stdMultiplier 2 pca 0.173705 
+stdMultiplier 2 z-pca 0.223687 
+stdMultiplier 2 z-pass 0.145921 
+stdMultiplier 2 pass 0.163894 
+stdMultiplier 2 pca 0.156998 
+stdMultiplier 2 z-pca 0.231287 
+stdMultiplier 2 z-pass 0.179664 
+stdMultiplier 2 pass 0.144192 
+stdMultiplier 2 pca 0.13127 
+stdMultiplier 2 z-pca 0.142098 
+stdMultiplier 2 z-pass 0.116523 
+stdMultiplier 2 pass 0.127334 
+stdMultiplier 2 pca 0.132716 
+stdMultiplier 2 z-pca 0.144053 
+stdMultiplier 2 z-pass 0.11504 
+
+stdMultiplier 2.5 pass 0.137538 
+stdMultiplier 2.5 pca 0.162759 
+stdMultiplier 2.5 z-pca 0.207341 
+stdMultiplier 2.5 z-pass 0.136778 
+stdMultiplier 2.5 pass 0.1597 
+stdMultiplier 2.5 pca 0.154192 
+stdMultiplier 2.5 z-pca 0.219113 
+stdMultiplier 2.5 z-pass 0.164528 
+stdMultiplier 2.5 pass 0.144151 
+stdMultiplier 2.5 pca 0.13206 
+stdMultiplier 2.5 z-pca 0.135724 
+stdMultiplier 2.5 z-pass 0.109532 
+stdMultiplier 2.5 pass 0.131083 
+stdMultiplier 2.5 pca 0.132078 
+stdMultiplier 2.5 z-pca 0.134728 
+stdMultiplier 2.5 z-pass 0.110968 
+
+stdMultiplier 3 pass 0.135553 
+stdMultiplier 3 pca 0.15868 
+stdMultiplier 3 z-pca 0.202333 
+stdMultiplier 3 z-pass 0.124935 
+stdMultiplier 3 pass 0.151342 
+stdMultiplier 3 pca 0.14742 
+stdMultiplier 3 z-pca 0.208945 
+stdMultiplier 3 z-pass 0.158786 
+stdMultiplier 3 pass 0.142774 
+stdMultiplier 3 pca 0.126691 
+stdMultiplier 3 z-pca 0.13797 
+stdMultiplier 3 z-pass 0.103758 
+stdMultiplier 3 pass 0.135739 
+stdMultiplier 3 pca 0.126554 
+stdMultiplier 3 z-pca 0.138686 
+stdMultiplier 3 z-pass 0.102069 (correlation)
+
+auto pass 0.133233 
+auto pca 0.17975 
+auto z-pca 0.264387 
+auto z-pass 0.148786 
+auto pass 0.156375 
+auto pca 0.146846 
+auto z-pca 0.279552 
+auto z-pass 0.191666 
+auto pass 0.140549 
+auto pca 0.0977278 
+auto z-pca 0.122696 
+auto z-pass 0.106401 
+auto pass 0.129296 
+auto pca 0.0981449 
+auto z-pca 0.12232 
+auto z-pass 0.101797 <== (correlation) 
+
+5. Feature weighting
+====================
+
+Input:
+ROI: (-60,-30) - (60,60)
+processing: gauss filter, kernel size: 9, 1x
+stripes/bins: 20/20
+metric: correlation
+histogram range: auto-adaptation
+feature extractor: z-score pass
+
+initial 0.101797 
+eerPotential weights 0.0829525 
+eerPotential scores selection 0.0899655 0.101797 
+eerPotential scores selection 0.134591 0.103826 
+eerPotential scores selection 0.179216 0.103085 
+eerPotential scores selection 0.223841 0.102615 
+eerPotential scores selection 0.268467 0.089329 
+eerPotential scores selection 0.313092 0.0874693 
+eerPotential scores selection 0.357717 0.0883136 
+eerPotential scores selection 0.402343 0.0797044 
+eerPotential scores selection 0.446968 0.0604946 <== (0.8*(max-min)+min
+eerPotential scores selection 0.491593 0.0775825 
+eerPotential scores selection 0.536219 0.312859 
+discPotential weights 0.0834989 
+discPotential scores selection -0.104282 0.101797 
+discPotential scores selection -0.0142472 0.102508 
+discPotential scores selection 0.0757878 0.100549 
+discPotential scores selection 0.165823 0.0962373 
+discPotential scores selection 0.255858 0.0898336 
+discPotential scores selection 0.345893 0.0879395 
+discPotential scores selection 0.435928 0.0783297 
+discPotential scores selection 0.525963 0.0780134 
+discPotential scores selection 0.615998 0.08159 
+discPotential scores selection 0.706033 0.17938 
+discPotential scores selection 0.796068 0.391558 

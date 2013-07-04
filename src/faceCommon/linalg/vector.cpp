@@ -440,7 +440,8 @@ double Vector::stdDeviation() const
         sum += (((*this)(i) - mean)*((*this)(i) - mean));
     }
 
-    return sqrt((1.0/(r - 1.0)) * sum);
+    return sqrt(sum/r);
+    //return sqrt((1.0/(r - 1.0)) * sum);
 }
 
 /*ouble Vector::stdDeviation(QVector<double> &vector)

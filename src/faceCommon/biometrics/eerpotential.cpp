@@ -6,7 +6,7 @@
 
 #include "evaluation.h"
 
-EERPotential::EERPotential(QVector<Template> &templates)
+EERPotential::EERPotential(const QVector<Template> &templates)
 {
     //qDebug() << "EER potential evaluation...";
     int n = templates.count();

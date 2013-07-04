@@ -12,7 +12,7 @@
 class EERPotential : public FeaturePotentialBase
 {
 public:
-    EERPotential(QVector<Template> &templates);
+    EERPotential(const QVector<Template> &templates);
 };
 
 #endif // EERPOTENTIAL_H

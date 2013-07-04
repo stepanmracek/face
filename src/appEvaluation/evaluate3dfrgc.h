@@ -240,81 +240,6 @@ public:
         }
     }
 
-    static void EvaluateHistogramAdaboost()
-    {
-        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
-        QDir srcDir(srcDirPath, "*.binz");
-        QFileInfoList srcFiles = srcDir.entryInfoList();
-
-        cv::Point2d meshStart(-60,-30);
-        cv::Point2d meshEnd(60,60);
-        int kSize = 9;
-        int gaussTimes = 1;
-        int stripes = 20;
-        int bins = 20;
-
-        Matrix gaussKernel = KernelGenerator::gaussianKernel(kSize);
-
-        qDebug() << "Loading...";
-        QVector<int> classes;
-        QVector<Vector> vectors;
-        foreach (const QFileInfo &fileInfo, srcFiles)
-        {
-            Mesh mesh = Mesh::fromBINZ(fileInfo.absoluteFilePath());
-            MapConverter mapConverter;
-            Map depth = SurfaceProcessor::depthmap(mesh, mapConverter, meshStart, meshEnd, 2.0, ZCoord);
-            depth.applyFilter(gaussKernel, gaussTimes, true);
-
-            //cv::imshow("depth", depth.toMatrix());
-            //cv::waitKey(0);
-            //qDebug() << depth.minValue() << depth.maxIndex() << depth.maxValue() << depth.maxIndex();
-            //return;
-
-            HistogramFeatures histogramFeatures(depth, stripes, bins, -70, 0);
-            vectors << histogramFeatures.toVector();
-            classes << fileInfo.baseName().split('d')[0].toInt();
-
-            //if (classes.count() >= 39) break;
-        }
-
-        ZScorePassExtractor extractor(vectors);
-        //MeanNormalizationExtractor extractor(vectors);
-        Evaluation eval(vectors, classes, extractor, CosineMetric());
-        qDebug() << eval.eer;
-        return;
-
-        QVector<Vector> trainVectorsForAdaboost;
-        QVector<int> labelsForAdaboost;
-        int n = classes.count();
-        for (int i = 0; i < (n-1); i++)
-        {
-            for (int j = i+1; j < n; j++)
-            {
-                if (classes[i] == classes[j])
-                    labelsForAdaboost << 1;
-                else
-                    labelsForAdaboost << 0;
-
-                int r = vectors[i].rows;
-                Vector trainVector(r*2);
-                vectors[i].copyTo(trainVector.rowRange(0, r));
-                vectors[j].copyTo(trainVector.rowRange(r, 2*r));
-                trainVectorsForAdaboost << trainVector;
-            }
-        }
-
-        // AdabBoost
-        qDebug() << "adaboost";
-        AdaBoostSimple adaBoost(stripes, bins);
-        adaBoost.learn(trainVectorsForAdaboost, labelsForAdaboost);
-
-        //qDebug() << "testing";
-        //for (int i = 0; i < trainVectorsForAdaboost.count(); i++)
-        //{
-        //    qDebug() << labelsForAdaboost[i] << adaBoost.classify(trainVectorsForAdaboost[i]);
-        //}
-    }
-
     static void evaluateHistogramFeatures()
     {
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
@@ -322,146 +247,78 @@ public:
         QFileInfoList srcFiles = srcDir.entryInfoList();
 
         cv::Point2d meshStart(-60,-30);
-        cv::Point2d meshEnd(60,60);
+        cv::Point2d meshEnd(60, 60);
         int kSize = 9;
         int gaussTimes = 1;
-        //int stripes = 20;
-        //int bins = 20;
+        int stripes = 20;
+        int bins = 20;
 
+        /*QVector<int> startx; startx << -50 << -50 << -60 << -60 << -60;
+        QVector<int> starty; starty << -30 << -30 << -30 << -40 << -40;
+        QVector<int> endx;   endx   <<  50 <<  50 <<  60 <<  60 <<  60;
+        QVector<int> endy;   endy   <<  50 <<  60 <<  60 <<  60 <<  70;
+
+        QVector<int> kSizes; kSizes << 3 << 5 << 7 << 9;
+        QVector<int> filterRepeats; filterRepeats << 1 << 2 << 3;
+
+        QVector<Metrics*> metrics;
+        metrics << new CityblockMetric() << new SumOfSquareDifferences() << new CosineMetric() << new CorrelationMetric();*/
+
+        MapConverter mapConverter;
         Matrix gaussKernel = KernelGenerator::gaussianKernel(kSize);
-
-        qDebug() << "Loading...";
-        QVector<int> allClasses;
         QVector<Map> allMaps;
-        bool first = true;
+        QVector<int> allClasses;
         foreach (const QFileInfo &fileInfo, srcFiles)
         {
             Mesh mesh = Mesh::fromBINZ(fileInfo.absoluteFilePath());
-            MapConverter mapConverter;
             Map depth = SurfaceProcessor::depthmap(mesh, mapConverter, meshStart, meshEnd, 2.0, ZCoord);
             depth.applyFilter(gaussKernel, gaussTimes, true);
 
-            if (first)
-            {
-                first = false;
-                cv::imshow("depth", depth.toMatrix());
-                cv::waitKey();
-            }
             allMaps << depth;
             allClasses << fileInfo.baseName().split('d')[0].toInt();
+
+            if (allClasses.count() == 874) break;
         }
 
-        double minEER = 1.0;
-        int minEERStripes;
-        int minEERBins;
-        for (int stripes = 26; stripes <= 30; stripes++)
+        QVector<Vector> allVectors;
+        foreach(const Map &depth, allMaps)
         {
-            for (int bins = 5; bins <= 30; bins++)
-            {
-                QVector<Vector> allRawVectors;
-
-                foreach (const Map &map, allMaps)
-                {
-                    HistogramFeatures hf(map, stripes, bins);
-                    allRawVectors << hf.toVector();
-                }
-
-                QList<QVector<int> > classesInClusters;
-                QList<QVector<Vector> > rawVectorsInClusters;
-                BioDataProcessing::divideToNClusters(allRawVectors, allClasses, 5, rawVectorsInClusters, classesInClusters);
-
-                ZScorePassExtractor zPassExtractor(rawVectorsInClusters[1]);
-                //Evaluation result(rawVectorsInClusters[1], classesInClusters[1], zPassExtractor, CosineMetric());
-                BatchEvaluationResult result = Evaluation::batch(rawVectorsInClusters, classesInClusters, zPassExtractor, CosineMetric(), 2);
-                qDebug() << stripes << bins << result.meanEER;
-
-                if (result.meanEER < minEER)
-                {
-                    minEER = result.meanEER;
-                    minEERStripes = stripes;
-                    minEERBins = bins;
-                }
-            }
-            qDebug() << "";
+            allVectors << HistogramFeatures(depth, stripes, bins).toVector();
         }
 
-        qDebug() << "Best results:" << minEERStripes << minEERBins << minEER;
+        QList<QVector<int> > classesInClusters;
+        QList<QVector<Vector> > vectorsInClusters;
+        BioDataProcessing::divideToNClusters<Vector>(allVectors, allClasses, 2, vectorsInClusters, classesInClusters);
 
+        ZScorePassExtractor zPassExtractor(vectorsInClusters[0]);
 
-        /*double selThresholds[5] = {0.95, 0.96, 0.97, 0.98, 0.99};
-        for (int selThresholdIndex = 0; selThresholdIndex < 5; selThresholdIndex++)
-        {
-            double selThreshold = selThresholds[selThresholdIndex];
-            PCA pca(rawVectorsInClusters[0]);
-            pca.modesSelectionThreshold(selThreshold);
+        Evaluation e(vectorsInClusters[1], classesInClusters[1], zPassExtractor, CorrelationMetric());
+        qDebug() << "initial eer" << e.eer;
 
-            PCAExtractor pcaExtractor(pca);
-            ZScorePCAExtractor zPcaExtractor(pca, rawVectorsInClusters[1]);
-            ZScorePassExtractor zPassExtractor(rawVectorsInClusters[1]);
+        QVector<Template> trainTemplates = Template::createTemplates(vectorsInClusters[0], classesInClusters[0], zPassExtractor);
+        EERPotential eerPotential(trainTemplates);
 
-            qDebug() << "selThreshold" << selThreshold << "PCA, SAD";
-            BatchEvaluationResult results = Evaluation::batch(rawVectorsInClusters, classesInClusters, pcaExtractor, CityblockMetric(), 2);
-            qDebug() << results.meanEER;
+        eerPotential.scores.toFile("eerPotentialTrain");
 
-            qDebug() << "selThreshold" << selThreshold << "PCA, SSD";
-            results = Evaluation::batch(rawVectorsInClusters, classesInClusters, pcaExtractor, SumOfSquareDifferences(), 2);
-            qDebug() << results.meanEER;
+        CorrelationWeightedMetric corrW;
+        double s = 0.8*(eerPotential.maxScore - eerPotential.minScore)+eerPotential.minScore;
+        corrW.w = eerPotential.createSelectionWeights(s);
+        Evaluation e2(vectorsInClusters[1], classesInClusters[1], zPassExtractor, corrW);
+        qDebug() << "eerPotential scores" << s << "eer" << e2.eer;
+    }
 
-            qDebug() << "selThreshold" << selThreshold << "PCA, cos";
-            results = Evaluation::batch(rawVectorsInClusters, classesInClusters, pcaExtractor, CosineMetric(), 2);
-            qDebug() << results.meanEER;
+    static void evaluateImages()
+    {
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/depth2";
 
-            qDebug() << "selThreshold" << selThreshold << "zPCA, SAD";
-            results = Evaluation::batch(rawVectorsInClusters, classesInClusters, zPcaExtractor, CityblockMetric(), 2);
-            qDebug() << results.meanEER;
+        QVector<Matrix> images;
+        QVector<int> classes;
+        Loader::loadImages(srcDirPath, images, &classes, "*.png", "d");
 
-            qDebug() << "selThreshold" << selThreshold << "zPCA, SSD";
-            results = Evaluation::batch(rawVectorsInClusters, classesInClusters, zPcaExtractor, SumOfSquareDifferences(), 2);
-            qDebug() << results.meanEER;
-
-            qDebug() << "selThreshold" << selThreshold << "zPCA, cos";
-            results = Evaluation::batch(rawVectorsInClusters, classesInClusters, zPcaExtractor, CosineMetric(), 2);
-            qDebug() << results.meanEER;
-
-            qDebug() << "selThreshold" << selThreshold << "zPass, SAD";
-            results = Evaluation::batch(rawVectorsInClusters, classesInClusters, zPassExtractor, CityblockMetric(), 2);
-            qDebug() << results.meanEER;
-
-            qDebug() << "selThreshold" << selThreshold << "zPass, SSD";
-            results = Evaluation::batch(rawVectorsInClusters, classesInClusters, zPassExtractor, SumOfSquareDifferences(), 2);
-            qDebug() << results.meanEER;
-
-            qDebug() << "selThreshold" << selThreshold << "zPass, cos";
-            results = Evaluation::batch(rawVectorsInClusters, classesInClusters, zPassExtractor, CosineMetric(), 2);
-            qDebug() << results.meanEER;
-        }*/
-
-        /*qDebug() << "Initial results...";
-        MahalanobisMetric mahal(rawVectorsInClusters[0]);
-        BatchEvaluationResult results = Evaluation::batch(rawVectorsInClusters, classesInClusters, PassExtractor(), mahal, 2);
-        qDebug() << results.meanEER << "+-" << results.stdDevOfEER;*/
-
-        /*qDebug() << "Train set and validation set...";
-        QVector<Template> trainSet = Template::joinVectorsAndClasses(rawVectorsInClusters[0], classesInClusters[0]);
-        QVector<Template> validationSet = Template::joinVectorsAndClasses(rawVectorsInClusters[1], classesInClusters[1]);
-
-        qDebug() << "EER potential...";
-        EERPotential eerPotential(trainSet);
-        CityblockWeightedMetric cityWeights;
-        cityWeights.w = eerPotential.createWeights();
-
-        qDebug() << "EER potential results...";
-        results = Evaluation::batch(rawVectorsInClusters, classesInClusters, PassExtractor(), cityWeights, 2);
-        qDebug() << results.meanEER << "+-" << results.stdDevOfEER;
-
-        qDebug() << "Genetic optimization...";
-        GeneticWeightOptimizationSettings settings;
-        GeneticWeightOptimization optimization(trainSet, validationSet, cityWeights, settings);
-        optimization.trainWeights();
-
-        qDebug() << "Genetic results...";
-        results = Evaluation::batch(rawVectorsInClusters, classesInClusters, PassExtractor(), cityWeights, 2);
-        qDebug() << results.meanEER << "+-" << results.stdDevOfEER;*/
+        cv::Rect roi(30, 30, 240, 180);
+        Matrix sub = images[0](roi);
+        cv::imshow("sub", sub);
+        cv::waitKey(0);
     }
 };
 

@@ -11,7 +11,7 @@
 class DiscriminativePotential : public FeaturePotentialBase
 {
 public:
-    DiscriminativePotential(QVector<Template> &templates);
+    DiscriminativePotential(const QVector<Template> &templates);
 };
 
 #endif // DISCRIMINATIVEPOTENTIAL_H

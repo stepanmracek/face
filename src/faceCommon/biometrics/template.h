@@ -44,7 +44,7 @@ public:
                                              QVector<int> &IDs,
                                              const FeatureExtractor &extractor);
 
-    static QVector<Template> clone(QVector<Template> &src);
+    static QVector<Template> clone(const QVector<Template> &src);
 };
 
 #endif // TEMPLATE_H

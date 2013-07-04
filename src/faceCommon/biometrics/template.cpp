@@ -182,7 +182,7 @@ QVector<Template> Template::createTemplates(QVector<Vector> &rawData, QVector<in
     return result;
 }
 
-QVector<Template> Template::clone(QVector<Template> &src)
+QVector<Template> Template::clone(const QVector<Template> &src)
 {
 	QVector<Template> result;
 	for (int i = 0; i < src.count(); i++)

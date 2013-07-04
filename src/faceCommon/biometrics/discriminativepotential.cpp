@@ -8,7 +8,7 @@
 #include "linalg/vector.h"
 #include "linalg/metrics.h"
 
-DiscriminativePotential::DiscriminativePotential(QVector<Template> &templates)
+DiscriminativePotential::DiscriminativePotential(const QVector<Template> &templates)
 {
     int n = templates.count();
     assert(n > 0);

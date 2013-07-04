@@ -166,7 +166,7 @@ inline double linearInterpolation(double x1, double y1, double z1,
     return result;
 }
 
-void SurfaceProcessor::depthmap(Mesh &mesh, Map &map, cv::Point2d meshStart, cv::Point2d meshEnd, SurfaceDataToProcess dataToProcess)
+void SurfaceProcessor::depthmap(const Mesh &mesh, Map &map, cv::Point2d meshStart, cv::Point2d meshEnd, SurfaceDataToProcess dataToProcess)
 {
     //qDebug() << "Depthmap calculation";
 
@@ -175,7 +175,7 @@ void SurfaceProcessor::depthmap(Mesh &mesh, Map &map, cv::Point2d meshStart, cv:
     for (int i = 0; i < c; i++)
     {
         //qDebug() << "triangle"<<i<<"/"<<f->triangleCount;
-        cv::Vec3i &t = mesh.triangles[i];
+        const cv::Vec3i &t = mesh.triangles[i];
         double x1d = mesh.points[t[0]].x;
         double y1d = mesh.points[t[0]].y;
         double x2d = mesh.points[t[1]].x;
@@ -284,7 +284,7 @@ void SurfaceProcessor::depthmap(Mesh &mesh, Map &map, cv::Point2d meshStart, cv:
     //qDebug() << "..done";
 }
 
-Map SurfaceProcessor::depthmap(Mesh &mesh, MapConverter &converter,
+Map SurfaceProcessor::depthmap(const Mesh &mesh, MapConverter &converter,
                                cv::Point2d meshStart, cv::Point2d meshEnd,
                                double scaleCoef, SurfaceDataToProcess dataToProcess)
 {
@@ -296,7 +296,7 @@ Map SurfaceProcessor::depthmap(Mesh &mesh, MapConverter &converter,
     return map;
 }
 
-Map SurfaceProcessor::depthmap(Mesh &mesh, MapConverter &converter, double scaleCoef, SurfaceDataToProcess dataToProcess)
+Map SurfaceProcessor::depthmap(const Mesh &mesh, MapConverter &converter, double scaleCoef, SurfaceDataToProcess dataToProcess)
 {
     converter.meshStart = cv::Point2d(mesh.minx, mesh.miny);
     converter.meshSize = cv::Point2d(mesh.maxx - mesh.minx, mesh.maxy - mesh.miny);
