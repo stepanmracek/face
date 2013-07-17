@@ -13,8 +13,8 @@ public:
     double minScore;
     double maxScore;
 
-    Vector createSelectionWeights(double threshold);
-    Vector createWeights();
+    Vector createSelectionWeights(double threshold) const;
+    Vector createWeights() const;
 };
 
 #endif // FEATUREPOTENTIALBASE_H

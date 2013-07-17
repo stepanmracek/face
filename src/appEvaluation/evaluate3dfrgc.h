@@ -114,7 +114,7 @@ public:
         QVector<Vector> rawFeatureVectors;
         Template::splitVectorsAndClasses(rawData, rawFeatureVectors, classes);
 
-        int clusterCount = 10;
+        int clusterCount = 5;
         QList<QVector<int> > classesInClusters;
         QList<QVector<Vector> > rawVectorsInClusters;
         BioDataProcessing::divideToNClusters(rawFeatureVectors, classes, clusterCount, rawVectorsInClusters, classesInClusters);
@@ -123,11 +123,15 @@ public:
         //PCAExtractor pcaExtractor(pca);
         ZScorePCAExtractor zscorePcaExtractor(pca, rawVectorsInClusters[1]);
         zscorePcaExtractor.serialize("../../test/isocurves/shifted-pca.yml", "../../test/isocurves/shifted-normparams.yml");
-        //EuclideanMetric euclMetric;
-        CosineMetric cosMetric;
 
-        BatchEvaluationResult batchResult = Evaluation::batch(rawVectorsInClusters, classesInClusters, zscorePcaExtractor, cosMetric, 2);
-        qDebug() << batchResult.meanEER << batchResult.stdDevOfEER;
+        Evaluation eCos(rawVectorsInClusters[2], classesInClusters[2], zscorePcaExtractor, CosineMetric());
+        Evaluation eCor(rawVectorsInClusters[2], classesInClusters[2], zscorePcaExtractor, CorrelationMetric());
+
+        Vector(eCos.genuineScores).toFile("cos-gen");
+        Vector(eCos.impostorScores).toFile("cos-imp");
+
+        Vector(eCor.genuineScores).toFile("cor-gen");
+        Vector(eCor.impostorScores).toFile("cor-imp");
     }
 
     static int createMaps()
@@ -309,16 +313,71 @@ public:
 
     static void evaluateImages()
     {
-        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/depth2";
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
+        QStringList sources; sources << "depth2" << "eigencur2" << "gauss2"
+                                     << "index2" << "mean2";
+        QString source = "index2";
 
+        QVector<double> thresholds; thresholds << 0.90 << 0.91  << 0.92 << 0.93
+                                               << 0.94 << 0.95  << 0.96 << 0.97
+                                               << 0.98 << 0.985 << 0.99 << 0.995
+                                               << 0.999 << 1;
+        double threshold = 0.995;
+
+        QVector<double> roiWidths; roiWidths << 50 << 50 << 60 << 60 << 60;
+        QVector<double> roiUppers; roiUppers << 50 << 60 << 60 << 60 << 70;
+        QVector<double> roiLowers; roiLowers << 30 << 30 << 30 << 40 << 40;
+        cv::Rect roi(50, 30, 200, 180);
+        /*cv::Rect roi(150-roiWidths[roiIndex]*2, 150-roiUppers[roiIndex]*2,
+                     roiWidths[roiIndex]*4, roiUppers[roiIndex]*2+roiLowers[roiIndex]*2);*/
+
+        QVector<Metrics*> metrics;
+        metrics << (new CityblockMetric()) << (new EuclideanMetric())
+                << (new CosineMetric()) << (new CorrelationMetric());
+
+        QVector<WeightedMetric*> metricsW;
+        metricsW << (new CityblockWeightedMetric()) << (new EuclideanWeightedMetric())
+                 << (new CosineWeightedMetric()) << (new CorrelationWeightedMetric());
+
+        QVector<Vector> vectors;
         QVector<Matrix> images;
         QVector<int> classes;
-        Loader::loadImages(srcDirPath, images, &classes, "*.png", "d");
+        Loader::loadImages(srcDirPath + source, images, &classes, "*.png", "d");
+        int n = images.count();
 
-        cv::Rect roi(30, 30, 240, 180);
-        Matrix sub = images[0](roi);
-        cv::imshow("sub", sub);
+        for (int i = 0; i < n; i++)
+        {
+            Matrix sub = images[i](roi);
+            //cv::resize(images[i], images[i], cv::Size(images[i].cols/2, images[i].rows/2));
+
+            vectors.append(MatrixConverter::matrixToColumnVector(sub));
+        }
+
+        QList<QVector<Vector> > vectorsInClusters;
+        QList<QVector<int> > classesInClusters;
+        BioDataProcessing::divideToNClusters(vectors, classes, 5, vectorsInClusters, classesInClusters);
+
+        /*QVector<Template> templates = Template::createTemplates(vectorsInClusters[0],
+                                                                classesInClusters[0],
+                                                                PassExtractor());
+        EERPotential eerMap(templates);
+        Matrix eerPotentialImage = MatrixConverter::columnVectorToMatrix(eerMap.createWeights(), 200);
+        cv::imshow("eerPotential", eerPotentialImage);
         cv::waitKey(0);
+        exit(0);*/
+
+        PCA pca(vectorsInClusters[0]);
+        pca.modesSelectionThreshold(threshold);
+        PCAExtractor pcaExtractor(pca);
+        ZScorePCAExtractor zPcaExtractor(pca, vectorsInClusters[0]);
+
+        qDebug() << "PCA" << Evaluation(vectorsInClusters[1],
+                                        classesInClusters[1],
+                                        pcaExtractor, CorrelationMetric()).eer;
+
+        qDebug() << "z-PCA" << Evaluation(vectorsInClusters[1],
+                                          classesInClusters[1],
+                                          zPcaExtractor, CorrelationMetric()).eer;
     }
 };
 

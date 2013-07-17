@@ -13,7 +13,7 @@
 class MatrixConverter
 {
 public:
-    static Matrix grayscaleImageToDoubleMatrix(cv::Mat &in)
+    static Matrix grayscaleImageToDoubleMatrix(const cv::Mat &in)
     {
         Matrix out(in.rows, in.cols);
 
@@ -27,7 +27,7 @@ public:
         return out;
     }
 
-    static Vector matrixToColumnVector(Matrix &in)
+    static Vector matrixToColumnVector(const Matrix &in)
     {
         Vector out(in.rows * in.cols);
         int i = 0;
@@ -42,7 +42,7 @@ public:
         return out;
     }
 
-    static Matrix columnVectorToMatrix(Vector &in, int cols)
+    static Matrix columnVectorToMatrix(const Vector &in, int cols)
     {
         int rows = in.rows/cols;
         Matrix out(rows, cols, CV_64F);
@@ -70,7 +70,7 @@ public:
         return matrixToColumnVector(m);
     }
 
-    static Matrix columnVectorsToDataMatrix(QVector<Vector> &vectors)
+    static Matrix columnVectorsToDataMatrix(const QVector<Vector> &vectors)
     {
         int cols = vectors.count();
         int rows = vectors[0].rows;

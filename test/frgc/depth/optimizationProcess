@@ -1,0 +1,375 @@
+1. PCA mode selection threshold
+===============================
+depth, roi(30, 30, 240, 180), Euclidean, original scale
+
+threshold 0.9 modes 9 eer 0.139912 
+threshold 0.91 modes 10 eer 0.137191 
+threshold 0.92 modes 12 eer 0.137592 
+threshold 0.93 modes 14 eer 0.138444 
+threshold 0.94 modes 18 eer 0.135289 
+threshold 0.95 modes 22 eer 0.136963 
+threshold 0.96 modes 30 eer 0.136627 
+threshold 0.97 modes 43 eer 0.136471 
+threshold 0.98 modes 68 eer 0.135144 
+threshold 0.985 modes 92 eer 0.135346 
+threshold 0.99 modes 133 eer 0.13504 
+threshold 0.995 modes 214 eer 0.134782 <==
+threshold 0.999 modes 353 eer 0.135205 
+threshold 1 modes 419 eer 0.135165
+
+depth, roi(30, 30, 240, 180), Euclidean, half scale
+
+threshold 0.9 modes 8 eer 0.141198 
+threshold 0.91 modes 9 eer 0.139961 
+threshold 0.92 modes 11 eer 0.137331 
+threshold 0.93 modes 13 eer 0.138861 
+threshold 0.94 modes 16 eer 0.138289 
+threshold 0.95 modes 20 eer 0.136365 
+threshold 0.96 modes 25 eer 0.137319 
+threshold 0.97 modes 36 eer 0.13663 
+threshold 0.98 modes 54 eer 0.136027 
+threshold 0.985 modes 71 eer 0.135342 
+threshold 0.99 modes 101 eer 0.134616 
+threshold 0.995 modes 165 eer 0.13446 <==
+threshold 0.999 modes 311 eer 0.135043 
+threshold 1 modes 419 eer 0.135395 
+
+2. ROI Selection
+================
+depth, Euclidean, PCA threshold 0.995
+
+ROI 200 160 eer 0.133377 
+ROI 200 180 eer 0.133232 <== width: 2*50, upper: 60, lower: 30
+ROI 240 180 eer 0.134782 
+ROI 240 200 eer 0.146406
+ROI 240 220 eer 0.150819 
+
+3. Data source
+==============
+Euclidean, PCA threshold 0.995, ROI(width: 2*50, upper: 60, lower: 30)
+
+source "depth2" eer 0.133232  <==
+source "eigencur2" eer 0.275983 
+source "gauss2" eer 0.222964 
+source "index2" eer 0.144232  <==
+source "mean2" eer 0.213164 
+
+4. EER potential map
+====================
+
+5. Metrics/projection/z-score
+=============================
+depth2
+cityblock PCA eer 0.133782 
+cityblock z-PCA eer 0.206374 
+Euclidean PCA eer 0.133232 
+Euclidean z-PCA eer 0.203218 
+cosine PCA eer 0.169473 
+cosine z-PCA eer 0.0631445 <==
+Correlation PCA 0.169612 
+Correlation z-PCA 0.0622595 <==
+
+index2
+cityblock PCA eer 0.159456 
+cityblock z-PCA eer 0.179923 
+Euclidean PCA eer 0.144232 
+Euclidean z-PCA eer 0.178179 
+cosine PCA eer 0.120194 
+cosine z-PCA eer 0.0919641 
+
+6. EER potential/Discriminative potential
+=========================================
+depth2
+------
+
+EERpotential weights
+
+PCA "City-block weighted" 0.130955 
+z-PCA "City-block weighted" 0.155511 
+PCA "Euclidean weighted" 0.143726 
+z-PCA "Euclidean weighted" 0.136661 
+PCA "Cosine weighted" 0.213367 
+z-PCA "Cosine weighted" 0.0682386 
+PCA "Correlation weighted" 0.213327 
+z-PCA "Correlation weighted" 0.068358 
+
+EERpotential selection
+PCA "City-block weighted" 0.1 0.0644932 0.125116 
+z-PCA "City-block weighted" 0.1 0.0644932 0.176984 
+PCA "City-block weighted" 0.15 0.0967398 0.12649 
+z-PCA "City-block weighted" 0.15 0.0967398 0.165458 
+PCA "City-block weighted" 0.2 0.128986 0.129951 
+z-PCA "City-block weighted" 0.2 0.128986 0.161365 
+PCA "City-block weighted" 0.25 0.161233 0.129208 
+z-PCA "City-block weighted" 0.25 0.161233 0.156776 
+PCA "City-block weighted" 0.3 0.19348 0.128902 
+z-PCA "City-block weighted" 0.3 0.19348 0.151323 
+PCA "City-block weighted" 0.35 0.225726 0.127947 
+z-PCA "City-block weighted" 0.35 0.225726 0.147586 
+PCA "City-block weighted" 0.4 0.257973 0.129549 
+z-PCA "City-block weighted" 0.4 0.257973 0.159776 
+PCA "City-block weighted" 0.45 0.290219 0.134333 
+z-PCA "City-block weighted" 0.45 0.290219 0.146168 
+PCA "City-block weighted" 0.5 0.322466 0.148354 
+z-PCA "City-block weighted" 0.5 0.322466 0.169883 
+PCA "City-block weighted" 0.55 0.354713 0.152711 
+z-PCA "City-block weighted" 0.55 0.354713 0.176956 
+PCA "City-block weighted" 0.6 0.386959 0.165899 
+z-PCA "City-block weighted" 0.6 0.386959 0.194499 
+PCA "City-block weighted" 0.65 0.419206 0.17933 
+z-PCA "City-block weighted" 0.65 0.419206 0.17933 
+PCA "City-block weighted" 0.7 0.451452 0.17933 
+z-PCA "City-block weighted" 0.7 0.451452 0.17933 
+PCA "City-block weighted" 0.75 0.483699 0.17933 
+z-PCA "City-block weighted" 0.75 0.483699 0.17933 
+PCA "City-block weighted" 0.8 0.515945 0.17933 
+z-PCA "City-block weighted" 0.8 0.515945 0.17933 
+PCA "City-block weighted" 0.85 0.548192 0.17933 
+z-PCA "City-block weighted" 0.85 0.548192 0.17933 
+PCA "City-block weighted" 0.9 0.580439 0.17933 
+z-PCA "City-block weighted" 0.9 0.580439 0.17933 
+
+PCA "Euclidean weighted" 0.1 0.0644932 0.134673 
+z-PCA "Euclidean weighted" 0.1 0.0644932 0.177846 
+PCA "Euclidean weighted" 0.15 0.0967398 0.134301 
+z-PCA "Euclidean weighted" 0.15 0.0967398 0.168936 
+PCA "Euclidean weighted" 0.2 0.128986 0.134887 
+z-PCA "Euclidean weighted" 0.2 0.128986 0.163171 
+PCA "Euclidean weighted" 0.25 0.161233 0.136133 
+z-PCA "Euclidean weighted" 0.25 0.161233 0.157548 
+PCA "Euclidean weighted" 0.3 0.19348 0.136094 
+z-PCA "Euclidean weighted" 0.3 0.19348 0.152723 
+PCA "Euclidean weighted" 0.35 0.225726 0.136057 
+z-PCA "Euclidean weighted" 0.35 0.225726 0.150627 
+PCA "Euclidean weighted" 0.4 0.257973 0.137129 
+z-PCA "Euclidean weighted" 0.4 0.257973 0.158636 
+PCA "Euclidean weighted" 0.45 0.290219 0.138568 
+z-PCA "Euclidean weighted" 0.45 0.290219 0.135533 
+PCA "Euclidean weighted" 0.5 0.322466 0.152508 
+z-PCA "Euclidean weighted" 0.5 0.322466 0.162968 
+PCA "Euclidean weighted" 0.55 0.354713 0.155683 
+z-PCA "Euclidean weighted" 0.55 0.354713 0.172599 
+PCA "Euclidean weighted" 0.6 0.386959 0.165153 
+z-PCA "Euclidean weighted" 0.6 0.386959 0.208526 
+PCA "Euclidean weighted" 0.65 0.419206 0.17933 
+z-PCA "Euclidean weighted" 0.65 0.419206 0.17933 
+PCA "Euclidean weighted" 0.7 0.451452 0.17933 
+z-PCA "Euclidean weighted" 0.7 0.451452 0.17933 
+PCA "Euclidean weighted" 0.75 0.483699 0.17933 
+z-PCA "Euclidean weighted" 0.75 0.483699 0.17933 
+PCA "Euclidean weighted" 0.8 0.515945 0.17933 
+z-PCA "Euclidean weighted" 0.8 0.515945 0.17933 
+PCA "Euclidean weighted" 0.85 0.548192 0.17933 
+z-PCA "Euclidean weighted" 0.85 0.548192 0.17933 
+PCA "Euclidean weighted" 0.9 0.580439 0.17933 
+z-PCA "Euclidean weighted" 0.9 0.580439 0.17933 
+
+PCA "Cosine weighted" 0.1 0.0644932 0.170002 
+z-PCA "Cosine weighted" 0.1 0.0644932 0.0732416 
+PCA "Cosine weighted" 0.15 0.0967398 0.170855 
+z-PCA "Cosine weighted" 0.15 0.0967398 0.0682497 
+PCA "Cosine weighted" 0.2 0.128986 0.172045 
+z-PCA "Cosine weighted" 0.2 0.128986 0.0728465 
+PCA "Cosine weighted" 0.25 0.161233 0.172631 
+z-PCA "Cosine weighted" 0.25 0.161233 0.0741365 
+PCA "Cosine weighted" 0.3 0.19348 0.174323 
+z-PCA "Cosine weighted" 0.3 0.19348 0.0863259 
+PCA "Cosine weighted" 0.35 0.225726 0.174249 
+z-PCA "Cosine weighted" 0.35 0.225726 0.0849979 
+PCA "Cosine weighted" 0.4 0.257973 0.175169 
+z-PCA "Cosine weighted" 0.4 0.257973 0.0952761 
+PCA "Cosine weighted" 0.45 0.290219 0.179298 
+z-PCA "Cosine weighted" 0.45 0.290219 0.106957 
+PCA "Cosine weighted" 0.5 0.322466 0.190777 
+z-PCA "Cosine weighted" 0.5 0.322466 0.133015 
+PCA "Cosine weighted" 0.55 0.354713 0.196195 
+z-PCA "Cosine weighted" 0.55 0.354713 0.150896 
+PCA "Cosine weighted" 0.6 0.386959 0.25851 
+z-PCA "Cosine weighted" 0.6 0.386959 0.220241 
+PCA "Cosine weighted" 0.65 0.419206 0.0428821 <==
+z-PCA "Cosine weighted" 0.65 0.419206 0.0428821 
+PCA "Cosine weighted" 0.7 0.451452 0.0428821 
+z-PCA "Cosine weighted" 0.7 0.451452 0.0428821 
+PCA "Cosine weighted" 0.75 0.483699 0.0428821 
+z-PCA "Cosine weighted" 0.75 0.483699 0.0428821 
+PCA "Cosine weighted" 0.8 0.515945 0.0428821 
+z-PCA "Cosine weighted" 0.8 0.515945 0.0428821 
+PCA "Cosine weighted" 0.85 0.548192 0.0428821 
+z-PCA "Cosine weighted" 0.85 0.548192 0.0428821 
+PCA "Cosine weighted" 0.9 0.580439 0.0428821 
+z-PCA "Cosine weighted" 0.9 0.580439 0.0428821 
+
+PCA "Correlation weighted" 0.1 0.0644932 0.170398 
+z-PCA "Correlation weighted" 0.1 0.0644932 0.0732072 
+PCA "Correlation weighted" 0.15 0.0967398 0.171854 
+z-PCA "Correlation weighted" 0.15 0.0967398 0.069009 
+PCA "Correlation weighted" 0.2 0.128986 0.172253 
+z-PCA "Correlation weighted" 0.2 0.128986 0.0739383 
+PCA "Correlation weighted" 0.25 0.161233 0.172468 
+z-PCA "Correlation weighted" 0.25 0.161233 0.074102 
+PCA "Correlation weighted" 0.3 0.19348 0.174784 
+z-PCA "Correlation weighted" 0.3 0.19348 0.085985 
+PCA "Correlation weighted" 0.35 0.225726 0.174665 
+z-PCA "Correlation weighted" 0.35 0.225726 0.0842792 
+PCA "Correlation weighted" 0.4 0.257973 0.175394 
+z-PCA "Correlation weighted" 0.4 0.257973 0.0962078 
+PCA "Correlation weighted" 0.45 0.290219 0.180327 
+z-PCA "Correlation weighted" 0.45 0.290219 0.106646 
+PCA "Correlation weighted" 0.5 0.322466 0.190492 
+z-PCA "Correlation weighted" 0.5 0.322466 0.133392 
+PCA "Correlation weighted" 0.55 0.354713 0.195761 
+z-PCA "Correlation weighted" 0.55 0.354713 0.150253 
+PCA "Correlation weighted" 0.6 0.386959 0.258456 
+z-PCA "Correlation weighted" 0.6 0.386959 0.220127 
+PCA "Correlation weighted" 0.65 0.419206 0.29255 
+z-PCA "Correlation weighted" 0.65 0.419206 0.29255 
+PCA "Correlation weighted" 0.7 0.451452 0.29255 
+z-PCA "Correlation weighted" 0.7 0.451452 0.29255 
+PCA "Correlation weighted" 0.75 0.483699 0.29255 
+z-PCA "Correlation weighted" 0.75 0.483699 0.29255 
+PCA "Correlation weighted" 0.8 0.515945 0.29255 
+z-PCA "Correlation weighted" 0.8 0.515945 0.29255 
+PCA "Correlation weighted" 0.85 0.548192 0.29255 
+z-PCA "Correlation weighted" 0.85 0.548192 0.29255 
+PCA "Correlation weighted" 0.9 0.580439 0.29255 
+z-PCA "Correlation weighted" 0.9 0.580439 0.29255 
+
+index 2
+
+PCA "City-block weighted" 0.1 0.047304 0.150171 
+z-PCA "City-block weighted" 0.1 0.047304 0.171289 
+PCA "City-block weighted" 0.15 0.070956 0.152803 
+z-PCA "City-block weighted" 0.15 0.070956 0.171682 
+PCA "City-block weighted" 0.2 0.094608 0.154238 
+z-PCA "City-block weighted" 0.2 0.094608 0.17266 
+PCA "City-block weighted" 0.25 0.11826 0.156642 
+z-PCA "City-block weighted" 0.25 0.11826 0.170203 
+PCA "City-block weighted" 0.3 0.141912 0.155574 
+z-PCA "City-block weighted" 0.3 0.141912 0.16952 
+PCA "City-block weighted" 0.35 0.165564 0.15172 
+z-PCA "City-block weighted" 0.35 0.165564 0.16784 
+PCA "City-block weighted" 0.4 0.189216 0.156016 
+z-PCA "City-block weighted" 0.4 0.189216 0.164659 
+PCA "City-block weighted" 0.45 0.212868 0.155602 
+z-PCA "City-block weighted" 0.45 0.212868 0.164137 
+PCA "City-block weighted" 0.5 0.23652 0.161313 
+z-PCA "City-block weighted" 0.5 0.23652 0.162429 
+PCA "City-block weighted" 0.55 0.260172 0.160855 
+z-PCA "City-block weighted" 0.55 0.260172 0.16306 
+PCA "City-block weighted" 0.6 0.283824 0.166297 
+z-PCA "City-block weighted" 0.6 0.283824 0.170228 
+PCA "City-block weighted" 0.65 0.307476 0.169661 
+z-PCA "City-block weighted" 0.65 0.307476 0.174567 
+PCA "City-block weighted" 0.7 0.331128 0.198025 
+z-PCA "City-block weighted" 0.7 0.331128 0.205881 
+PCA "City-block weighted" 0.75 0.35478 0.206994 
+z-PCA "City-block weighted" 0.75 0.35478 0.212524 
+PCA "City-block weighted" 0.8 0.378432 0.282247 
+z-PCA "City-block weighted" 0.8 0.378432 0.282247 
+PCA "City-block weighted" 0.85 0.402084 0.282247 
+z-PCA "City-block weighted" 0.85 0.402084 0.282247 
+PCA "City-block weighted" 0.9 0.425736 0.282247 
+z-PCA "City-block weighted" 0.9 0.425736 0.282247 
+PCA "Euclidean weighted" 0.1 0.047304 0.145304 
+z-PCA "Euclidean weighted" 0.1 0.047304 0.165981 
+PCA "Euclidean weighted" 0.15 0.070956 0.148006 
+z-PCA "Euclidean weighted" 0.15 0.070956 0.170176 
+PCA "Euclidean weighted" 0.2 0.094608 0.148344 
+z-PCA "Euclidean weighted" 0.2 0.094608 0.168093 
+PCA "Euclidean weighted" 0.25 0.11826 0.150006 
+z-PCA "Euclidean weighted" 0.25 0.11826 0.169367 
+PCA "Euclidean weighted" 0.3 0.141912 0.151872 
+z-PCA "Euclidean weighted" 0.3 0.141912 0.166493 
+PCA "Euclidean weighted" 0.35 0.165564 0.149954 
+z-PCA "Euclidean weighted" 0.35 0.165564 0.165371 
+PCA "Euclidean weighted" 0.4 0.189216 0.155862 
+z-PCA "Euclidean weighted" 0.4 0.189216 0.161147 
+PCA "Euclidean weighted" 0.45 0.212868 0.15534 
+z-PCA "Euclidean weighted" 0.45 0.212868 0.155479 
+PCA "Euclidean weighted" 0.5 0.23652 0.158277 
+z-PCA "Euclidean weighted" 0.5 0.23652 0.15645 
+PCA "Euclidean weighted" 0.55 0.260172 0.159 
+z-PCA "Euclidean weighted" 0.55 0.260172 0.15732 
+PCA "Euclidean weighted" 0.6 0.283824 0.164473 
+z-PCA "Euclidean weighted" 0.6 0.283824 0.164364 
+PCA "Euclidean weighted" 0.65 0.307476 0.167732 
+z-PCA "Euclidean weighted" 0.65 0.307476 0.16847 
+PCA "Euclidean weighted" 0.7 0.331128 0.191677 
+z-PCA "Euclidean weighted" 0.7 0.331128 0.194064 
+PCA "Euclidean weighted" 0.75 0.35478 0.198676 
+z-PCA "Euclidean weighted" 0.75 0.35478 0.204404 
+PCA "Euclidean weighted" 0.8 0.378432 0.282247 
+z-PCA "Euclidean weighted" 0.8 0.378432 0.282247 
+PCA "Euclidean weighted" 0.85 0.402084 0.282247 
+z-PCA "Euclidean weighted" 0.85 0.402084 0.282247 
+PCA "Euclidean weighted" 0.9 0.425736 0.282247 
+z-PCA "Euclidean weighted" 0.9 0.425736 0.282247 
+PCA "Cosine weighted" 0.1 0.047304 0.129134 
+z-PCA "Cosine weighted" 0.1 0.047304 0.111847 
+PCA "Cosine weighted" 0.15 0.070956 0.133756 
+z-PCA "Cosine weighted" 0.15 0.070956 0.114984 
+PCA "Cosine weighted" 0.2 0.094608 0.136849 
+z-PCA "Cosine weighted" 0.2 0.094608 0.12088 
+PCA "Cosine weighted" 0.25 0.11826 0.138918 
+z-PCA "Cosine weighted" 0.25 0.11826 0.119274 
+PCA "Cosine weighted" 0.3 0.141912 0.140361 
+z-PCA "Cosine weighted" 0.3 0.141912 0.118709 
+PCA "Cosine weighted" 0.35 0.165564 0.142257 
+z-PCA "Cosine weighted" 0.35 0.165564 0.123382 
+PCA "Cosine weighted" 0.4 0.189216 0.14637 
+z-PCA "Cosine weighted" 0.4 0.189216 0.124752 
+PCA "Cosine weighted" 0.45 0.212868 0.148917 
+z-PCA "Cosine weighted" 0.45 0.212868 0.12796 
+PCA "Cosine weighted" 0.5 0.23652 0.153649 
+z-PCA "Cosine weighted" 0.5 0.23652 0.132499 
+PCA "Cosine weighted" 0.55 0.260172 0.157026 
+z-PCA "Cosine weighted" 0.55 0.260172 0.139543 
+PCA "Cosine weighted" 0.6 0.283824 0.157955 
+z-PCA "Cosine weighted" 0.6 0.283824 0.142908 
+PCA "Cosine weighted" 0.65 0.307476 0.16198 
+z-PCA "Cosine weighted" 0.65 0.307476 0.14829 
+PCA "Cosine weighted" 0.7 0.331128 0.198468 
+z-PCA "Cosine weighted" 0.7 0.331128 0.178819 
+PCA "Cosine weighted" 0.75 0.35478 0.211163 
+z-PCA "Cosine weighted" 0.75 0.35478 0.190433 
+PCA "Cosine weighted" 0.8 0.378432 0.0545508 <==
+z-PCA "Cosine weighted" 0.8 0.378432 0.0545508 
+PCA "Cosine weighted" 0.85 0.402084 0.0545508 
+z-PCA "Cosine weighted" 0.85 0.402084 0.0545508 
+PCA "Cosine weighted" 0.9 0.425736 0.0545508 
+z-PCA "Cosine weighted" 0.9 0.425736 0.0545508
+
+PCA "Correlation weighted" 0.1 0.047304 0.129208 
+z-PCA "Correlation weighted" 0.1 0.047304 0.110619 
+PCA "Correlation weighted" 0.15 0.070956 0.133849 
+z-PCA "Correlation weighted" 0.15 0.070956 0.115299 
+PCA "Correlation weighted" 0.2 0.094608 0.136503 
+z-PCA "Correlation weighted" 0.2 0.094608 0.121022 
+PCA "Correlation weighted" 0.25 0.11826 0.138685 
+z-PCA "Correlation weighted" 0.25 0.11826 0.118962 
+PCA "Correlation weighted" 0.3 0.141912 0.14043 
+z-PCA "Correlation weighted" 0.3 0.141912 0.118571 
+PCA "Correlation weighted" 0.35 0.165564 0.142539 
+z-PCA "Correlation weighted" 0.35 0.165564 0.123224 
+PCA "Correlation weighted" 0.4 0.189216 0.146464 
+z-PCA "Correlation weighted" 0.4 0.189216 0.124546 
+PCA "Correlation weighted" 0.45 0.212868 0.14837 
+z-PCA "Correlation weighted" 0.45 0.212868 0.128714 
+PCA "Correlation weighted" 0.5 0.23652 0.153772 
+z-PCA "Correlation weighted" 0.5 0.23652 0.132183 
+PCA "Correlation weighted" 0.55 0.260172 0.157443 
+z-PCA "Correlation weighted" 0.55 0.260172 0.139301 
+PCA "Correlation weighted" 0.6 0.283824 0.158627 
+z-PCA "Correlation weighted" 0.6 0.283824 0.143303 
+PCA "Correlation weighted" 0.65 0.307476 0.162504 
+z-PCA "Correlation weighted" 0.65 0.307476 0.148661 
+PCA "Correlation weighted" 0.7 0.331128 0.199299 
+z-PCA "Correlation weighted" 0.7 0.331128 0.178824 
+PCA "Correlation weighted" 0.75 0.35478 0.21133 
+z-PCA "Correlation weighted" 0.75 0.35478 0.190269 
+PCA "Correlation weighted" 0.8 0.378432 0.315314 
+z-PCA "Correlation weighted" 0.8 0.378432 0.315314 
+PCA "Correlation weighted" 0.85 0.402084 0.315314 
+z-PCA "Correlation weighted" 0.85 0.402084 0.315314 
+PCA "Correlation weighted" 0.9 0.425736 0.315314 
+z-PCA "Correlation weighted" 0.9 0.425736 0.315314 

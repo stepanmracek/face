@@ -41,12 +41,13 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::createShapeIndexMaps();
     //Evaluate3dFrgc::createBIN();
     //Evaluate3dFrgc::align();
-    //Evaluate3dFrgc::createIsoCurves();
-    //Evaluate3dFrgc::evaluateIsoCurves();
+
     //Evaluate3dFrgc::createMaps();
     //Evaluate3dFrgc::evaluateHistogramFeaturesGenerateStripesBinsMap();
     //Evaluate3dFrgc::evaluateHistogramFeatures();
-    Evaluate3dFrgc::evaluateImages();
+    //Evaluate3dFrgc::evaluateImages();
+    //Evaluate3dFrgc::createIsoCurves();
+    Evaluate3dFrgc::evaluateIsoCurves();
 
     //EvaluateKinect::isoCurves();
 

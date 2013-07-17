@@ -1,6 +1,6 @@
 #include "featurepotentialbase.h"
 
-Vector FeaturePotentialBase::createSelectionWeights(double threshold)
+Vector FeaturePotentialBase::createSelectionWeights(double threshold) const
 {
     int r = scores.rows;
     Vector result(r);
@@ -12,7 +12,7 @@ Vector FeaturePotentialBase::createSelectionWeights(double threshold)
     return result;
 }
 
-Vector FeaturePotentialBase::createWeights()
+Vector FeaturePotentialBase::createWeights() const
 {
     Vector result(scores);
     result = result.normalizeComponents();

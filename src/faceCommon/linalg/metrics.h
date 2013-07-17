@@ -17,6 +17,8 @@ public:
     virtual double distance(const Vector &v1, const Vector &v2) const = 0;
 
     virtual ~Metrics() {}
+
+    virtual QString toString() = 0;
 };
 
 class WeightedMetric : public Metrics
@@ -75,6 +77,8 @@ public:
     }
 
     virtual ~EuclideanMetric() {}
+
+    virtual QString toString() { return "Euclidean"; }
 };
 
 class EuclideanWeightedMetric : public WeightedMetric
@@ -97,6 +101,8 @@ public:
     }
 
     virtual ~EuclideanWeightedMetric() {}
+
+    virtual QString toString() { return "Euclidean weighted"; }
 };
 
 class CityblockMetric : public Metrics
@@ -117,6 +123,8 @@ public:
     }
 
     virtual ~CityblockMetric() {}
+
+    virtual QString toString() { return "City-block"; }
 };
 
 class CityblockWeightedMetric : public WeightedMetric
@@ -138,6 +146,8 @@ public:
     }
 
     virtual ~CityblockWeightedMetric() {}
+
+    virtual QString toString() { return "City-block weighted"; }
 };
 
 class CorrelationMetric : public Metrics
@@ -168,6 +178,8 @@ public:
     }
 
     virtual ~CorrelationMetric() {}
+
+    virtual QString toString() { return "Correlation"; }
 };
 
 class CorrelationWeightedMetric : public WeightedMetric
@@ -201,6 +213,8 @@ public:
     }
 
     virtual ~CorrelationWeightedMetric() {}
+
+    virtual QString toString() { return "Correlation weighted"; }
 };
 
 class CosineMetric : public Metrics
@@ -224,6 +238,8 @@ public:
     }
 
     virtual ~CosineMetric() {}
+
+    virtual QString toString() { return "Cosine"; }
 };
 
 class CosineWeightedMetric : public WeightedMetric
@@ -245,11 +261,14 @@ public:
             // qDebug() << "CosineWeightedMetric" << dist;
             dist = 0.0;
         }
+        //qDebug() << dist;
 
         return dist;
     }
 
     virtual ~CosineWeightedMetric() {}
+
+    virtual QString toString() { return "Cosine weighted"; }
 };
 
 class MahalanobisMetric : public Metrics
@@ -283,6 +302,8 @@ public:
     }
 
     virtual ~MahalanobisMetric() {}
+
+    virtual QString toString() { return "Mahalanobis"; }
 };
 
 class MahalanobisWeightedMetric : public WeightedMetric
@@ -313,9 +334,11 @@ public:
     }
 
     virtual ~MahalanobisWeightedMetric() {}
+
+    virtual QString toString() { return "Mahalanobis weighted"; }
 };
 
-class SumOfSquareDifferences : public Metrics
+class SSDMetric : public Metrics
 {
 public:
     double distance(const Vector &v1, const Vector &v2) const
@@ -334,7 +357,33 @@ public:
         return sum;
     }
 
-    virtual ~SumOfSquareDifferences() {}
+    virtual ~SSDMetric() {}
+
+    virtual QString toString() { return "SSD"; }
+};
+
+class SSDWeightedMetric : public WeightedMetric
+{
+public:
+    virtual double distance(const Vector &v1, const Vector &v2) const
+    {
+        int n = v1.rows;
+        assert(n == v2.rows);
+        assert(w.rows >= n);
+
+        double sum = 0.0;
+        for (int i = 0; i < n; i++)
+        {
+            double v = w(i) * (v1(i) - v2(i));
+            sum += v*v;
+        }
+
+        return sum;
+    }
+
+    virtual ~SSDWeightedMetric() {}
+
+    virtual QString toString() { return "SSD weighted"; }
 };
 
 #endif // METRICS_H
