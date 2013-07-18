@@ -20,10 +20,10 @@ public:
     static bool matrixContainsNan(Matrix &m);
     static void getMinMax(Matrix &m, double &min, double &max);
 
-    static void savePlot(QVector<double> &x, QVector<double> &y, QVector<double> &z, const QString &path);
-    static void savePlot(QVector<cv::Point3d> &values, const QString &path, bool append);
-    static void savePlot(QVector<double> &x, QVector<double> &y, const QString &path);
-    static void savePlot(QVector<double> values[], int axisCount, const QString &path);
+    static void savePlot(const QVector<double> &x, const QVector<double> &y, const QVector<double> &z, const QString &path);
+    static void savePlot(const QVector<cv::Point3d> &values, const QString &path, bool append);
+    static void savePlot(const QVector<double> &x, const QVector<double> &y, const QString &path);
+    static void savePlot(const QVector<double> values[], int axisCount, const QString &path);
 
     static void saveMap(QMap<double, double> &map, const QString &path);
 };

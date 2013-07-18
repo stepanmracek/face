@@ -64,3 +64,8 @@ Histogram::Histogram(const QVector<double> &values, int bins, bool normalize, do
         histogramValues[i] = delta/bins*i + minValue;
     }
 }
+
+void Histogram::savePlot(const QString &path) const
+{
+    Common::savePlot(histogramValues, histogramCounter, path);
+}

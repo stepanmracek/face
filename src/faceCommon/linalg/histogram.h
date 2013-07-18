@@ -2,6 +2,7 @@
 #define HISTOGRAM_H
 
 #include <QVector>
+#include <QString>
 
 class Histogram
 {
@@ -15,6 +16,8 @@ public:
 
     Histogram() {}
     Histogram(const QVector<double> &values, int bins, bool normalize, double minValue = 0, double maxValue = 0);
+
+    void savePlot(const QString &path) const;
 };
 
 #endif // HISTOGRAM_H

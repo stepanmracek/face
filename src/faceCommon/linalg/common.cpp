@@ -62,7 +62,7 @@ void Common::getMinMax(Matrix &m, double &min, double &max)
     }
 }
 
-void Common::savePlot(QVector<double> &x, QVector<double> &y, QVector<double> &z, const QString &path)
+void Common::savePlot(const QVector<double> &x, const QVector<double> &y, const QVector<double> &z, const QString &path)
 {
     int n = x.count();
     assert(n == y.count());
@@ -78,7 +78,7 @@ void Common::savePlot(QVector<double> &x, QVector<double> &y, QVector<double> &z
     }
 }
 
-void Common::savePlot(QVector<cv::Point3d> &values, const QString &path, bool append)
+void Common::savePlot(const QVector<cv::Point3d> &values, const QString &path, bool append)
 {
     int n = values.count();
 
@@ -106,7 +106,7 @@ void Common::savePlot(QVector<cv::Point3d> &values, const QString &path, bool ap
     }
 }
 
-void Common::savePlot(QVector<double> &x, QVector<double> &y, const QString &path)
+void Common::savePlot(const QVector<double> &x, const QVector<double> &y, const QString &path)
 {
     int n = x.count();
     assert(n == y.count());
@@ -121,7 +121,7 @@ void Common::savePlot(QVector<double> &x, QVector<double> &y, const QString &pat
     }
 }
 
-void Common::savePlot(QVector<double> values[], int axisCount, const QString &path)
+void Common::savePlot(const QVector<double> values[], int axisCount, const QString &path)
 {
     int n = values[0].count();
 

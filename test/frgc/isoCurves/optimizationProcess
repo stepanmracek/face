@@ -1,0 +1,79 @@
+0. Select Iso Curves
+====================
+indexy 0,1,2,3,4
+
+1. Modulo
+=========
+Correlation, z-PCA
+Rozdeleni na petiny:
+	- 1. polovina 1. petiny PCA
+	- 2. polovina 1. petiny z-score
+
+modulo 1 0.0295175 <==
+modulo 2 0.0308393 
+modulo 3 0.0337845 
+modulo 4 0.0374054 
+modulo 5 0.0364689 
+modulo 6 0.0400208 
+modulo 7 0.0470756 
+modulo 8 0.046651 
+modulo 9 0.0745438 
+modulo 10 0.0711358
+modulo 11 0.0748601 
+modulo 12 0.0737758 
+modulo 13 0.0784774 
+modulo 14 0.0820773 
+modulo 15 0.0845746 
+
+2. PCA threshold
+================
+
+pcaThreshold 0.9 0.175776 
+pcaThreshold 0.91 0.164241 
+pcaThreshold 0.92 0.164241 
+pcaThreshold 0.93 0.150686 
+pcaThreshold 0.94 0.132656 
+pcaThreshold 0.95 0.118561 
+pcaThreshold 0.96 0.100727 
+pcaThreshold 0.97 0.0708786 
+pcaThreshold 0.98 0.0665242 
+pcaThreshold 0.985 0.0573476 
+pcaThreshold 0.99 0.0497058 
+pcaThreshold 0.995 0.041259 
+pcaThreshold 0.999 0.0324122 
+pcaThreshold 1 0.0295175 <==
+
+3. EERPotential
+===============
+trenovano na 2. polovine 1. petiny
+
+selThreshold 0 0.0295175 
+selThreshold 0.01 0.0296356 
+selThreshold 0.02 0.0296356 
+selThreshold 0.03 0.0296356 
+selThreshold 0.04 0.0296356 
+selThreshold 0.05 0.0292061 
+selThreshold 0.06 0.0292061 
+selThreshold 0.07 0.0296652 
+selThreshold 0.08 0.0296406 
+selThreshold 0.09 0.0294683 
+selThreshold 0.1 0.0288602 <==
+selThreshold 0.11 0.0293685 
+selThreshold 0.12 0.0303162 
+selThreshold 0.13 0.0293538 
+selThreshold 0.14 0.0286436 
+selThreshold 0.15 0.0285845 
+selThreshold 0.16 0.0280122 
+selThreshold 0.17 0.0267593 
+selThreshold 0.18 0.0279089 
+selThreshold 0.19 0.0292898 
+selThreshold 0.2 0.0291224 
+selThreshold 0.21 0.0298141 
+selThreshold 0.22 0.0292405 
+selThreshold 0.23 0.0302178 
+selThreshold 0.24 0.0301193 
+selThreshold 0.25 0.0294916 
+selThreshold 0.26 0.0281845 
+selThreshold 0.27 0.0292123 
+selThreshold 0.28 0.0321907 
+selThreshold 0.29 0.0303655 

@@ -1,0 +1,28 @@
+Fuze:
+=====
+Histogram
+---------
+histogram-20-20
+ROI: (-60,-30) - (60,60)
+smooth: kernel 9, 1x
+stripes/bins: 20,20
+auto histogram bounds, z-pass, correlation
+eerPotential: relative selection threshold 0.8
+rozdelit na petiny, cela 1. petina PCA, cela 1. petina z-score, cela 1. petina EEE potencial
+
+Image:
+------
+depth2, PCA threshold 0.995
+ROI: width: 2*50, upper: 60, lower: 30; (50, 30, 200, 180)
+Correlation z-PCA
+rozdelit na petiny, cela 1. petina PCA, cela 1. petina z-score
+
+Iso-Curves
+----------
+isocurves2 (posunute o 10 jednotek od spicky nosu (0,0,0) po smeru osy Y => (centrum (0,10,0)))
+indexy krivek 0,1,2,3,4
+Correlation, z-PCA
+Rozdeleni na petiny:
+	- 1. polovina 1. petiny PCA
+	- 2. polovina 1. petiny z-score a eer-potencial
+selection threshold 0.1

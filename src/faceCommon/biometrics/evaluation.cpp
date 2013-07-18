@@ -1,8 +1,9 @@
 #include "evaluation.h"
 
 #include <QDebug>
-
 #include <cmath>
+
+#include "linalg/histogram.h"
 
 void Evaluation::commonInit()
 {
@@ -207,7 +208,7 @@ bool Evaluation::commonTemplatesEvaluation(QVector<Template> &templates, const M
     return ((maxSameDistance > minSameDistance) && (maxDifferentDistance > minDifferentDistance));
 }
 
-void Evaluation::outputResultsDET(const QString &path)
+void Evaluation::outputResultsDET(const QString &path) const
 {
     QFile file(path);
     file.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -219,24 +220,48 @@ void Evaluation::outputResultsDET(const QString &path)
     }
 }
 
-void Evaluation::outputResultsGenuine(const QString &path)
+void Evaluation::outputResultsFMR(const QString &path) const
 {
-    // TODO
+    Vector(fmr).toFile(path);
 }
 
-void Evaluation::outputResultsImpostor(const QString &path)
+void Evaluation::outputResultsFNMR(const QString &path) const
 {
-    // TODO
+    Vector(fnmr).toFile(path);
 }
 
-void Evaluation::outputResults(const QString &path)
+void Evaluation::outputResultsGenuineDistribution(const QString &path, int bins) const
+{
+    Histogram(genuineScores, bins, true, minDistance, maxDistance).savePlot(path);
+}
+
+void Evaluation::outputResultsGenuineScores(const QString &path) const
+{
+    Vector(genuineScores).toFile(path);
+}
+
+void Evaluation::outputResultsImpostorDistribution(const QString &path, int bins) const
+{
+    Histogram(impostorScores, bins, true, minDistance, maxDistance).savePlot(path);
+}
+
+void Evaluation::outputResultsImpostorScores(const QString &path) const
+{
+    Vector(impostorScores).toFile(path);
+}
+
+void Evaluation::outputResults(const QString &path, int histogramBins) const
 {
     // DET
+    outputResultsFMR(path+"-fmr");
+    outputResultsFNMR(path+"-fnmr");
     outputResultsDET(path+"-det");
 
     // Impostor, Genuine
-    outputResultsImpostor(path+"-impostor");
-    outputResultsGenuine(path+"-genuine");
+    outputResultsImpostorDistribution(path+"-imp-distrib", histogramBins);
+    outputResultsImpostorScores(path+"-imp-scores");
+    outputResultsGenuineDistribution(path+"-gen-distrib", histogramBins);
+    outputResultsGenuineScores(path+"-gen-scores");
 }
 
 BatchEvaluationResult Evaluation::batch(QList<QVector<Template> > &templates, const Metrics &metrics, int startIndex)

@@ -1,5 +1,7 @@
 #include "featurepotentialbase.h"
 
+#include <cassert>
+
 Vector FeaturePotentialBase::createSelectionWeights(double threshold) const
 {
     int r = scores.rows;
@@ -10,6 +12,15 @@ Vector FeaturePotentialBase::createSelectionWeights(double threshold) const
             result(i) = 1.0;
     }
     return result;
+}
+
+Vector FeaturePotentialBase::createSelectionWeightsBasedOnRelativeThreshold(double threshold) const
+{
+    assert(threshold >= 0);
+    assert(threshold < 1);
+
+    threshold = threshold * (maxScore - minScore) + minScore;
+    return createSelectionWeights(threshold);
 }
 
 Vector FeaturePotentialBase::createWeights() const

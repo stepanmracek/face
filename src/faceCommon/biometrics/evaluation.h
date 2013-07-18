@@ -36,8 +36,6 @@ public:
     QVector<double> fmr;
     QVector<double> fnmr;
     QVector<double> thresholds;
-    QVector<double> impostorDistribution;
-    QVector<double> genuineDistribution;
 
     double eer;
     double eerDistance;
@@ -53,10 +51,14 @@ public:
 
     double fnmrAtFmr(double fmr);
 
-    void outputResults(const QString &path);
-    void outputResultsDET(const QString &path);
-    void outputResultsGenuine(const QString &path);
-    void outputResultsImpostor(const QString &path);
+    void outputResults(const QString &path, int histogramBins) const;
+    void outputResultsDET(const QString &path) const;
+    void outputResultsGenuineDistribution(const QString &path, int bins) const;
+    void outputResultsImpostorDistribution(const QString &path, int bins) const;
+    void outputResultsGenuineScores(const QString &path) const;
+    void outputResultsImpostorScores(const QString &path) const;
+    void outputResultsFMR(const QString &path) const;
+    void outputResultsFNMR(const QString &path) const;
 
     static BatchEvaluationResult batch(QList<QVector<Template> > &templates, const Metrics &metrics, int startIndex = 0);
 

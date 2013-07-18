@@ -13,6 +13,7 @@ public:
     double minScore;
     double maxScore;
 
+    Vector createSelectionWeightsBasedOnRelativeThreshold(double threshold) const;
     Vector createSelectionWeights(double threshold) const;
     Vector createWeights() const;
 };

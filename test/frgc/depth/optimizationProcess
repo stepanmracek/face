@@ -75,7 +75,9 @@ cityblock z-PCA eer 0.179923
 Euclidean PCA eer 0.144232 
 Euclidean z-PCA eer 0.178179 
 cosine PCA eer 0.120194 
-cosine z-PCA eer 0.0919641 
+cosine z-PCA eer 0.0919641 <==
+Correlation PCA 0.119277 
+Correlation z-PCA 0.0911236 <==
 
 6. EER potential/Discriminative potential
 =========================================
