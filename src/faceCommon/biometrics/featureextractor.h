@@ -57,6 +57,8 @@ public:
     PCA pca;
     ZScoreNormalizationResult normParams;
 
+    ZScorePCAExtractor() {}
+
     ZScorePCAExtractor(PCA pca, const QVector<Vector> &rawData )
     {
         this->pca = pca;

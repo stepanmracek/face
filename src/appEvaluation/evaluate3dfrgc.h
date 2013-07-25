@@ -442,6 +442,8 @@ public:
             cv::destroyAllWindows();
         }
 
+        //QVector<PCA> pcas(filterCount*3);
+        QVector<ZScorePCAExtractor> extractors(filterCount*3);
         for (int filterIndex = 0; filterIndex < filterCount*3; filterIndex++)
         {
             const QVector<Vector> vectors = responses[filterIndex];
@@ -450,9 +452,8 @@ public:
 
             BioDataProcessing::divideToNClusters(vectors, classes, 2, vectorsInClusters, classesInClusters);
             PCA pca(vectorsInClusters[0]);
-            ZScorePCAExtractor zPcaExtractor(pca, vectorsInClusters[0]);
-            Evaluation eval(vectorsInClusters[1], classesInClusters[1], zPcaExtractor, CorrelationMetric());
-            qDebug() << filterIndex << (filterIndex % filterCount) << eval.eer;
+            ZScorePCAExtractor extractor(pca, vectorsInClusters[0]);
+            extractors << extractor;
         }
     }
 
