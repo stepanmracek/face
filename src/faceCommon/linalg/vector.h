@@ -30,6 +30,8 @@ public:
 
     static Vector fromFile(const QString &path);
 
+    static Vector concatenate(const QVector<Vector> &vectors);
+
     double sqrMagnitude() const;
 
     double magnitude() const;

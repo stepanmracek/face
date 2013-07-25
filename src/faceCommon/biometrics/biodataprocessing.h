@@ -28,7 +28,7 @@ public:
      * @param resultVectors
      * @param resultClasses
      */
-    static void divideToNClusters(QVector<T> &vectors, QVector<int> &classMembership, int numberOfClusters,
+    static void divideToNClusters(const QVector<T> &vectors, const QVector<int> &classMembership, int numberOfClusters,
                                   QList<QVector<T> > &resultVectors, QList<QVector<int> > &resultClasses)
     {
         int n = vectors.count();

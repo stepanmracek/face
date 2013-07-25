@@ -29,6 +29,8 @@
 #include "biometrics/geneticweightoptimization.h"
 #include "biometrics/eerpotential.h"
 #include "linalg/adaboost.h"
+#include "linalg/gausslaguerre.h"
+#include "linalg/gabor.h"
 
 class Evaluate3dFrgc
 {
@@ -399,6 +401,59 @@ public:
         qDebug() << "z-PCA" << Evaluation(vectorsInClusters[1],
                                           classesInClusters[1],
                                           zPcaExtractor, CorrelationMetric()).eer;
+    }
+
+    static void evaluateFilterBanks()
+    {
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
+        QString source = "depth2";
+        cv::Rect roi(50, 30, 200, 180);
+
+        QVector<int> absIndicies; absIndicies << 18 << 19 << 20 << 21 << 22;
+        QVector<int> realIndicies; realIndicies << 18 << 19 << 20 << 21 << 22;
+        QVector<int> imagIndicies;
+
+        QVector<Matrix> images;
+        QVector<int> classes;
+        Loader::loadImages(srcDirPath + source, images, &classes, "*.png", "d", 874);
+        int n = images.count();
+        //GaussLaguerre bank(13);
+        Gabor bank(13);
+        int filterCount = bank.realKernels.count();
+
+        QVector<QVector<Vector> > responses(3*filterCount);
+        for (int i = 0; i < n; i++)
+        {
+            Matrix sub = images[i](roi);
+            cv::resize(sub, sub, cv::Size(sub.cols/2, sub.rows/2));
+
+            QVector<Matrix> r = bank.getAbsRealImagResponse(sub);//, &absIndicies, &realIndicies, &imagIndicies);
+            for (int j = 0; j < r.count(); j++)
+            {
+                if (i == 0)
+                {
+                    double min, max;
+                    Common::getMinMax(r[j], min, max);
+                    cv::imshow(QString::number(j).toStdString(), (r[j]-min)/(max-min));
+                    cv::waitKey();
+                }
+                responses[j] << MatrixConverter::matrixToColumnVector(r[j]);
+            }
+            cv::destroyAllWindows();
+        }
+
+        for (int filterIndex = 0; filterIndex < filterCount*3; filterIndex++)
+        {
+            const QVector<Vector> vectors = responses[filterIndex];
+            QList<QVector<Vector> > vectorsInClusters;
+            QList<QVector<int> > classesInClusters;
+
+            BioDataProcessing::divideToNClusters(vectors, classes, 2, vectorsInClusters, classesInClusters);
+            PCA pca(vectorsInClusters[0]);
+            ZScorePCAExtractor zPcaExtractor(pca, vectorsInClusters[0]);
+            Evaluation eval(vectorsInClusters[1], classesInClusters[1], zPcaExtractor, CorrelationMetric());
+            qDebug() << filterIndex << (filterIndex % filterCount) << eval.eer;
+        }
     }
 
     static void evaluateFusion()

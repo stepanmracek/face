@@ -23,7 +23,9 @@ public:
 
     static void loadImages(const QString &dirPath, QVector<Matrix> &images, QVector<int> *classes = 0,
                            const char *extensionFilter = "*.png",
-                           const char *classSeparator = "-", bool qdebug = false);
+                           const char *classSeparator = "-",
+                           int maxImages = -1,
+                           bool qdebug = false);
 
     static void loadImages(const QString &dirPath, QVector<Vector> &vectors, QVector<int> *classes = 0,
                            const char *extensionFilter = "*.png",

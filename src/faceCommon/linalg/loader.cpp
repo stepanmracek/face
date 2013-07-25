@@ -78,7 +78,7 @@ void Loader::loadImages(const QString &dirPath, QVector<Vector> &vectors, QVecto
 }
 
 void Loader::loadImages(const QString &dirPath, QVector<Matrix> &images, QVector<int> *classes,
-                        const char *extensionFilter, const char *classSeparator, bool qdebug)
+                        const char *extensionFilter, const char *classSeparator, int maxImages, bool qdebug)
 {
     qDebug() << "loading files from" << dirPath;
 
@@ -105,6 +105,11 @@ void Loader::loadImages(const QString &dirPath, QVector<Matrix> &images, QVector
             QString classString = filenames.at(i).left(indexOfSeparator);
             int classNumber = classString.toInt();
             classes->append(classNumber);
+        }
+
+        if (maxImages > 0 && images.count() >= maxImages)
+        {
+            break;
         }
     }
 }

@@ -44,6 +44,17 @@ Vector::Vector(const QVector<double> &vec) : Matrix(vec.count(), 1)
     }
 }
 
+Vector Vector::concatenate(const QVector<Vector> &vectors)
+{
+    QVector<double> resultValues;
+    foreach(const Vector &v, vectors)
+    {
+        resultValues += v.toQVector();
+    }
+
+    return Vector(resultValues);
+}
+
 Vector Vector::fromFile(const QString &path)
 {
 	assert(QFile::exists(path));

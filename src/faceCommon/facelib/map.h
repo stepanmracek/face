@@ -172,7 +172,7 @@ public:
 
     static Map fromMatrix(Matrix &matrix, double voidValue = 0.0);
 
-    void applyFilter(Matrix &kernel, int times = 1, bool checkSum = false);
+    void applyFilter(const Matrix &kernel, int times = 1, bool checkSum = false);
 
     void serialize(const QString &path);
 };

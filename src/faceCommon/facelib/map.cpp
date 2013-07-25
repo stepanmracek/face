@@ -472,7 +472,7 @@ QVector<double> Map::getUsedValues() const
     return result;
 }
 
-void Map::applyFilter(Matrix &kernel, int times, bool checkSum)
+void Map::applyFilter(const Matrix &kernel, int times, bool checkSum)
 {
     assert(kernel.rows % 2 == 1);
     assert(kernel.cols % 2 == 1);

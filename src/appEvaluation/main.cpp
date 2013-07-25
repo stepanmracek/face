@@ -46,9 +46,10 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::evaluateHistogramFeaturesGenerateStripesBinsMap();
     //Evaluate3dFrgc::evaluateHistogramFeatures();
     //Evaluate3dFrgc::evaluateImages();
+    Evaluate3dFrgc::evaluateFilterBanks();
     //Evaluate3dFrgc::createIsoCurves();
     //Evaluate3dFrgc::evaluateIsoCurves();
-    Evaluate3dFrgc::evaluateFusion();
+    //Evaluate3dFrgc::evaluateFusion();
 
     //EvaluateKinect::isoCurves();
 
