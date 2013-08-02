@@ -7,8 +7,8 @@
 ScoreLevelFusionBase & ScoreLevelFusionBase::addComponent(
 		QVector<Vector> &trainRawData,
 		QVector<int> &trainClasses,
-		FeatureExtractor &featureExtractor,
-		Metrics &metrics)
+        const FeatureExtractor &featureExtractor,
+        const Metrics &metrics)
 {
 	this->trainClasses << (&trainClasses);
 	this->trainRawData << (&trainRawData);
@@ -47,7 +47,7 @@ Evaluation ScoreLevelFusionBase::evaluate(QList<QVector<Vector> > &rawData, QVec
     QVector<QVector<Template> > templates;
     for (int unit = 0; unit < unitCount; unit++)
     {
-        FeatureExtractor &extractor = *(extractors[unit]);
+        const FeatureExtractor &extractor = *(extractors[unit]);
         Templates t = Template::createTemplates(rawData[unit], classes, extractor);
         templates.append(t);
     }
@@ -110,6 +110,7 @@ void ScoreLevelFusionBase::prepareDataForClassification(QList<Evaluation> &evalu
             s = (s - genuineMeans[unit])/(impostorMeans[unit] - genuineMeans[unit]);
             scoreVec << s;
         }
+        //qDebug() << "genuine" << scoreVec;
 
         Vector score(scoreVec);
         scores << score;
@@ -125,6 +126,7 @@ void ScoreLevelFusionBase::prepareDataForClassification(QList<Evaluation> &evalu
             s = (s - genuineMeans[unit])/(impostorMeans[unit] - genuineMeans[unit]);
             scoreVec << s;
         }
+        //qDebug() << "impostor" << scoreVec;
 
         Vector score(scoreVec);
         scores << score;
@@ -135,7 +137,7 @@ void ScoreLevelFusionBase::prepareDataForClassification(QList<Evaluation> &evalu
 Vector ScoreLevelFusionBase::normalizeScore(QVector<double> &score)
 {
     Vector m(score);
-    m.normalizeComponents(impostorMeans, genuineMeans, false);
+    m = m.normalizeComponents(genuineMeans, impostorMeans, false);
     return m;
 }
 
@@ -148,7 +150,7 @@ void ScoreLDAFusion::learnImplementation(QList<Evaluation> &evaluationResults)
     prepareDataForClassification(evaluationResults, scores, classes, 0, 1);
 
     // LDA should find 1 projection vectors (K-1 = 2-1 = 1; K is number of classes (impostors and genuines))
-    lda.learn(scores, classes, false);
+    lda.learn(scores, classes);
     assert(lda.Wt.rows == 1);
 
     maxScore = -1e300;
@@ -170,7 +172,7 @@ double ScoreLDAFusion::fuse(QVector<double> &scores)
     if (s > maxScore) return 1.0;
     if (s < minScore) return 0.0;
 
-    double result = 1-(s - minScore)/(maxScore - minScore);
+    double result = (s - minScore)/(maxScore - minScore);
     return result;
 }
 
@@ -180,19 +182,21 @@ void ScoreLogisticRegressionFusion::learnImplementation(QList<Evaluation> &evalu
 {
     QVector<Vector> scores;
     QVector<int> classes;
-    prepareDataForClassification(evaluationResults, scores, classes, 0, 1);
-
+    prepareDataForClassification(evaluationResults, scores, classes, 1, 0);
     logR.learn(scores, classes);
 }
 
 double ScoreLogisticRegressionFusion::fuse(QVector<double> &scores)
 {
-    Vector score = normalizeScore(scores);
-    double genuineProbability = logR.classify(score);
+    Vector normalized = normalizeScore(scores);
+    // 1 ~ certainly genuine
+    // 0 ~ most likely impostor
+    double genuineProbability = logR.classify(normalized);
 
-    // 0 ~ certainly genuine (we have to return distance)
-    // 1 ~ most likely impostor
-    return 1.0 - genuineProbability;
+    // we have to return 'distance', not probability
+    double d = 1.0 - genuineProbability;
+    qDebug() << scores << normalized.toQVector() << d;
+    return d;
 }
 
 // --- Weightes sum Fusion ---
@@ -241,8 +245,10 @@ void ScoreProductFusion::learnImplementation(QList<Evaluation> &evaluationResult
     {
         Vector genuineScoresVec(evaluationResults[unit].genuineScores);
         double meanGenuine = genuineScoresVec.meanValue();
+        genuineMeans << meanGenuine;
         Vector impostorScoresVec(evaluationResults[unit].impostorScores);
         double meanImpostor = impostorScoresVec.meanValue();
+        impostorMeans << meanImpostor;
     }
 }
 
@@ -332,4 +338,17 @@ cv::Mat ScoreSVMFusion::colVectorsToFPMatrix(QVector<Vector> &vectors)
     }
 
     return data;
+}
+
+// --- Dummy product fusion ---
+
+double ScoreDummyProductFusion::fuse(QVector<double> &scores)
+{
+    double result = 1.0;
+    foreach(double s, scores)
+    {
+        assert(s > 0);
+        result *= s;
+    }
+    return result;
 }

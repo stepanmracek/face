@@ -34,6 +34,9 @@ public:
     static QVector<cv::Point3d> isoGeodeticCurve(Map &map, MapConverter &converter, cv::Point3d center,
                                                  double distance, int samples, double mapScaleFactor);
 
+    static QVector<cv::Point3d> surfaceCurve(const Map &map, const MapConverter &converter, cv::Point3d start,
+                                             cv::Point3d end, int samples, double mapScaleFactor);
+
     static QVector<double> isoGeodeticCurveToEuclDistance(const QVector<cv::Point3d> &isoCuvre, cv::Point3d center);
 
     static void calculateNormals(Mesh &mesh, int knn);
@@ -65,7 +68,7 @@ public:
     cv::Point2d meshStart;
     cv::Point2d meshSize;
 
-    cv::Point2d MeshToMapCoords(Map &map, cv::Point3d meshCoords)
+    cv::Point2d MeshToMapCoords(const Map &map, cv::Point3d meshCoords) const
     {
         double x = ( (meshCoords.x-meshStart.x) / meshSize.x) * map.w;
         double y = ( (meshCoords.y-meshStart.y) / meshSize.y) * map.h;
@@ -74,7 +77,7 @@ public:
         return cv::Point2d(x, y);
     }
 
-    cv::Point2d MeshToMapCoords(Map &map, cv::Point2d meshCoords)
+    cv::Point2d MeshToMapCoords(const Map &map, cv::Point2d meshCoords) const
     {
         double x = ( (meshCoords.x-meshStart.x) / meshSize.x) * map.w;
         double y = ( (meshCoords.y-meshStart.y) / meshSize.y) * map.h;
@@ -83,7 +86,7 @@ public:
         return cv::Point2d(x, y);
     }
 
-    cv::Point3d MapToMeshCoords(Map &map, cv::Point2d mapCoords, bool *success = 0)
+    cv::Point3d MapToMeshCoords(const Map &map, cv::Point2d mapCoords, bool *success = 0) const
     {
         double z = map.get(mapCoords.x, mapCoords.y, success);
 
@@ -95,7 +98,7 @@ public:
         return cv::Point3d(x, y, z);
     }
 
-    cv::Point3d MapToMeshCoordsSafe(Map &map, cv::Point2d mapCoords, double safeZValue)
+    cv::Point3d MapToMeshCoordsSafe(const Map &map, cv::Point2d mapCoords, double safeZValue) const
     {
         double z = map.getSafe(mapCoords.x, mapCoords.y, safeZValue);
 

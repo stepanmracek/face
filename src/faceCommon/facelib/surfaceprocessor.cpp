@@ -452,6 +452,35 @@ CurvatureStruct SurfaceProcessor::calculateCurvatures(Map &depthmap)
     return c;
 }
 
+QVector<cv::Point3d> SurfaceProcessor::surfaceCurve(const Map &map, const MapConverter &converter, cv::Point3d start,
+                                                    cv::Point3d end, int samples, double mapScaleFactor)
+{
+    assert(samples > 1);
+    double nan = 0.0/0.0;
+    QVector<cv::Point3d> result;
+
+    for (int i = 0; i < samples; i++)
+    {
+        double t = (double)i/(samples-1.0);
+        cv::Point3d p = start + (t*(end-start));
+
+        cv::Point2d mapPoint = converter.MeshToMapCoords(map, p);
+        bool success;
+        double z = map.get(mapPoint.x, mapPoint.y, &success);
+        if (success)
+        {
+            p.z = z*mapScaleFactor;
+        }
+        else
+        {
+            p == cv::Point3d(nan, nan, nan);
+        }
+        result << p;
+    }
+
+    return result;
+}
+
 QVector<cv::Point3d> SurfaceProcessor::isoGeodeticCurve(Map &map, MapConverter &converter, cv::Point3d center,
                                                         double distance, int samples, double mapScaleFactor)
 {

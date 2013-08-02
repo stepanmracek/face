@@ -137,19 +137,37 @@ public:
         pca.modesSelectionThreshold(pcaThreshold);
         //PCAExtractor pcaExtractor(pca);
         ZScorePCAExtractor zscorePcaExtractor(pca, trainVectorsInClusters[1]);
-        //zscorePcaExtractor.serialize("../../test/isocurves/shifted-pca.yml", "../../test/isocurves/shifted-normparams.yml");
+        zscorePcaExtractor.serialize("../../test/isocurves/shifted-pca.yml", "../../test/isocurves/shifted-normparams.yml");
 
         QVector<Template> trainTemplates = Template::createTemplates(trainVectorsInClusters[1],
                                                                      trainClassesInClusters[1],
                                                                      zscorePcaExtractor);
         EERPotential eerPot(trainTemplates);
 
+        CorrelationWeightedMetric corW;
+        double bestThreshold;
+        double bestEER = 1;
         for (double selThreshold = 0.0; selThreshold <= 0.3; selThreshold += 0.01)
         {
-            CorrelationWeightedMetric corW;
             corW.w = eerPot.createSelectionWeightsBasedOnRelativeThreshold(selThreshold);
             Evaluation eCor(rawVectorsInClusters[1], classesInClusters[1], zscorePcaExtractor, corW);
+
+            if (eCor.eer < bestEER)
+            {
+                bestEER = eCor.eer;
+                bestThreshold = selThreshold;
+            }
+
             qDebug() << "selThreshold" << selThreshold << eCor.eer;
+        }
+
+        corW.w = eerPot.createSelectionWeightsBasedOnRelativeThreshold(bestThreshold);
+        BatchEvaluationResult batchResult = Evaluation::batch(rawVectorsInClusters, classesInClusters,
+                                                              zscorePcaExtractor, corW, 2);
+        qDebug() << batchResult.meanEER << batchResult.stdDevOfEER;
+        foreach(const Evaluation &e, batchResult.results)
+        {
+            qDebug() << e.eer;
         }
     }
 
@@ -314,6 +332,7 @@ public:
         BioDataProcessing::divideToNClusters<Vector>(allVectors, allClasses, 2, vectorsInClusters, classesInClusters);
 
         ZScorePassExtractor zPassExtractor(vectorsInClusters[0]);
+        zPassExtractor.serialize("../../test/frgc/histogram/normparams.yml");
 
         Evaluation e(vectorsInClusters[1], classesInClusters[1], zPassExtractor, CorrelationMetric());
         qDebug() << "initial eer" << e.eer;
@@ -324,10 +343,44 @@ public:
         eerPotential.scores.toFile("eerPotentialTrain");
 
         CorrelationWeightedMetric corrW;
-        double s = 0.8*(eerPotential.maxScore - eerPotential.minScore)+eerPotential.minScore;
-        corrW.w = eerPotential.createSelectionWeights(s);
+        double s = 0.8;
+        Vector selectionWeights = eerPotential.createSelectionWeightsBasedOnRelativeThreshold(s);
+        selectionWeights.toFile("../../test/frgc/histogram/selectionWeights");
+        corrW.w = selectionWeights;
+
         Evaluation e2(vectorsInClusters[1], classesInClusters[1], zPassExtractor, corrW);
         qDebug() << "eerPotential scores" << s << "eer" << e2.eer;
+    }
+
+    static void evaluateTextures()
+    {
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
+        double threshold = 0.995;
+        cv::Rect roi(50, 40, 100, 90);
+        CorrelationMetric metric;
+
+        QVector<Matrix> images;
+        QVector<Vector> vectors;
+        QVector<int> classes;
+        Loader::loadImages(srcDirPath, images, &classes, "*.png", "d", 874);
+        foreach(const Matrix &img, images)
+        {
+            vectors << MatrixConverter::matrixToColumnVector(img(roi));
+        }
+
+        QList<QVector<Vector> > vectorsInClusters;
+        QList<QVector<int> > classesInClusters;
+        BioDataProcessing::divideToNClusters(vectors, classes, 2, vectorsInClusters, classesInClusters);
+
+        PCA pca(vectorsInClusters[0]);
+        ZScorePCAExtractor extractor(pca, vectorsInClusters[0]);
+        extractor.serialize("../../test/frgc/texture/pca.yml", "../../test/frgc/texture/normparams.yml");
+
+        Evaluation eval(vectorsInClusters[1], classesInClusters[1], extractor, metric);
+        qDebug() << eval.eer;
+
+        eval.outputResultsGenuineScores("texture-genuine-scores");
+        eval.outputResultsImpostorScores("texture-impostor-scores");
     }
 
     static void evaluateImages()
@@ -343,6 +396,7 @@ public:
                                                << 0.999 << 1;
         double threshold = 0.995;
 
+        // best: w: 50, u: 60, l: 30
         QVector<double> roiWidths; roiWidths << 50 << 50 << 60 << 60 << 60;
         QVector<double> roiUppers; roiUppers << 50 << 60 << 60 << 60 << 70;
         QVector<double> roiLowers; roiLowers << 30 << 30 << 30 << 40 << 40;
@@ -393,14 +447,97 @@ public:
         pca.modesSelectionThreshold(threshold);
         PCAExtractor pcaExtractor(pca);
         ZScorePCAExtractor zPcaExtractor(pca, vectorsInClusters[1]);
+        zPcaExtractor.serialize("../../test/frgc/depth/pca.yml", "../../test/frgc/depth/normparams.yml");
 
         qDebug() << "PCA" << Evaluation(vectorsInClusters[1],
                                         classesInClusters[1],
                                         pcaExtractor, CorrelationMetric()).eer;
 
-        qDebug() << "z-PCA" << Evaluation(vectorsInClusters[1],
-                                          classesInClusters[1],
-                                          zPcaExtractor, CorrelationMetric()).eer;
+        Evaluation eval(vectorsInClusters[1],
+                        classesInClusters[1],
+                        zPcaExtractor, CorrelationMetric());
+        qDebug() << "z-PCA" << eval.eer;
+
+        eval.outputResultsGenuineScores(source + "-genuine-scores");
+        eval.outputResultsImpostorScores(source + "-impostor-scores");
+    }
+
+    static void evaluateDirect()
+    {
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
+        QString source = "depth2";
+        cv::Rect roi(50, 30, 200, 180);
+
+        QVector<Matrix> images;
+        QVector<int> classes;
+        QVector<Vector> vectors;
+        Loader::loadImages(srcDirPath + source, images, &classes, "*.png", "d", 874);
+        int n = images.count();
+
+        for (int i = 0; i < n; i++)
+        {
+            Matrix sub = images[i](roi);
+            cv::resize(sub, sub, cv::Size(sub.cols/4, sub.rows/4));
+            vectors << MatrixConverter::matrixToColumnVector(sub);
+        }
+
+        QList<QVector<Vector> > vectorsInClusters;
+        QList<QVector<int> > classesInClusters;
+        BioDataProcessing::divideToNClusters(vectors, classes, 2, vectorsInClusters, classesInClusters);
+
+        ZScorePassExtractor extractor(vectorsInClusters[0]);
+        QVector<Template> trainTemplates = Template::joinVectorsAndClasses(vectorsInClusters[0], classesInClusters[0]);
+        EERPotential potential(trainTemplates);
+        CorrelationWeightedMetric metric;
+        for (double t = 0.05; t <= 0.95; t += 0.05) // 0.3 je nejlepsi
+        {
+            metric.w = potential.createSelectionWeightsBasedOnRelativeThreshold(t);
+            qDebug() << t << Evaluation(vectorsInClusters[1], classesInClusters[1], extractor, metric).eer;
+        }
+    }
+
+    static void createCurves()
+    {
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
+        QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/curves/";
+        QDir srcDir(srcDirPath, "*.binz");
+        QFileInfoList srcFiles = srcDir.entryInfoList();
+        QVector<Map> maps;
+        foreach (const QFileInfo &srcFileInfo, srcFiles)
+        {
+            Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
+            LandmarkDetector detector(mesh);
+            Landmarks lm = detector.detect();
+            cv::Point3d nosetip = lm.get(Landmarks::Nosetip);
+            mesh.translate(-nosetip);
+
+            MapConverter converter;
+            Map depth = SurfaceProcessor::depthmap(mesh, converter, cv::Point2d(-100,-100), cv::Point2d(100, 100), 2, ZCoord);
+            Matrix gaussKernel = KernelGenerator::gaussianKernel(7);
+            depth.applyFilter(gaussKernel, 3, true);
+
+            maps << depth;
+
+            if (maps.count() == 847) break;
+        }
+
+        Map mean(400, 400);
+        mean.setAll(0);
+        foreach(const Map &m, maps)
+        {
+            mean.add(m);
+            /*cv::imshow("mean", mean.toMatrix());
+            cv::waitKey();*/
+        }
+        mean.linearTransform(1.0/maps.count(), 0);
+        int count = 0;
+        for (int i = 0; i < mean.w*mean.h; i++)
+        {
+            if (mean.flags[i]) count++;
+        }
+        qDebug() << count;
+        cv::imshow("mean", mean.toMatrix());
+        cv::waitKey();
     }
 
     static void evaluateFilterBanks()
@@ -409,23 +546,24 @@ public:
         QString source = "depth2";
         cv::Rect roi(50, 30, 200, 180);
 
-        QVector<int> absIndicies; absIndicies << 18 << 19 << 20 << 21 << 22;
+        /*QVector<int> absIndicies; absIndicies << 18 << 19 << 20 << 21 << 22;
         QVector<int> realIndicies; realIndicies << 18 << 19 << 20 << 21 << 22;
-        QVector<int> imagIndicies;
+        QVector<int> imagIndicies;*/
 
         QVector<Matrix> images;
         QVector<int> classes;
         Loader::loadImages(srcDirPath + source, images, &classes, "*.png", "d", 874);
         int n = images.count();
         //GaussLaguerre bank(13);
-        Gabor bank(13);
+        Gabor bank(7);
         int filterCount = bank.realKernels.count();
 
+        qDebug() << "responses";
         QVector<QVector<Vector> > responses(3*filterCount);
         for (int i = 0; i < n; i++)
         {
             Matrix sub = images[i](roi);
-            cv::resize(sub, sub, cv::Size(sub.cols/2, sub.rows/2));
+            cv::resize(sub, sub, cv::Size(sub.cols/4, sub.rows/4));
 
             QVector<Matrix> r = bank.getAbsRealImagResponse(sub);//, &absIndicies, &realIndicies, &imagIndicies);
             for (int j = 0; j < r.count(); j++)
@@ -434,16 +572,18 @@ public:
                 {
                     double min, max;
                     Common::getMinMax(r[j], min, max);
-                    cv::imshow(QString::number(j).toStdString(), (r[j]-min)/(max-min));
-                    cv::waitKey();
+                    //cv::imshow(QString::number(j).toStdString(), (r[j]-min)/(max-min));
+                    //cv::waitKey();
                 }
                 responses[j] << MatrixConverter::matrixToColumnVector(r[j]);
             }
-            cv::destroyAllWindows();
+            //cv::destroyAllWindows();
         }
 
+        qDebug() << "PCAs";
         //QVector<PCA> pcas(filterCount*3);
-        QVector<ZScorePCAExtractor> extractors(filterCount*3);
+        //QVector<ZScorePCAExtractor> extractors(filterCount*3);
+        QVector<QVector<double> > concatenated(n);
         for (int filterIndex = 0; filterIndex < filterCount*3; filterIndex++)
         {
             const QVector<Vector> vectors = responses[filterIndex];
@@ -452,9 +592,39 @@ public:
 
             BioDataProcessing::divideToNClusters(vectors, classes, 2, vectorsInClusters, classesInClusters);
             PCA pca(vectorsInClusters[0]);
+            pca.modesSelectionThreshold(0.95);
             ZScorePCAExtractor extractor(pca, vectorsInClusters[0]);
-            extractors << extractor;
+            //extractors << extractor;
+
+            QVector<Vector> projectedResponses = extractor.batchExtract(vectors);
+            int i = 0;
+            foreach(const Vector &v, projectedResponses)
+            {
+                concatenated[i] += v.toQVector();
+                i++;
+            }
+
+            qDebug() << filterIndex << Evaluation(vectorsInClusters[1], classesInClusters[1], extractor, CorrelationMetric()).eer;
         }
+
+        qDebug() << "concatenation";
+        QVector<Vector> concatenatedVectors;
+        foreach(const QVector<double> &v, concatenated)
+        {
+            concatenatedVectors << Vector(v);
+        }
+
+        qDebug() << "dividing";
+        QList<QVector<Vector> > vectorsInClusters;
+        QList<QVector<int> > classesInClusters;
+        BioDataProcessing::divideToNClusters(concatenatedVectors, classes, 2, vectorsInClusters, classesInClusters);
+
+        qDebug() << "evaluation";
+        PCA pca(vectorsInClusters[0]);
+        pca.modesSelectionThreshold(0.95);
+        ZScorePCAExtractor extractor(pca, vectorsInClusters[0]);
+        qDebug() << "train" << Evaluation(vectorsInClusters[0], classesInClusters[0], extractor, CorrelationMetric()).eer;
+        qDebug() << "test" << Evaluation(vectorsInClusters[1], classesInClusters[1], extractor, CorrelationMetric()).eer;
     }
 
     static void evaluateFusion()

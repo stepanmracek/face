@@ -12,37 +12,16 @@
 #include "linalg/logisticregression.h"
 #include "linalg/vector.h"
 
-/*class ScoreLevelFusionComponent
-{
-public:
-	QVector<Matrix> &trainRawData;
-	QVector<int> &trainClasses;
-	FeatureExtractor &featureExtractor;
-	Metrics &metrics;
-
-	ScoreLevelFusionComponent(
-			QVector<Matrix> &trainRawData,
-			QVector<int> &trainClasses,
-			FeatureExtractor &featureExtractor,
-			Metrics &metrics) :
-				trainRawData(trainRawData),
-				trainClasses(trainClasses),
-				featureExtractor(featureExtractor),
-				metrics(metrics)
-	{}
-};*/
-
 class ScoreLevelFusionBase
 {
 private:
 	QList<QVector<Vector> *> trainRawData;
 	QList<QVector<int> *> trainClasses;
-	QVector<FeatureExtractor *> extractors;
-	QVector<Metrics *> metrics;
-
-	bool learned;
+    QVector<const FeatureExtractor *> extractors;
+    QVector<const Metrics *> metrics;
 
 protected:
+    bool learned;
     QVector<double> genuineMeans;
     QVector<double> impostorMeans;
 
@@ -64,33 +43,20 @@ public:
     ScoreLevelFusionBase & addComponent(
 			QVector<Vector> &trainRawData,
 			QVector<int> &trainClasses,
-			FeatureExtractor &featureExtractor,
-			Metrics &metrics);
+            const FeatureExtractor &featureExtractor,
+            const Metrics &metrics);
 
     Evaluation evaluate(QList<QVector<Vector> > &rawData, QVector<int> &classes, bool debugOutput = false);
 
     virtual ~ScoreLevelFusionBase() {}
 };
 
-/*class ScoreLevelFusionSystem
-{
-	QVector<FeatureExtractor *> extractors;
-	QVector<Metrics *> metrics;
-	ScoreLeveFusionBase &fuser;
-
-public:
-	ScoreLevelFusionSystem(ScoreLeveFusionBase &fuser) : fuser(fuser) {}
-
-    Evaluation evaluate(QList<QVector<Matrix> > &rawData, QVector<int> &classes, bool debugOutput = false);
-
-    void addModule(FeatureExtractor &featureExtractor, Metrics& metrics);
-};*/
-
 class ScoreLDAFusion : public ScoreLevelFusionBase
 {
 private:
     double maxScore;
     double minScore;
+    bool swapResultScore;
 
     LDA lda;
 
@@ -129,6 +95,14 @@ public:
 	void learnImplementation(QList<Evaluation> &evaluationResults);
     double fuse(QVector<double> &scores);
     virtual ~ScoreProductFusion() {}
+};
+
+class ScoreDummyProductFusion : public ScoreLevelFusionBase
+{
+public:
+    virtual ~ScoreDummyProductFusion() {}
+    void learnImplementation(QList<Evaluation> &evaluationResults) {}
+    double fuse(QVector<double> &scores);
 };
 
 class ScoreSVMFusion : public ScoreLevelFusionBase

@@ -19,13 +19,14 @@
 
 class FeatureVectorFusionBase
 {
+private:
+    bool learned;
+
 protected:
     QList<QVector<Vector> *> trainRawData;
 	QList<QVector<int> *> trainClasses;
-	QVector<ZScoreFeatureExtractor *> extractors;
+    QVector<FeatureExtractor *> extractors;
 	QVector<Metrics *> metrics;
-
-	bool learned;
 
 	virtual void learnImplementation() = 0;
 
@@ -35,7 +36,7 @@ public:
 	FeatureVectorFusionBase & addComponent(
                 QVector<Vector> &trainRawData,
 				QVector<int> &trainClasses,
-				ZScoreFeatureExtractor &featureExtractor,
+                FeatureExtractor &featureExtractor,
 				Metrics &metrics);
 
     QVector<Vector> batchFuse(QList<QVector<Vector> > inputMatricies);
@@ -45,6 +46,8 @@ public:
     virtual Vector fuse(QVector<Vector> &inputMatricies) = 0;
 
 	virtual ~FeatureVectorFusionBase() {}
+
+    bool isLearned() { return learned; }
 };
 
 class FeatureVectorFusionConcatenation : public FeatureVectorFusionBase

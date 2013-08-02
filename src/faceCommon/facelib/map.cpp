@@ -91,18 +91,6 @@ void Map::bandPass(double minValue, double maxValue, bool unsetBelowMin, bool un
     }
 }
 
-void Map::linearScale(double multiply, double add)
-{
-    int n = w*h;
-    for (int i = 0; i < n; i++)
-    {
-        if (flags[i])
-        {
-            values[i] = values[i] * multiply + add;
-        }
-    }
-}
-
 void Map::erode(int kernelSize)
 {
     assert(kernelSize % 2 == 1);
@@ -175,7 +163,7 @@ double Map::maxValue() const
     return max;
 }
 
-void Map::add(Map &other)
+void Map::add(const Map &other)
 {
     assert(w == other.w);
     assert(h == other.h);

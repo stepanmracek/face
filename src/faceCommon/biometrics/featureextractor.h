@@ -294,6 +294,8 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
+    ZScorePassExtractor(const QString &normParamsPath);
+
     ZScorePassExtractor(const QVector<Vector> &rawData)
     {
         QVector<Vector> projectedData;
@@ -312,6 +314,8 @@ public:
     }
 
     int outputLen() { return normParams.mean.count(); }
+
+    void serialize(const QString &normParamsPath);
 };
 
 class MeanNormalizationExtractor : public FeatureExtractor

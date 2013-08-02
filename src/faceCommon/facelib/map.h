@@ -68,7 +68,7 @@ public:
         return flags[coordToIndex(x, y)];
     }
 
-    double getSafe(int x, int y, double safeValue)
+    double getSafe(int x, int y, double safeValue) const
     {
         int i = coordToIndex(x, y);
         assert(isValidCoord(x,y));
@@ -128,13 +128,11 @@ public:
 
     void erode(int kernelSize);
 
-    void linearScale(double multiply, double add);
-
     double minValue() const;
 
     double maxValue() const;
 
-    void add(Map &other);
+    void add(const Map &other);
 
     void linearTransform(double multiply, double add);
 

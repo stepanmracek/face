@@ -128,7 +128,7 @@ public:
         qDebug() << "LDA on test set using Mahalanobis distance:" << evalLDAonTestWithMahal.eer;
 
         // save results to file
-        evalLDA2.outputResults("fisherface");
+        evalLDA2.outputResults("fisherface", 20);
     }
 };
 

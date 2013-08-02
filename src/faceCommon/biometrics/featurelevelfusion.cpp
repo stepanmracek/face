@@ -12,7 +12,7 @@
 
 FeatureVectorFusionBase & FeatureVectorFusionBase::addComponent(QVector<Vector> &trainRawData,
         QVector<int> &trainClasses,
-        ZScoreFeatureExtractor &featureExtractor,
+        FeatureExtractor &featureExtractor,
         Metrics &metrics)
 {
 	this->extractors << (&featureExtractor);
@@ -31,7 +31,7 @@ void FeatureVectorFusionBase::learn()
 
 QVector<Vector> FeatureVectorFusionBase::batchFuse(QList<QVector<Vector> > inputMatricies)
 {
-	assert(learned);
+    assert(isLearned());
 	int unitsCount = inputMatricies.count();
 	assert(unitsCount > 0);
 
