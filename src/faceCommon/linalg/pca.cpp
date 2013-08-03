@@ -12,6 +12,7 @@ PCA::PCA(QVector<Vector> &vectors, int maxComponents, bool debug)
 PCA::PCA(const QString &path)
 {
     cv::FileStorage storage(path.toStdString(), cv::FileStorage::READ);
+    assert(storage.isOpened());
     storage["eigenvalues"] >> cvPca.eigenvalues;
     storage["eigenvectors"] >> cvPca.eigenvectors;
     storage["mean"] >> cvPca.mean;

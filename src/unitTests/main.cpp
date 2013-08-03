@@ -21,6 +21,7 @@
 #include "testmap.h"
 #include "testhistogramfeatures.h"
 #include "testdistance.h"
+#include "testlogisticregression.h"
 
 #include <QString>
 
@@ -119,7 +120,9 @@ int main(int argc, char *argv[])
 
     //TestHistogramFeatures::testFeaturesGeneration(frgcPath());
 
-    TestDistance::testCosine();
+    //TestDistance::testCosine();
+
+    TestLogisticRegression::test();
 
 	return 0;
 }

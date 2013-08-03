@@ -125,8 +125,8 @@ public:
         textureEval.outputResults("kinect-texture", 10);
 
         QList<QVector<Vector> > joinedVectors;
-        joinedVectors << curveVectors << depthVectors << histVectors << textureVectors;
-        ScoreLogisticRegressionFusion fusion;
+        joinedVectors << curveVectors*/ << depthVectors << histVectors << textureVectors;
+        ScoreSVMFusion fusion;
         fusion.addComponent(curveVectors, classes, curveExtractor, cor);
         fusion.addComponent(depthVectors, classes, depthExtractor, cor);
         fusion.addComponent(histVectors, classes, histExtractor, sad);
@@ -136,6 +136,25 @@ public:
         Evaluation fusionEval = fusion.evaluate(joinedVectors, classes);
         qDebug() << "fusion" << fusionEval.eer;
         fusionEval.outputResults("kinect-fusion", 10);
+
+        /*double depthDelta = depthEval.maxDistance - depthEval.minDistance;
+        double textureDelta = textureEval.maxDistance - textureEval.minDistance;
+        double depthStep = depthDelta / 10.0;
+        double textureStep = textureDelta / 10.0;
+        for (double depth = depthEval.minDistance;
+             depth <= depthEval.maxDistance;
+             depth += depthStep)
+        {
+            for (double texture = textureEval.minDistance;
+                 texture <= textureEval.maxDistance;
+                 texture += textureStep)
+            {
+                QVector<double> scores; scores << depth << texture;
+                double fused = fusion.fuse(scores);
+                qDebug() << depth << texture << fused;
+            }
+            qDebug() << "";
+        }*/
     }
 };
 

@@ -7,21 +7,21 @@
 class LogisticRegression
 {
 private:
-    Vector prependOne(Vector &in);
+    Vector prependOne(const Vector &in) const;
 
 public:
     LogisticRegression() {}
-    LogisticRegression(QVector<Vector> &data, QVector<int> &classLabels);
-    void learn(QVector<Vector> &data, QVector<int> &classLabels);
+    LogisticRegression(const QVector<Vector> &data, const QVector<int> &classLabels);
+    void learn(const QVector<Vector> &data, const QVector<int> &classLabels);
 
     Matrix w;
 
-    double sigma(double x);
-    Matrix sigma(Matrix x);
+    double sigma(double x) const;
+    //Matrix sigma(const Matrix &x) const;
 
-    Matrix createDesignMatrix(QVector<Vector> &data);
+    Matrix createDesignMatrix(const QVector<Vector> &data) const;
 
-    double classify(Vector &x);
+    double classify(const Vector &x) const;
 };
 
 #endif // LOGISTICREGRESSION_H

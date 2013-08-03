@@ -39,4 +39,5 @@ HEADERS += \
     testanotation.h \
     testmap.h \
     testhistogramfeatures.h \
-    testdistance.h
+    testdistance.h \
+    testlogisticregression.h

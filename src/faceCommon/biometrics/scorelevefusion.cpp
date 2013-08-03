@@ -193,9 +193,9 @@ double ScoreLogisticRegressionFusion::fuse(QVector<double> &scores)
     // 0 ~ most likely impostor
     double genuineProbability = logR.classify(normalized);
 
-    // we have to return 'distance', not probability
+    // we have to return 'distance', not genuine probability
     double d = 1.0 - genuineProbability;
-    qDebug() << scores << normalized.toQVector() << d;
+    //qDebug() << scores << normalized.toQVector() << d;
     return d;
 }
 
@@ -274,14 +274,14 @@ void ScoreSVMFusion::learnImplementation(QList<Evaluation> &evaluationResults)
     QVector<int> classes;
     prepareDataForClassification(evaluationResults, scores, classes, -1, 1);
 
-    Matrix data = colVectorsToFPMatrix(scores).t();
-    Matrix labels = colVectorToColFPMatrix(classes);
+    cv::Mat data = colVectorsToFPMatrix(scores).t();
+    cv::Mat labels = colVectorToColFPMatrix(classes);
 
     cv::SVMParams params;
     params.svm_type = cv::SVM::C_SVC;
     params.kernel_type = cv::SVM::SIGMOID;
     params.term_crit   = cv::TermCriteria(CV_TERMCRIT_ITER, 1000, 1e-6);
-    svm.train(data, labels, Matrix(), Matrix(), params);
+    svm.train(data, labels, cv::Mat(), cv::Mat(), params);
 }
 
 double ScoreSVMFusion::fuse(QVector<double> &scores)

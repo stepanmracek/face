@@ -7,12 +7,12 @@
 
 #include "matrixconverter.h"
 
-LogisticRegression::LogisticRegression(QVector<Vector> &data, QVector<int> &classLabels)
+LogisticRegression::LogisticRegression(const QVector<Vector> &data, const QVector<int> &classLabels)
 {
     learn(data, classLabels);
 }
 
-void LogisticRegression::learn(QVector<Vector> &data, QVector<int> &classLabels)
+void LogisticRegression::learn(const QVector<Vector> &data, const QVector<int> &classLabels)
 {
     // initial assertion
     int N = data.count();
@@ -33,13 +33,13 @@ void LogisticRegression::learn(QVector<Vector> &data, QVector<int> &classLabels)
     w = (Phi.t() * Phi).inv() * Phi.t() * target;
 }
 
-double LogisticRegression::sigma(double x)
+double LogisticRegression::sigma(double x) const
 {
     double s =  1.0 / (1.0 + exp(-x) );
     return s;
 }
 
-Matrix LogisticRegression::sigma(Matrix x)
+/*Matrix LogisticRegression::sigma(const Matrix &x) const
 {
     // assuming input column vector
     int M = x.rows;
@@ -53,9 +53,9 @@ Matrix LogisticRegression::sigma(Matrix x)
     }
 
     return result;
-}
+}*/
 
-Matrix LogisticRegression::createDesignMatrix(QVector<Vector> &data)
+Matrix LogisticRegression::createDesignMatrix(const QVector<Vector> &data) const
 {
     QVector<Vector> zeroPadding;
     for (int i = 0; i < data.count(); i++)
@@ -67,17 +67,20 @@ Matrix LogisticRegression::createDesignMatrix(QVector<Vector> &data)
     return MatrixConverter::columnVectorsToDataMatrix(zeroPadding).t();
 }
 
-double LogisticRegression::classify(Vector &x)
+double LogisticRegression::classify(const Vector &x) const
 {
     Vector psi = prependOne(x);
-    Vector product = w.t() * psi;
+    Matrix product = w.t() * psi;
+    assert (product.rows == 1);
+    assert (product.cols == 1);
     return sigma(product(0));
 }
 
-Vector LogisticRegression::prependOne(Vector &in)
+Vector LogisticRegression::prependOne(const Vector &in) const
 {
     int M = in.rows;
     Vector modified(M+1);
+    modified(0) = 1;
     for (int r = 0; r < M; r++)
     {
         modified(r+1) = in(r);
