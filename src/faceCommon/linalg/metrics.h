@@ -127,6 +127,41 @@ public:
     virtual QString toString() { return "City-block"; }
 };
 
+class CityBlockNaNSafeMetric : public Metrics
+{
+public:
+    virtual double distance(const Vector &vec1, const Vector &vec2) const
+    {
+        int n = vec1.rows;
+        assert(n == vec2.rows);
+
+        double sum = 0.0;
+        int nans = 0;
+        for (int i = 0; i < n; i++)
+        {
+            double v1 = vec1(i);
+            double v2 = vec2(i);
+            if (v1 != v1 || v2 != v2)
+            {
+                nans++;
+            }
+            else
+            {
+                sum += fabs(v1 - v2);
+            }
+        }
+
+        if (nans == n) return 0.0/0.0;
+        if (nans == 0) return sum;
+        double mean = sum / (n - nans);
+        return sum + nans / sum * mean;
+    }
+
+    virtual ~CityBlockNaNSafeMetric() {}
+
+    virtual QString toString() { return "City-block (NaN safe)"; }
+};
+
 class CityblockWeightedMetric : public WeightedMetric
 {
 public:

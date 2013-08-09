@@ -45,7 +45,7 @@ QVector<Matrix> Loader::loadImages(const QString &dirPath)
 }
 
 void Loader::loadImages(const QString &dirPath, QVector<Vector> &vectors, QVector<int> *classes,
-                        const char *extensionFilter, const char *classSeparator, bool qdebug)
+                        const char *extensionFilter, const char *classSeparator, int maxImages, cv::Rect roi, bool qdebug)
 {
     qDebug() << "loading files from" << dirPath;
 
@@ -64,6 +64,10 @@ void Loader::loadImages(const QString &dirPath, QVector<Vector> &vectors, QVecto
 
         QString imgPath(dirPath + QDir::separator() + filenames[i]);
         Matrix img = MatrixConverter::imageToMatrix(imgPath);
+        if (roi.width != 0 && roi.height != 0)
+        {
+            img = img(roi);
+        }
         Vector vec = MatrixConverter::matrixToColumnVector(img);
         vectors.append(vec);
 
@@ -74,11 +78,16 @@ void Loader::loadImages(const QString &dirPath, QVector<Vector> &vectors, QVecto
             int classNumber = classString.toInt();
             classes->append(classNumber);
         }
+
+        if (maxImages > 0 && vectors.count() >= maxImages)
+        {
+            break;
+        }
     }
 }
 
 void Loader::loadImages(const QString &dirPath, QVector<Matrix> &images, QVector<int> *classes,
-                        const char *extensionFilter, const char *classSeparator, int maxImages, bool qdebug)
+                        const char *extensionFilter, const char *classSeparator, int maxImages, cv::Rect roi, bool qdebug)
 {
     qDebug() << "loading files from" << dirPath;
 
@@ -98,6 +107,10 @@ void Loader::loadImages(const QString &dirPath, QVector<Matrix> &images, QVector
         QString imgPath(dirPath + QDir::separator() + filenames[i]);
         Matrix img = MatrixConverter::imageToMatrix(imgPath);
         images.append(img);
+        if (roi.width != 0 && roi.height != 0)
+        {
+            img = img(roi);
+        }
 
         if (classes)
         {

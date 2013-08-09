@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 
     //TestSVM::testSVM();
 
-    //TestGaborWavelet::test();
+    TestGaborWavelet::test();
 
 	//Annotation a("/home/stepo/SVN/disp-stepan-mracek/test/testASM");
 	//TestTextureWarper::test();
@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 
     //TestDistance::testCosine();
 
-    TestLogisticRegression::test();
+    //TestLogisticRegression::test();
 
 	return 0;
 }

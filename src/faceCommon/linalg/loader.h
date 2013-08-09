@@ -25,11 +25,15 @@ public:
                            const char *extensionFilter = "*.png",
                            const char *classSeparator = "-",
                            int maxImages = -1,
+                           cv::Rect roi = cv::Rect(),
                            bool qdebug = false);
 
     static void loadImages(const QString &dirPath, QVector<Vector> &vectors, QVector<int> *classes = 0,
                            const char *extensionFilter = "*.png",
-                           const char *classSeparator = "-", bool qdebug = false);
+                           const char *classSeparator = "-",
+                           int maxImages = -1,
+                           cv::Rect roi = cv::Rect(),
+                           bool qdebug = false);
 
     static void loadMaps(const QString &dirPath, QVector<Map>, QVector<int> *classes = 0,
                          const char *extensionFilter = "*.map",

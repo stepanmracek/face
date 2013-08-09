@@ -91,6 +91,8 @@ public:
     /*static double stdDeviation(QVector<double> &vector);*/
 
     Vector smooth(int kernelSize) const;
+
+    bool containsNan() const;
 };
 
 #endif // VECTORN_H

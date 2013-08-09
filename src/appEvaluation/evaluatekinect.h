@@ -76,7 +76,7 @@ public:
             cv::waitKey(1);*/
 
             cv::Point3d center(0,20,0);
-            VectorOfIsocurves isocurves;
+            VectorOfCurves isocurves;
             for (int distance = 10; distance <= 50; distance += 10)
             {
                 VectorOfPoints isocurve = SurfaceProcessor::isoGeodeticCurve(depth, converter, center, distance, 100, 2);
@@ -86,7 +86,7 @@ public:
             int id = info.baseName().split('-')[0].toInt();
             classes << id;
 
-            curveVectors << IsoCurveProcessing::generateFeatureVector(isocurves);
+            curveVectors << IsoCurveProcessing::generateFeatureVector(isocurves, false);
             depthVectors << MatrixConverter::matrixToColumnVector(depthMat);
             histVectors << HistogramFeatures(depth, 20, 20).toVector();
             textureVectors << MatrixConverter::matrixToColumnVector(textureMat);
@@ -125,7 +125,7 @@ public:
         textureEval.outputResults("kinect-texture", 10);
 
         QList<QVector<Vector> > joinedVectors;
-        joinedVectors << curveVectors*/ << depthVectors << histVectors << textureVectors;
+        joinedVectors << curveVectors << depthVectors << histVectors << textureVectors;
         ScoreSVMFusion fusion;
         fusion.addComponent(curveVectors, classes, curveExtractor, cor);
         fusion.addComponent(depthVectors, classes, depthExtractor, cor);

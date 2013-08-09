@@ -11,8 +11,9 @@ class Gabor : public FilterBank
 public:
     Gabor(int size);
 
+    static void createWavelet(Matrix &real, Matrix &imag, int frequency, int orientation);
 private:
-    void gaborFunc(int x, int y, double omega, double theta, double sigma, double &real, double &imag);
+    static void gaborFunc(int x, int y, double omega, double theta, double sigma, double &real, double &imag);
 };
 
 #endif // GABOR_H

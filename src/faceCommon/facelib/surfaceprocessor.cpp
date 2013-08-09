@@ -469,7 +469,7 @@ QVector<cv::Point3d> SurfaceProcessor::surfaceCurve(const Map &map, const MapCon
         double z = map.get(mapPoint.x, mapPoint.y, &success);
         if (success)
         {
-            p.z = z*mapScaleFactor;
+            p.z = z;
         }
         else
         {

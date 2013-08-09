@@ -17,7 +17,7 @@ public:
 
     PCA() {}
 
-    PCA(QVector<Vector> &vectors, int maxComponents = 0, bool debug = false);
+    PCA(const QVector<Vector> &vectors, int maxComponents = 0, bool debug = false);
 
     PCA(const QString &path);
 
@@ -33,7 +33,7 @@ public:
 
     double getVariation(int mode);
 
-    void learn(QVector<Vector> &vectors, int maxComponents = 0, bool debug = false);
+    void learn(const QVector<Vector> &vectors, int maxComponents = 0, bool debug = false);
 
     void serialize(const QString &path);
 
@@ -41,9 +41,9 @@ public:
 
     Vector scaledProject(const Vector &vector) const;
 
-    Vector backProject(const Vector &vector);
+    Vector backProject(const Vector &vector) const;
 
-    Vector getMean();
+    Vector getMean() const;
 
     Vector normalizeParams(const Vector &params);
 

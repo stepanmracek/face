@@ -4,7 +4,7 @@
 
 #include "matrixconverter.h"
 
-PCA::PCA(QVector<Vector> &vectors, int maxComponents, bool debug)
+PCA::PCA(const QVector<Vector> &vectors, int maxComponents, bool debug)
 {
     learn(vectors, maxComponents, debug);
 }
@@ -18,11 +18,25 @@ PCA::PCA(const QString &path)
     storage["mean"] >> cvPca.mean;
 }
 
-void PCA::learn(QVector<Vector> &vectors, int maxComponents, bool debug)
+void PCA::learn(const QVector<Vector> &vectors, int maxComponents, bool debug)
 {
     if (debug) qDebug() << "PCA";
     if (debug) qDebug() << "Creating input data matrix";
-    Matrix data = MatrixConverter::columnVectorsToDataMatrix(vectors);
+
+    QVector<Vector> input;
+    foreach (const Vector &v, vectors)
+    {
+        if (!v.containsNan())
+        {
+            input << v;
+        }
+    }
+    if (input.count() != vectors.count())
+    {
+        qDebug() << "PCA: Using" << input.count() << "of" << vectors.count() << "input vectors ";
+    }
+
+    Matrix data = MatrixConverter::columnVectorsToDataMatrix(input);
     if (debug) qDebug() << "Calculating eigenvectors and eigenvalues";
     cvPca = cv::PCA(data, cv::Mat(), CV_PCA_DATA_AS_COL, maxComponents);
     if (debug) qDebug() << "PCA done";
@@ -38,8 +52,43 @@ void PCA::serialize(const QString &path)
 
 Vector PCA::project(const Vector &in) const
 {
-    Matrix m = cvPca.project(in);
-    return m;
+    if (!in.containsNan())
+    {
+        Matrix m = cvPca.project(in);
+        return m;
+    }
+    else
+    {
+        Vector mean = getMean();
+        Vector filled = in;
+        int n = in.rows;
+        QMap<int, double> valid;
+        for (int i = 0; i < n; i++)
+        {
+            double v = in(i);
+            if (v != v)
+            {
+                filled(i) = mean(i);
+            }
+            else
+            {
+                valid[i] = v;
+            }
+        }
+
+        for (int iter = 0; iter < 5; iter++)
+        {
+            Matrix projected = cvPca.project(filled);
+            filled = backProject(projected);
+
+            foreach(int i, valid)
+            {
+                filled(i) = valid[i];
+            }
+        }
+        Matrix result = cvPca.project(filled);
+        return result;
+    }
 }
 
 Vector PCA::scaledProject(const Vector &vector) const
@@ -50,7 +99,7 @@ Vector PCA::scaledProject(const Vector &vector) const
     return out;
 }
 
-Vector PCA::backProject(const Vector &in)
+Vector PCA::backProject(const Vector &in) const
 {
     Matrix m = cvPca.backProject(in);
     return m;
@@ -87,7 +136,7 @@ double PCA::getVariation(int mode)
     return val;
 }
 
-Vector PCA::getMean()
+Vector PCA::getMean() const
 {
     Matrix mean = cvPca.mean;
     return mean;

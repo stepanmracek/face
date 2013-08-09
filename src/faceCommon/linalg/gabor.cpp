@@ -5,31 +5,15 @@ Gabor::Gabor(int size)
     assert(size % 2 == 1);
 
     // frequency
-    double omegaMax = M_PI_2;
-    double lambda = M_SQRT2;
-    for (int m = 1; m <= 5; m++)
+    for (int frequency = 1; frequency <= 5; frequency++)
     {
-        double omega = omegaMax * pow(lambda, -(m - 1));
-        double sigma = M_PI / omega;
-
         // orientation
-        for (int n = 1; n <= 8; n++)
+        for (int orientation = 1; orientation <= 8; orientation++)
         {
-            double theta = (n-1)*M_PI*0.125;
-
             Matrix real(size, size);
             Matrix imag(size, size);
 
-            for (int y = 0; y < size; y++)
-            {
-                for (int x = 0; x < size; x++)
-                {
-                    double r,i;
-                    gaborFunc(x-size/2, y-size/2, omega, theta, sigma, r, i);
-                    real(y, x) = r;
-                    imag(y, x) = i;
-                }
-            }
+            createWavelet(real, imag, frequency, orientation);
 
             realKernels << real;
             imagKernels << imag;
@@ -52,3 +36,28 @@ void Gabor::gaborFunc(int x, int y, double omega, double theta, double sigma, do
     imag = a*b*(cImag - d);
 }
 
+void Gabor::createWavelet(Matrix &real, Matrix &imag, int frequency, int orientation)
+{
+    int size = real.rows;
+    assert(size > 0);
+    assert(size == real.cols);
+    assert(size == imag.rows);
+    assert(size == imag.cols);
+
+    double omegaMax = M_PI_2;
+    double lambda = M_SQRT2;
+    double omega = omegaMax * pow(lambda, -(frequency - 1));
+    double sigma = M_PI / omega;
+    double theta = (orientation-1)*M_PI*0.125;
+
+    for (int y = 0; y < size; y++)
+    {
+        for (int x = 0; x < size; x++)
+        {
+            double r,i;
+            gaborFunc(x-size/2, y-size/2, omega, theta, sigma, r, i);
+            real(y, x) = r;
+            imag(y, x) = i;
+        }
+    }
+}

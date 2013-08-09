@@ -36,12 +36,9 @@ int main(int argc, char *argv[])
 	//EvaluateThermo2::evaluateZScoreAndWeighting();
 	//EvaluateThermo2::evaluateFilterBanks();
 
-	//Evaluate3dFrgc::pcaSubspace();
     //Evaluate3dFrgc::evaluateFusion();
-    //Evaluate3dFrgc::createShapeIndexMaps();
     //Evaluate3dFrgc::createBIN();
     //Evaluate3dFrgc::align();
-
     //Evaluate3dFrgc::createMaps();
     //Evaluate3dFrgc::evaluateHistogramFeaturesGenerateStripesBinsMap();
     //Evaluate3dFrgc::evaluateHistogramFeatures();
@@ -52,9 +49,10 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::evaluateIsoCurves();
     //Evaluate3dFrgc::evaluateFusion();
     //Evaluate3dFrgc::createCurves();
-    //Evaluate3dFrgc::evaluateTextures();
+    //Evaluate3dFrgc::evaluateCurves();
+    Evaluate3dFrgc::evaluateTextures();
 
-    EvaluateKinect::evaluate();
+    //EvaluateKinect::evaluate();
 
     return 0;
 }

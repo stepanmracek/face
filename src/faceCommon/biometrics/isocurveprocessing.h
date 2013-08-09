@@ -4,13 +4,13 @@
 #include "facelib/mesh.h"
 #include "biometrics/template.h"
 
-typedef QVector<VectorOfPoints> VectorOfIsocurves;
+typedef QVector<VectorOfPoints> VectorOfCurves;
 
 class SubjectIsoCurves
 {
 public:
     int subjectID;
-    VectorOfIsocurves vectorOfIsocurves;
+    VectorOfCurves vectorOfIsocurves;
 };
 
 class IsoCurveProcessing
@@ -24,7 +24,7 @@ public:
 
     static void sampleIsoCurvePoints(QVector<SubjectIsoCurves> &data, int modulo);
 
-    static void sampleIsoCurvePoints(VectorOfIsocurves &isocurves, int modulo);
+    static void sampleIsoCurvePoints(VectorOfCurves &isocurves, int modulo);
 
     static void sampleIsoCurvePoints(VectorOfPoints &isocurve, int modulo);
 
@@ -32,11 +32,11 @@ public:
 
     static void stats(QVector<SubjectIsoCurves> &data);
 
-    static QVector<Template> generateTemplates(QVector<SubjectIsoCurves> &data);
+    static QVector<Template> generateTemplates(QVector<SubjectIsoCurves> &data, bool onlyZ);
 
-    static Template generateTemplate(const SubjectIsoCurves &subj);
+    static Template generateTemplate(const SubjectIsoCurves &subj, bool onlyZ);
 
-    static Vector generateFeatureVector(const VectorOfIsocurves &isocurves);
+    static Vector generateFeatureVector(const VectorOfCurves &isocurves, bool onlyZ);
 
     static QVector<Template> generateEuclDistanceTemplates(QVector<SubjectIsoCurves> &data);
 };

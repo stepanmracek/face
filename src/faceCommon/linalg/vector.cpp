@@ -542,3 +542,14 @@ Vector Vector::smooth(int kernelSize) const
 
     return result;
 }
+
+bool Vector::containsNan() const
+{
+    int n = rows;
+    for (int i = 0; i < n; i++)
+    {
+        double v = (*this)(i);
+        if (v != v) return true;
+    }
+    return false;
+}

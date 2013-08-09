@@ -34,7 +34,7 @@ void IsoCurveProcessing::sampleIsoCurves(QVector<SubjectIsoCurves> &data, int mo
     for (int i = 0; i < data.count(); i++)
     {
         SubjectIsoCurves &subj = data[i];
-        VectorOfIsocurves newIsoCurves;
+        VectorOfCurves newIsoCurves;
         for (int j = 0; j < subj.vectorOfIsocurves.count(); j += modulo)
         {
             newIsoCurves << subj.vectorOfIsocurves[j];
@@ -65,7 +65,7 @@ void IsoCurveProcessing::sampleIsoCurvePoints(QVector<SubjectIsoCurves> &data, i
     }
 }
 
-void IsoCurveProcessing::sampleIsoCurvePoints(VectorOfIsocurves &isocurves, int modulo)
+void IsoCurveProcessing::sampleIsoCurvePoints(VectorOfCurves &isocurves, int modulo)
 {
     for (int i = 0; i < isocurves.count(); i++)
     {
@@ -88,7 +88,7 @@ void IsoCurveProcessing::selectIsoCurves(QVector<SubjectIsoCurves> &data, int st
     for (int i = 0; i < data.count(); i++)
     {
         SubjectIsoCurves &subj = data[i];
-        VectorOfIsocurves newIsoCurves;
+        VectorOfCurves newIsoCurves;
         for (int j = start; j < end; j++)
         {
             newIsoCurves << subj.vectorOfIsocurves[j];
@@ -130,26 +130,26 @@ void IsoCurveProcessing::stats(QVector<SubjectIsoCurves> &data)
     }
 }
 
-QVector<Template> IsoCurveProcessing::generateTemplates(QVector<SubjectIsoCurves> &data)
+QVector<Template> IsoCurveProcessing::generateTemplates(QVector<SubjectIsoCurves> &data, bool onlyZ)
 {
     QVector<Template> result;
     foreach (const SubjectIsoCurves &subjectIsoCurves, data)
     {
-        result << generateTemplate(subjectIsoCurves);
+        result << generateTemplate(subjectIsoCurves, onlyZ);
     }
 
     return result;
 }
 
-Template IsoCurveProcessing::generateTemplate(const SubjectIsoCurves &subj)
+Template IsoCurveProcessing::generateTemplate(const SubjectIsoCurves &subj, bool onlyZ)
 {
     Template t;
     t.subjectID = subj.subjectID;
-    t.featureVector = generateFeatureVector(subj.vectorOfIsocurves);
+    t.featureVector = generateFeatureVector(subj.vectorOfIsocurves, onlyZ);
     return t;
 }
 
-Vector IsoCurveProcessing::generateFeatureVector(const VectorOfIsocurves &isocurves)
+Vector IsoCurveProcessing::generateFeatureVector(const VectorOfCurves &isocurves, bool onlyZ)
 {
     QVector<double> fv;
     foreach (const VectorOfPoints &isocurve, isocurves)
@@ -158,7 +158,7 @@ Vector IsoCurveProcessing::generateFeatureVector(const VectorOfIsocurves &isocur
         {
             if (p.x != p.x || p.y != p.y || p.z != p.z)
             {
-                qDebug() << "NaN";
+                //qDebug() << "NaN";
             }
             fv << p.x;
             fv << p.y;

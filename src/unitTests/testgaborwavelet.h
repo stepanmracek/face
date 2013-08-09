@@ -6,64 +6,6 @@
 #include <opencv2/opencv.hpp>
 #include <cmath>
 
-//#include "linalg/cvgabor.h"
-
-/*struct GaborParamsAlt
-{
-    GaborParamsAlt(int size)
-    {
-        this->size = size;
-        lambda = 0.1; lamdaSlider = 0;
-        theta = 0.0; thetaSlider = 5;
-        psi = 0.0; psiSlider = 5;
-        sigma = 0.1; sigmaSlider = 0;
-        gamma = 0.0; gammaSlider = 5;
-    }
-
-    int size;
-    double lambda;
-    double theta;
-    double psi;
-    double sigma;
-    double gamma;
-
-    int lamdaSlider;
-    int thetaSlider;
-    int psiSlider;
-    int sigmaSlider;
-    int gammaSlider;
-};
-
-double gaborAlt(int x, int y, double lambda, double theta, double psi, double sigma, double gamma)
-{
-    double xprime = x * cos(theta) + y * sin(theta);
-    double yprime = -x * sin(theta) + y * cos(theta);
-
-    double expPart = exp( -(xprime*xprime + gamma*gamma*yprime*yprime)/2*sigma*sigma );
-    double cosPart = cos( 2*M_PI*xprime/lambda+psi );
-
-    return expPart*cosPart;
-}
-
-cv::Mat gaborAlt(int size, double lambda, double theta, double psi, double sigma, double gamma)
-{
-    int matSize = size*2 + 1;
-    cv::Mat result = cv::Mat::zeros(matSize, matSize, CV_64F);
-    int centralIndex = matSize/2;
-    for (int r = 0; r < matSize; r++)
-    {
-        int y = r - centralIndex;
-        for (int c = 0; c < matSize; c++)
-        {
-            int x = c-centralIndex;
-
-            double gaborValue = gabor(x, y, lambda, theta, psi, sigma, gamma);
-            result(r, c) = gaborValue;
-        }
-    }
-    return result;
-}*/
-
 struct GaborParams
 {
     GaborParams(int size)
@@ -203,7 +145,7 @@ public:
 
         cv::namedWindow("input image");
         cv::namedWindow("convolution output");
-        inputImage = cv::imread("/home/stepo/SVN/disp-stepan-mracek/test/shapeindex.png");
+        inputImage = cv::imread("/mnt/data/frgc/spring2004/zbin-aligned/index2/02463d652.png");
         cv::imshow("input image", inputImage);
         redraw(&gParams);
 

@@ -294,6 +294,8 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
+    ZScorePassExtractor() {}
+
     ZScorePassExtractor(const QString &normParamsPath);
 
     ZScorePassExtractor(const QVector<Vector> &rawData)
