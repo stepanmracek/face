@@ -19,7 +19,7 @@ void Common::printMatrix(CvMat *m)
     }
 }
 
-void Common::printMatrix(Matrix &m)
+void Common::printMatrix(const Matrix &m)
 {
     for (int r = 0; r < m.rows; r++)
     {
@@ -29,7 +29,7 @@ void Common::printMatrix(Matrix &m)
     }
 }
 
-bool Common::matrixContainsNan(Matrix &m)
+bool Common::matrixContainsNan(const Matrix &m)
 {
 	int rows = m.rows;
 	int cols = m.cols;

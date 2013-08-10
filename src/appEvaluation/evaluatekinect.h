@@ -127,10 +127,10 @@ public:
         QList<QVector<Vector> > joinedVectors;
         joinedVectors << curveVectors << depthVectors << histVectors << textureVectors;
         ScoreSVMFusion fusion;
-        fusion.addComponent(curveVectors, classes, curveExtractor, cor);
-        fusion.addComponent(depthVectors, classes, depthExtractor, cor);
-        fusion.addComponent(histVectors, classes, histExtractor, sad);
-        fusion.addComponent(textureVectors, classes, textureExtractor, cor);
+        fusion.addComponent(ScoreLevelFusionComponent(curveVectors, classes, &curveExtractor, &cor));
+        fusion.addComponent(ScoreLevelFusionComponent(depthVectors, classes, &depthExtractor, &cor));
+        fusion.addComponent(ScoreLevelFusionComponent(histVectors, classes, &histExtractor, &sad));
+        fusion.addComponent(ScoreLevelFusionComponent(textureVectors, classes, &textureExtractor, &cor));
         fusion.learn();
 
         Evaluation fusionEval = fusion.evaluate(joinedVectors, classes);

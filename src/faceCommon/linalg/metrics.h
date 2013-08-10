@@ -193,7 +193,7 @@ public:
         return 1.0 - correlation(v1, v2);
     }
 
-    double correlation(const Vector &v1, const Vector &v2) const
+    static double correlation(const Vector &v1, const Vector &v2)
     {
         int n = v1.rows;
         assert(n == v2.rows);

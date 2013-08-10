@@ -164,7 +164,8 @@ void Template::stats(QVector<Template> &templates, const QString &outPath)
     }
 }
 
-QVector<Template> Template::createTemplates(QVector<Vector> &rawData, QVector<int> &IDs, const FeatureExtractor &extractor)
+QVector<Template> Template::createTemplates(const QVector<Vector> &rawData, const QVector<int> &IDs,
+                                            const FeatureExtractor &extractor)
 {
     int n = rawData.count();
     assert (n == IDs.count());

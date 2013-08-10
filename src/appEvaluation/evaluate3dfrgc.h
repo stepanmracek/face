@@ -32,6 +32,7 @@
 #include "linalg/adaboost.h"
 #include "linalg/gausslaguerre.h"
 #include "linalg/gabor.h"
+#include "biometrics/scorelevelfusionwrapper.h"
 
 class Evaluate3dFrgc
 {
@@ -183,30 +184,30 @@ public:
         QFileInfoList srcFiles = srcDir.entryInfoList();
         MapConverter converter;
 
-        Matrix smoothKernel2 = KernelGenerator::gaussianKernel(7);
+        Matrix smoothKernel2 = KernelGenerator::gaussianKernel(5);
         //QVector<double> allZValues;
         //bool first = true;
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
-            if (QFile::exists(srcDirPath + "depth2/" + srcFileInfo.baseName() + ".png") &&
-                QFile::exists(srcDirPath + "mean2/" + srcFileInfo.baseName() + ".png") &&
-                QFile::exists(srcDirPath + "gauss2/" + srcFileInfo.baseName() + ".png") &&
-                QFile::exists(srcDirPath + "index2/" + srcFileInfo.baseName() + ".png") &&
-                QFile::exists(srcDirPath + "eigencur2/" + srcFileInfo.baseName() + ".png"))
+            /*if (QFile::exists(srcDirPath + "mean/" + srcFileInfo.baseName() + ".png") &&
+                QFile::exists(srcDirPath + "gauss/" + srcFileInfo.baseName() + ".png") &&
+                QFile::exists(srcDirPath + "index/" + srcFileInfo.baseName() + ".png") &&
+                QFile::exists(srcDirPath + "eigencur/" + srcFileInfo.baseName() + ".png"))
             {
                 continue;
-            }
+            }*/
 
             Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
             Map depthmap = SurfaceProcessor::depthmap(mesh, converter,
                                                       cv::Point2d(-75, -75),
                                                       cv::Point2d(75, 75),
-                                                      2, ZCoord);
+                                                      1, ZCoord);
             //allZValues << depthmap.getUsedValues();
 
+            QString out;
             depthmap.bandPass(-75, 0, false, false);
             Matrix depthImage = depthmap.toMatrix(0, -75, 0);
-            QString out = srcDirPath + "depth2/" + srcFileInfo.baseName() + ".png";
+            out = srcDirPath + "depth/" + srcFileInfo.baseName() + ".png";
             cv::imwrite(out.toStdString(), depthImage*255);
 
             Map smoothedDepthmap = depthmap;
@@ -215,22 +216,22 @@ public:
 
             cs.curvatureMean.bandPass(-0.1, 0.1, false, false);
             Matrix meanImage = cs.curvatureMean.toMatrix(0, -0.1, 0.1);
-            out = srcDirPath + "mean2/" + srcFileInfo.baseName() + ".png";
+            out = srcDirPath + "mean/" + srcFileInfo.baseName() + ".png";
             cv::imwrite(out.toStdString(), meanImage*255);
 
             cs.curvatureGauss.bandPass(-0.01, 0.01, false, false);
             Matrix gaussImage = cs.curvatureGauss.toMatrix(0, -0.01, 0.01);
-            out = srcDirPath + "gauss2/" + srcFileInfo.baseName() + ".png";
+            out = srcDirPath + "gauss/" + srcFileInfo.baseName() + ".png";
             cv::imwrite(out.toStdString(), gaussImage*255);
 
             cs.curvatureIndex.bandPass(0, 1, false, false);
             Matrix indexImage = cs.curvatureIndex.toMatrix(0, 0, 1);
-            out = srcDirPath + "index2/" + srcFileInfo.baseName() + ".png";
+            out = srcDirPath + "index/" + srcFileInfo.baseName() + ".png";
             cv::imwrite(out.toStdString(), indexImage*255);
 
             cs.curvaturePcl.bandPass(0, 0.0025, false, false);
             Matrix pclImage = cs.curvaturePcl.toMatrix(0, 0, 0.0025);
-            out = srcDirPath + "eigencur2/" + srcFileInfo.baseName() + ".png";
+            out = srcDirPath + "eigencur/" + srcFileInfo.baseName() + ".png";
             cv::imwrite(out.toStdString(), pclImage*255);
         }
 
@@ -391,96 +392,66 @@ public:
         //eval.outputResultsImpostorScores("texture-impostor-scores");
     }
 
-    static void evaluateImages()
+    static void evaluateMaps()
     {
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
-        /*QStringList sources; sources << "depth2" << "eigencur2" << "gauss2"
-                                     << "index2" << "mean2";*/
-        QString source = "depth2";
-
-        /*QVector<double> thresholds; thresholds << 0.90 << 0.91  << 0.92 << 0.93
-                                               << 0.94 << 0.95  << 0.96 << 0.97
-                                               << 0.98 << 0.985 << 0.99 << 0.995
-                                               << 0.999 << 1;*/
+        QStringList sources; sources << "depth" << "eigencur" << "gauss"
+                                     << "index" << "mean";
         double threshold = 0.995;
 
         // best: w: 50, u: 60, l: 30
         /*QVector<double> roiWidths; roiWidths << 50 << 50 << 60 << 60 << 60;
         QVector<double> roiUppers; roiUppers << 50 << 60 << 60 << 60 << 70;
         QVector<double> roiLowers; roiLowers << 30 << 30 << 30 << 40 << 40;*/
-        cv::Rect roi(50, 30, 200, 180);
+        //cv::Rect roi2(50, 30, 200, 180);
+        cv::Rect roi(25, 15, 100, 90);
         /*cv::Rect roi(150-roiWidths[roiIndex]*2, 150-roiUppers[roiIndex]*2,
                      roiWidths[roiIndex]*4, roiUppers[roiIndex]*2+roiLowers[roiIndex]*2);*/
 
-        /*QVector<Metrics*> metrics;
-        metrics << (new CityblockMetric()) << (new EuclideanMetric())
-                << (new CosineMetric()) << (new CorrelationMetric());
-
-        QVector<WeightedMetric*> metricsW;
-        metricsW << (new CityblockWeightedMetric()) << (new EuclideanWeightedMetric())
-                 << (new CosineWeightedMetric()) << (new CorrelationWeightedMetric());*/
-
-        QVector<Vector> vectors;
-        QVector<Matrix> images;
-        QVector<int> classes;
-        Loader::loadImages(srcDirPath + source, images, &classes, "*.png", "d");
-        int n = images.count();
-
-        for (int i = 0; i < n; i++)
+        QList<ScoreLevelFusionComponent> components;
+        QList<QVector<Vector> > allData;
+        QVector<int> testClasses;
+        foreach (const QString &source, sources)
         {
-            Matrix sub = images[i](roi);
-            images[i] = Matrix();
-            //cv::resize(images[i], images[i], cv::Size(images[i].cols/2, images[i].rows/2));
+            QVector<Vector> vectors;
+            QVector<int> classes;
+            Loader::loadImages(srcDirPath + source, vectors, &classes, "*.png", "d", -1, roi);
 
-            vectors.append(MatrixConverter::matrixToColumnVector(sub));
+            QList<QVector<Vector> > vectorsInClusters;
+            QList<QVector<int> > classesInClusters;
+            BioDataProcessing::divideToNClusters(vectors, classes, 5, vectorsInClusters, classesInClusters);
+
+            PCA pca(vectorsInClusters[0]);
+            pca.modesSelectionThreshold(threshold);
+            ZScorePCAExtractor *zPcaExtractor = new ZScorePCAExtractor(pca, vectorsInClusters[0]);
+            //zPcaExtractor.serialize("../../test/frgc/depth/pca.yml", "../../test/frgc/depth/normparams.yml");
+
+            Metrics *metrics = new CorrelationMetric();
+
+            /*Evaluation eval(vectorsInClusters[1],
+                            classesInClusters[1],
+                            *zPcaExtractor, *metrics);
+            qDebug() << source << "z-PCA" << eval.eer;*/
+
+            ScoreLevelFusionComponent component(vectorsInClusters[1], classesInClusters[1], zPcaExtractor, metrics);
+            components << component;
+
+            if (testClasses.count() == 0)
+                testClasses = classesInClusters[2];
+            allData << vectorsInClusters[2];
         }
-        images.clear();
 
-        QList<QVector<Vector> > vectorsInClusters;
-        QList<QVector<int> > classesInClusters;
-        BioDataProcessing::divideToNClusters(vectors, classes, 5, vectorsInClusters, classesInClusters);
-
-        /*QVector<Template> templates = Template::createTemplates(vectorsInClusters[0],
-                                                                classesInClusters[0],
-                                                                PassExtractor());
-        EERPotential eerMap(templates);
-        Matrix eerPotentialImage = MatrixConverter::columnVectorToMatrix(eerMap.createWeights(), 200);
-        cv::imshow("eerPotential", eerPotentialImage);
-        cv::waitKey(0);
-        exit(0);*/
-
-        /*QList<QVector<Vector> > trainVectorsInClusters;
-        QList<QVector<int> > trainClassesInClusters;
-        BioDataProcessing::divideToNClusters(vectorsInClusters[0], classesInClusters[0], 2, trainVectorsInClusters, trainClassesInClusters);*/
-
-        /*QVector<Vector> trainPcaVectors;
-        QSet<int> usedClasses;
-        for (int i = 0; i < classesInClusters[0].count(); i++)
+        ScoreSVMFusion fusion;
+        QVector<int> selectedComponents = ScoreLevelFusionWrapper::trainClassifier(fusion, components);
+        qDebug() << "Selected components";
+        QList<QVector<Vector> > testData;
+        foreach (int i, selectedComponents)
         {
-            int id = classesInClusters[0][i];
-            if (usedClasses.contains(id)) continue;
-            usedClasses << id;
-            trainPcaVectors << vectorsInClusters[0][i];
+            qDebug() << sources[i];
+            testData << allData[i];
         }
-        qDebug() << "Using" << trainPcaVectors.count() << "of" << vectorsInClusters[0].count() << "train vectors";*/
 
-        PCA pca(vectorsInClusters[0]);
-        pca.modesSelectionThreshold(threshold);
-        PCAExtractor pcaExtractor(pca);
-        ZScorePCAExtractor zPcaExtractor(pca, vectorsInClusters[1]);
-        zPcaExtractor.serialize("../../test/frgc/depth/pca.yml", "../../test/frgc/depth/normparams.yml");
-
-        qDebug() << "PCA" << Evaluation(vectorsInClusters[1],
-                                        classesInClusters[1],
-                                        pcaExtractor, CorrelationMetric()).eer;
-
-        Evaluation eval(vectorsInClusters[1],
-                        classesInClusters[1],
-                        zPcaExtractor, CorrelationMetric());
-        qDebug() << "z-PCA" << eval.eer;
-
-        eval.outputResultsGenuineScores(source + "-genuine-scores");
-        eval.outputResultsImpostorScores(source + "-impostor-scores");
+        qDebug() << "Test EER:" << fusion.evaluate(testData, testClasses).eer;
     }
 
     static void evaluateDirect()
@@ -812,9 +783,12 @@ public:
         }
 
         ScoreWeightedSumFusion svmFusion;
-        svmFusion.addComponent(histVectorsInClusters[1], histClassesInClusters[1], histZPassExtractor, histCorrW);
-        svmFusion.addComponent(curveVectorsInClusters[1], curveClassesInClusters[1], curveZPcaExtractor, curvesCorrW);
-        svmFusion.addComponent(depthVectorsInClusters[1], depthClassesInClusters[1], depthZPcaExtractor, depthCorr);
+        svmFusion.addComponent(ScoreLevelFusionComponent(histVectorsInClusters[1],
+                               histClassesInClusters[1], &histZPassExtractor, &histCorrW));
+        svmFusion.addComponent(ScoreLevelFusionComponent(curveVectorsInClusters[1],
+                               curveClassesInClusters[1], &curveZPcaExtractor, &curvesCorrW));
+        svmFusion.addComponent(ScoreLevelFusionComponent(depthVectorsInClusters[1],
+                               depthClassesInClusters[1], &depthZPcaExtractor, &depthCorr));
         svmFusion.learn();
 
         for (int i = 2; i < clusters; i++)

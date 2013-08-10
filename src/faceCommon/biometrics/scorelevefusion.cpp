@@ -4,40 +4,40 @@
 
 #include <cassert>
 
-ScoreLevelFusionBase & ScoreLevelFusionBase::addComponent(
-		QVector<Vector> &trainRawData,
-		QVector<int> &trainClasses,
-        const FeatureExtractor &featureExtractor,
-        const Metrics &metrics)
+ScoreLevelFusionBase & ScoreLevelFusionBase::addComponent(const ScoreLevelFusionComponent &component)
 {
-	this->trainClasses << (&trainClasses);
-	this->trainRawData << (&trainRawData);
-	this->extractors << (&featureExtractor);
-	this->metrics << (&metrics);
-
+    components << component;
+    learned = false;
 	return (*this);
+}
+
+void ScoreLevelFusionBase::popComponent()
+{
+    learned = false;
+    components.removeLast();
 }
 
 void ScoreLevelFusionBase::learn()
 {
-	int unitsCount = trainClasses.count();
-	assert(unitsCount > 1);
+    int componentsCount = components.count();
+    assert(componentsCount > 1);
 
 	QList<Evaluation> evaluationResults;
-	for (int i = 0; i < unitsCount; i++)
+    for (int i = 0; i < componentsCount; i++)
 	{
-		Evaluation e(*(trainRawData[i]), *(trainClasses[i]), *(extractors[i]), *(metrics[i]));
+        Evaluation e(components[i].trainRawData, components[i].trainClasses,
+                     *components[i].featureExtractor, *components[i].metrics);
 		evaluationResults << e;
 	}
 	learnImplementation(evaluationResults);
 	learned = true;
 }
 
-Evaluation ScoreLevelFusionBase::evaluate(QList<QVector<Vector> > &rawData, QVector<int> &classes, bool debugOutput)
+Evaluation ScoreLevelFusionBase::evaluate(const QList<QVector<Vector> > &rawData, const QVector<int> &classes, bool debugOutput)
 {
 	assert(learned);
 
-    int unitCount = extractors.count();
+    int unitCount = components.count();
     assert(unitCount > 0);
     assert(unitCount == rawData.count());
 
@@ -47,8 +47,8 @@ Evaluation ScoreLevelFusionBase::evaluate(QList<QVector<Vector> > &rawData, QVec
     QVector<QVector<Template> > templates;
     for (int unit = 0; unit < unitCount; unit++)
     {
-        const FeatureExtractor &extractor = *(extractors[unit]);
-        Templates t = Template::createTemplates(rawData[unit], classes, extractor);
+        const FeatureExtractor *extractor = components[unit].featureExtractor;
+        Templates t = Template::createTemplates(rawData[unit], classes, *extractor);
         templates.append(t);
     }
 
@@ -60,7 +60,7 @@ Evaluation ScoreLevelFusionBase::evaluate(QList<QVector<Vector> > &rawData, QVec
             QVector<double> distances;
             for (int unit = 0; unit < unitCount; unit++)
             {
-                double d = metrics[unit]->distance(templates[unit][i].featureVector, templates[unit][j].featureVector);
+                double d = components[unit].metrics->distance(templates[unit][i].featureVector, templates[unit][j].featureVector);
                 assert(d == d);
                 distances << d;
             }

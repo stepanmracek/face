@@ -16,8 +16,8 @@ public:
     static double absSum(Matrix &m);
 
     static void printMatrix(CvMat *m);
-    static void printMatrix(Matrix &m);
-    static bool matrixContainsNan(Matrix &m);
+    static void printMatrix(const Matrix &m);
+    static bool matrixContainsNan(const Matrix &m);
     static void getMinMax(Matrix &m, double &min, double &max);
 
     static void savePlot(const QVector<double> &x, const QVector<double> &y, const QVector<double> &z, const QString &path);

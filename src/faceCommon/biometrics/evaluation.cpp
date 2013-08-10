@@ -64,7 +64,7 @@ Evaluation::Evaluation(QHash<QPair<int, int>, double> &distances, bool debugOutp
     commonEvaluation(debugOutput);
 }
 
-Evaluation::Evaluation(QVector<Template> &templates, const Metrics &metrics, bool debugOutput)
+Evaluation::Evaluation(const QVector<Template> &templates, const Metrics &metrics, bool debugOutput)
 {
     commonInit();
 
@@ -75,7 +75,7 @@ Evaluation::Evaluation(QVector<Template> &templates, const Metrics &metrics, boo
         commonEvaluation(debugOutput);
 }
 
-Evaluation::Evaluation(QVector<Vector> &rawData, QVector<int> &classes,
+Evaluation::Evaluation(const QVector<Vector> &rawData, const QVector<int> &classes,
                        const FeatureExtractor &extractor, const Metrics &metric, bool debugOutput)
 {
     commonInit();
@@ -152,7 +152,7 @@ double Evaluation::fnmrAtFmr(double _fmr)
 	return _fnmr;
 }
 
-bool Evaluation::commonTemplatesEvaluation(QVector<Template> &templates, const Metrics &metrics, bool debugOutput)
+bool Evaluation::commonTemplatesEvaluation(const QVector<Template> &templates, const Metrics &metrics, bool debugOutput)
 {
     minSameDistance = 1e300;
     minDifferentDistance = 1e300;
@@ -167,12 +167,12 @@ bool Evaluation::commonTemplatesEvaluation(QVector<Template> &templates, const M
     int n = templates.count();
     for (int i = 0; i < (n-1); i++)
     {
-        Template &ti = templates[i];
+        const Template &ti = templates[i];
         assert(!(Common::matrixContainsNan(ti.featureVector)));
 
         for (int j = i+1; j < n; j++)
         {
-            Template &tj = templates[j];
+            const Template &tj = templates[j];
             assert(!(Common::matrixContainsNan(tj.featureVector)));
             double d = metrics.distance(ti.featureVector, tj.featureVector);
             assert(d == d); // Not NaN

@@ -18,7 +18,7 @@ class Evaluation
 {
 private:
     void commonEvaluation(bool debugOutput);
-    bool commonTemplatesEvaluation(QVector<Template> &templates, const Metrics &metrics, bool debugOutput);
+    bool commonTemplatesEvaluation(const QVector<Template> &templates, const Metrics &metrics, bool debugOutput);
     void commonInit();
 
 public:
@@ -42,11 +42,11 @@ public:
 
     Evaluation();
 
-    Evaluation(QVector<Template> &templates, const Metrics &metrics, bool debugOutput = false);
+    Evaluation(const QVector<Template> &templates, const Metrics &metrics, bool debugOutput = false);
 
     Evaluation(QHash<QPair<int, int>, double> &distances, bool debugOutput = false);
 
-    Evaluation(QVector<Vector> &rawData, QVector<int> &classes,
+    Evaluation(const QVector<Vector> &rawData, const QVector<int> &classes,
                const FeatureExtractor &extractor, const Metrics &metric, bool debugOutput = false);
 
     double fnmrAtFmr(double fmr);

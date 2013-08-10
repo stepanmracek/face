@@ -2,90 +2,79 @@
 #define TESTGABORWAVELET_H
 
 #include <QDebug>
-
 #include <opencv2/opencv.hpp>
 #include <cmath>
+
+#include "linalg/common.h"
+#include "linalg/gabor.h"
+#include "linalg/matrixconverter.h"
 
 struct GaborParams
 {
     GaborParams(int size)
     {
         this->size = size;
-        waveSize = 0;
-        orientation = 0;
+        frequency = 1;
+        orientation = 1;
     }
 
     int size;
-    int waveSize;
+    int frequency;
     int orientation;
 };
 
-cv::Mat gabor(int size, int waveSize, int orientation)
-{
-    //CvGabor cvGabor(waveSize, orientation);
-    //return cvGabor.Real.clone();
-
-    int matSize = (size*2 + 1);
-    Matrix result = Matrix::zeros(matSize, matSize);
-    int centralIndex = matSize/2;
-
-    double kmax = M_PI/2.0;
-    double f = 2;
-    double sigma = 2*M_PI;///size;
-
-    double phi = orientation * M_PI / 8.0;
-    double k = kmax/pow(f,(waveSize+2.0)/2.0);
-    double k1 = k * cos(phi);
-    double k2 = k * sin(phi);
-
-    double kMag = k1*k1+k2*k2;
-    double coef = kMag/(sigma*sigma);
-    double coef2 = exp( - (sigma*sigma)/2 );
-
-    for (int r = 0; r < matSize; r++)
-    {
-        int y = r - centralIndex;
-        for (int c = 0; c < matSize; c++)
-        {
-            int x = c-centralIndex;
-
-            double expPart = coef * exp(- (kMag*(x*x+y*y))/(2*sigma*sigma) );
-            double cosPart = cos(k1*x + k2*y) - coef2;
-            double val = expPart*cosPart;
-            result(r, c) = val;
-        }
-    }
-    return result;
-}
-
-cv::Mat inputImage;
-cv::Mat outputImage;
+Matrix inputImage;
+Matrix responseReal;
+Matrix responseImag;
+Matrix responseAbs;
 
 void redraw(GaborParams *gParams)
 {
-    cv::Mat gaborWavelet = gabor(gParams->size, gParams->waveSize, gParams->orientation);
+    qDebug() << "redraw, size:" << gParams->size
+             << "frequency:" << gParams->frequency
+             << "orientation:" << gParams->orientation;
+    Matrix r(gParams->size, gParams->size);
+    Matrix i(gParams->size, gParams->size);
+    Gabor::createWavelet(r, i, gParams->frequency, gParams->orientation);
 
-    cv::filter2D(inputImage, outputImage, -1, gaborWavelet);
+    qDebug() << "applying filters";
+    cv::filter2D(inputImage, responseReal, -1, r);
+    cv::filter2D(inputImage, responseImag, -1, i);
 
+    Matrix re2;
+    cv::multiply(responseReal, responseReal, re2);
+    Matrix im2;
+    cv::multiply(responseImag, responseImag, im2);
+    Matrix ab2 = re2 + im2;
+    cv::sqrt(ab2, responseAbs);
+
+    qDebug() << "showing kernels";
     double min,max;
-    cv::minMaxLoc(gaborWavelet, &min, &max);
-    cv::imshow("wavelet generator", (gaborWavelet-min)/(max-min));
+    cv::minMaxLoc(r, &min, &max);
+    cv::imshow("real kernel", (r-min)/(max-min));
+    cv::minMaxLoc(i, &min, &max);
+    cv::imshow("imag kernel", (i-min)/(max-min));
 
-    cv::minMaxLoc(outputImage, &min, &max);
-    cv::imshow("convolution output", outputImage);// (outputImage-min)/(max-min));
+    qDebug() << "showing result";
+    cv::minMaxLoc(responseAbs, &min, &max);
+    cv::imshow("response real", (responseReal-min)/(max-min));
+    cv::minMaxLoc(responseAbs, &min, &max);
+    cv::imshow("response imag", (responseImag-min)/(max-min));
+    cv::minMaxLoc(responseAbs, &min, &max);
+    cv::imshow("response abs", (responseAbs-min)/(max-min));
 }
 
 void onSizeChange(int newVal, void *p)
 {
     GaborParams *gparams = (GaborParams*)p;
-    gparams->size = newVal;
+    gparams->size = newVal+1;
     redraw(gparams);
 }
 
-void onWaveSizeChange(int newVal, void *p)
+void onFrequencyChange(int newVal, void *p)
 {
     GaborParams *gparams = (GaborParams*)p;
-    gparams->waveSize = newVal;
+    gparams->frequency = newVal;
     redraw(gparams);
 }
 
@@ -96,56 +85,19 @@ void onOrientationChange(int newVal, void *p)
     redraw(gparams);
 }
 
-/*void onLambdaChange(int newVal, void *p)
-{
-    GaborParams *gparams = (GaborParams*)p;
-    gparams->lambda = newVal/100.0+0.5;
-    redraw(gparams);
-}
-void onThetaChange(int newVal, void *p)
-{
-    GaborParams *gparams = (GaborParams*)p;
-    gparams->theta = (newVal-5.0)/10.0;
-    redraw(gparams);
-}
-void onPsiChange(int newVal, void *p)
-{
-    GaborParams *gparams = (GaborParams*)p;
-    gparams->psi = (newVal-5.0)/10.0;
-    redraw(gparams);
-}
-void onSigmaChange(int newVal, void *p)
-{
-    GaborParams *gparams = (GaborParams*)p;
-    gparams->sigma = newVal/100.0;
-    redraw(gparams);
-}
-void onGammaChange(int newVal, void *p)
-{
-    GaborParams *gparams = (GaborParams*)p;
-    gparams->gamma = (newVal-5.0)/10.0;
-    redraw(gparams);
-}*/
-
 class TestGaborWavelet
 {
 public:
     static void test()
     {
-        GaborParams gParams(20);
-        cv::namedWindow("wavelet generator");
-        cv::createTrackbar("size", "wavelet generator", &gParams.size, 100, onSizeChange, &gParams);
-        cv::createTrackbar("wave size", "wavelet generator", &gParams.waveSize, 5, onWaveSizeChange, &gParams);
-        cv::createTrackbar("orientation", "wavelet generator", &gParams.orientation, 7, onOrientationChange, &gParams);
-        /*cv::createTrackbar("lambda", "wavelet generator", &gParams.lamdaSlider, 99, onLambdaChange, &gParams);
-        cv::createTrackbar("theta", "wavelet generator", &gParams.thetaSlider, 10, onThetaChange, &gParams);
-        cv::createTrackbar("psi", "wavelet generator", &gParams.psiSlider, 10, onPsiChange, &gParams);
-        cv::createTrackbar("sigma", "wavelet generator", &gParams.sigmaSlider, 99, onSigmaChange, &gParams);
-        cv::createTrackbar("gamma", "wavelet generator", &gParams.gammaSlider, 10, onGammaChange, &gParams);*/
-
+        GaborParams gParams(100);
         cv::namedWindow("input image");
-        cv::namedWindow("convolution output");
-        inputImage = cv::imread("/mnt/data/frgc/spring2004/zbin-aligned/index2/02463d652.png");
+        cv::createTrackbar("size", "input image", &gParams.size, 200, onSizeChange, &gParams);
+        cv::createTrackbar("frequency", "input image", &gParams.frequency, 5, onFrequencyChange, &gParams);
+        cv::createTrackbar("orientation", "input image", &gParams.orientation, 8, onOrientationChange, &gParams);
+
+        inputImage = MatrixConverter::imageToMatrix("/mnt/data/frgc/spring2004/zbin-aligned/index2/02463d652.png");
+        cv::resize(inputImage, inputImage, cv::Size(inputImage.cols/2, inputImage.rows/2));
         cv::imshow("input image", inputImage);
         redraw(&gParams);
 

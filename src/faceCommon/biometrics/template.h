@@ -40,8 +40,8 @@ public:
 
     static void stats(QVector<Template> &templates, const QString &outPath);
 
-    static QVector<Template> createTemplates(QVector<Vector> &rawData,
-                                             QVector<int> &IDs,
+    static QVector<Template> createTemplates(const QVector<Vector> &rawData,
+                                             const QVector<int> &IDs,
                                              const FeatureExtractor &extractor);
 
     static QVector<Template> clone(const QVector<Template> &src);

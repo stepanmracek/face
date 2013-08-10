@@ -12,13 +12,32 @@
 #include "linalg/logisticregression.h"
 #include "linalg/vector.h"
 
+class ScoreLevelFusionComponent
+{
+public:
+    const QVector<Vector> trainRawData;
+    const QVector<int> trainClasses;
+    const FeatureExtractor *featureExtractor;
+    const Metrics *metrics;
+
+    ScoreLevelFusionComponent() {}
+
+    ScoreLevelFusionComponent(const QVector<Vector> &trainRawData,
+                              const QVector<int> &trainClasses,
+                              const FeatureExtractor *featureExtractor,
+                              const Metrics *metrics) :
+        trainRawData(trainRawData), trainClasses(trainClasses),
+        featureExtractor(featureExtractor), metrics(metrics) {}
+};
+
 class ScoreLevelFusionBase
 {
 private:
-	QList<QVector<Vector> *> trainRawData;
+    QList<ScoreLevelFusionComponent> components;
+    /*QList<QVector<Vector> *> trainRawData;
 	QList<QVector<int> *> trainClasses;
     QVector<const FeatureExtractor *> extractors;
-    QVector<const Metrics *> metrics;
+    QVector<const Metrics *> metrics;*/
 
 protected:
     bool learned;
@@ -40,13 +59,11 @@ public:
 
     virtual double fuse(QVector<double> &scores) = 0;
 
-    ScoreLevelFusionBase & addComponent(
-			QVector<Vector> &trainRawData,
-			QVector<int> &trainClasses,
-            const FeatureExtractor &featureExtractor,
-            const Metrics &metrics);
+    ScoreLevelFusionBase & addComponent(const ScoreLevelFusionComponent &component);
 
-    Evaluation evaluate(QList<QVector<Vector> > &rawData, QVector<int> &classes, bool debugOutput = false);
+    void popComponent();
+
+    Evaluation evaluate(const QList<QVector<Vector> > &rawData, const QVector<int> &classes, bool debugOutput = false);
 
     virtual ~ScoreLevelFusionBase() {}
 };
