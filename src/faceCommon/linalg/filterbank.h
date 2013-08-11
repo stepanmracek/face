@@ -28,6 +28,8 @@ public:
     QVector<Map> getAbsResponse(const Map &map) const;
     QVector<Matrix> getAbsResponse(const Matrix &mat,
                                    const QVector<int> *selectedIndicies = 0) const;
+
+    static Matrix absResponse(const Matrix &image, const Matrix &realKernel, const Matrix &imagKernel);
 };
 
 #endif // FILTERBANK_H

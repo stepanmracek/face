@@ -114,44 +114,36 @@ QVector<Matrix> FilterBank::getAbsResponse(const Matrix &mat, const QVector<int>
     {
         foreach(int i, *selectedIndicies)
         {
-            Matrix re;
-            cv::filter2D(mat, re, CV_64F, realKernels[i]);
-
-            Matrix im;
-            cv::filter2D(mat, im, CV_64F, imagKernels[i]);
-
-            Matrix re2;
-            cv::multiply(re, re, re2);
-            Matrix im2;
-            cv::multiply(im, im, im2);
-            Matrix ab2 = re2 + im2;
-            Matrix ab;
-            cv::sqrt(ab2, ab);
-            result << ab;
+            result << absResponse(mat, realKernels[i], imagKernels[i]);
         }
     }
     else
     {
         for (int i = 0; i < n; i++)
         {
-            Matrix re;
-            cv::filter2D(mat, re, CV_64F, realKernels[i]);
-
-            Matrix im;
-            cv::filter2D(mat, im, CV_64F, imagKernels[i]);
-
-            Matrix re2;
-            cv::multiply(re, re, re2);
-            Matrix im2;
-            cv::multiply(im, im, im2);
-            Matrix ab2 = re2 + im2;
-            Matrix ab;
-            cv::sqrt(ab2, ab);
-            result << ab;
+            result << absResponse(mat, realKernels[i], imagKernels[i]);
         }
     }
 
     return result;
+}
+
+Matrix FilterBank::absResponse(const Matrix &image, const Matrix &realKernel, const Matrix &imagKernel)
+{
+    Matrix re;
+    cv::filter2D(image, re, CV_64F, realKernel);
+
+    Matrix im;
+    cv::filter2D(image, im, CV_64F, imagKernel);
+
+    Matrix re2;
+    cv::multiply(re, re, re2);
+    Matrix im2;
+    cv::multiply(im, im, im2);
+    Matrix ab2 = re2 + im2;
+    Matrix ab;
+    cv::sqrt(ab2, ab);
+    return ab;
 }
 
 QVector<Matrix> FilterBank::getAbsRealImagResponse(const Matrix &mat,

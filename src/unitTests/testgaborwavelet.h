@@ -93,7 +93,7 @@ public:
         GaborParams gParams(100);
         cv::namedWindow("input image");
         cv::createTrackbar("size", "input image", &gParams.size, 200, onSizeChange, &gParams);
-        cv::createTrackbar("frequency", "input image", &gParams.frequency, 5, onFrequencyChange, &gParams);
+        cv::createTrackbar("frequency", "input image", &gParams.frequency, 10, onFrequencyChange, &gParams);
         cv::createTrackbar("orientation", "input image", &gParams.orientation, 8, onOrientationChange, &gParams);
 
         inputImage = MatrixConverter::imageToMatrix("/mnt/data/frgc/spring2004/zbin-aligned/index2/02463d652.png");
