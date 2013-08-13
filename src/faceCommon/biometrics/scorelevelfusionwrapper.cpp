@@ -27,16 +27,20 @@ QVector<int> ScoreLevelFusionWrapper::trainClassifier(ScoreLevelFusionBase &clas
 
     qDebug() << "Selected" << bestIndex << "with EER" << bestEER << "as the base for the classifier";
 
-    // iteratively add the best remaining components until there is some improvement
+
+    //QVector<int> rejectedComponents;
+
+    // iteratively add the best remaining components while there is some improvement
     bool improvement = true;
     while (improvement)
     {
         improvement = false;
         bestIndex = -1;
+        //double currentIterationBestEER = bestEER;
         for (int i = 0; i < n; i++)
         {
-            // if the component was already selected skip it
-            if (selectedComponents.contains(i)) continue;
+            // if the component was already selected or rejected skip it
+            if (selectedComponents.contains(i)/* || rejectedComponents.contains(i)*/) continue;
 
             // lear the classifier
             classifier.addComponent(components[i]);
@@ -59,13 +63,20 @@ QVector<int> ScoreLevelFusionWrapper::trainClassifier(ScoreLevelFusionBase &clas
                 improvement = true;
                 bestIndex = i;
             }
+
+            /*// if the eer of classifier is greater than current iteration eer
+            // reject component from future iterations
+            if (eer > currentIterationBestEER)
+            {
+                rejectedComponents << i;
+            }*/
+
             classifier.popComponent();
         }
 
         if (improvement)
         {
             classifier.addComponent(components[bestIndex]);
-            classifier.learn();
             selectedComponents << bestIndex;
             qDebug() << "added classifier" << bestIndex << ", fusion EER:" << bestEER;
         }

@@ -1,0 +1,207 @@
+classifier, freq, orientation
+0  loading files from "/home/stepo/data/frgc/spring2004/zbin-aligned/index" 
+1 4 1 
+2 4 2 
+3 4 3 
+4 4 4 
+5 4 5 
+6 4 6 
+7 4 7 
+8 4 8 <-
+9 5 1 
+10 5 2 <-
+11 5 3 
+12 5 4 <-
+13 5 5 
+14 5 6 
+15 5 7 <-
+16 5 8 <-
+17 6 1 
+18 6 2 
+19 6 3 <-
+20 6 4 
+21 6 5 <-
+22 6 6 
+23 6 7 
+24 6 8
+Training score-level fusion classifier: 25 candidate components 
+Component 0 , EER: 0.0886366 
+Component 1 , EER: 0.0963274 
+Component 2 , EER: 0.0796265 
+Component 3 , EER: 0.095103 
+Component 4 , EER: 0.100425 
+Component 5 , EER: 0.111754 
+Component 6 , EER: 0.0952874 
+Component 7 , EER: 0.0846589 
+Component 8 , EER: 0.0812974 
+Component 9 , EER: 0.093709 
+Component 10 , EER: 0.0781402 
+Component 11 , EER: 0.0849159 
+Component 12 , EER: 0.095497 
+Component 13 , EER: 0.117809 
+Component 14 , EER: 0.104991 
+Component 15 , EER: 0.0874171 
+Component 16 , EER: 0.0781901 
+Component 17 , EER: 0.115928 
+Component 18 , EER: 0.0987764 
+Component 19 , EER: 0.0892775 
+Component 20 , EER: 0.0990979 
+Component 21 , EER: 0.129749 
+Component 22 , EER: 0.106248 
+Component 23 , EER: 0.106644 
+Component 24 , EER: 0.102323 
+Selected 10 with EER 0.0781402 as the base for the classifier 
+  trying to add classifier 0 , fusion EER: 0.0570454 
+  trying to add classifier 1 , fusion EER: 0.0553071 
+  trying to add classifier 2 , fusion EER: 0.0546363 
+  trying to add classifier 3 , fusion EER: 0.0512272 
+  trying to add classifier 4 , fusion EER: 0.052519 
+  trying to add classifier 5 , fusion EER: 0.0562448 
+  trying to add classifier 6 , fusion EER: 0.0477136 
+  trying to add classifier 7 , fusion EER: 0.0480128 
+  trying to add classifier 8 , fusion EER: 0.0472472 
+  trying to add classifier 9 , fusion EER: 0.0541601 
+  trying to add classifier 11 , fusion EER: 0.0537834 
+  trying to add classifier 12 , fusion EER: 0.0481051 
+  trying to add classifier 13 , fusion EER: 0.0620378 
+  trying to add classifier 14 , fusion EER: 0.0542722 
+  trying to add classifier 15 , fusion EER: 0.0461176 
+  trying to add classifier 16 , fusion EER: 0.0519505 
+  trying to add classifier 17 , fusion EER: 0.0652924 
+  trying to add classifier 18 , fusion EER: 0.0601126 
+  trying to add classifier 19 , fusion EER: 0.0533471 
+  trying to add classifier 20 , fusion EER: 0.052614 
+  trying to add classifier 21 , fusion EER: 0.0626763 
+  trying to add classifier 22 , fusion EER: 0.0566338 
+  trying to add classifier 23 , fusion EER: 0.0556089 
+  trying to add classifier 24 , fusion EER: 0.0592324 
+added classifier 15 , fusion EER: 0.0461176 
+  trying to add classifier 0 , fusion EER: 0.0478681 
+  trying to add classifier 1 , fusion EER: 0.0438955 
+  trying to add classifier 2 , fusion EER: 0.0411724 
+  trying to add classifier 3 , fusion EER: 0.0392172
+  trying to add classifier 4 , fusion EER: 0.0421874 
+  trying to add classifier 5 , fusion EER: 0.0416289 
+  trying to add classifier 6 , fusion EER: 0.0412546 
+  trying to add classifier 7 , fusion EER: 0.0422323 
+  trying to add classifier 8 , fusion EER: 0.040529 
+  trying to add classifier 9 , fusion EER: 0.0403345 
+  trying to add classifier 11 , fusion EER: 0.0397334 
+  trying to add classifier 12 , fusion EER: 0.0396463 
+  trying to add classifier 13 , fusion EER: 0.0470054 
+  trying to add classifier 14 , fusion EER: 0.0482722 
+  trying to add classifier 16 , fusion EER: 0.0391575 
+  trying to add classifier 17 , fusion EER: 0.0432997 
+  trying to add classifier 18 , fusion EER: 0.0408732 
+  trying to add classifier 19 , fusion EER: 0.0401201 
+  trying to add classifier 20 , fusion EER: 0.0401026 
+  trying to add classifier 21 , fusion EER: 0.0467335 
+  trying to add classifier 22 , fusion EER: 0.0448309 
+  trying to add classifier 23 , fusion EER: 0.0464643 
+  trying to add classifier 24 , fusion EER: 0.0427684 
+added classifier 16 , fusion EER: 0.0391575 
+  trying to add classifier 0 , fusion EER: 0.0413121 
+  trying to add classifier 1 , fusion EER: 0.0397409 
+  trying to add classifier 2 , fusion EER: 0.0357509 
+  trying to add classifier 3 , fusion EER: 0.0336311 
+  trying to add classifier 4 , fusion EER: 0.0345662 
+  trying to add classifier 5 , fusion EER: 0.0354992 
+  trying to add classifier 6 , fusion EER: 0.0347358 
+  trying to add classifier 7 , fusion EER: 0.0370301 
+  trying to add classifier 8 , fusion EER: 0.0367233 
+  trying to add classifier 9 , fusion EER: 0.0352422 
+  trying to add classifier 11 , fusion EER: 0.0326062 
+  trying to add classifier 12 , fusion EER: 0.0313069 
+  trying to add classifier 13 , fusion EER: 0.0365687 
+  trying to add classifier 14 , fusion EER: 0.0385539 
+  trying to add classifier 17 , fusion EER: 0.0368007 
+  trying to add classifier 18 , fusion EER: 0.0366012 
+  trying to add classifier 19 , fusion EER: 0.0325863 
+  trying to add classifier 20 , fusion EER: 0.0337858 
+  trying to add classifier 21 , fusion EER: 0.0384942 
+  trying to add classifier 22 , fusion EER: 0.0375016 
+  trying to add classifier 23 , fusion EER: 0.0370276 
+  trying to add classifier 24 , fusion EER: 0.0374668 
+added classifier 12 , fusion EER: 0.0313069 
+  trying to add classifier 0 , fusion EER: 0.0335214 
+  trying to add classifier 1 , fusion EER: 0.0301026 
+  trying to add classifier 2 , fusion EER: 0.0297583 
+  trying to add classifier 3 , fusion EER: 0.0280076 
+  trying to add classifier 4 , fusion EER: 0.0340328 
+  trying to add classifier 5 , fusion EER: 0.0314693 
+  trying to add classifier 6 , fusion EER: 0.0309153 
+  trying to add classifier 7 , fusion EER: 0.0317806 
+  trying to add classifier 8 , fusion EER: 0.0289577 
+  trying to add classifier 9 , fusion EER: 0.030439 
+  trying to add classifier 11 , fusion EER: 0.0306711 
+  trying to add classifier 13 , fusion EER: 0.0329479 
+  trying to add classifier 14 , fusion EER: 0.0367858 
+  trying to add classifier 17 , fusion EER: 0.0286288 
+  trying to add classifier 18 , fusion EER: 0.0297534 
+  trying to add classifier 19 , fusion EER: 0.0279729 
+  trying to add classifier 20 , fusion EER: 0.0294938 
+  trying to add classifier 21 , fusion EER: 0.0309205 
+  trying to add classifier 22 , fusion EER: 0.0328058 
+  trying to add classifier 23 , fusion EER: 0.0339703 
+  trying to add classifier 24 , fusion EER: 0.0292744 
+added classifier 19 , fusion EER: 0.0279729 
+  trying to add classifier 0 , fusion EER: 0.0318459 
+  trying to add classifier 1 , fusion EER: 0.0277432 
+  trying to add classifier 2 , fusion EER: 0.0268829 
+  trying to add classifier 3 , fusion EER: 0.0265339 
+  trying to add classifier 4 , fusion EER: 0.028135 
+  trying to add classifier 5 , fusion EER: 0.0258854 
+  trying to add classifier 6 , fusion EER: 0.02702 
+  trying to add classifier 7 , fusion EER: 0.0271996 
+  trying to add classifier 8 , fusion EER: 0.0267957 
+  trying to add classifier 9 , fusion EER: 0.0279654 
+  trying to add classifier 11 , fusion EER: 0.0277456 
+  trying to add classifier 13 , fusion EER: 0.0310149 
+  trying to add classifier 14 , fusion EER: 0.0289578 
+  trying to add classifier 17 , fusion EER: 0.0264541 
+  trying to add classifier 18 , fusion EER: 0.026651 
+  trying to add classifier 20 , fusion EER: 0.0279976 
+  trying to add classifier 21 , fusion EER: 0.0258284 
+  trying to add classifier 22 , fusion EER: 0.0268705 
+  trying to add classifier 23 , fusion EER: 0.0296436 
+  trying to add classifier 24 , fusion EER: 0.0269304 
+added classifier 21 , fusion EER: 0.0258284 
+  trying to add classifier 0 , fusion EER: 0.0294867 
+  trying to add classifier 1 , fusion EER: 0.0243043 
+  trying to add classifier 2 , fusion EER: 0.0242121 
+  trying to add classifier 3 , fusion EER: 0.0248408 
+  trying to add classifier 4 , fusion EER: 0.0276061 
+  trying to add classifier 5 , fusion EER: 0.0265468 
+  trying to add classifier 6 , fusion EER: 0.0269628 
+  trying to add classifier 7 , fusion EER: 0.0267985 
+  trying to add classifier 8 , fusion EER: 0.0233746 
+  trying to add classifier 9 , fusion EER: 0.0264217 
+  trying to add classifier 11 , fusion EER: 0.0268534 
+  trying to add classifier 13 , fusion EER: 0.0300404 
+  trying to add classifier 14 , fusion EER: 0.0294488 
+  trying to add classifier 17 , fusion EER: 0.0242647 
+  trying to add classifier 18 , fusion EER: 0.0246636 
+  trying to add classifier 20 , fusion EER: 0.0268355 
+  trying to add classifier 22 , fusion EER: 0.0283347 
+  trying to add classifier 23 , fusion EER: 0.0288929 
+  trying to add classifier 24 , fusion EER: 0.0255337 
+added classifier 8 , fusion EER: 0.0233746 
+  trying to add classifier 0 , fusion EER: 0.029938 
+  trying to add classifier 1 , fusion EER: 0.0260822 
+  trying to add classifier 2 , fusion EER: 0.024733 
+  trying to add classifier 3 , fusion EER: 0.0249353 
+  trying to add classifier 4 , fusion EER: 0.0248903 
+  trying to add classifier 5 , fusion EER: 0.0239602 
+  trying to add classifier 6 , fusion EER: 0.0257386 
+  trying to add classifier 7 , fusion EER: 0.0350248 
+  trying to add classifier 9 , fusion EER: 0.0235615 
+  trying to add classifier 11 , fusion EER: 0.023781 
+  trying to add classifier 13 , fusion EER: 0.0290952 
+  trying to add classifier 14 , fusion EER: 0.0268676 
+  trying to add classifier 17 , fusion EER: 0.0236687 
+  trying to add classifier 18 , fusion EER: 0.0234214 
+  trying to add classifier 20 , fusion EER: 0.0258003 
+  trying to add classifier 22 , fusion EER: 0.0265592 
+  trying to add classifier 23 , fusion EER: 0.0295118 
+  trying to add classifier 24 , fusion EER: 0.024025 	
+final result QVector(10, 15, 16, 12, 19, 21, 8) EER: 0.0233746 

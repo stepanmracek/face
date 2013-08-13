@@ -587,11 +587,177 @@ public:
         }
     }
 
-    static void evaluateFilterBanks()
+    static void evaluateGaborFusion()
+    {
+        // Declare variables
+        QString indexPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/index";
+        QString depthPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/depth";
+        cv::Rect roi(25, 15, 100, 90);
+        int kSize = 200;
+        QVector<int> classes;
+        QVector<Matrix> indexImages;
+        QVector<Matrix> depthImages;
+        QList<QVector<Vector> > rawVectors;
+
+        // Create index kernels
+        QVector<Matrix> indexRealWavelets;
+        QVector<Matrix> indexImagWavelets;
+        for (int i = 0; i < 7; i++)
+        {
+            indexRealWavelets << Matrix(kSize, kSize);
+            indexImagWavelets << Matrix(kSize, kSize);
+        }
+        Gabor::createWavelet(indexRealWavelets[0], indexImagWavelets[0], 4, 8);
+        Gabor::createWavelet(indexRealWavelets[1], indexImagWavelets[1], 5, 2);
+        Gabor::createWavelet(indexRealWavelets[2], indexImagWavelets[2], 5, 4);
+        Gabor::createWavelet(indexRealWavelets[3], indexImagWavelets[3], 5, 7);
+        Gabor::createWavelet(indexRealWavelets[4], indexImagWavelets[4], 5, 8);
+        Gabor::createWavelet(indexRealWavelets[5], indexImagWavelets[5], 6, 3);
+        Gabor::createWavelet(indexRealWavelets[6], indexImagWavelets[6], 6, 5);
+
+        // Create depth kernels
+        QVector<Matrix> depthRealWavelets;
+        QVector<Matrix> depthImagWavelets;
+        for (int i = 0; i < 6; i++)
+        {
+            depthRealWavelets << Matrix(kSize, kSize);
+            depthImagWavelets << Matrix(kSize, kSize);
+        }
+        Gabor::createWavelet(depthRealWavelets[0], depthImagWavelets[0], 5, 1);
+        Gabor::createWavelet(depthRealWavelets[1], depthImagWavelets[1], 5, 2);
+        Gabor::createWavelet(depthRealWavelets[2], depthImagWavelets[2], 5, 4);
+        Gabor::createWavelet(depthRealWavelets[3], depthImagWavelets[3], 6, 3);
+        Gabor::createWavelet(depthRealWavelets[4], depthImagWavelets[4], 6, 6);
+        Gabor::createWavelet(depthRealWavelets[5], depthImagWavelets[5], 6, 8);
+
+        // Load and process index images
+        Loader::loadImages(indexPath, indexImages, &classes, "*.png", "d", -1, roi);
+        for (int i = 0; i < indexRealWavelets.count(); i++)
+        {
+            rawVectors << QVector<Vector>();
+            foreach(const Matrix &img, indexImages)
+            {
+                rawVectors[i] << MatrixConverter::matrixToColumnVector(Gabor::absResponse(img, indexRealWavelets[0], indexImagWavelets[0]));
+            }
+        }
+        indexImages.clear();
+
+        // Load and process depth images
+        Loader::loadImages(depthPath, depthImages, 0, "*.png", "d", -1, roi);
+        rawVectors << QVector<Vector>();
+        int back = rawVectors.count() - 1;
+        foreach (const Matrix &img, depthImages)
+        {
+            rawVectors[back] << MatrixConverter::matrixToColumnVector(img);
+        }
+        for (int i = 0; i < depthRealWavelets.count(); i++)
+        {
+            rawVectors << QVector<Vector>();
+            back = rawVectors.count() - 1;
+            foreach(const Matrix &img, depthImages)
+            {
+                rawVectors[back] << MatrixConverter::matrixToColumnVector(Gabor::absResponse(img, depthRealWavelets[0], depthImagWavelets[0]));
+            }
+        }
+        depthImages.clear();
+
+        // train extractors
+        QVector<ZScorePCAExtractor> extractors;
+        QList<QList<QVector<Vector> > > vectorsInClusters;
+        QList<QVector<int> > classesInClusters;
+        for (int unit = 0; unit < rawVectors.count(); unit++)
+        {
+            vectorsInClusters << QList<QVector<Vector> >();
+            classesInClusters.clear();
+            BioDataProcessing::divideToNClusters(rawVectors[unit], classes, 5, vectorsInClusters[unit], classesInClusters);
+
+            PCA pca(vectorsInClusters[unit][0]);
+            extractors << ZScorePCAExtractor(pca, vectorsInClusters[unit][0]);
+        }
+
+        // train fusion classifier
+        CorrelationMetric metric;
+        ScoreSVMFusion fusion;
+        for (int unit = 0; unit < rawVectors.count(); unit++)
+        {
+            fusion.addComponent(ScoreLevelFusionComponent(vectorsInClusters[unit][1], classesInClusters[1], &(extractors[unit]), &metric));
+        }
+        fusion.learn();
+
+        // evaluate
+        for (int cluster = 2; cluster < 5; cluster++)
+        {
+            QList<QVector<Vector> > data;
+            for (int unit = 0; unit < rawVectors.count(); unit++)
+            {
+                data << vectorsInClusters[unit][cluster];
+            }
+            Evaluation eval = fusion.evaluate(data, classesInClusters[cluster]);
+            qDebug() << "EER:" << eval.eer << "FNMR at FMR=1.0:" << eval.fnmrAtFmr(1.0) << "FNMR at FMR=0.1:" << eval.fnmrAtFmr(0.1);
+        }
+    }
+
+    static void trainGaborFusion()
+    {
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/mean";
+        cv::Rect roi(25, 15, 100, 90);
+        int kSize = 200;
+        QVector<Matrix> srcImages;
+        QVector<int> classes;
+        Loader::loadImages(srcDirPath, srcImages, &classes, "*.png", "d", 866, roi);
+
+        QList<QVector<Matrix> > srcImagesInClusters;
+        QList<QVector<int> > classesInClusters;
+        BioDataProcessing::divideToNClusters(srcImages, classes, 2, srcImagesInClusters, classesInClusters);
+
+        QList<ScoreLevelFusionComponent> components;
+        QVector<Vector> trainVectors;
+        foreach(const Matrix &srcImg, srcImagesInClusters[0])
+            trainVectors << MatrixConverter::matrixToColumnVector(srcImg);
+        QVector<Vector> testVectors;
+        foreach(const Matrix &srcImg, srcImagesInClusters[1])
+            testVectors << MatrixConverter::matrixToColumnVector(srcImg);
+
+        PCA pca(trainVectors);
+        pca.modesSelectionThreshold();
+        ZScorePCAExtractor *extractor = new ZScorePCAExtractor(pca, trainVectors);
+        components << ScoreLevelFusionComponent(testVectors, classesInClusters[1], extractor, new CorrelationMetric());
+
+        Matrix realWavelet(kSize, kSize);
+        Matrix imagWavelet(kSize, kSize);
+
+        for (int freq = 4; freq <= 6; freq++)
+        {
+            for (int orientation = 1; orientation <= 8; orientation++)
+            {
+                qDebug() << freq << orientation;
+                Gabor::createWavelet(realWavelet, imagWavelet, freq, orientation);
+
+                QVector<Vector> trainVectors;
+                foreach(const Matrix &srcImg, srcImagesInClusters[0])
+                {
+                    trainVectors << MatrixConverter::matrixToColumnVector(Gabor::absResponse(srcImg, realWavelet, imagWavelet));
+                }
+                PCA pca(trainVectors);
+                ZScorePCAExtractor *extractor = new ZScorePCAExtractor(pca, trainVectors);
+
+                QVector<Vector> vectors;
+                foreach(const Matrix &srcImg, srcImagesInClusters[1])
+                {
+                    vectors << MatrixConverter::matrixToColumnVector(Gabor::absResponse(srcImg, realWavelet, imagWavelet));
+                }
+                components << ScoreLevelFusionComponent(vectors, classesInClusters[1], extractor, new CorrelationMetric());
+            }
+        }
+
+        ScoreSVMFusion fusion;
+        ScoreLevelFusionWrapper::trainClassifier(fusion, components);
+    }
+
+    static void evaluateGaborFilterBanks()
     {
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
-        QStringList sources; sources << "depth" << "eigencur" << "gauss"
-                                     << "index" << "mean";
+        QStringList sources; sources << "depth" << "eigencur" << "gauss" << "index" << "mean";
         cv::Rect roi(25, 15, 100, 90);
 
         foreach (const QString &source, sources)
@@ -604,7 +770,7 @@ public:
             {
                 Matrix realWavelet(kSize, kSize);
                 Matrix imagWavelet(kSize, kSize);
-                for (int freq = 10; freq <= 10; freq++)
+                for (int freq = 3; freq <= 10; freq++)
                 {
                     for (int orientation = 1; orientation <= 8; orientation++)
                     {
