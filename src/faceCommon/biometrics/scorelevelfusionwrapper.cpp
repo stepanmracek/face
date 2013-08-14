@@ -12,8 +12,7 @@ QVector<int> ScoreLevelFusionWrapper::trainClassifier(ScoreLevelFusionBase &clas
     int bestIndex = -1;
     for (int i = 0; i < n; i++)
     {
-        double eer = Evaluation(components[i].trainRawData, components[i].trainClasses,
-                                *components[i].featureExtractor, *components[i].metrics).eer;
+        double eer = Evaluation(components[i].trainTemplates, *components[i].metrics).eer;
         qDebug() << "Component" << i << ", EER:" << eer;
         if (eer < bestEER)
         {
@@ -47,15 +46,15 @@ QVector<int> ScoreLevelFusionWrapper::trainClassifier(ScoreLevelFusionBase &clas
             classifier.learn();
 
             // create the input
-            QList<QVector<Vector> > rawVectors;
+            QList<Templates> inputTemplates;
             foreach(int component, selectedComponents)
             {
-                rawVectors << components[component].trainRawData;
+                inputTemplates << components[component].trainTemplates;
             }
-            rawVectors << components[i].trainRawData;
+            inputTemplates << components[i].trainTemplates;
 
             // evaluate
-            double eer = classifier.evaluate(rawVectors, components[i].trainClasses).eer;
+            double eer = classifier.evaluate(inputTemplates).eer;
             qDebug() << "  trying to add classifier" << i << ", fusion EER:" << eer;
             if (eer < bestEER)
             {

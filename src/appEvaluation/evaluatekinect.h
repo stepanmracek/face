@@ -127,15 +127,15 @@ public:
         QList<QVector<Vector> > joinedVectors;
         joinedVectors << curveVectors << depthVectors << histVectors << textureVectors;
         ScoreSVMFusion fusion;
-        fusion.addComponent(ScoreLevelFusionComponent(curveVectors, classes, &curveExtractor, &cor));
-        fusion.addComponent(ScoreLevelFusionComponent(depthVectors, classes, &depthExtractor, &cor));
-        fusion.addComponent(ScoreLevelFusionComponent(histVectors, classes, &histExtractor, &sad));
-        fusion.addComponent(ScoreLevelFusionComponent(textureVectors, classes, &textureExtractor, &cor));
+        //fusion.addComponent(ScoreLevelFusionComponent(curveVectors, classes, &curveExtractor, &cor));
+        //fusion.addComponent(ScoreLevelFusionComponent(depthVectors, classes, &depthExtractor, &cor));
+        //fusion.addComponent(ScoreLevelFusionComponent(histVectors, classes, &histExtractor, &sad));
+        //fusion.addComponent(ScoreLevelFusionComponent(textureVectors, classes, &textureExtractor, &cor));
         fusion.learn();
 
-        Evaluation fusionEval = fusion.evaluate(joinedVectors, classes);
-        qDebug() << "fusion" << fusionEval.eer;
-        fusionEval.outputResults("kinect-fusion", 10);
+        //Evaluation fusionEval = fusion.evaluate(joinedVectors, classes);
+        //qDebug() << "fusion" << fusionEval.eer;
+        //fusionEval.outputResults("kinect-fusion", 10);
 
         /*double depthDelta = depthEval.maxDistance - depthEval.minDistance;
         double textureDelta = textureEval.maxDistance - textureEval.minDistance;

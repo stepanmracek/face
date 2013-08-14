@@ -429,20 +429,20 @@ public:
 
             Metrics *metrics = new CorrelationMetric();
 
-            /*Evaluation eval(vectorsInClusters[1],
+            Evaluation eval(vectorsInClusters[1],
                             classesInClusters[1],
                             *zPcaExtractor, *metrics);
-            qDebug() << source << "z-PCA" << eval.eer;*/
+            qDebug() << source << "z-PCA" << eval.eer;
 
-            ScoreLevelFusionComponent component(vectorsInClusters[1], classesInClusters[1], zPcaExtractor, metrics);
-            components << component;
+            //ScoreLevelFusionComponent component(vectorsInClusters[1], classesInClusters[1], zPcaExtractor, metrics);
+            //components << component;
 
-            if (testClasses.count() == 0)
-                testClasses = classesInClusters[2];
-            allData << vectorsInClusters[2];
+            //if (testClasses.count() == 0)
+            //    testClasses = classesInClusters[2];
+            //allData << vectorsInClusters[2];
         }
 
-        ScoreSVMFusion fusion;
+        /*ScoreSVMFusion fusion;
         QVector<int> selectedComponents = ScoreLevelFusionWrapper::trainClassifier(fusion, components);
         qDebug() << "Selected components";
         QList<QVector<Vector> > testData;
@@ -452,7 +452,7 @@ public:
             testData << allData[i];
         }
 
-        qDebug() << "Test EER:" << fusion.evaluate(testData, testClasses).eer;
+        qDebug() << "Test EER:" << fusion.evaluate(testData, testClasses).eer;*/
     }
 
     static void evaluateDirect()
@@ -594,10 +594,7 @@ public:
         QString depthPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/depth";
         cv::Rect roi(25, 15, 100, 90);
         int kSize = 200;
-        QVector<int> classes;
-        QVector<Matrix> indexImages;
-        QVector<Matrix> depthImages;
-        QList<QVector<Vector> > rawVectors;
+        int clusters = 5;
 
         // Create index kernels
         QVector<Matrix> indexRealWavelets;
@@ -630,70 +627,100 @@ public:
         Gabor::createWavelet(depthRealWavelets[4], depthImagWavelets[4], 6, 6);
         Gabor::createWavelet(depthRealWavelets[5], depthImagWavelets[5], 6, 8);
 
+        CorrelationMetric metric;
+        ScoreSVMFusion fusion;
+
+        QVector<QList<Templates> > testTemplates(clusters - 1); // [cluster][method][subject]
         // Load and process index images
-        Loader::loadImages(indexPath, indexImages, &classes, "*.png", "d", -1, roi);
-        for (int i = 0; i < indexRealWavelets.count(); i++)
         {
-            rawVectors << QVector<Vector>();
-            foreach(const Matrix &img, indexImages)
+            QVector<Matrix> indexImages;
+            QVector<int> classes;
+            Loader::loadImages(indexPath, indexImages, &classes, "*.png", "d", -1, roi);
+            for (int i = 0; i < indexRealWavelets.count(); i++)
             {
-                rawVectors[i] << MatrixConverter::matrixToColumnVector(Gabor::absResponse(img, indexRealWavelets[0], indexImagWavelets[0]));
+                qDebug() << "index" << i;
+                QVector<Vector> rawVectors;
+                foreach(const Matrix &img, indexImages)
+                {
+                    rawVectors << MatrixConverter::matrixToColumnVector(Gabor::absResponse(img, indexRealWavelets[0], indexImagWavelets[0]));
+                }
+
+                QList<QVector<Vector> > vectorsInClusters;
+                QList<QVector<int> > classesInClusters;
+                BioDataProcessing::divideToNClusters(rawVectors, classes, 5, vectorsInClusters, classesInClusters);
+                PCA pca(vectorsInClusters[0]);
+                ZScorePCAExtractor extractor(pca, vectorsInClusters[0]);
+                fusion.addComponent(ScoreLevelFusionComponent(
+                                        Template::createTemplates(
+                                            vectorsInClusters[1], classesInClusters[1], extractor), &metric));
+
+                for (int c = 0; c < clusters-1; c++)
+                {
+                    testTemplates[c] << Template::createTemplates(vectorsInClusters[c+1], classesInClusters[c+1], extractor);
+                }
             }
         }
-        indexImages.clear();
 
         // Load and process depth images
-        Loader::loadImages(depthPath, depthImages, 0, "*.png", "d", -1, roi);
-        rawVectors << QVector<Vector>();
-        int back = rawVectors.count() - 1;
-        foreach (const Matrix &img, depthImages)
         {
-            rawVectors[back] << MatrixConverter::matrixToColumnVector(img);
-        }
-        for (int i = 0; i < depthRealWavelets.count(); i++)
-        {
-            rawVectors << QVector<Vector>();
-            back = rawVectors.count() - 1;
+            QVector<Matrix> depthImages;
+            QVector<int> classes;
+            Loader::loadImages(depthPath, depthImages, &classes, "*.png", "d", -1, roi);
+            for (int i = 0; i < depthRealWavelets.count(); i++)
+            {
+                qDebug() << "depth" << i;
+                QVector<Vector> rawVectors;
+                foreach(const Matrix &img, depthImages)
+                {
+                    rawVectors << MatrixConverter::matrixToColumnVector(Gabor::absResponse(img, depthRealWavelets[0], depthImagWavelets[0]));
+                }
+
+                QList<QVector<Vector> > vectorsInClusters;
+                QList<QVector<int> > classesInClusters;
+                BioDataProcessing::divideToNClusters(rawVectors, classes, clusters, vectorsInClusters, classesInClusters);
+                PCA pca(vectorsInClusters[0]);
+                ZScorePCAExtractor extractor(pca, vectorsInClusters[0]);
+                fusion.addComponent(ScoreLevelFusionComponent(
+                                        Template::createTemplates(
+                                            vectorsInClusters[1], classesInClusters[1], extractor), &metric));
+
+                for (int c = 0; c < clusters-1; c++)
+                {
+                    testTemplates[c] << Template::createTemplates(vectorsInClusters[c+1], classesInClusters[c+1], extractor);
+                }
+            }
+
+            // plain images
+            qDebug() << "depth plain";
+            QVector<Vector> rawVectors;
             foreach(const Matrix &img, depthImages)
             {
-                rawVectors[back] << MatrixConverter::matrixToColumnVector(Gabor::absResponse(img, depthRealWavelets[0], depthImagWavelets[0]));
+                rawVectors << MatrixConverter::matrixToColumnVector(img);
             }
-        }
-        depthImages.clear();
 
-        // train extractors
-        QVector<ZScorePCAExtractor> extractors;
-        QList<QList<QVector<Vector> > > vectorsInClusters;
-        QList<QVector<int> > classesInClusters;
-        for (int unit = 0; unit < rawVectors.count(); unit++)
-        {
-            vectorsInClusters << QList<QVector<Vector> >();
-            classesInClusters.clear();
-            BioDataProcessing::divideToNClusters(rawVectors[unit], classes, 5, vectorsInClusters[unit], classesInClusters);
+            QList<QVector<Vector> > vectorsInClusters;
+            QList<QVector<int> > classesInClusters;
+            BioDataProcessing::divideToNClusters(rawVectors, classes, clusters, vectorsInClusters, classesInClusters);
+            PCA pca(vectorsInClusters[0]);
+            ZScorePCAExtractor extractor(pca, vectorsInClusters[0]);
+            fusion.addComponent(ScoreLevelFusionComponent(
+                                    Template::createTemplates(
+                                        vectorsInClusters[1], classesInClusters[1], extractor), &metric));
 
-            PCA pca(vectorsInClusters[unit][0]);
-            extractors << ZScorePCAExtractor(pca, vectorsInClusters[unit][0]);
+            for (int c = 0; c < clusters - 1; c++)
+            {
+                testTemplates[c] << Template::createTemplates(vectorsInClusters[c+1], classesInClusters[c+1], extractor);
+            }
         }
 
         // train fusion classifier
-        CorrelationMetric metric;
-        ScoreSVMFusion fusion;
-        for (int unit = 0; unit < rawVectors.count(); unit++)
-        {
-            fusion.addComponent(ScoreLevelFusionComponent(vectorsInClusters[unit][1], classesInClusters[1], &(extractors[unit]), &metric));
-        }
+        qDebug() << "training fusion classifier";
         fusion.learn();
 
         // evaluate
-        for (int cluster = 2; cluster < 5; cluster++)
+        for (int c = 0; c < clusters - 1; c++)
         {
-            QList<QVector<Vector> > data;
-            for (int unit = 0; unit < rawVectors.count(); unit++)
-            {
-                data << vectorsInClusters[unit][cluster];
-            }
-            Evaluation eval = fusion.evaluate(data, classesInClusters[cluster]);
-            qDebug() << "EER:" << eval.eer << "FNMR at FMR=1.0:" << eval.fnmrAtFmr(1.0) << "FNMR at FMR=0.1:" << eval.fnmrAtFmr(0.1);
+            qDebug() << fusion.evaluate(testTemplates[c]).eer;
         }
     }
 
@@ -720,8 +747,9 @@ public:
 
         PCA pca(trainVectors);
         pca.modesSelectionThreshold();
-        ZScorePCAExtractor *extractor = new ZScorePCAExtractor(pca, trainVectors);
-        components << ScoreLevelFusionComponent(testVectors, classesInClusters[1], extractor, new CorrelationMetric());
+        ZScorePCAExtractor extractor(pca, trainVectors);
+        Templates testTempates = Template::createTemplates(testVectors, classesInClusters[1], extractor);
+        components << ScoreLevelFusionComponent(testTempates, new CorrelationMetric());
 
         Matrix realWavelet(kSize, kSize);
         Matrix imagWavelet(kSize, kSize);
@@ -739,14 +767,14 @@ public:
                     trainVectors << MatrixConverter::matrixToColumnVector(Gabor::absResponse(srcImg, realWavelet, imagWavelet));
                 }
                 PCA pca(trainVectors);
-                ZScorePCAExtractor *extractor = new ZScorePCAExtractor(pca, trainVectors);
+                ZScorePCAExtractor extractor(pca, trainVectors);
 
                 QVector<Vector> vectors;
                 foreach(const Matrix &srcImg, srcImagesInClusters[1])
                 {
                     vectors << MatrixConverter::matrixToColumnVector(Gabor::absResponse(srcImg, realWavelet, imagWavelet));
                 }
-                components << ScoreLevelFusionComponent(vectors, classesInClusters[1], extractor, new CorrelationMetric());
+                components << ScoreLevelFusionComponent(Template::createTemplates(vectors, classesInClusters[1], extractor), new CorrelationMetric());
             }
         }
 
@@ -797,7 +825,7 @@ public:
 
     static void evaluateFusion()
     {
-        int clusters = 5;
+        /*int clusters = 5;
         // ---------
         // Histogram
         // ---------
@@ -920,7 +948,7 @@ public:
             Evaluation fusionEval = svmFusion.evaluate(vectors, histClassesInClusters[i]);
             qDebug() << fusionEval.eer;
         }
-        //fusionEval.outputResults("../../test/frgc/fusion/fusion", 50);
+        //fusionEval.outputResults("../../test/frgc/fusion/fusion", 50);*/
     }
 };
 

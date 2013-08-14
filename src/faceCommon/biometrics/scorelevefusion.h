@@ -15,29 +15,20 @@
 class ScoreLevelFusionComponent
 {
 public:
-    const QVector<Vector> trainRawData;
-    const QVector<int> trainClasses;
-    const FeatureExtractor *featureExtractor;
+    const QVector<Template> trainTemplates;
     const Metrics *metrics;
 
     ScoreLevelFusionComponent() {}
 
-    ScoreLevelFusionComponent(const QVector<Vector> &trainRawData,
-                              const QVector<int> &trainClasses,
-                              const FeatureExtractor *featureExtractor,
+    ScoreLevelFusionComponent(const QVector<Template> &trainTemplates,
                               const Metrics *metrics) :
-        trainRawData(trainRawData), trainClasses(trainClasses),
-        featureExtractor(featureExtractor), metrics(metrics) {}
+        trainTemplates(trainTemplates), metrics(metrics) {}
 };
 
 class ScoreLevelFusionBase
 {
 private:
     QList<ScoreLevelFusionComponent> components;
-    /*QList<QVector<Vector> *> trainRawData;
-	QList<QVector<int> *> trainClasses;
-    QVector<const FeatureExtractor *> extractors;
-    QVector<const Metrics *> metrics;*/
 
 protected:
     bool learned;
@@ -63,7 +54,7 @@ public:
 
     void popComponent();
 
-    Evaluation evaluate(const QList<QVector<Vector> > &rawData, const QVector<int> &classes, bool debugOutput = false);
+    Evaluation evaluate(const QList<QVector<Template> > &templates, bool debugOutput = false);
 
     virtual ~ScoreLevelFusionBase() {}
 };

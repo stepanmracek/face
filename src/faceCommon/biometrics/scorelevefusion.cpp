@@ -25,32 +25,22 @@ void ScoreLevelFusionBase::learn()
 	QList<Evaluation> evaluationResults;
     for (int i = 0; i < componentsCount; i++)
 	{
-        Evaluation e(components[i].trainRawData, components[i].trainClasses,
-                     *components[i].featureExtractor, *components[i].metrics);
+        Evaluation e(components[i].trainTemplates, *components[i].metrics);
 		evaluationResults << e;
 	}
 	learnImplementation(evaluationResults);
 	learned = true;
 }
 
-Evaluation ScoreLevelFusionBase::evaluate(const QList<QVector<Vector> > &rawData, const QVector<int> &classes, bool debugOutput)
+Evaluation ScoreLevelFusionBase::evaluate(const QList<QVector<Template> > &templates, bool debugOutput)
 {
 	assert(learned);
 
     int unitCount = components.count();
     assert(unitCount > 0);
-    assert(unitCount == rawData.count());
+    assert(unitCount == templates.count());
 
-    int n = rawData[0].count();
-    assert(n == classes.count());
-
-    QVector<QVector<Template> > templates;
-    for (int unit = 0; unit < unitCount; unit++)
-    {
-        const FeatureExtractor *extractor = components[unit].featureExtractor;
-        Templates t = Template::createTemplates(rawData[unit], classes, *extractor);
-        templates.append(t);
-    }
+    int n = templates[0].count();
 
     QHash<QPair<int, int>, double> distanceMatrix;
     for (int i = 0; i < (n-1); i++)
