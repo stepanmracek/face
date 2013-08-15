@@ -12,36 +12,40 @@
 #include "linalg/logisticregression.h"
 #include "linalg/vector.h"
 
-class ScoreLevelFusionComponent
+/*class ScoreLevelFusionComponent
 {
 public:
-    const QVector<Template> trainTemplates;
-    const Metrics *metrics;
+    //const QVector<Template> trainTemplates;
+    //const Metrics *metrics;
+
+    Evaluation evalResult;
 
     ScoreLevelFusionComponent() {}
 
     ScoreLevelFusionComponent(const QVector<Template> &trainTemplates,
-                              const Metrics *metrics) :
-        trainTemplates(trainTemplates), metrics(metrics) {}
-};
+                              const Metrics &metrics)
+    {
+        evalResult = Evaluation(trainTemplates, metrics);
+    }
+
+    ScoreLevelFusionComponent(const Evaluation &evalResult) : evalResult(evalResult) { }
+};*/
 
 class ScoreLevelFusionBase
 {
-private:
-    QList<ScoreLevelFusionComponent> components;
-
 protected:
+    QList<Evaluation> components;
+
     bool learned;
     QVector<double> genuineMeans;
     QVector<double> impostorMeans;
 
-    void prepareDataForClassification(QList<Evaluation> &evaluationResults,
-                                      QVector<Vector> &scores, QVector<int> &classes,
+    void prepareDataForClassification(QVector<Vector> &scores, QVector<int> &classes,
                                       int genuineLabel, int impostorLabel);
 
     Vector normalizeScore(QVector<double> &score);
 
-    virtual void learnImplementation(QList<Evaluation> &evaluationResults) = 0;
+    virtual void learnImplementation() = 0;
 
 public:
     ScoreLevelFusionBase() { learned = false; }
@@ -50,11 +54,12 @@ public:
 
     virtual double fuse(QVector<double> &scores) = 0;
 
-    ScoreLevelFusionBase & addComponent(const ScoreLevelFusionComponent &component);
+    ScoreLevelFusionBase & addComponent(const Evaluation &component);
 
     void popComponent();
 
-    Evaluation evaluate(const QList<QVector<Template> > &templates, bool debugOutput = false);
+    Evaluation evaluate(const QList<Templates> &templates, const QList<Metrics *> &, bool debugOutput = false);
+    Evaluation evaluate(const QList<Evaluation> &evaluations, bool debugOutput = false);
 
     virtual ~ScoreLevelFusionBase() {}
 };
@@ -69,7 +74,7 @@ private:
     LDA lda;
 
 public:
-    void learnImplementation(QList<Evaluation> &evaluationResults);
+    void learnImplementation();
     double fuse(QVector<double> &scores);
     virtual ~ScoreLDAFusion() {}
 };
@@ -80,7 +85,7 @@ private:
     LogisticRegression logR;
 
 public:
-    void learnImplementation(QList<Evaluation> &evaluationResults);
+    void learnImplementation();
     double fuse(QVector<double> &scores);
     virtual ~ScoreLogisticRegressionFusion() {}
 };
@@ -92,7 +97,7 @@ private:
     double weightDenominator;
 
 public:
-    void learnImplementation(QList<Evaluation> &evaluationResults);
+    void learnImplementation();
     double fuse(QVector<double> &scores);
     virtual ~ScoreWeightedSumFusion() {}
 };
@@ -100,17 +105,9 @@ public:
 class ScoreProductFusion : public ScoreLevelFusionBase
 {
 public:
-	void learnImplementation(QList<Evaluation> &evaluationResults);
+    void learnImplementation();
     double fuse(QVector<double> &scores);
     virtual ~ScoreProductFusion() {}
-};
-
-class ScoreDummyProductFusion : public ScoreLevelFusionBase
-{
-public:
-    virtual ~ScoreDummyProductFusion() {}
-    void learnImplementation(QList<Evaluation> &evaluationResults) {}
-    double fuse(QVector<double> &scores);
 };
 
 class ScoreSVMFusion : public ScoreLevelFusionBase
@@ -123,9 +120,10 @@ private:
     cv::Mat colVectorToColFPMatrix(QVector<double> &vector);
 
 public:
-    void learnImplementation(QList<Evaluation> &evaluationResults);
+    void learnImplementation();
     double fuse(QVector<double> &scores);
     virtual ~ScoreSVMFusion() {}
+    void serialize(const QString &path);
 };
 
 #endif // MULTIBIOSYSTEM_H

@@ -9,6 +9,44 @@ void Evaluation::commonInit()
 {
     eer = 1.0;
     eerDistance = 0.0;
+
+    minSameDistance = 1e300;
+    minDifferentDistance = 1e300;
+    minDistance = 1e300;
+
+    maxSameDistance = -1e300;
+    maxDifferentDistance = -1e300;
+    maxDistance = -1e300;
+}
+
+Evaluation::Evaluation(const QVector<double> &genuineScores, const QVector<double> &impostorScores, bool debugOutput) :
+    genuineScores(genuineScores), impostorScores(impostorScores)
+{
+    commonInit();
+
+    if (debugOutput)
+        qDebug() << "Evaluation";
+
+    Vector genVec(genuineScores);
+    minSameDistance = genVec.minValue();
+    maxSameDistance = genVec.maxValue();
+
+    Vector impVec(impostorScores);
+    minDifferentDistance = impVec.minValue();
+    maxDifferentDistance = impVec.maxValue();
+
+    minDistance = minSameDistance;
+    maxDistance = maxDifferentDistance;
+
+    if (debugOutput)
+    {
+        qDebug() << "  same distance range:" << minSameDistance << maxSameDistance;
+        qDebug() << "  different distance range" << minDifferentDistance << maxDifferentDistance;
+    }
+
+    assert((maxSameDistance > minSameDistance) && (maxDifferentDistance > minDifferentDistance));
+
+    commonEvaluation(debugOutput);
 }
 
 Evaluation::Evaluation(QHash<QPair<int, int>, double> &distances, bool debugOutput)
@@ -17,14 +55,6 @@ Evaluation::Evaluation(QHash<QPair<int, int>, double> &distances, bool debugOutp
 
     if (debugOutput)
         qDebug() << "Evaluation";
-
-    minSameDistance = 1e300;
-    minDifferentDistance = 1e300;
-    minDistance = 1e300;
-
-    maxSameDistance = 0.0;
-    maxDifferentDistance = 0.0;
-    maxDistance = 0.0;
 
     if (debugOutput)
         qDebug() << "  distance calculation";
@@ -54,11 +84,16 @@ Evaluation::Evaluation(QHash<QPair<int, int>, double> &distances, bool debugOutp
                 if (d > maxDifferentDistance) maxDifferentDistance = d;
                 if (d < minDifferentDistance) minDifferentDistance = d;
             }
-            scores.append(d);
 
             if (d > maxDistance) maxDistance = d;
             if (d < minDistance) minDistance = d;
         }
+    }
+
+    if (debugOutput)
+    {
+        qDebug() << "  same distance range:" << minSameDistance << maxSameDistance;
+        qDebug() << "  different distance range" << minDifferentDistance << maxDifferentDistance;
     }
 
     commonEvaluation(debugOutput);
@@ -71,8 +106,8 @@ Evaluation::Evaluation(const QVector<Template> &templates, const Metrics &metric
     if (debugOutput)
         qDebug() << "Evaluation";
 
-    if (commonTemplatesEvaluation(templates, metrics, debugOutput))
-        commonEvaluation(debugOutput);
+    commonTemplatesEvaluation(templates, metrics, debugOutput);
+    commonEvaluation(debugOutput);
 }
 
 Evaluation::Evaluation(const QVector<Vector> &rawData, const QVector<int> &classes,
@@ -84,8 +119,8 @@ Evaluation::Evaluation(const QVector<Vector> &rawData, const QVector<int> &class
     if (debugOutput)
         qDebug() << "Evaluation";
 
-    if (commonTemplatesEvaluation(templates, metric, debugOutput))
-        commonEvaluation(debugOutput);
+    commonTemplatesEvaluation(templates, metric, debugOutput);
+    commonEvaluation(debugOutput);
 }
 
 void Evaluation::commonEvaluation(bool debugOutput)
@@ -125,9 +160,6 @@ void Evaluation::commonEvaluation(bool debugOutput)
             eer = (sameMismatchCount+differentMatchCount)/2;
             eerDistance = t;
         }
-
-        // Impostor, Genuine
-        // TODO
     }
 }
 
@@ -152,16 +184,8 @@ double Evaluation::fnmrAtFmr(double _fmr)
 	return _fnmr;
 }
 
-bool Evaluation::commonTemplatesEvaluation(const QVector<Template> &templates, const Metrics &metrics, bool debugOutput)
+void Evaluation::commonTemplatesEvaluation(const QVector<Template> &templates, const Metrics &metrics, bool debugOutput)
 {
-    minSameDistance = 1e300;
-    minDifferentDistance = 1e300;
-    minDistance = 1e300;
-
-    maxSameDistance = -1e300;
-    maxDifferentDistance = -1e300;
-    maxDistance = -1e300;
-
     if (debugOutput)
         qDebug() << "  distance calculation";
     int n = templates.count();
@@ -190,7 +214,6 @@ bool Evaluation::commonTemplatesEvaluation(const QVector<Template> &templates, c
                 if (d > maxDifferentDistance) maxDifferentDistance = d;
                 if (d < minDifferentDistance) minDifferentDistance = d;
             }
-            scores.append(d);
 
             if (d > maxDistance) maxDistance = d;
             if (d < minDistance) minDistance = d;
@@ -205,7 +228,7 @@ bool Evaluation::commonTemplatesEvaluation(const QVector<Template> &templates, c
         qDebug() << "  different distance range" << minDifferentDistance << maxDifferentDistance;
     }
 
-    return ((maxSameDistance > minSameDistance) && (maxDifferentDistance > minDifferentDistance));
+    assert((maxSameDistance > minSameDistance) && (maxDifferentDistance > minDifferentDistance));
 }
 
 void Evaluation::outputResultsDET(const QString &path) const

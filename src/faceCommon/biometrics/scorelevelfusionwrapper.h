@@ -8,7 +8,7 @@
 class ScoreLevelFusionWrapper
 {
 public:
-    static QVector<int> trainClassifier(ScoreLevelFusionBase &classifier, QList<ScoreLevelFusionComponent> &components);
+    static QVector<int> trainClassifier(ScoreLevelFusionBase &classifier, const QList<Evaluation> &components);
 };
 
 #endif // SCORELEVELFUSIONWRAPPER_H

@@ -1,7 +1,7 @@
 #include "scorelevelfusionwrapper.h"
 
 QVector<int> ScoreLevelFusionWrapper::trainClassifier(ScoreLevelFusionBase &classifier,
-                                                      QList<ScoreLevelFusionComponent> &components)
+                                                      const QList<Evaluation> &components)
 {
     QVector<int> selectedComponents;
     int n = components.count();
@@ -12,7 +12,7 @@ QVector<int> ScoreLevelFusionWrapper::trainClassifier(ScoreLevelFusionBase &clas
     int bestIndex = -1;
     for (int i = 0; i < n; i++)
     {
-        double eer = Evaluation(components[i].trainTemplates, *components[i].metrics).eer;
+        double eer = components[i].eer;
         qDebug() << "Component" << i << ", EER:" << eer;
         if (eer < bestEER)
         {
@@ -46,15 +46,15 @@ QVector<int> ScoreLevelFusionWrapper::trainClassifier(ScoreLevelFusionBase &clas
             classifier.learn();
 
             // create the input
-            QList<Templates> inputTemplates;
+            QList<Evaluation> inputEvaluationResults;
             foreach(int component, selectedComponents)
             {
-                inputTemplates << components[component].trainTemplates;
+                inputEvaluationResults << components[component];
             }
-            inputTemplates << components[i].trainTemplates;
+            inputEvaluationResults << components[i];
 
             // evaluate
-            double eer = classifier.evaluate(inputTemplates).eer;
+            double eer = classifier.evaluate(inputEvaluationResults).eer;
             qDebug() << "  trying to add classifier" << i << ", fusion EER:" << eer;
             if (eer < bestEER)
             {

@@ -36,16 +36,18 @@ int main(int argc, char *argv[])
 	//EvaluateThermo2::evaluateZScoreAndWeighting();
 	//EvaluateThermo2::evaluateFilterBanks();
 
-    //Evaluate3dFrgc::evaluateFusion();
     //Evaluate3dFrgc::createBIN();
     //Evaluate3dFrgc::align();
     //Evaluate3dFrgc::createMaps();
     //Evaluate3dFrgc::evaluateHistogramFeaturesGenerateStripesBinsMap();
     //Evaluate3dFrgc::evaluateHistogramFeatures();
     //Evaluate3dFrgc::evaluateMaps();
+
     //Evaluate3dFrgc::evaluateGaborFilterBanks();
     //Evaluate3dFrgc::trainGaborFusion();
-    Evaluate3dFrgc::evaluateGaborFusion();
+    //Evaluate3dFrgc::evaluateGaborFusion();
+    Evaluate3dFrgc::evaluateFusion();
+
     //Evaluate3dFrgc::evaluateDirect();
     //Evaluate3dFrgc::createIsoCurves();
     //Evaluate3dFrgc::evaluateIsoCurves();

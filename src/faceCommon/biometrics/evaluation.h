@@ -18,7 +18,7 @@ class Evaluation
 {
 private:
     void commonEvaluation(bool debugOutput);
-    bool commonTemplatesEvaluation(const QVector<Template> &templates, const Metrics &metrics, bool debugOutput);
+    void commonTemplatesEvaluation(const QVector<Template> &templates, const Metrics &metrics, bool debugOutput);
     void commonInit();
 
 public:
@@ -31,7 +31,7 @@ public:
 
     QVector<double> genuineScores;
     QVector<double> impostorScores;
-    QVector<double> scores;
+    //QVector<double> scores;
 
     QVector<double> fmr;
     QVector<double> fnmr;
@@ -41,6 +41,8 @@ public:
     double eerDistance;
 
     Evaluation();
+
+    Evaluation(const QVector<double> &genuineScores, const QVector<double> &impostorScores, bool debugOutput = false);
 
     Evaluation(const QVector<Template> &templates, const Metrics &metrics, bool debugOutput = false);
 

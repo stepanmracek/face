@@ -110,20 +110,13 @@ public:
 
     static void evaluateIsoCurves()
     {
-        int modulo = 1;
-        double pcaThreshold = 1.0;
-        QVector<double> thresholds; thresholds << 0.90 << 0.91  << 0.92 << 0.93
-                                               << 0.94 << 0.95  << 0.96 << 0.97
-                                               << 0.98 << 0.985 << 0.99 << 0.995
-                                               << 0.999 << 1;
-
+        //int modulo = 1;
         QString dirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/isocurves2/";
         QVector<SubjectIsoCurves> data = IsoCurveProcessing::readDirectory(dirPath, "d", "*.xml");
         IsoCurveProcessing::selectIsoCurves(data, 0, 5);
         IsoCurveProcessing::stats(data);
-        IsoCurveProcessing::sampleIsoCurvePoints(data, modulo);
+        //IsoCurveProcessing::sampleIsoCurvePoints(data, modulo);
         QVector<Template> rawData = IsoCurveProcessing::generateTemplates(data, false);
-        //QVector<Template> rawData = IsoCurveProcessing::generateEuclDistanceTemplates(data);
 
         QVector<int> classes;
         QVector<Vector> rawFeatureVectors;
@@ -140,7 +133,7 @@ public:
                                              trainVectorsInClusters, trainClassesInClusters);
 
         PCA pca(trainVectorsInClusters[0]);
-        pca.modesSelectionThreshold(pcaThreshold);
+        //pca.modesSelectionThreshold(pcaThreshold);
         //PCAExtractor pcaExtractor(pca);
         ZScorePCAExtractor zscorePcaExtractor(pca, trainVectorsInClusters[1]);
         zscorePcaExtractor.serialize("../../test/isocurves/shifted-pca.yml", "../../test/isocurves/shifted-normparams.yml");
@@ -169,11 +162,13 @@ public:
 
         corW.w = eerPot.createSelectionWeightsBasedOnRelativeThreshold(bestThreshold);
         BatchEvaluationResult batchResult = Evaluation::batch(rawVectorsInClusters, classesInClusters,
-                                                              zscorePcaExtractor, corW, 2);
+                                                              zscorePcaExtractor, corW, 1);
         qDebug() << batchResult.meanEER << batchResult.stdDevOfEER;
+        int i = 0;
         foreach(const Evaluation &e, batchResult.results)
         {
             qDebug() << e.eer;
+            e.outputResults("isocurves-" + QString::number(i++), 50);
         }
     }
 
@@ -408,9 +403,9 @@ public:
         /*cv::Rect roi(150-roiWidths[roiIndex]*2, 150-roiUppers[roiIndex]*2,
                      roiWidths[roiIndex]*4, roiUppers[roiIndex]*2+roiLowers[roiIndex]*2);*/
 
-        QList<ScoreLevelFusionComponent> components;
-        QList<QVector<Vector> > allData;
-        QVector<int> testClasses;
+        //QList<ScoreLevelFusionComponent> components;
+        //QList<QVector<Vector> > allData;
+        //QVector<int> testClasses;
         foreach (const QString &source, sources)
         {
             QVector<Vector> vectors;
@@ -587,62 +582,126 @@ public:
         }
     }
 
+    enum sourceEnum { index, mean, depth, gauss, eigencur };
+    static void fillKernels(QVector<Matrix> &realWavelets, QVector<Matrix> &imagWavelets, const QString &source)
+    {
+        int kSize = 200;
+        realWavelets.clear(); imagWavelets.clear();
+
+        QVector<int> freqs; QVector<int> ornts;
+
+        // Index
+        if (source.compare("index") == 0)
+        {
+            // no ROI
+            //freqs << 5 << 4 << 5 << 5 << 6 << 6 << 4;
+            //ornts << 2 << 6 << 4 << 8 << 1 << 4 << 1;
+
+            // with ROI
+            freqs << 0 << 5 << 5 << 6 << 5 << 6 << 6 << 5 << 4;
+            ornts << 0 << 2 << 3 << 7 << 8 << 6 << 2 << 1 << 7;
+        }
+
+        // Mean
+        else if (source.compare("mean") == 0)
+        {
+            // no ROI
+            //freqs << 4 << 6 << 5 << 5 << 6 << 5 << 5 << 6 << 4 << 5;
+            //ornts << 7 << 4 << 8 << 3 << 3 << 1 << 2 << 6 << 4 << 4;
+
+            // with ROI
+            freqs << 5 << 5 << 6 << 6 << 6 << 5 << 6 << 4 << 4 << 0 << 5;
+            ornts << 8 << 2 << 3 << 6 << 8 << 4 << 4 << 8 << 7 << 0 << 6;
+        }
+
+        // Depth
+        else if (source.compare("depth") == 0)
+        {
+            // no ROI
+            //freqs << 5 << 6 << 5 << 0 << 5 << 6 << 6 << 4;
+            //ornts << 1 << 3 << 6 << 0 << 3 << 2 << 4 << 6;
+
+            // with RO
+            freqs << 0 << 5 << 6 << 5;
+            ornts << 0 << 8 << 2 << 2;
+        }
+
+        // Gauss
+        else if (source.compare("gauss") == 0)
+        {
+            // no ROI
+            //freqs << 5 << 6 << 5 << 5 << 4 << 4;
+            //ornts << 7 << 1 << 1 << 6 << 5 << 1;
+
+            // with ROI
+            freqs << 4 << 4 << 6 << 4 << 6 << 5 << 5 << 6 << 4;
+            ornts << 8 << 2 << 2 << 4 << 5 << 7 << 2 << 6 << 5;
+        }
+
+        // Eigencur
+        else if (source.compare("eigencur") == 0)
+        {
+            // no ROI
+            //freqs << 4 << 4 << 5 << 4 << 6 << 6 << 5;
+            //ornts << 8 << 3 << 3 << 6 << 4 << 7 << 5;
+
+            // with ROI
+            freqs << 4 << 5 << 4 << 6 << 4 << 4 << 5 << 4;
+            ornts << 7 << 2 << 3 << 6 << 6 << 1 << 8 << 4;
+        }
+
+        for (int i = 0; i < freqs.count(); i++)
+        {
+            if (freqs[i] == 0 && ornts[i] == 0)
+            {
+                realWavelets << Matrix(0, 0);
+                imagWavelets << Matrix(0, 0);
+            }
+            else
+            {
+                realWavelets << Matrix(kSize, kSize);
+                imagWavelets << Matrix(kSize, kSize);
+                Gabor::createWavelet(realWavelets[i], imagWavelets[i], freqs[i], ornts[i]);
+            }
+        }
+    }
+
     static void evaluateGaborFusion()
     {
+        QString source = "index";
         // Declare variables
-        QString indexPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/index";
-        QString depthPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/depth";
+        QString path = "/home/stepo/data/frgc/spring2004/zbin-aligned/" + source;
         cv::Rect roi(25, 15, 100, 90);
-        int kSize = 200;
         int clusters = 5;
 
-        // Create index kernels
-        QVector<Matrix> indexRealWavelets;
-        QVector<Matrix> indexImagWavelets;
-        for (int i = 0; i < 7; i++)
-        {
-            indexRealWavelets << Matrix(kSize, kSize);
-            indexImagWavelets << Matrix(kSize, kSize);
-        }
-        Gabor::createWavelet(indexRealWavelets[0], indexImagWavelets[0], 4, 8);
-        Gabor::createWavelet(indexRealWavelets[1], indexImagWavelets[1], 5, 2);
-        Gabor::createWavelet(indexRealWavelets[2], indexImagWavelets[2], 5, 4);
-        Gabor::createWavelet(indexRealWavelets[3], indexImagWavelets[3], 5, 7);
-        Gabor::createWavelet(indexRealWavelets[4], indexImagWavelets[4], 5, 8);
-        Gabor::createWavelet(indexRealWavelets[5], indexImagWavelets[5], 6, 3);
-        Gabor::createWavelet(indexRealWavelets[6], indexImagWavelets[6], 6, 5);
-
-        // Create depth kernels
-        QVector<Matrix> depthRealWavelets;
-        QVector<Matrix> depthImagWavelets;
-        for (int i = 0; i < 6; i++)
-        {
-            depthRealWavelets << Matrix(kSize, kSize);
-            depthImagWavelets << Matrix(kSize, kSize);
-        }
-        Gabor::createWavelet(depthRealWavelets[0], depthImagWavelets[0], 5, 1);
-        Gabor::createWavelet(depthRealWavelets[1], depthImagWavelets[1], 5, 2);
-        Gabor::createWavelet(depthRealWavelets[2], depthImagWavelets[2], 5, 4);
-        Gabor::createWavelet(depthRealWavelets[3], depthImagWavelets[3], 6, 3);
-        Gabor::createWavelet(depthRealWavelets[4], depthImagWavelets[4], 6, 6);
-        Gabor::createWavelet(depthRealWavelets[5], depthImagWavelets[5], 6, 8);
+        // Create kernels
+        QVector<Matrix> realWavelets;
+        QVector<Matrix> imagWavelets;
+        fillKernels(realWavelets, imagWavelets, source);
 
         CorrelationMetric metric;
         ScoreSVMFusion fusion;
 
-        QVector<QList<Templates> > testTemplates(clusters - 1); // [cluster][method][subject]
-        // Load and process index images
+        QVector<QList<Evaluation> > testData(clusters - 1); // [cluster][method]
+        // Load and process images
         {
-            QVector<Matrix> indexImages;
+            QVector<Matrix> images;
             QVector<int> classes;
-            Loader::loadImages(indexPath, indexImages, &classes, "*.png", "d", -1, roi);
-            for (int i = 0; i < indexRealWavelets.count(); i++)
+            Loader::loadImages(path, images, &classes, "*.png", "d", -1, roi);
+            for (int i = 0; i < realWavelets.count(); i++)
             {
-                qDebug() << "index" << i;
+                qDebug() << source << i;
                 QVector<Vector> rawVectors;
-                foreach(const Matrix &img, indexImages)
+                foreach(const Matrix &img, images)
                 {
-                    rawVectors << MatrixConverter::matrixToColumnVector(Gabor::absResponse(img, indexRealWavelets[0], indexImagWavelets[0]));
+                    if (realWavelets[i].rows == 0)
+                    {
+                        rawVectors << MatrixConverter::matrixToColumnVector(img);
+                    }
+                    else
+                    {
+                        rawVectors << MatrixConverter::matrixToColumnVector(Gabor::absResponse(img, realWavelets[i], imagWavelets[i]));
+                    }
                 }
 
                 QList<QVector<Vector> > vectorsInClusters;
@@ -650,66 +709,12 @@ public:
                 BioDataProcessing::divideToNClusters(rawVectors, classes, 5, vectorsInClusters, classesInClusters);
                 PCA pca(vectorsInClusters[0]);
                 ZScorePCAExtractor extractor(pca, vectorsInClusters[0]);
-                fusion.addComponent(ScoreLevelFusionComponent(
-                                        Template::createTemplates(
-                                            vectorsInClusters[1], classesInClusters[1], extractor), &metric));
+                fusion.addComponent(Evaluation(vectorsInClusters[1], classesInClusters[1], extractor, metric));
 
                 for (int c = 0; c < clusters-1; c++)
                 {
-                    testTemplates[c] << Template::createTemplates(vectorsInClusters[c+1], classesInClusters[c+1], extractor);
+                    testData[c] << Evaluation(vectorsInClusters[c+1], classesInClusters[c+1], extractor, metric);
                 }
-            }
-        }
-
-        // Load and process depth images
-        {
-            QVector<Matrix> depthImages;
-            QVector<int> classes;
-            Loader::loadImages(depthPath, depthImages, &classes, "*.png", "d", -1, roi);
-            for (int i = 0; i < depthRealWavelets.count(); i++)
-            {
-                qDebug() << "depth" << i;
-                QVector<Vector> rawVectors;
-                foreach(const Matrix &img, depthImages)
-                {
-                    rawVectors << MatrixConverter::matrixToColumnVector(Gabor::absResponse(img, depthRealWavelets[0], depthImagWavelets[0]));
-                }
-
-                QList<QVector<Vector> > vectorsInClusters;
-                QList<QVector<int> > classesInClusters;
-                BioDataProcessing::divideToNClusters(rawVectors, classes, clusters, vectorsInClusters, classesInClusters);
-                PCA pca(vectorsInClusters[0]);
-                ZScorePCAExtractor extractor(pca, vectorsInClusters[0]);
-                fusion.addComponent(ScoreLevelFusionComponent(
-                                        Template::createTemplates(
-                                            vectorsInClusters[1], classesInClusters[1], extractor), &metric));
-
-                for (int c = 0; c < clusters-1; c++)
-                {
-                    testTemplates[c] << Template::createTemplates(vectorsInClusters[c+1], classesInClusters[c+1], extractor);
-                }
-            }
-
-            // plain images
-            qDebug() << "depth plain";
-            QVector<Vector> rawVectors;
-            foreach(const Matrix &img, depthImages)
-            {
-                rawVectors << MatrixConverter::matrixToColumnVector(img);
-            }
-
-            QList<QVector<Vector> > vectorsInClusters;
-            QList<QVector<int> > classesInClusters;
-            BioDataProcessing::divideToNClusters(rawVectors, classes, clusters, vectorsInClusters, classesInClusters);
-            PCA pca(vectorsInClusters[0]);
-            ZScorePCAExtractor extractor(pca, vectorsInClusters[0]);
-            fusion.addComponent(ScoreLevelFusionComponent(
-                                    Template::createTemplates(
-                                        vectorsInClusters[1], classesInClusters[1], extractor), &metric));
-
-            for (int c = 0; c < clusters - 1; c++)
-            {
-                testTemplates[c] << Template::createTemplates(vectorsInClusters[c+1], classesInClusters[c+1], extractor);
             }
         }
 
@@ -720,13 +725,15 @@ public:
         // evaluate
         for (int c = 0; c < clusters - 1; c++)
         {
-            qDebug() << fusion.evaluate(testTemplates[c]).eer;
+            Evaluation result = fusion.evaluate(testData[c]);
+            result.outputResults("gabor-" + source + "-" + QString::number(c), 50);
+            qDebug() << result.eer;
         }
     }
 
     static void trainGaborFusion()
     {
-        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/mean";
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/index";
         cv::Rect roi(25, 15, 100, 90);
         int kSize = 200;
         QVector<Matrix> srcImages;
@@ -737,7 +744,7 @@ public:
         QList<QVector<int> > classesInClusters;
         BioDataProcessing::divideToNClusters(srcImages, classes, 2, srcImagesInClusters, classesInClusters);
 
-        QList<ScoreLevelFusionComponent> components;
+        QList<Evaluation> components;
         QVector<Vector> trainVectors;
         foreach(const Matrix &srcImg, srcImagesInClusters[0])
             trainVectors << MatrixConverter::matrixToColumnVector(srcImg);
@@ -749,16 +756,17 @@ public:
         pca.modesSelectionThreshold();
         ZScorePCAExtractor extractor(pca, trainVectors);
         Templates testTempates = Template::createTemplates(testVectors, classesInClusters[1], extractor);
-        components << ScoreLevelFusionComponent(testTempates, new CorrelationMetric());
+        components << Evaluation(testTempates, CorrelationMetric());
 
         Matrix realWavelet(kSize, kSize);
         Matrix imagWavelet(kSize, kSize);
 
+        int index = 1;
         for (int freq = 4; freq <= 6; freq++)
         {
             for (int orientation = 1; orientation <= 8; orientation++)
             {
-                qDebug() << freq << orientation;
+                qDebug() << index++ << freq << orientation;
                 Gabor::createWavelet(realWavelet, imagWavelet, freq, orientation);
 
                 QVector<Vector> trainVectors;
@@ -774,7 +782,7 @@ public:
                 {
                     vectors << MatrixConverter::matrixToColumnVector(Gabor::absResponse(srcImg, realWavelet, imagWavelet));
                 }
-                components << ScoreLevelFusionComponent(Template::createTemplates(vectors, classesInClusters[1], extractor), new CorrelationMetric());
+                components << Evaluation(vectors, classesInClusters[1], extractor, CorrelationMetric());
             }
         }
 
@@ -824,6 +832,39 @@ public:
     }
 
     static void evaluateFusion()
+    {
+        QString dir = "/home/stepo/git/face/test/frgc/filterBanks/";
+        QStringList units;
+        units << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur" << "gabor-depth" << "isocurves";
+        ScoreSVMFusion fusion;
+
+        QList<Evaluation> trainComponents;
+        foreach (const QString &unit, units)
+        {
+            QVector<double> trainGenScores = Vector::fromFile(dir + unit + "-0-gen-scores").toQVector();
+            QVector<double> trainImpScores = Vector::fromFile(dir + unit + "-0-imp-scores").toQVector();
+            trainComponents << Evaluation(trainGenScores, trainImpScores);
+        }
+
+        QVector<int> selectedUnits = ScoreLevelFusionWrapper::trainClassifier(fusion, trainComponents);
+
+        for (int i = 0; i <= 3; i++)
+        {
+            QList<Evaluation> testEvals;
+
+            foreach (int unitIndex, selectedUnits)
+            {
+                QVector<double> testGenScores = Vector::fromFile(dir + units[unitIndex] + "-" + QString::number(i) + "-gen-scores").toQVector();
+                QVector<double> testImpScores = Vector::fromFile(dir + units[unitIndex] + "-" + QString::number(i) + "-imp-scores").toQVector();
+                testEvals << Evaluation(testGenScores, testImpScores);
+            }
+
+            Evaluation eval = fusion.evaluate(testEvals);
+            qDebug() << eval.eer << eval.fnmrAtFmr(0.01) << eval.fnmrAtFmr(0.001) << eval.fnmrAtFmr(0.0001);
+        }
+    }
+
+    static void evaluateFusionOld()
     {
         /*int clusters = 5;
         // ---------
