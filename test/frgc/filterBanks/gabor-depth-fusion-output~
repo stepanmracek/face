@@ -23,7 +23,7 @@
 22 6 6 
 23 6 7 
 24 6 8 
-final result QVector(9, 19, 14, 0, 11, 18, 20, 6) EER: 0.0400178 
+9, 19, 14, 0, 11, 18, 20, 6
 Training score-level fusion classifier: 25 candidate components 
 Component 0 , EER: 0.0893747 
 Component 1 , EER: 0.0920381 
@@ -222,3 +222,4 @@ added classifier 6 , fusion EER: 0.0400178
   trying to add classifier 22 , fusion EER: 0.0659456 
   trying to add classifier 23 , fusion EER: 0.0584643 
   trying to add classifier 24 , fusion EER: 0.162567 
+final result QVector(9, 19, 14, 0, 11, 18, 20, 6) EER: 0.0400178 
