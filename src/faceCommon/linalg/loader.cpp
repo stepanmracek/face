@@ -106,11 +106,12 @@ void Loader::loadImages(const QString &dirPath, QVector<Matrix> &images, QVector
 
         QString imgPath(dirPath + QDir::separator() + filenames[i]);
         Matrix img = MatrixConverter::imageToMatrix(imgPath);
-        images.append(img);
         if (roi.width != 0 && roi.height != 0)
         {
             img = img(roi);
         }
+        images.append(img);
+
 
         if (classes)
         {
