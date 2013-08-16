@@ -14,3 +14,4 @@ SUBDIRS += \
     appEvaluation \
     appMorphFaceModel \
     appKinectAcquire \
+    appHEF

@@ -37,6 +37,7 @@ public:
     void printStats();
     VectorOfPoints getNearestPoints(VectorOfPoints input);
     Mesh zLevelSelect(double zValue);
+    Mesh radiusSelect(double radius, cv::Point3d center = cv::Point3d(0,0,0));
 
     Mesh();
     Mesh(const Mesh &src);

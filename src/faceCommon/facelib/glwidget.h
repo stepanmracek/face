@@ -38,6 +38,7 @@ public:
     void addFace(Mesh *f) { faces << f; }
     void addLandmarks(Landmarks *landmarks) { this->landmarks << landmarks; }
     void addCurve(QVector<cv::Point3d> &curve) { curves << curve; }
+    void deleteAll();
 
 protected:
     void init();

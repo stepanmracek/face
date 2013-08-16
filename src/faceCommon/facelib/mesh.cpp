@@ -778,7 +778,6 @@ VectorOfPoints Mesh::getNearestPoints(VectorOfPoints input)
 
 Mesh Mesh::zLevelSelect(double zValue)
 {
-    qDebug() << "Mesh::zLevelSelect";
     Mesh result;
     for (int i = 0; i < points.count(); i++)
     {
@@ -797,6 +796,29 @@ Mesh Mesh::zLevelSelect(double zValue)
     }
     result.recalculateMinMax();
     result.calculateTriangles();
-    qDebug() << points.count() << result.points.count();
+    return result;
+}
+
+Mesh Mesh::radiusSelect(double radius, cv::Point3d center)
+{
+
+    Mesh result;
+    for (int i = 0; i < points.count(); i++)
+    {
+        if (euclideanDistance(points[i], center) < radius)
+        {
+            result.points << points[i];
+            if (colors.count() > 0)
+            {
+                result.colors << colors[i];
+            }
+            if (normals.count() > 0)
+            {
+                result.normals << normals[i];
+            }
+        }
+    }
+    result.recalculateMinMax();
+    result.calculateTriangles();
     return result;
 }

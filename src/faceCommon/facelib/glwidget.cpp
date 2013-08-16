@@ -16,6 +16,19 @@ void GLWidget::init()
     //startTimer(100);
 }
 
+void GLWidget::deleteAll()
+{
+    for (int i = 0; i < faces.count(); i++)
+        delete faces[i];
+    faces.clear();
+
+    for (int i = 0; i < landmarks.count(); i++)
+        delete landmarks[i];
+    landmarks.clear();
+
+    curves.clear();
+}
+
 GLWidget::~GLWidget()
 {
 }
