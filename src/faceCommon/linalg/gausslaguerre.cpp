@@ -10,24 +10,10 @@ GaussLaguerre::GaussLaguerre(int size)
             Matrix re = Matrix::zeros(size, size);
             Matrix im = Matrix::zeros(size, size);
 
-            for (int y = 0; y < size; y++)
-            {
-                double realY = size/2 - y;
-                for (int x = 0; x < size; x++)
-                {
-                    double realX = size/2 - x;
-                    double r = sqrt(realX*realX + realY*realY)/(size/4);
-                    double theta = atan2(realY, realX);
-
-                    re(y, x) = h(r, theta, n, k, j) * cos(n * theta);
-                    im(y, x) = h(r, theta, n, k, j) * sin(n * theta);
-                }
-            }
+            createWavelet(re, im, n, k, j);
 
             realKernels << re;
             imagKernels << im;
-            //Common::printMatrix(re);
-            //Common::printMatrix(im);
         }
     }
 }
@@ -43,6 +29,29 @@ unsigned int factorial(unsigned int n)
 double over(double n, double k)
 {
     return ((double)factorial(n))/(factorial(k) * factorial(n-k));
+}
+
+void GaussLaguerre::createWavelet(Matrix &real, Matrix &imag, int n, int k, int j)
+{
+    int size = real.rows;
+    assert(size > 0);
+    assert(size == real.cols);
+    assert(size == imag.rows);
+    assert(size == imag.cols);
+
+    for (int y = 0; y < size; y++)
+    {
+        double realY = size/2 - y;
+        for (int x = 0; x < size; x++)
+        {
+            double realX = size/2 - x;
+            double r = sqrt(realX*realX + realY*realY)/(size/4);
+            double theta = atan2(realY, realX);
+
+            real(y, x) = h(r, theta, n, k, j) * cos(n * theta);
+            imag(y, x) = h(r, theta, n, k, j) * sin(n * theta);
+        }
+    }
 }
 
 double GaussLaguerre::L(double r, int n, int k)

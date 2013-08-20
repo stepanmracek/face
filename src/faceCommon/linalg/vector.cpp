@@ -12,6 +12,14 @@ Vector::Vector(int size) : Matrix(size, 1)
     }
 }
 
+Vector::Vector(int size, double values) : Matrix(size, 1)
+{
+    for(int i = 0; i < size; i++)
+    {
+        (*this)(i) = values;
+    }
+}
+
 Vector::Vector(const Matrix &m) : Matrix(m.rows, 1)
 {
     assert(m.cols == 1);

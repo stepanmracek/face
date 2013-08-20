@@ -33,7 +33,7 @@ public:
 
     Vector whiten(const Vector &vector) const;
 
-    QVector<Vector> whiten(const QVector<Vector> &vectors);
+    QVector<Vector> whiten(const QVector<Vector> &vectors) const;
 
     Vector backProject(const Vector &vector);
 

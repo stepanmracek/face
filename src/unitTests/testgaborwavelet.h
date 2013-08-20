@@ -28,7 +28,7 @@ Matrix responseReal;
 Matrix responseImag;
 Matrix responseAbs;
 
-void redraw(GaborParams *gParams)
+void gaborRedraw(GaborParams *gParams)
 {
     qDebug() << "redraw, size:" << gParams->size
              << "frequency:" << gParams->frequency
@@ -64,25 +64,25 @@ void redraw(GaborParams *gParams)
     cv::imshow("response abs", (responseAbs-min)/(max-min));
 }
 
-void onSizeChange(int newVal, void *p)
+void gaborOnSizeChange(int newVal, void *p)
 {
     GaborParams *gparams = (GaborParams*)p;
     gparams->size = newVal+1;
-    redraw(gparams);
+    gaborRedraw(gparams);
 }
 
-void onFrequencyChange(int newVal, void *p)
+void gaborOnFrequencyChange(int newVal, void *p)
 {
     GaborParams *gparams = (GaborParams*)p;
     gparams->frequency = newVal;
-    redraw(gparams);
+    gaborRedraw(gparams);
 }
 
-void onOrientationChange(int newVal, void *p)
+void gaborOnOrientationChange(int newVal, void *p)
 {
     GaborParams *gparams = (GaborParams*)p;
     gparams->orientation = newVal;
-    redraw(gparams);
+    gaborRedraw(gparams);
 }
 
 class TestGaborWavelet
@@ -92,14 +92,14 @@ public:
     {
         GaborParams gParams(100);
         cv::namedWindow("input image");
-        cv::createTrackbar("size", "input image", &gParams.size, 200, onSizeChange, &gParams);
-        cv::createTrackbar("frequency", "input image", &gParams.frequency, 10, onFrequencyChange, &gParams);
-        cv::createTrackbar("orientation", "input image", &gParams.orientation, 8, onOrientationChange, &gParams);
+        cv::createTrackbar("size", "input image", &gParams.size, 200, gaborOnSizeChange, &gParams);
+        cv::createTrackbar("frequency", "input image", &gParams.frequency, 10, gaborOnFrequencyChange, &gParams);
+        cv::createTrackbar("orientation", "input image", &gParams.orientation, 8, gaborOnOrientationChange, &gParams);
 
         inputImage = MatrixConverter::imageToMatrix("/mnt/data/frgc/spring2004/zbin-aligned/index2/02463d652.png");
         cv::resize(inputImage, inputImage, cv::Size(inputImage.cols/2, inputImage.rows/2));
         cv::imshow("input image", inputImage);
-        redraw(&gParams);
+        gaborRedraw(&gParams);
 
         cv::waitKey(0);
     }

@@ -22,6 +22,8 @@ void ScoreLevelFusionBase::learn()
     int componentsCount = components.count();
     assert(componentsCount > 1);
 
+    impostorMeans.clear();
+    genuineMeans.clear();
     learnImplementation();
 	learned = true;
 }
@@ -103,8 +105,6 @@ void ScoreLevelFusionBase::prepareDataForClassification(QVector<Vector> &scores,
 {
     scores.clear();
     classes.clear();
-    impostorMeans.clear();
-    genuineMeans.clear();
 
     int unitsCount = components.count();
     assert(unitsCount >= 2);
@@ -228,6 +228,7 @@ void ScoreWeightedSumFusion::learnImplementation()
     int unitsCount = components.count();
     assert(unitsCount >= 2);
 
+    eer.clear();
     weightDenominator = 0.0;
     for (int unit = 0; unit < unitsCount; unit++)
     {
@@ -239,7 +240,7 @@ void ScoreWeightedSumFusion::learnImplementation()
         genuineMeans << meanGenuine;
         impostorMeans << meanImpostor;
         eer << components[unit].eer;
-        weightDenominator += (1 - components[unit].eer);
+        weightDenominator += (0.5 - components[unit].eer);
     }
 }
 
@@ -249,7 +250,7 @@ double ScoreWeightedSumFusion::fuse(QVector<double> &scores)
     double result = 0.0;
     for (int i = 0; i < scores.count(); i++)
     {
-        double w = (1-eer[i]) / weightDenominator;
+        double w = (0.5-eer[i]) / weightDenominator;
         double s = (scores[i]-genuineMeans[i])/(impostorMeans[i]-genuineMeans[i]);
         result += w*s;
     }

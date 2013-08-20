@@ -20,6 +20,8 @@ public:
 
     Vector(int size);
 
+    Vector(int size, double values);
+
     Vector(const Matrix &m);
 
     Vector(const cv::MatExpr &expr);

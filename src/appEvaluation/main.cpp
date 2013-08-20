@@ -43,9 +43,15 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::evaluateHistogramFeatures();
     //Evaluate3dFrgc::evaluateMaps();
 
+    // Gabor
     //Evaluate3dFrgc::evaluateGaborFilterBanks();
     //Evaluate3dFrgc::trainGaborFusion();
-    //Evaluate3dFrgc::evaluateGaborFusion();
+
+    // Gauss-Laguerre
+    //Evaluate3dFrgc::trainGaussLaguerreFusion();
+
+    // Fusion
+    //Evaluate3dFrgc::evaluateFilterBankFusion();
     Evaluate3dFrgc::evaluateFusion();
 
     //Evaluate3dFrgc::evaluateDirect();

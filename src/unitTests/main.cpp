@@ -22,6 +22,7 @@
 #include "testhistogramfeatures.h"
 #include "testdistance.h"
 #include "testlogisticregression.h"
+#include "testlaguerrewavelet.h"
 
 #include <QString>
 
@@ -68,7 +69,8 @@ int main(int argc, char *argv[])
 
     //TestSVM::testSVM();
 
-    TestGaborWavelet::test();
+    //TestGaborWavelet::test();
+    TestLaguerreWavelet::test();
 
 	//Annotation a("/home/stepo/SVN/disp-stepan-mracek/test/testASM");
 	//TestTextureWarper::test();

@@ -6,7 +6,7 @@
 
 QT       += core gui widgets opengl
 
-TARGET = appMorphFaceModel
+TARGET = appHEF
 TEMPLATE = app
 
 INCLUDEPATH += "../faceCommon"

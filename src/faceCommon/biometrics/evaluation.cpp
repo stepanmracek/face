@@ -220,8 +220,6 @@ void Evaluation::commonTemplatesEvaluation(const QVector<Template> &templates, c
         }
     }
 
-    //assert(maxDifferentDistance > maxSameDistance); // FIXME: not sure
-    //assert(minSameDistance < minDifferentDistance); // FIXME: not sure
     if (debugOutput)
     {
         qDebug() << "  same distance range:" << minSameDistance << maxSameDistance;

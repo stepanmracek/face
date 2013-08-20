@@ -45,7 +45,7 @@ Vector ICAofPCA::whiten(const Vector &vector) const
     return result;
 }
 
-QVector<Vector> ICAofPCA::whiten(const QVector<Vector> &vectors)
+QVector<Vector> ICAofPCA::whiten(const QVector<Vector> &vectors) const
 {
     QVector<Vector> result;
     for (int i = 0; i < vectors.count(); i++)

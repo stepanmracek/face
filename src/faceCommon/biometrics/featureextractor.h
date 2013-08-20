@@ -39,7 +39,7 @@ private:
     PCA pca;
 
 public:
-    PCAExtractor(PCA pca) : pca(pca) {}
+    PCAExtractor(const PCA &pca) : pca(pca) {}
 
     Vector extract(const Vector &rawData) const
     {
@@ -59,9 +59,8 @@ public:
 
     ZScorePCAExtractor() {}
 
-    ZScorePCAExtractor(PCA pca, const QVector<Vector> &rawData )
+    ZScorePCAExtractor(const PCA &pca, const QVector<Vector> &rawData ) : pca(pca)
     {
-        this->pca = pca;
         QVector<Vector> projectedData = pca.batchProject(rawData);
         normParams = Normalization::zScoreNormalization(projectedData);
     }
@@ -88,7 +87,7 @@ private:
     PCA pca;
 
 public:
-    NormPCAExtractor(PCA pca) : pca(pca) {}
+    NormPCAExtractor(const PCA &pca) : pca(pca) {}
 
     Vector extract(const Vector &rawData) const
     {
@@ -106,7 +105,7 @@ private:
     ICAofPCA icaOfpca;
 
 public:
-    ICAofPCAExtractor(ICAofPCA icaOfpca) : icaOfpca(icaOfpca) {}
+    ICAofPCAExtractor(const ICAofPCA &icaOfpca) : icaOfpca(icaOfpca) {}
 
     Vector extract(const Vector &rawData) const
     {
@@ -125,7 +124,7 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
-    ZScoreICAofPCAExtractor(ICAofPCA icaOfpca, const QVector<Vector> &rawData )
+    ZScoreICAofPCAExtractor(const ICAofPCA &icaOfpca, const QVector<Vector> &rawData )
     {
         this->icaOfpca = icaOfpca;
         QVector<Vector> projectedData = icaOfpca.batchProject(rawData);
@@ -150,7 +149,7 @@ private:
     ICAofPCA icaOfpca;
 
 public:
-    ICAofPCAWhiteningExtractor(ICAofPCA icaOfpca) : icaOfpca(icaOfpca) {}
+    ICAofPCAWhiteningExtractor(const ICAofPCA &icaOfpca) : icaOfpca(icaOfpca) {}
 
     Vector extract(const Vector &rawData) const
     {
@@ -170,7 +169,7 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
-    ZScoreICAofPCAWhiteningExtractor(ICAofPCA icaOfpca, const QVector<Vector> &rawData )
+    ZScoreICAofPCAWhiteningExtractor(const ICAofPCA &icaOfpca, const QVector<Vector> &rawData )
     {
         this->icaOfpca = icaOfpca;
         QVector<Vector> projectedData = icaOfpca.whiten(rawData);
@@ -195,7 +194,7 @@ private:
     LDAofPCA ldaOfpca;
 
 public:
-    LDAofPCAExtractor(LDAofPCA ldaOfpca) : ldaOfpca(ldaOfpca) {}
+    LDAofPCAExtractor(const LDAofPCA &ldaOfpca) : ldaOfpca(ldaOfpca) {}
 
     Vector extract(const Vector &rawData) const
     {
@@ -214,7 +213,7 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
-    ZScoreLDAofPCAExtractor(LDAofPCA ldaOfpca, const QVector<Vector> &rawData )
+    ZScoreLDAofPCAExtractor(const LDAofPCA &ldaOfpca, const QVector<Vector> &rawData )
     {
         this->ldaOfpca = ldaOfpca;
         QVector<Vector> projectedData = ldaOfpca.batchProject(rawData);
@@ -239,7 +238,7 @@ private:
     LDA lda;
 
 public:
-    LDAExtractor(LDA lda) : lda(lda) {}
+    LDAExtractor(const LDA &lda) : lda(lda) {}
 
     Vector extract(const Vector &rawData) const
     {
@@ -258,7 +257,7 @@ private:
     ZScoreNormalizationResult normParams;
 
 public:
-    ZScoreLDAExtractor(LDA lda, const QVector<Vector> &rawData )
+    ZScoreLDAExtractor(const LDA &lda, const QVector<Vector> &rawData )
     {
         this->lda = lda;
         QVector<Vector> projectedData = lda.batchProject(rawData);

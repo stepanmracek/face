@@ -33,6 +33,7 @@
 #include "linalg/gausslaguerre.h"
 #include "linalg/gabor.h"
 #include "biometrics/scorelevelfusionwrapper.h"
+#include "biometrics/zpcacorrw.h"
 
 class Evaluate3dFrgc
 {
@@ -361,30 +362,25 @@ public:
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
         double threshold = 0.995;
         cv::Rect roi(50, 40, 100, 90);
-        CorrelationMetric metric;
 
         QVector<Vector> vectors;
         QVector<int> classes;
         Loader::loadImages(srcDirPath, vectors, &classes, "*.png", "d", -1, roi);
 
+        qDebug() << "dividing";
         QList<QVector<Vector> > vectorsInClusters;
         QList<QVector<int> > classesInClusters;
         BioDataProcessing::divideToNClusters(vectors, classes, 5, vectorsInClusters, classesInClusters);
 
-        PCA pca(vectorsInClusters[0]);
-        pca.modesSelectionThreshold(threshold);
-        ZScorePCAExtractor extractor(pca, vectorsInClusters[1]);
-        extractor.serialize("../../test/frgc/texture/pca.yml", "../../test/frgc/texture/normparams.yml");
+        qDebug() << "extractor and metric";
+        ZPCACorrW extractorAndMetric(vectorsInClusters[0], threshold, vectorsInClusters[0]);//, classesInClusters[1], vectorsInClusters[1], 0.0, 0.5, 0.05);
 
-        //qDebug() << Evaluation(vectorsInClusters[1], classesInClusters[1], extractor, metric).eer;
-        BatchEvaluationResult batchEval = Evaluation::batch(vectorsInClusters, classesInClusters, extractor, metric, 2);
+        qDebug() << "evaluation";
+        BatchEvaluationResult batchEval = Evaluation::batch(vectorsInClusters, classesInClusters, extractorAndMetric.extractor, extractorAndMetric.metric);
         foreach(const Evaluation &eval, batchEval.results)
         {
             qDebug() << eval.eer;
         }
-
-        //eval.outputResultsGenuineScores("texture-genuine-scores");
-        //eval.outputResultsImpostorScores("texture-impostor-scores");
     }
 
     static void evaluateMaps()
@@ -515,40 +511,7 @@ public:
             }
 
             Serialization::serializeVectorOfPointclouds(curves, outDirPath + srcFileInfo.baseName() + ".xml");
-
-            /*int argc;
-            char **argv;
-            QApplication app(argc, argv);
-            GLWidget w;
-            w.addFace(&mesh);
-            foreach (VectorOfPoints v, curves)
-            {
-                w.addCurve(v);
-            }
-            w.show();
-            return app.exec();*/
-
-            //maps << depth;
-            //if (maps.count() == 847) break;
         }
-
-        /*Map mean(120, 90);
-        mean.setAll(0);
-        foreach(const Map &m, maps)
-        {
-            mean.add(m);
-            //cv::imshow("mean", mean.toMatrix());
-            //cv::waitKey();
-        }
-        mean.linearTransform(1.0/maps.count(), 0);
-        int count = 0;
-        for (int i = 0; i < mean.w*mean.h; i++)
-        {
-            if (mean.flags[i]) count++;
-        }
-        qDebug() << count;
-        cv::imshow("mean", mean.toMatrix());
-        cv::waitKey();*/
     }
 
     static void evaluateCurves()
@@ -582,107 +545,131 @@ public:
         }
     }
 
-    enum sourceEnum { index, mean, depth, gauss, eigencur };
-    static void fillKernels(QVector<Matrix> &realWavelets, QVector<Matrix> &imagWavelets, const QString &source)
+    static void addFilterKernels(QVector<Matrix> &realWavelets, QVector<Matrix> &imagWavelets, const QString &source, bool gabor)
     {
         int kSize = 200;
-        realWavelets.clear(); imagWavelets.clear();
 
-        QVector<int> freqs; QVector<int> ornts;
+        QVector<int> p1; QVector<int> p2;
 
         // Index
         if (source.compare("index") == 0)
         {
-            // no ROI
-            //freqs << 5 << 4 << 5 << 5 << 6 << 6 << 4;
-            //ornts << 2 << 6 << 4 << 8 << 1 << 4 << 1;
-
-            // with ROI
-            freqs << 0 << 5 << 5 << 6 << 5 << 6 << 6 << 5 << 4;
-            ornts << 0 << 2 << 3 << 7 << 8 << 6 << 2 << 1 << 7;
+            if (gabor)
+            {
+                p1 << 5 << 5 << 6 << 6 << 4 << 5 << 6 << 5 << 4 << 6 << 4;
+                p2 << 8 << 2 << 4 << 1 << 3 << 5 << 3 << 4 << 8 << 2 << 1;
+            }
+            else
+            {
+                p1 << 75 << 0 << 75 << 75 << 100;
+                p2 <<  2 << 0 <<  3 <<  5 <<   1;
+            }
         }
 
         // Mean
         else if (source.compare("mean") == 0)
         {
-            // no ROI
-            //freqs << 4 << 6 << 5 << 5 << 6 << 5 << 5 << 6 << 4 << 5;
-            //ornts << 7 << 4 << 8 << 3 << 3 << 1 << 2 << 6 << 4 << 4;
-
-            // with ROI
-            freqs << 5 << 5 << 6 << 6 << 6 << 5 << 6 << 4 << 4 << 0 << 5;
-            ornts << 8 << 2 << 3 << 6 << 8 << 4 << 4 << 8 << 7 << 0 << 6;
+            if (gabor)
+            {
+                p1 << 5 << 6 << 6 << 6 << 4 << 6 << 6 << 5;
+                p2 << 8 << 3 << 8 << 4 << 2 << 6 << 7 << 1;
+            }
+            else
+            {
+                //p1 << 75 << 75 << 50 << 100 << 50 << 75;
+                //p2 <<  2 <<  3 <<  1 <<   1 <<  4 <<  1;
+            }
         }
 
         // Depth
         else if (source.compare("depth") == 0)
         {
-            // no ROI
-            //freqs << 5 << 6 << 5 << 0 << 5 << 6 << 6 << 4;
-            //ornts << 1 << 3 << 6 << 0 << 3 << 2 << 4 << 6;
-
-            // with RO
-            freqs << 0 << 5 << 6 << 5;
-            ornts << 0 << 8 << 2 << 2;
+            if (gabor)
+            {
+                p1 << 6 << 6 << 6 << 5;
+                p2 << 8 << 3 << 6 << 1;
+            }
+            else
+            {
+                //p1 << 0 << 50 << 75 << 100 << 75 << 75;
+                //p2 << 0 <<  2 <<  3 <<   2 <<  5 <<  1;
+            }
         }
 
         // Gauss
         else if (source.compare("gauss") == 0)
         {
-            // no ROI
-            //freqs << 5 << 6 << 5 << 5 << 4 << 4;
-            //ornts << 7 << 1 << 1 << 6 << 5 << 1;
-
-            // with ROI
-            freqs << 4 << 4 << 6 << 4 << 6 << 5 << 5 << 6 << 4;
-            ornts << 8 << 2 << 2 << 4 << 5 << 7 << 2 << 6 << 5;
+            if (gabor)
+            {
+                p1 << 5 << 4 << 6 << 4 << 4 << 5 << 4;
+                p2 << 7 << 4 << 3 << 1 << 5 << 2 << 2;
+            }
+            else
+            {
+                //p1 << 50 << 100 << 75 << 25 << 75 << 50;
+                //p2 <<  1 <<   1 <<  4 <<  3 <<  3 <<  2;
+            }
         }
 
         // Eigencur
         else if (source.compare("eigencur") == 0)
         {
-            // no ROI
-            //freqs << 4 << 4 << 5 << 4 << 6 << 6 << 5;
-            //ornts << 8 << 3 << 3 << 6 << 4 << 7 << 5;
-
-            // with ROI
-            freqs << 4 << 5 << 4 << 6 << 4 << 4 << 5 << 4;
-            ornts << 7 << 2 << 3 << 6 << 6 << 1 << 8 << 4;
+            if (gabor)
+            {
+                p1 << 4 << 5 << 5 << 4 << 6 << 4 << 5;
+                p2 << 8 << 3 << 7 << 1 << 6 << 4 << 8;
+            }
+            else
+            {
+                //p1 << 50 << 75 << 25 << 100;
+                //p2 <<  2 <<  5 <<  4 <<   2;
+            }
         }
 
-        for (int i = 0; i < freqs.count(); i++)
+        for (int i = 0; i < p1.count(); i++)
         {
-            if (freqs[i] == 0 && ornts[i] == 0)
+            if (p1[i] == 0 && p2[i] == 0)
             {
                 realWavelets << Matrix(0, 0);
                 imagWavelets << Matrix(0, 0);
             }
             else
             {
-                realWavelets << Matrix(kSize, kSize);
-                imagWavelets << Matrix(kSize, kSize);
-                Gabor::createWavelet(realWavelets[i], imagWavelets[i], freqs[i], ornts[i]);
+                if (gabor)
+                {
+                    realWavelets << Matrix(kSize, kSize);
+                    imagWavelets << Matrix(kSize, kSize);
+                    Gabor::createWavelet(realWavelets[i], imagWavelets[i], p1[i], p2[i]);
+                }
+                else
+                {
+                    realWavelets << Matrix(p1[i], p1[i]);
+                    imagWavelets << Matrix(p1[i], p1[i]);
+                    GaussLaguerre::createWavelet(realWavelets[i], imagWavelets[i], p2[i], 0, 0);
+                }
             }
         }
     }
 
-    static void evaluateGaborFusion()
+    static void evaluateFilterBankFusion()
     {
         QString source = "index";
+        bool isGabor = false;
+
         // Declare variables
         QString path = "/home/stepo/data/frgc/spring2004/zbin-aligned/" + source;
         cv::Rect roi(25, 15, 100, 90);
+        double pcaThreshold = 0.995;
         int clusters = 5;
 
         // Create kernels
         QVector<Matrix> realWavelets;
         QVector<Matrix> imagWavelets;
-        fillKernels(realWavelets, imagWavelets, source);
+        addFilterKernels(realWavelets, imagWavelets, source, isGabor);
 
-        CorrelationMetric metric;
-        ScoreSVMFusion fusion;
+        ScoreWeightedSumFusion fusion;
 
-        QVector<QList<Evaluation> > testData(clusters - 1); // [cluster][method]
+        QVector<QList<Evaluation> > testData(clusters); // [cluster][method]
         // Load and process images
         {
             QVector<Matrix> images;
@@ -695,25 +682,21 @@ public:
                 foreach(const Matrix &img, images)
                 {
                     if (realWavelets[i].rows == 0)
-                    {
                         rawVectors << MatrixConverter::matrixToColumnVector(img);
-                    }
                     else
-                    {
-                        rawVectors << MatrixConverter::matrixToColumnVector(Gabor::absResponse(img, realWavelets[i], imagWavelets[i]));
-                    }
+                        rawVectors << MatrixConverter::matrixToColumnVector(FilterBank::absResponse(img, realWavelets[i], imagWavelets[i]));
                 }
 
                 QList<QVector<Vector> > vectorsInClusters;
                 QList<QVector<int> > classesInClusters;
                 BioDataProcessing::divideToNClusters(rawVectors, classes, 5, vectorsInClusters, classesInClusters);
-                PCA pca(vectorsInClusters[0]);
-                ZScorePCAExtractor extractor(pca, vectorsInClusters[0]);
-                fusion.addComponent(Evaluation(vectorsInClusters[1], classesInClusters[1], extractor, metric));
 
-                for (int c = 0; c < clusters-1; c++)
+                ZPCACorrW pcaCor(vectorsInClusters[0], pcaThreshold, vectorsInClusters[0]);
+                fusion.addComponent(Evaluation(vectorsInClusters[1], classesInClusters[1], pcaCor.extractor, pcaCor.metric));
+
+                for (int c = 1; c < clusters; c++)
                 {
-                    testData[c] << Evaluation(vectorsInClusters[c+1], classesInClusters[c+1], extractor, metric);
+                    testData[c] << Evaluation(vectorsInClusters[c], classesInClusters[c], pcaCor.extractor, pcaCor.metric);
                 }
             }
         }
@@ -723,19 +706,20 @@ public:
         fusion.learn();
 
         // evaluate
-        for (int c = 0; c < clusters - 1; c++)
+        for (int c = 1; c < clusters; c++)
         {
             Evaluation result = fusion.evaluate(testData[c]);
-            result.outputResults("gabor-" + source + "-" + QString::number(c), 50);
+            result.outputResults((isGabor ? QString("gabor") : QString("gl")) + "-" + source + "-" + QString::number(c-1), 50);
             qDebug() << result.eer;
         }
     }
 
     static void trainGaborFusion()
     {
-        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/index";
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/eigencur";
         cv::Rect roi(25, 15, 100, 90);
         int kSize = 200;
+        double pcaThreshold = 0.995;
         QVector<Matrix> srcImages;
         QVector<int> classes;
         Loader::loadImages(srcDirPath, srcImages, &classes, "*.png", "d", 866, roi);
@@ -752,42 +736,49 @@ public:
         foreach(const Matrix &srcImg, srcImagesInClusters[1])
             testVectors << MatrixConverter::matrixToColumnVector(srcImg);
 
-        PCA pca(trainVectors);
-        pca.modesSelectionThreshold();
-        ZScorePCAExtractor extractor(pca, trainVectors);
-        Templates testTempates = Template::createTemplates(testVectors, classesInClusters[1], extractor);
-        components << Evaluation(testTempates, CorrelationMetric());
+        ZPCACorrW pcaCor(trainVectors, pcaThreshold, trainVectors);
+        components << Evaluation(testVectors, classesInClusters[1], pcaCor.extractor, pcaCor.metric);
 
         Matrix realWavelet(kSize, kSize);
         Matrix imagWavelet(kSize, kSize);
 
+        QMap<int, int> freqs; freqs[0] = 0;
+        QMap<int, int> ornts; ornts[0] = 0;
         int index = 1;
         for (int freq = 4; freq <= 6; freq++)
         {
             for (int orientation = 1; orientation <= 8; orientation++)
             {
-                qDebug() << index++ << freq << orientation;
+                qDebug() << index << freq << orientation;
+                freqs[index] = freq;
+                ornts[index] = orientation;
+                index++;
                 Gabor::createWavelet(realWavelet, imagWavelet, freq, orientation);
 
                 QVector<Vector> trainVectors;
                 foreach(const Matrix &srcImg, srcImagesInClusters[0])
-                {
                     trainVectors << MatrixConverter::matrixToColumnVector(Gabor::absResponse(srcImg, realWavelet, imagWavelet));
-                }
-                PCA pca(trainVectors);
-                ZScorePCAExtractor extractor(pca, trainVectors);
+
+                ZPCACorrW pcaCor(trainVectors, pcaThreshold, trainVectors);
 
                 QVector<Vector> vectors;
                 foreach(const Matrix &srcImg, srcImagesInClusters[1])
-                {
                     vectors << MatrixConverter::matrixToColumnVector(Gabor::absResponse(srcImg, realWavelet, imagWavelet));
-                }
-                components << Evaluation(vectors, classesInClusters[1], extractor, CorrelationMetric());
+
+                components << Evaluation(vectors, classesInClusters[1], pcaCor.extractor, pcaCor.metric);
             }
         }
 
-        ScoreSVMFusion fusion;
-        ScoreLevelFusionWrapper::trainClassifier(fusion, components);
+        ScoreWeightedSumFusion fusion;
+        QVector<int> keys = ScoreLevelFusionWrapper::trainClassifier(fusion, components);
+        QString fString, oString;
+        foreach (int k, keys)
+        {
+            fString += " << " + QString::number(freqs[k]);
+            oString += " << " + QString::number(ornts[k]);
+        }
+        qDebug() << fString;
+        qDebug() << oString;
     }
 
     static void evaluateGaborFilterBanks()
@@ -831,11 +822,78 @@ public:
         }
     }
 
+    static void trainGaussLaguerreFusion()
+    {
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/index";
+        double pcaSelThreshold = 0.995;
+        cv::Rect roi(25, 15, 100, 90);
+        QVector<Matrix> srcImages;
+        QVector<int> classes;
+        Loader::loadImages(srcDirPath, srcImages, &classes, "*.png", "d", 866, roi);
+
+        QList<QVector<Matrix> > srcImagesInClusters;
+        QList<QVector<int> > classesInClusters;
+        BioDataProcessing::divideToNClusters(srcImages, classes, 2, srcImagesInClusters, classesInClusters);
+
+        QList<Evaluation> components;
+        QVector<Vector> trainVectors;
+        foreach(const Matrix &srcImg, srcImagesInClusters[0])
+            trainVectors << MatrixConverter::matrixToColumnVector(srcImg);
+        QVector<Vector> testVectors;
+        foreach(const Matrix &srcImg, srcImagesInClusters[1])
+            testVectors << MatrixConverter::matrixToColumnVector(srcImg);
+
+        ZPCACorrW pcaCor(trainVectors, pcaSelThreshold, trainVectors);
+        components << Evaluation(testVectors, classesInClusters[1], pcaCor.extractor, pcaCor.metric);
+
+        QMap<int, int> sizes; sizes[0] = 0;
+        QMap<int, int> ns; ns[0] = 0;
+
+        int k = 0;
+        int j = 0;
+        int index = 1;
+        for (int kSize = 25; kSize <= 100; kSize += 25)
+        {
+            for (int n = 1; n <= 5; n++)
+            {
+                qDebug() << index << kSize << n;
+                sizes[index] = kSize;
+                ns[index] = n;
+                index++;
+
+                Matrix realWavelet(kSize, kSize);
+                Matrix imagWavelet(kSize, kSize);
+                GaussLaguerre::createWavelet(realWavelet, imagWavelet, n, k, j);
+
+                QVector<Vector> trainVectors;
+                foreach(const Matrix &srcImg, srcImagesInClusters[0])
+                    trainVectors << MatrixConverter::matrixToColumnVector(GaussLaguerre::absResponse(srcImg, realWavelet, imagWavelet));
+                ZPCACorrW pcaCor(trainVectors, pcaSelThreshold, trainVectors);
+
+                QVector<Vector> testVectors;
+                foreach(const Matrix &srcImg, srcImagesInClusters[1])
+                    testVectors << MatrixConverter::matrixToColumnVector(GaussLaguerre::absResponse(srcImg, realWavelet, imagWavelet));
+                components << Evaluation(testVectors, classesInClusters[1], pcaCor.extractor, pcaCor.metric);
+            }
+        }
+
+        ScoreWeightedSumFusion fusion;
+        QVector<int> keys = ScoreLevelFusionWrapper::trainClassifier(fusion, components);
+        QString sString, nString;
+        foreach (int k, keys)
+        {
+            sString += " << " + QString::number(sizes[k]);
+            nString += " << " + QString::number(ns[k]);
+        }
+        qDebug() << sString;
+        qDebug() << nString;
+    }
+
     static void evaluateFusion()
     {
         QString dir = "/home/stepo/git/face/test/frgc/filterBanks/";
         QStringList units;
-        units << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur" << "gabor-depth" << "isocurves";
+        units << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur" << "gabor-depth" << "isocurves" << "gl-index";
         ScoreSVMFusion fusion;
 
         QList<Evaluation> trainComponents;
@@ -861,6 +919,8 @@ public:
 
             Evaluation eval = fusion.evaluate(testEvals);
             qDebug() << eval.eer << eval.fnmrAtFmr(0.01) << eval.fnmrAtFmr(0.001) << eval.fnmrAtFmr(0.0001);
+
+            eval.outputResultsDET(QString::number(i));
         }
     }
 

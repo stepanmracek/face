@@ -58,7 +58,8 @@ SOURCES += \
     biometrics/histogramfeatures.cpp \
     linalg/adaboost.cpp \
     biometrics/system.cpp \
-    biometrics/scorelevelfusionwrapper.cpp
+    biometrics/scorelevelfusionwrapper.cpp \
+    biometrics/zpcacorrw.cpp
 
 HEADERS += \
     kinect/kinnect.h \
@@ -125,7 +126,8 @@ HEADERS += \
     biometrics/histogramfeatures.h \
     linalg/adaboost.h \
     biometrics/system.h \
-    biometrics/scorelevelfusionwrapper.h
+    biometrics/scorelevelfusionwrapper.h \
+    biometrics/zpcacorrw.h
 
 FORMS += \
     facelib/morphable3dfacemodelwidget.ui \
