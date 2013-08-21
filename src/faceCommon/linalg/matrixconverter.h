@@ -27,6 +27,19 @@ public:
         return out;
     }
 
+    static ImageGrayscale DoubleMatrixToGrayscaleImage(const Matrix &in)
+    {
+        ImageGrayscale out(in.rows, in.cols);
+        for (int r = 0; r < in.rows; r++)
+        {
+            for (int c = 0; c < in.cols; c++)
+            {
+                out(r, c) = cv::saturate_cast<double>(in(r, c)*255.0);
+            }
+        }
+        return out;
+    }
+
     static Vector matrixToColumnVector(const Matrix &in)
     {
         Vector out(in.rows * in.cols);
