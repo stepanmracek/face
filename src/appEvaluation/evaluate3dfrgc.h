@@ -576,8 +576,8 @@ public:
             }
             else
             {
-                //p1 << 75 << 75 << 50 << 100 << 50 << 75;
-                //p2 <<  2 <<  3 <<  1 <<   1 <<  4 <<  1;
+                p1 << 75 << 100 << 50 << 100 << 25 << 75 << 75 << 0;
+                p2 <<  3 <<   2 <<  2 <<   4 <<  5 <<  1 <<  5 << 0;
             }
         }
 
@@ -591,8 +591,8 @@ public:
             }
             else
             {
-                //p1 << 0 << 50 << 75 << 100 << 75 << 75;
-                //p2 << 0 <<  2 <<  3 <<   2 <<  5 <<  1;
+                p1 << 50 << 50 << 0 << 75 << 25 << 100;
+                p2 <<  1 <<  2 << 0 <<  3 <<  1 <<   4;
             }
         }
 
@@ -606,8 +606,8 @@ public:
             }
             else
             {
-                //p1 << 50 << 100 << 75 << 25 << 75 << 50;
-                //p2 <<  1 <<   1 <<  4 <<  3 <<  3 <<  2;
+                p1 << 50 << 75 << 100 << 75 << 25 << 50 << 100;
+                p2 <<  1 <<  1 <<   5 <<  5 <<  5 <<  2 <<   4;
             }
         }
 
@@ -621,8 +621,8 @@ public:
             }
             else
             {
-                //p1 << 50 << 75 << 25 << 100;
-                //p2 <<  2 <<  5 <<  4 <<   2;
+                p1 << 75 << 50 << 100 << 50 << 75 << 50 << 100 << 25 << 75 << 75;
+                p2 <<  4 <<  1 <<   5 << 3 <<   2 <<  4 <<   1 <<  5 <<  3 <<  1;
             }
         }
 
@@ -653,7 +653,7 @@ public:
 
     static void evaluateFilterBankFusion()
     {
-        QString source = "index";
+        QString source = "eigencur";
         bool isGabor = false;
 
         // Declare variables
@@ -824,7 +824,7 @@ public:
 
     static void trainGaussLaguerreFusion()
     {
-        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/index";
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/eigencur";
         double pcaSelThreshold = 0.995;
         cv::Rect roi(25, 15, 100, 90);
         QVector<Matrix> srcImages;
@@ -893,7 +893,10 @@ public:
     {
         QString dir = "/home/stepo/git/face/test/frgc/filterBanks/";
         QStringList units;
-        units << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur" << "gabor-depth" << "isocurves" << "gl-index";
+        units << "isocurves"
+              << "gl-index" << "gl-mean" << "gl-gauss" << "gl-eigencur" << "gl-depth"
+              << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur" << "gabor-depth";
+
         ScoreSVMFusion fusion;
 
         QList<Evaluation> trainComponents;
