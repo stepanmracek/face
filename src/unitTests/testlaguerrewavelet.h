@@ -97,8 +97,7 @@ public:
         cv::createTrackbar("k", "input image", &params.k, 5, laguerreOnKChange, &params);
         cv::createTrackbar("j", "input image", &params.j, 5, laguerreOnKChange, &params);
 
-        lagInputImage = MatrixConverter::imageToMatrix("/mnt/data/frgc/spring2004/zbin-aligned/index2/02463d652.png");
-        cv::resize(lagInputImage, lagInputImage, cv::Size(lagInputImage.cols/2, lagInputImage.rows/2));
+        lagInputImage = MatrixConverter::imageToMatrix("/mnt/data/frgc/spring2004/zbin-aligned/textureE/02463d652.png");
         cv::imshow("input image", lagInputImage);
         laguerreRedraw(&params);
 

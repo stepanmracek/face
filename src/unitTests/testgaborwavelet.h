@@ -96,8 +96,7 @@ public:
         cv::createTrackbar("frequency", "input image", &gParams.frequency, 10, gaborOnFrequencyChange, &gParams);
         cv::createTrackbar("orientation", "input image", &gParams.orientation, 8, gaborOnOrientationChange, &gParams);
 
-        inputImage = MatrixConverter::imageToMatrix("/mnt/data/frgc/spring2004/zbin-aligned/index2/02463d652.png");
-        cv::resize(inputImage, inputImage, cv::Size(inputImage.cols/2, inputImage.rows/2));
+        inputImage = MatrixConverter::imageToMatrix("/mnt/data/frgc/spring2004/zbin-aligned/textureE/02463d652.png");
         cv::imshow("input image", inputImage);
         gaborRedraw(&gParams);
 
