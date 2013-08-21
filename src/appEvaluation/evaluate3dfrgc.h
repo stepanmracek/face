@@ -173,6 +173,39 @@ public:
         }
     }
 
+    static void createTextures()
+    {
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
+        QDir srcDir(srcDirPath, "*.binz");
+        QFileInfoList srcFiles = srcDir.entryInfoList();
+        MapConverter converter;
+
+        QMap<SurfaceDataToProcess, QString> dests;
+        //dests[Texture_R] = "textureR";
+        //dests[Texture_G] = "textureG";
+        //dests[Texture_B] = "textureB";
+        dests[Texture_I] = "textureI";
+
+        foreach (const QFileInfo &srcFileInfo, srcFiles)
+        {
+            Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
+
+            foreach (SurfaceDataToProcess dataToProcess, dests.keys())
+            {
+                Map texture = SurfaceProcessor::depthmap(mesh, converter, cv::Point2d(-75, -75), cv::Point2d(75, 75), 1, dataToProcess);
+                Matrix matrix = texture.toMatrix(0, 0, 255);
+
+                ImageGrayscale image = MatrixConverter::DoubleMatrixToGrayscaleImage(matrix);
+                cv::equalizeHist(image, image);
+                QString out = srcDirPath + "textureE/" + srcFileInfo.baseName() + ".png";
+                cv::imwrite(out.toStdString(), image);
+
+                //QString out = srcDirPath + dests[dataToProcess] + "/" + srcFileInfo.baseName() + ".png";
+                //cv::imwrite(out.toStdString(), image*255);
+            }
+        }
+    }
+
     static int createMaps()
     {
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
@@ -181,18 +214,8 @@ public:
         MapConverter converter;
 
         Matrix smoothKernel2 = KernelGenerator::gaussianKernel(5);
-        //QVector<double> allZValues;
-        //bool first = true;
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
-            /*if (QFile::exists(srcDirPath + "mean/" + srcFileInfo.baseName() + ".png") &&
-                QFile::exists(srcDirPath + "gauss/" + srcFileInfo.baseName() + ".png") &&
-                QFile::exists(srcDirPath + "index/" + srcFileInfo.baseName() + ".png") &&
-                QFile::exists(srcDirPath + "eigencur/" + srcFileInfo.baseName() + ".png"))
-            {
-                continue;
-            }*/
-
             Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
             Map depthmap = SurfaceProcessor::depthmap(mesh, converter,
                                                       cv::Point2d(-75, -75),
@@ -230,13 +253,6 @@ public:
             out = srcDirPath + "eigencur/" + srcFileInfo.baseName() + ".png";
             cv::imwrite(out.toStdString(), pclImage*255);
         }
-
-        /*Histogram zValuesHistogram(allZValues, 20, false);
-        qDebug() << "mean" << zValuesHistogram.mean;
-        qDebug() << "stdDev" << zValuesHistogram.stdDev;
-        qDebug() << "min" << zValuesHistogram.minValue;
-        qDebug() << "max" << zValuesHistogram.maxValue;
-        Common::savePlot(zValuesHistogram.histogramValues, zValuesHistogram.histogramCounter, "zValuesHistogram");*/
     }
 
     static void evaluateHistogramFeaturesGenerateStripesBinsMap()
@@ -626,6 +642,20 @@ public:
             }
         }
 
+        else if (source.compare("textureE") == 0)
+        {
+            if (gabor)
+            {
+                p1 << 5 << 6 << 5 << 6 << 6 << 4;
+                p2 << 4 << 3 << 6 << 1 << 5 << 2;
+            }
+            else
+            {
+                p1 << 0 << 100 << 100 << 25 << 100 << 75;
+                p2 << 0 <<   3 <<   1 <<  5 <<   4 <<  5;
+            }
+        }
+
         for (int i = 0; i < p1.count(); i++)
         {
             if (p1[i] == 0 && p2[i] == 0)
@@ -653,7 +683,7 @@ public:
 
     static void evaluateFilterBankFusion()
     {
-        QString source = "eigencur";
+        QString source = "textureE";
         bool isGabor = false;
 
         // Declare variables
@@ -716,7 +746,7 @@ public:
 
     static void trainGaborFusion()
     {
-        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/eigencur";
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/textureE";
         cv::Rect roi(25, 15, 100, 90);
         int kSize = 200;
         double pcaThreshold = 0.995;
@@ -824,7 +854,7 @@ public:
 
     static void trainGaussLaguerreFusion()
     {
-        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/eigencur";
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/textureE";
         double pcaSelThreshold = 0.995;
         cv::Rect roi(25, 15, 100, 90);
         QVector<Matrix> srcImages;
@@ -889,15 +919,15 @@ public:
         qDebug() << nString;
     }
 
-    static void evaluateFusion()
+    static void evaluateFusionWrapper()
     {
         QString dir = "/home/stepo/git/face/test/frgc/filterBanks/";
         QStringList units;
         units << "isocurves"
-              << "gl-index" << "gl-mean" << "gl-gauss" << "gl-eigencur" << "gl-depth"
-              << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur" << "gabor-depth";
+              << "gl-index" << "gl-mean" << "gl-gauss" << "gl-eigencur" << "gl-depth" << "gl-textureE"
+              << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur" << "gabor-depth" << "gl-textureE";
 
-        ScoreSVMFusion fusion;
+        ScoreProductFusion fusion;
 
         QList<Evaluation> trainComponents;
         foreach (const QString &unit, units)
@@ -917,6 +947,41 @@ public:
             {
                 QVector<double> testGenScores = Vector::fromFile(dir + units[unitIndex] + "-" + QString::number(i) + "-gen-scores").toQVector();
                 QVector<double> testImpScores = Vector::fromFile(dir + units[unitIndex] + "-" + QString::number(i) + "-imp-scores").toQVector();
+                testEvals << Evaluation(testGenScores, testImpScores);
+            }
+
+            Evaluation eval = fusion.evaluate(testEvals);
+            qDebug() << eval.eer << eval.fnmrAtFmr(0.01) << eval.fnmrAtFmr(0.001) << eval.fnmrAtFmr(0.0001);
+
+            eval.outputResultsDET(QString::number(i));
+        }
+    }
+
+    static void evaluateFusionAll()
+    {
+        QString dir = "/home/stepo/git/face/test/frgc/filterBanks/";
+        QStringList units;
+        units << "isocurves"
+              << "gl-index" << "gl-mean" << "gl-gauss" << "gl-eigencur" << "gl-depth" << "gl-textureE"
+              << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur" << "gabor-depth" << "gl-textureE";
+
+        ScoreLogisticRegressionFusion fusion;
+        foreach (const QString &unit, units)
+        {
+            QVector<double> trainGenScores = Vector::fromFile(dir + unit + "-0-gen-scores").toQVector();
+            QVector<double> trainImpScores = Vector::fromFile(dir + unit + "-0-imp-scores").toQVector();
+            fusion.addComponent(Evaluation(trainGenScores, trainImpScores));
+        }
+        fusion.learn();
+
+        for (int i = 0; i <= 3; i++)
+        {
+            QList<Evaluation> testEvals;
+
+            foreach (const QString &unit, units)
+            {
+                QVector<double> testGenScores = Vector::fromFile(dir + unit + "-" + QString::number(i) + "-gen-scores").toQVector();
+                QVector<double> testImpScores = Vector::fromFile(dir + unit + "-" + QString::number(i) + "-imp-scores").toQVector();
                 testEvals << Evaluation(testGenScores, testImpScores);
             }
 

@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::createBIN();
     //Evaluate3dFrgc::align();
     //Evaluate3dFrgc::createMaps();
+    //Evaluate3dFrgc::createTextures();
     //Evaluate3dFrgc::evaluateHistogramFeaturesGenerateStripesBinsMap();
     //Evaluate3dFrgc::evaluateHistogramFeatures();
     //Evaluate3dFrgc::evaluateMaps();
@@ -52,7 +53,8 @@ int main(int argc, char *argv[])
 
     // Fusion
     //Evaluate3dFrgc::evaluateFilterBankFusion();
-    Evaluate3dFrgc::evaluateFusion();
+    //Evaluate3dFrgc::evaluateFusionWrapper();
+    Evaluate3dFrgc::evaluateFusionAll();
 
     //Evaluate3dFrgc::evaluateDirect();
     //Evaluate3dFrgc::createIsoCurves();
