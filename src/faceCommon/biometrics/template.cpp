@@ -8,14 +8,13 @@
 QVector<Template> Template::loadTemplates(const QString &dirPath, const QString &classSeparator)
 {
     QVector<Template> templates;
-    QStringList filenames = Loader::listFiles(dirPath, "*");
+    QVector<QString> filenames = Loader::listFiles(dirPath, "*", AbsoluteFull);
     int n = filenames.count();
     assert(n > 0);
 
     for (int i = 0; i < n; i++)
     {
-        QString path(dirPath + QDir::separator() + filenames[i]);
-        Vector featureVector = Vector::fromFile(path);
+        Vector featureVector = Vector::fromFile(filenames[i]);
 
         int indexOfSeparator = filenames.at(i).indexOf(classSeparator);
         QString classString = filenames.at(i).left(indexOfSeparator);

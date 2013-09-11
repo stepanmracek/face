@@ -34,6 +34,7 @@
 #include "linalg/gabor.h"
 #include "biometrics/scorelevelfusionwrapper.h"
 #include "biometrics/zpcacorrw.h"
+#include "biometrics/facetemplate.h"
 
 class Evaluate3dFrgc
 {
@@ -137,7 +138,7 @@ public:
         //pca.modesSelectionThreshold(pcaThreshold);
         //PCAExtractor pcaExtractor(pca);
         ZScorePCAExtractor zscorePcaExtractor(pca, trainVectorsInClusters[1]);
-        zscorePcaExtractor.serialize("../../test/isocurves/shifted-pca.yml", "../../test/isocurves/shifted-normparams.yml");
+        zscorePcaExtractor.serialize("isocurves-pca", "isocurves-normparams");
 
         QVector<Template> trainTemplates = Template::createTemplates(trainVectorsInClusters[1],
                                                                      trainClassesInClusters[1],
@@ -162,6 +163,7 @@ public:
         }
 
         corW.w = eerPot.createSelectionWeightsBasedOnRelativeThreshold(bestThreshold);
+        corW.w.toFile("isocurves-selWeights");
         BatchEvaluationResult batchResult = Evaluation::batch(rawVectorsInClusters, classesInClusters,
                                                               zscorePcaExtractor, corW, 1);
         qDebug() << batchResult.meanEER << batchResult.stdDevOfEER;
@@ -684,7 +686,8 @@ public:
     static void evaluateFilterBankFusion()
     {
         QString source = "textureE";
-        bool isGabor = false;
+        bool isGabor = true;
+        QString filterType = (isGabor ? QString("gabor") : QString("gl"));
 
         // Declare variables
         QString path = "/home/stepo/data/frgc/spring2004/zbin-aligned/" + source;
@@ -722,6 +725,9 @@ public:
                 BioDataProcessing::divideToNClusters(rawVectors, classes, 5, vectorsInClusters, classesInClusters);
 
                 ZPCACorrW pcaCor(vectorsInClusters[0], pcaThreshold, vectorsInClusters[0]);
+                pcaCor.extractor.serialize(filterType + "-" + source + "-" + QString::number(i) + "-pca",
+                                           filterType + "-" + source + "-" + QString::number(i) + "-normParams");
+
                 fusion.addComponent(Evaluation(vectorsInClusters[1], classesInClusters[1], pcaCor.extractor, pcaCor.metric));
 
                 for (int c = 1; c < clusters; c++)
@@ -734,14 +740,16 @@ public:
         // train fusion classifier
         qDebug() << "training fusion classifier";
         fusion.learn();
+        fusion.serialize(filterType + "-" + source + "-wSumFusion");
+
 
         // evaluate
-        for (int c = 1; c < clusters; c++)
-        {
-            Evaluation result = fusion.evaluate(testData[c]);
-            result.outputResults((isGabor ? QString("gabor") : QString("gl")) + "-" + source + "-" + QString::number(c-1), 50);
-            qDebug() << result.eer;
-        }
+        //for (int c = 1; c < clusters; c++)
+        //{
+        //    Evaluation result = fusion.evaluate(testData[c]);
+        //    result.outputResults(filterType + "-" + source + "-" + QString::number(c-1), 50);
+        //    qDebug() << result.eer;
+        //}
     }
 
     static void trainGaborFusion()
@@ -927,8 +935,7 @@ public:
               << "gl-index" << "gl-mean" << "gl-gauss" << "gl-eigencur" << "gl-depth" << "gl-textureE"
               << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur" << "gabor-depth" << "gl-textureE";
 
-        ScoreProductFusion fusion;
-
+        ScoreWeightedSumFusion fusion;
         QList<Evaluation> trainComponents;
         foreach (const QString &unit, units)
         {
@@ -965,30 +972,77 @@ public:
               << "gl-index" << "gl-mean" << "gl-gauss" << "gl-eigencur" << "gl-depth" << "gl-textureE"
               << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur" << "gabor-depth" << "gl-textureE";
 
-        ScoreLogisticRegressionFusion fusion;
-        foreach (const QString &unit, units)
-        {
-            QVector<double> trainGenScores = Vector::fromFile(dir + unit + "-0-gen-scores").toQVector();
-            QVector<double> trainImpScores = Vector::fromFile(dir + unit + "-0-imp-scores").toQVector();
-            fusion.addComponent(Evaluation(trainGenScores, trainImpScores));
-        }
-        fusion.learn();
-
-        for (int i = 0; i <= 3; i++)
-        {
-            QList<Evaluation> testEvals;
-
+        /*{
+            ScoreSVMFusion fusion;
             foreach (const QString &unit, units)
             {
-                QVector<double> testGenScores = Vector::fromFile(dir + unit + "-" + QString::number(i) + "-gen-scores").toQVector();
-                QVector<double> testImpScores = Vector::fromFile(dir + unit + "-" + QString::number(i) + "-imp-scores").toQVector();
-                testEvals << Evaluation(testGenScores, testImpScores);
+                QVector<double> trainGenScores = Vector::fromFile(dir + unit + "-0-gen-scores").toQVector();
+                QVector<double> trainImpScores = Vector::fromFile(dir + unit + "-0-imp-scores").toQVector();
+                fusion.addComponent(Evaluation(trainGenScores, trainImpScores));
+            }
+            fusion.learn();
+            fusion.serialize("final");
+        }*/
+
+        {
+            ScoreSVMFusion fusion2("final");
+            for (int i = 0; i <= 3; i++)
+            {
+                QList<Evaluation> testEvals;
+
+                foreach (const QString &unit, units)
+                {
+                    QVector<double> testGenScores = Vector::fromFile(dir + unit + "-" + QString::number(i) + "-gen-scores").toQVector();
+                    QVector<double> testImpScores = Vector::fromFile(dir + unit + "-" + QString::number(i) + "-imp-scores").toQVector();
+                    testEvals << Evaluation(testGenScores, testImpScores);
+                }
+
+                Evaluation eval = fusion2.evaluate(testEvals);
+                qDebug() << eval.eer << eval.fnmrAtFmr(0.01) << eval.fnmrAtFmr(0.001) << eval.fnmrAtFmr(0.0001);
+
+                eval.outputResultsDET(QString::number(i));
+            }
+        }
+    }
+
+    static void testSerializedClassifiers()
+    {
+        QString classifiersDir = "/home/stepo/git/face/test/frgc/classifiers/";
+        FaceClassifier faceClassifier(classifiersDir);
+
+        QString path = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
+        QVector<QString> filenames = Loader::listFiles(path, "*.binz", baseFilename);
+        QVector<int> classes;
+        foreach (const QString &f, filenames)
+        {
+            classes << f.split("d")[0].toInt();
+        }
+
+        QList<QVector<QString> > filenamesInClusters;
+        QList<QVector<int> > classesInClusters;
+        BioDataProcessing::divideToNClusters(filenames, classes, 5, filenamesInClusters, classesInClusters);
+
+        for (int cluster = 1; cluster < filenamesInClusters.count(); cluster++)
+        {
+            QVector<FaceTemplate> templates;
+            for (int i = 0; i < filenamesInClusters[cluster].count(); i++)
+            {
+                //qDebug() << i << "/" << filenamesInClusters[cluster].count();
+                templates << FaceTemplate(path, filenamesInClusters[cluster][i], faceClassifier);
             }
 
-            Evaluation eval = fusion.evaluate(testEvals);
-            qDebug() << eval.eer << eval.fnmrAtFmr(0.01) << eval.fnmrAtFmr(0.001) << eval.fnmrAtFmr(0.0001);
-
-            eval.outputResultsDET(QString::number(i));
+            QHash<QPair<int, int>, double> distances;
+            for (int i = 0; i < templates.count() - 1; i++)
+            {
+                for (int j = i + 1; j < templates.count(); j++)
+                {
+                    double d = faceClassifier.compare(templates[i], templates[j]);
+                    //qDebug() << "comparing" << i << j << (templates[i].id == templates[j].id) << d;
+                    distances.insertMulti(QPair<int, int>(templates[i].id, templates[j].id), d);
+                }
+            }
+            Evaluation eval(distances);
+            qDebug() << eval.eer;
         }
     }
 

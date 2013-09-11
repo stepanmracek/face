@@ -178,7 +178,7 @@ void GLWidget::paintGL()
         foreach (const cv::Point3d &p, l->points)
         {
             glVertex3f(p.x, p.y, p.z);
-            glVertex3f(p.x, p.y, p.z+3);
+            glVertex3f(p.x, p.y, p.z+10);
         }
         glEnd();
     }

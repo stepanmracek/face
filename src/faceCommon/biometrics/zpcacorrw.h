@@ -14,6 +14,8 @@ public:
     ZScorePCAExtractor extractor;
     CorrelationWeightedMetric metric;
 
+    ZPCACorrW() {}
+
     ZPCACorrW(const QVector<Vector> &trainPCAVectors, double pcaSelThreshold, const QVector<Vector> &trainZscoreVectors);
 
     ZPCACorrW(const QVector<Vector> &trainPCAVectors, double pcaSelThreshold, const QVector<Vector> &trainZscoreVectors,

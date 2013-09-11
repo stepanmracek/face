@@ -32,9 +32,12 @@ Evaluation ScoreLevelFusionBase::evaluate(const QList<Evaluation> &evaluations, 
 {
     assert(learned);
 
-    int unitCount = components.count();
+    /*int unitCount = components.count();
     assert(unitCount > 0);
-    assert(unitCount == evaluations.count());
+    assert(unitCount == evaluations.count());*/
+
+    int unitCount = evaluations.count();
+    assert(unitCount > 0);
 
     // genuines
     QVector<double> fusedGenuineScores;
@@ -70,9 +73,13 @@ Evaluation ScoreLevelFusionBase::evaluate(const QList<Templates> &templates, con
 {
 	assert(learned);
 
-    int unitCount = components.count();
+    /*int unitCount = components.count();
     assert(unitCount > 0);
     assert(unitCount == templates.count());
+    assert(unitCount == metrics.count());*/
+
+    int unitCount = templates.count();
+    assert(unitCount > 0);
     assert(unitCount == metrics.count());
 
     int n = templates[0].count();
@@ -257,6 +264,37 @@ double ScoreWeightedSumFusion::fuse(QVector<double> &scores)
     return result;
 }
 
+void ScoreWeightedSumFusion::serialize(const QString &path)
+{
+    cv::FileStorage storage(path.toStdString(), cv::FileStorage::WRITE);
+    storage << "weightDenominator" << weightDenominator;
+    storage << "eer" << Vector(eer);
+    storage << "genuineMeans" << Vector(genuineMeans);
+    storage << "impostorMeans" << Vector(impostorMeans);
+}
+
+ScoreWeightedSumFusion::ScoreWeightedSumFusion(const QString &path)
+{
+    cv::FileStorage storage(path.toStdString(), cv::FileStorage::READ);
+    assert(storage.isOpened());
+
+    storage["weightDenominator"] >> weightDenominator;
+
+    Matrix eerMat;
+    storage["eer"] >> eerMat;
+    eer = Vector(eerMat).toQVector();
+
+    Matrix genMeansMat;
+    storage["genuineMeans"] >> genMeansMat;
+    genuineMeans = Vector(genMeansMat).toQVector();
+
+    Matrix impMeansMat;
+    storage["impostorMeans"] >> impMeansMat;
+    impostorMeans = Vector(impMeansMat).toQVector();
+
+    learned = true;
+}
+
 // --- Product rule fusion ---
 
 void ScoreProductFusion::learnImplementation()
@@ -309,7 +347,29 @@ void ScoreSVMFusion::learnImplementation()
 
 void ScoreSVMFusion::serialize(const QString &path)
 {
-    svm.save(path.toStdString().c_str());
+    svm.save(path.toStdString().c_str(), "svm");
+
+    cv::FileStorage storage(path.toStdString(), cv::FileStorage::APPEND);
+    storage << "genuineMeans" << Vector(genuineMeans);
+    storage << "impostorMeans" << Vector(impostorMeans);
+}
+
+ScoreSVMFusion::ScoreSVMFusion(const QString &path)
+{
+    svm.load(path.toStdString().c_str(), "svm");
+
+    cv::FileStorage storage(path.toStdString(), cv::FileStorage::READ);
+    assert(storage.isOpened());
+
+    Matrix genMeansMat;
+    storage["genuineMeans"] >> genMeansMat;
+    genuineMeans = Vector(genMeansMat).toQVector();
+
+    Matrix impMeansMat;
+    storage["impostorMeans"] >> impMeansMat;
+    impostorMeans = Vector(impMeansMat).toQVector();
+
+    learned = true;
 }
 
 double ScoreSVMFusion::fuse(QVector<double> &scores)
@@ -319,6 +379,7 @@ double ScoreSVMFusion::fuse(QVector<double> &scores)
         scores[i] = (scores[i]-genuineMeans[i])/(impostorMeans[i]-genuineMeans[i]);
 
     cv::Mat score = colVectorToColFPMatrix(scores);
+
     double svmResult = svm.predict(score, true);
     return svmResult;
 }

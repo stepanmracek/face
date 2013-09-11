@@ -54,7 +54,8 @@ int main(int argc, char *argv[])
     // Fusion
     //Evaluate3dFrgc::evaluateFilterBankFusion();
     //Evaluate3dFrgc::evaluateFusionWrapper();
-    Evaluate3dFrgc::evaluateFusionAll();
+    //Evaluate3dFrgc::evaluateFusionAll();
+    Evaluate3dFrgc::testSerializedClassifiers();
 
     //Evaluate3dFrgc::evaluateDirect();
     //Evaluate3dFrgc::createIsoCurves();

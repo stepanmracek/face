@@ -50,6 +50,8 @@ protected:
 public:
     ScoreLevelFusionBase() { learned = false; }
 
+    virtual ~ScoreLevelFusionBase() {}
+
     void learn();
 
     virtual double fuse(QVector<double> &scores) = 0;
@@ -60,8 +62,6 @@ public:
 
     Evaluation evaluate(const QList<Templates> &templates, const QList<Metrics *> &, bool debugOutput = false);
     Evaluation evaluate(const QList<Evaluation> &evaluations, bool debugOutput = false);
-
-    virtual ~ScoreLevelFusionBase() {}
 };
 
 class ScoreLDAFusion : public ScoreLevelFusionBase
@@ -76,7 +76,6 @@ private:
 public:
     void learnImplementation();
     double fuse(QVector<double> &scores);
-    virtual ~ScoreLDAFusion() {}
 };
 
 class ScoreLogisticRegressionFusion : public ScoreLevelFusionBase
@@ -87,7 +86,6 @@ private:
 public:
     void learnImplementation();
     double fuse(QVector<double> &scores);
-    virtual ~ScoreLogisticRegressionFusion() {}
 };
 
 class ScoreWeightedSumFusion : public ScoreLevelFusionBase
@@ -99,7 +97,11 @@ private:
 public:
     void learnImplementation();
     double fuse(QVector<double> &scores);
-    virtual ~ScoreWeightedSumFusion() {}
+
+    ScoreWeightedSumFusion() {}
+    ScoreWeightedSumFusion(const QString &path);
+
+    void serialize(const QString &path);
 };
 
 class ScoreProductFusion : public ScoreLevelFusionBase
@@ -107,7 +109,6 @@ class ScoreProductFusion : public ScoreLevelFusionBase
 public:
     void learnImplementation();
     double fuse(QVector<double> &scores);
-    virtual ~ScoreProductFusion() {}
 };
 
 class ScoreSVMFusion : public ScoreLevelFusionBase
@@ -122,7 +123,9 @@ private:
 public:
     void learnImplementation();
     double fuse(QVector<double> &scores);
-    virtual ~ScoreSVMFusion() {}
+
+    ScoreSVMFusion() {}
+    ScoreSVMFusion(const QString &path);
     void serialize(const QString &path);
 };
 

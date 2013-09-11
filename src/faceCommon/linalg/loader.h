@@ -14,6 +14,8 @@
 #include "matrixconverter.h"
 #include "facelib/map.h"
 
+enum PathType { AbsoluteFull, Filename, baseFilename };
+
 class Loader
 {
 public:
@@ -42,7 +44,7 @@ public:
     static void loadVectors(const QString &dirPath, QVector<Vector> &vectors, QVector<int> &classes,
                             const char *classSeparator = "-", const char *nameFilter = "*");
 
-    static QStringList listFiles(const QString &path, const QString &filter, bool fullPath = false);
+    static QVector<QString> listFiles(const QString &path, const QString &filter, PathType pathType);
 };
 
 #endif // LOADER_H

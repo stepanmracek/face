@@ -16,9 +16,9 @@ public:
 
     virtual double distance(const Vector &v1, const Vector &v2) const = 0;
 
-    virtual ~Metrics() {}
-
     virtual QString toString() = 0;
+
+    virtual ~Metrics() {}
 };
 
 class WeightedMetric : public Metrics
@@ -54,8 +54,6 @@ public:
         for (int i = 0; i < n; i++)
             w(i) = w(i)/sum*n;
     }
-
-    virtual ~WeightedMetric() {}
 };
 
 class EuclideanMetric : public Metrics
@@ -75,8 +73,6 @@ public:
 
         return sqrt(sum);
     }
-
-    virtual ~EuclideanMetric() {}
 
     virtual QString toString() { return "Euclidean"; }
 };
@@ -100,8 +96,6 @@ public:
         return sqrt(sum);
     }
 
-    virtual ~EuclideanWeightedMetric() {}
-
     virtual QString toString() { return "Euclidean weighted"; }
 };
 
@@ -121,8 +115,6 @@ public:
 
         return sum;
     }
-
-    virtual ~CityblockMetric() {}
 
     virtual QString toString() { return "City-block"; }
 };
@@ -157,8 +149,6 @@ public:
         return sum + nans / sum * mean;
     }
 
-    virtual ~CityBlockNaNSafeMetric() {}
-
     virtual QString toString() { return "City-block (NaN safe)"; }
 };
 
@@ -179,8 +169,6 @@ public:
 
         return sum;
     }
-
-    virtual ~CityblockWeightedMetric() {}
 
     virtual QString toString() { return "City-block weighted"; }
 };
@@ -211,8 +199,6 @@ public:
 
         return (1.0/(n-1.0)) * sum;
     }
-
-    virtual ~CorrelationMetric() {}
 
     virtual QString toString() { return "Correlation"; }
 };
@@ -247,8 +233,6 @@ public:
         return (1.0/(n-1.0)) * sum;
     }
 
-    virtual ~CorrelationWeightedMetric() {}
-
     virtual QString toString() { return "Correlation weighted"; }
 };
 
@@ -271,8 +255,6 @@ public:
 
         return dist;
     }
-
-    virtual ~CosineMetric() {}
 
     virtual QString toString() { return "Cosine"; }
 };
@@ -300,8 +282,6 @@ public:
 
         return dist;
     }
-
-    virtual ~CosineWeightedMetric() {}
 
     virtual QString toString() { return "Cosine weighted"; }
 };
@@ -336,8 +316,6 @@ public:
         return cv::Mahalanobis(v, mean, invCov);
     }
 
-    virtual ~MahalanobisMetric() {}
-
     virtual QString toString() { return "Mahalanobis"; }
 };
 
@@ -368,8 +346,6 @@ public:
         return cv::Mahalanobis(v.mul(w), mean.mul(w), invCov);
     }
 
-    virtual ~MahalanobisWeightedMetric() {}
-
     virtual QString toString() { return "Mahalanobis weighted"; }
 };
 
@@ -392,8 +368,6 @@ public:
         return sum;
     }
 
-    virtual ~SSDMetric() {}
-
     virtual QString toString() { return "SSD"; }
 };
 
@@ -415,8 +389,6 @@ public:
 
         return sum;
     }
-
-    virtual ~SSDWeightedMetric() {}
 
     virtual QString toString() { return "SSD weighted"; }
 };

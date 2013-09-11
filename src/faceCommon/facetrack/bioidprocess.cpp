@@ -14,8 +14,8 @@
 void BioIDProcess::process(const char *path)
 {
     QVector<Matrix> processedImages;
-    QStringList imagesPaths = Loader::listFiles(path, "*.pgm", true);
-    QStringList eyesPaths = Loader::listFiles(path, "*.eye", true);
+    QVector<QString> imagesPaths = Loader::listFiles(path, "*.pgm", AbsoluteFull);
+    QVector<QString> eyesPaths = Loader::listFiles(path, "*.eye", AbsoluteFull);
 
     int n = imagesPaths.count();
     assert(n == eyesPaths.count());

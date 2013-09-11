@@ -135,11 +135,10 @@ void Loader::loadVectors(const QString &dirPath, QVector<Vector> &vectors,
     vectors.clear();
     classes.clear();
 
-    QStringList filenames = listFiles(dirPath, nameFilter);
+    QVector<QString> filenames = listFiles(dirPath, nameFilter, AbsoluteFull);
     for (int i = 0; i < filenames.count(); i++)
     {
-        QString fullpath(dirPath + QDir::separator() + filenames[i]);
-        Vector vec = Vector::fromFile(fullpath);
+        Vector vec = Vector::fromFile(filenames[i]);
         vectors.append(vec);
 
         int indexOfSeparator = filenames.at(i).indexOf(classSeparator);
@@ -149,21 +148,26 @@ void Loader::loadVectors(const QString &dirPath, QVector<Vector> &vectors,
     }
 }
 
-QStringList Loader::listFiles(const QString &path, const QString &filter, bool fullPath)
+QVector<QString> Loader::listFiles(const QString &path, const QString &filter, PathType pathType)
 {
-    QDir dir(path);
-    dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
-    QStringList nameFilter;
-    nameFilter << filter;
-    dir.setNameFilters(nameFilter);
-    QStringList filenames = dir.entryList();
-    filenames.sort();
+    QFileInfoList filenames = QDir(path, filter).entryInfoList();
 
-    if (fullPath)
+    QVector<QString> result;
+    foreach (const QFileInfo &i, filenames)
     {
-        for (int i = 0; i < filenames.count(); i++)
-            filenames[i] = path + QDir::separator() + filenames[i];
+        switch (pathType)
+        {
+        case AbsoluteFull:
+            result << i.absoluteFilePath();
+            break;
+        case Filename:
+            result << i.fileName();
+            break;
+        default:
+            result << i.baseName();
+            break;
+        }
     }
 
-    return filenames;
+    return result;
 }
