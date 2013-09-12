@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::evaluateFilterBankFusion();
     //Evaluate3dFrgc::evaluateFusionWrapper();
     //Evaluate3dFrgc::evaluateFusionAll();
-    Evaluate3dFrgc::testSerializedClassifiers();
+    //Evaluate3dFrgc::testSerializedClassifiers();
 
     //Evaluate3dFrgc::evaluateDirect();
     //Evaluate3dFrgc::createIsoCurves();
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::evaluateCurves();
     //Evaluate3dFrgc::evaluateTextures();
 
-    //EvaluateKinect::evaluate();
+    EvaluateKinect::evaluate();
 
     return 0;
 }

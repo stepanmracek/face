@@ -563,126 +563,6 @@ public:
         }
     }
 
-    static void addFilterKernels(QVector<Matrix> &realWavelets, QVector<Matrix> &imagWavelets, const QString &source, bool gabor)
-    {
-        int kSize = 200;
-
-        QVector<int> p1; QVector<int> p2;
-
-        // Index
-        if (source.compare("index") == 0)
-        {
-            if (gabor)
-            {
-                p1 << 5 << 5 << 6 << 6 << 4 << 5 << 6 << 5 << 4 << 6 << 4;
-                p2 << 8 << 2 << 4 << 1 << 3 << 5 << 3 << 4 << 8 << 2 << 1;
-            }
-            else
-            {
-                p1 << 75 << 0 << 75 << 75 << 100;
-                p2 <<  2 << 0 <<  3 <<  5 <<   1;
-            }
-        }
-
-        // Mean
-        else if (source.compare("mean") == 0)
-        {
-            if (gabor)
-            {
-                p1 << 5 << 6 << 6 << 6 << 4 << 6 << 6 << 5;
-                p2 << 8 << 3 << 8 << 4 << 2 << 6 << 7 << 1;
-            }
-            else
-            {
-                p1 << 75 << 100 << 50 << 100 << 25 << 75 << 75 << 0;
-                p2 <<  3 <<   2 <<  2 <<   4 <<  5 <<  1 <<  5 << 0;
-            }
-        }
-
-        // Depth
-        else if (source.compare("depth") == 0)
-        {
-            if (gabor)
-            {
-                p1 << 6 << 6 << 6 << 5;
-                p2 << 8 << 3 << 6 << 1;
-            }
-            else
-            {
-                p1 << 50 << 50 << 0 << 75 << 25 << 100;
-                p2 <<  1 <<  2 << 0 <<  3 <<  1 <<   4;
-            }
-        }
-
-        // Gauss
-        else if (source.compare("gauss") == 0)
-        {
-            if (gabor)
-            {
-                p1 << 5 << 4 << 6 << 4 << 4 << 5 << 4;
-                p2 << 7 << 4 << 3 << 1 << 5 << 2 << 2;
-            }
-            else
-            {
-                p1 << 50 << 75 << 100 << 75 << 25 << 50 << 100;
-                p2 <<  1 <<  1 <<   5 <<  5 <<  5 <<  2 <<   4;
-            }
-        }
-
-        // Eigencur
-        else if (source.compare("eigencur") == 0)
-        {
-            if (gabor)
-            {
-                p1 << 4 << 5 << 5 << 4 << 6 << 4 << 5;
-                p2 << 8 << 3 << 7 << 1 << 6 << 4 << 8;
-            }
-            else
-            {
-                p1 << 75 << 50 << 100 << 50 << 75 << 50 << 100 << 25 << 75 << 75;
-                p2 <<  4 <<  1 <<   5 << 3 <<   2 <<  4 <<   1 <<  5 <<  3 <<  1;
-            }
-        }
-
-        else if (source.compare("textureE") == 0)
-        {
-            if (gabor)
-            {
-                p1 << 5 << 6 << 5 << 6 << 6 << 4;
-                p2 << 4 << 3 << 6 << 1 << 5 << 2;
-            }
-            else
-            {
-                p1 << 0 << 100 << 100 << 25 << 100 << 75;
-                p2 << 0 <<   3 <<   1 <<  5 <<   4 <<  5;
-            }
-        }
-
-        for (int i = 0; i < p1.count(); i++)
-        {
-            if (p1[i] == 0 && p2[i] == 0)
-            {
-                realWavelets << Matrix(0, 0);
-                imagWavelets << Matrix(0, 0);
-            }
-            else
-            {
-                if (gabor)
-                {
-                    realWavelets << Matrix(kSize, kSize);
-                    imagWavelets << Matrix(kSize, kSize);
-                    Gabor::createWavelet(realWavelets[i], imagWavelets[i], p1[i], p2[i]);
-                }
-                else
-                {
-                    realWavelets << Matrix(p1[i], p1[i]);
-                    imagWavelets << Matrix(p1[i], p1[i]);
-                    GaussLaguerre::createWavelet(realWavelets[i], imagWavelets[i], p2[i], 0, 0);
-                }
-            }
-        }
-    }
-
     static void evaluateFilterBankFusion()
     {
         QString source = "textureE";
@@ -698,7 +578,7 @@ public:
         // Create kernels
         QVector<Matrix> realWavelets;
         QVector<Matrix> imagWavelets;
-        addFilterKernels(realWavelets, imagWavelets, source, isGabor);
+        FilterBankClassifier::addFilterKernels(realWavelets, imagWavelets, source, isGabor);
 
         ScoreWeightedSumFusion fusion;
 

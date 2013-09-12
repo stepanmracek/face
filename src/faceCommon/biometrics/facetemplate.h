@@ -6,6 +6,7 @@
 #include "linalg/vector.h"
 #include "biometrics/zpcacorrw.h"
 #include "biometrics/scorelevefusion.h"
+#include "facelib/mesh.h"
 
 class FilterBankClassifier; // forward declarations
 class FilterBanksClassifiers;
@@ -21,6 +22,8 @@ public:
     QVector<Vector> textureE;
 
     void load(const QString &dirPath, const QString &baseFilename, const FilterBanksClassifiers &classifier);
+
+    void load(const Matrix& image, QVector<Vector> &target, const FilterBankClassifier &classifier);
 
 private:
     void load(const QString &dirPath, const QString &baseFilename, const QString &source, QVector<Vector> &target, const FilterBankClassifier &classifier);
@@ -39,6 +42,7 @@ public:
 
     FaceTemplate() {}
     FaceTemplate(const QString &dirPath, const QString &baseFilename, const FaceClassifier &classifier);
+    FaceTemplate(int id, const Mesh &properlyAlignedMesh, const FaceClassifier &classifier);
 };
 
 class FilterBankClassifier
@@ -89,6 +93,7 @@ public:
     FilterBanksClassifiers gaussLaguerre;
     FilterBanksClassifiers gabor;
 
+    FaceClassifier() : gaussLaguerre(false), gabor(true) {}
     FaceClassifier(const QString &dirPath);
 
     double compare(FaceTemplate &first, FaceTemplate &second);

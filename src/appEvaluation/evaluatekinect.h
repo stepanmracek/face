@@ -19,12 +19,43 @@
 #include "facelib/facealigner.h"
 #include "linalg/kernelgenerator.h"
 #include "linalg/serialization.h"
+#include "linalg/loader.h"
 #include "linalg/matrixconverter.h"
+#include "biometrics/facetemplate.h"
 
 class EvaluateKinect
 {
 public:
+
     static void evaluate()
+    {
+        FaceClassifier faceClassifier("/home/stepo/git/face/test/frgc/classifiers/");
+        QVector<FaceTemplate> templates;
+
+        QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.bin", AbsoluteFull);
+        foreach(const QString &path, binFiles)
+        {
+            int id = QFileInfo(path).baseName().split("-")[0].toInt();
+            Mesh face = Mesh::fromBIN(path);
+            templates << FaceTemplate(id, face, faceClassifier);
+        }
+
+        QHash<QPair<int, int>, double> distances;
+        int n = templates.count();
+        for (int i = 0; i < n - 1; i++)
+        {
+            for (int j = i + 1; j < n; j++)
+            {
+                double d = faceClassifier.compare(templates[i], templates[j]);
+                distances.insertMulti(QPair<int, int>(templates[i].id, templates[j].id), d);
+                qDebug() << templates[i].id << templates[j].id << (templates[i].id == templates[j].id) << d;
+            }
+        }
+        Evaluation e(distances);
+        qDebug() << e.eer;
+    }
+
+    static void evaluateOld()
     {
         //QApplication app(0, 0);
         //GLWidget widget;
