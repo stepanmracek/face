@@ -78,8 +78,8 @@ void GLWidget::paintGL()
 
     //if (!face) return;
 
-    //float color[] = {0.75f,0.75f,0.75f};
-    float color[] = {214.0/255.0, 180.0/255.0, 155.0/255.0};
+    float color[] = {0.0f,0.75f,0.75f};
+    //float color[] = {214.0/255.0, 180.0/255.0, 155.0/255.0};
     glColor3fv(color);
     foreach(Mesh *face, faces)
     {
@@ -108,6 +108,11 @@ void GLWidget::paintGL()
                 glEnable(GL_LIGHTING);
                 glEnable(GL_LIGHT0);
                 glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
+            }
+            else
+            {
+                glDisable(GL_LIGHTING);
+                glDisable(GL_LIGHT0);
             }
 
             glPointSize(1);

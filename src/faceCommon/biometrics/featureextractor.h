@@ -67,7 +67,7 @@ public:
 
     ZScorePCAExtractor(const QString &pcaPath, const QString &normParamsPath);
 
-    void serialize(const QString &pcaPath, const QString &normParamsPath);
+    void serialize(const QString &pcaPath, const QString &normParamsPath) const;
 
     Vector extract(const Vector &rawData) const
     {

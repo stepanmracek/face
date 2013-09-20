@@ -95,7 +95,7 @@ void Normalization::zScoreNormalization(QVector<Vector> &vectors, const ZScoreNo
     }
 }
 
-void ZScoreNormalizationResult::serialize(const QString &path)
+void ZScoreNormalizationResult::serialize(const QString &path) const
 {
     Vector means(mean);
     Vector stdDevs(stdDev);

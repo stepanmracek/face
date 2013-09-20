@@ -65,6 +65,9 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::evaluateCurves();
     //Evaluate3dFrgc::evaluateTextures();
 
+    // Kinect
+    //EvaluateKinect::learnFromFrgc();
+    //EvaluateKinect::createTemplates();
     EvaluateKinect::evaluate();
 
     return 0;

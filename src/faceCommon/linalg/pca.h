@@ -35,7 +35,7 @@ public:
 
     void learn(const QVector<Vector> &vectors, int maxComponents = 0, bool debug = false);
 
-    void serialize(const QString &path);
+    void serialize(const QString &path) const;
 
     Vector project(const Vector &vector) const;
 

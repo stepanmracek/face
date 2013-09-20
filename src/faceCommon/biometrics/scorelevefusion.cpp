@@ -264,7 +264,7 @@ double ScoreWeightedSumFusion::fuse(QVector<double> &scores)
     return result;
 }
 
-void ScoreWeightedSumFusion::serialize(const QString &path)
+void ScoreWeightedSumFusion::serialize(const QString &path) const
 {
     cv::FileStorage storage(path.toStdString(), cv::FileStorage::WRITE);
     storage << "weightDenominator" << weightDenominator;

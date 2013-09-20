@@ -29,7 +29,40 @@ public:
 
     static void evaluate()
     {
-        FaceClassifier faceClassifier("/home/stepo/git/face/test/frgc/classifiers/");
+        FaceClassifier faceClassifier("../../test/kinect/classifiers/");
+        QVector<FaceTemplate> templates;
+
+        QVector<QString> templateFiles = Loader::listFiles("../../test/kinect/", "*.yml", AbsoluteFull);
+        foreach(const QString &path, templateFiles)
+        {
+            int id = QFileInfo(path).baseName().split("-")[0].toInt();
+            templates << FaceTemplate(id, path, faceClassifier);
+        }
+
+        Evaluation e = faceClassifier.evaluate(templates);
+        qDebug() << e.eer;
+        e.outputResults("kinect", 15);
+    }
+
+    static void createTemplates()
+    {
+        FaceClassifier faceClassifier("../../test/kinect/classifiers/");
+
+        QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.bin", AbsoluteFull);
+        foreach(const QString &path, binFiles)
+        {
+            QString baseName = QFileInfo(path).baseName();
+            int id = baseName.split("-")[0].toInt();
+            Mesh face = Mesh::fromBIN(path);
+            FaceTemplate t(id, face, faceClassifier);
+            t.serialize("../../test/kinect/" + baseName + ".yml", faceClassifier);
+        }
+
+    }
+
+    static void learnFromFrgc()
+    {
+        FaceClassifier faceClassifier("../../test/frgc/classifiers/");
         QVector<FaceTemplate> templates;
 
         QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.bin", AbsoluteFull);
@@ -40,19 +73,9 @@ public:
             templates << FaceTemplate(id, face, faceClassifier);
         }
 
-        QHash<QPair<int, int>, double> distances;
-        int n = templates.count();
-        for (int i = 0; i < n - 1; i++)
-        {
-            for (int j = i + 1; j < n; j++)
-            {
-                double d = faceClassifier.compare(templates[i], templates[j]);
-                distances.insertMulti(QPair<int, int>(templates[i].id, templates[j].id), d);
-                qDebug() << templates[i].id << templates[j].id << (templates[i].id == templates[j].id) << d;
-            }
-        }
-        Evaluation e(distances);
-        qDebug() << e.eer;
+        ScoreSVMFusion newFusion = faceClassifier.relearnFinalFusion(templates);
+        faceClassifier.serialize("../../test/kinect/classifiers");
+        newFusion.serialize("../../test/kinect/classifiers/final");
     }
 
     static void evaluateOld()

@@ -17,6 +17,9 @@ public:
     int subjectID;
     Vector featureVector;
 
+    Template() {}
+    Template(int id, const Vector &featureVector) : subjectID(id), featureVector(featureVector) { }
+
     static QVector<Template> loadTemplates(const QString &dirPath, const QString& classSeparator);
 
     static void normalizeFeatureVectorComponents(QVector<Template> &templates,

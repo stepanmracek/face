@@ -28,7 +28,7 @@ public:
     ZScoreNormalizationResult() {}
     ZScoreNormalizationResult(const QString &path);
 
-    void serialize(const QString &path);
+    void serialize(const QString &path) const;
 };
 
 class Normalization

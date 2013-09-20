@@ -1,6 +1,6 @@
 #include "featureextractor.h"
 
-void ZScorePCAExtractor::serialize(const QString &pcaPath, const QString &normParamsPath)
+void ZScorePCAExtractor::serialize(const QString &pcaPath, const QString &normParamsPath) const
 {
     pca.serialize(pcaPath);
     normParams.serialize(normParamsPath);

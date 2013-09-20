@@ -813,7 +813,7 @@ public:
         QStringList units;
         units << "isocurves"
               << "gl-index" << "gl-mean" << "gl-gauss" << "gl-eigencur" << "gl-depth" << "gl-textureE"
-              << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur" << "gabor-depth" << "gl-textureE";
+              << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur" << "gabor-depth" << "gabor-textureE";
 
         ScoreWeightedSumFusion fusion;
         QList<Evaluation> trainComponents;
@@ -850,9 +850,9 @@ public:
         QStringList units;
         units << "isocurves"
               << "gl-index" << "gl-mean" << "gl-gauss" << "gl-eigencur" << "gl-depth" << "gl-textureE"
-              << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur" << "gabor-depth" << "gl-textureE";
+              << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur" << "gabor-depth" << "gabor-textureE";
 
-        /*{
+        {
             ScoreSVMFusion fusion;
             foreach (const QString &unit, units)
             {
@@ -862,7 +862,7 @@ public:
             }
             fusion.learn();
             fusion.serialize("final");
-        }*/
+        }
 
         {
             ScoreSVMFusion fusion2("final");

@@ -42,7 +42,7 @@ void PCA::learn(const QVector<Vector> &vectors, int maxComponents, bool debug)
     if (debug) qDebug() << "PCA done";
 }
 
-void PCA::serialize(const QString &path)
+void PCA::serialize(const QString &path) const
 {
     cv::FileStorage storage(path.toStdString(), cv::FileStorage::WRITE);
     storage << "eigenvalues" << cvPca.eigenvalues;

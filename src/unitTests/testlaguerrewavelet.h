@@ -29,17 +29,19 @@ Matrix lagInputImage;
 Matrix lagResponseReal;
 Matrix lagResponseImag;
 Matrix lagResponseAbs;
+Matrix lagKernelReal;
+Matrix lagKernelImag;
 
 void laguerreRedraw(LaguerreParams *params)
 {
     qDebug() << "redraw";
-    Matrix r(params->size, params->size);
-    Matrix i(params->size, params->size);
-    GaussLaguerre::createWavelet(r, i, params->n, params->k, params->j);
+    lagKernelReal = Matrix(params->size, params->size);
+    lagKernelImag = Matrix(params->size, params->size);
+    GaussLaguerre::createWavelet(lagKernelReal, lagKernelImag, params->n, params->k, params->j);
 
     qDebug() << "applying filters";
-    cv::filter2D(lagInputImage, lagResponseReal, -1, r);
-    cv::filter2D(lagInputImage, lagResponseImag, -1, i);
+    cv::filter2D(lagInputImage, lagResponseReal, -1, lagKernelReal);
+    cv::filter2D(lagInputImage, lagResponseImag, -1, lagKernelImag);
 
     Matrix re2;
     cv::multiply(lagResponseReal, lagResponseReal, re2);
@@ -50,18 +52,26 @@ void laguerreRedraw(LaguerreParams *params)
 
     qDebug() << "showing kernels";
     double min,max;
-    cv::minMaxLoc(r, &min, &max);
-    cv::imshow("real kernel", (r-min)/(max-min));
-    cv::minMaxLoc(i, &min, &max);
-    cv::imshow("imag kernel", (i-min)/(max-min));
+    cv::minMaxLoc(lagKernelReal, &min, &max);
+    lagKernelReal = (lagKernelReal-min)/(max-min);
+    cv::imshow("real kernel", lagKernelReal);
+
+    cv::minMaxLoc(lagKernelImag, &min, &max);
+    lagKernelImag = (lagKernelImag-min)/(max-min);
+    cv::imshow("imag kernel", lagKernelImag);
 
     qDebug() << "showing result";
+    cv::minMaxLoc(lagResponseReal, &min, &max);
+    lagResponseReal = (lagResponseReal-min)/(max-min);
+    cv::imshow("response real", lagResponseReal);
+
+    cv::minMaxLoc(lagResponseImag, &min, &max);
+    lagResponseImag = (lagResponseImag-min)/(max-min);
+    cv::imshow("response imag", lagResponseImag);
+
     cv::minMaxLoc(lagResponseAbs, &min, &max);
-    cv::imshow("response real", (lagResponseReal-min)/(max-min));
-    cv::minMaxLoc(lagResponseAbs, &min, &max);
-    cv::imshow("response imag", (lagResponseImag-min)/(max-min));
-    cv::minMaxLoc(lagResponseAbs, &min, &max);
-    cv::imshow("response abs", (lagResponseAbs-min)/(max-min));
+    lagResponseAbs = (lagResponseAbs-min)/(max-min);
+    cv::imshow("response abs", lagResponseAbs);
 }
 
 void laguerreOnSizeChange(int newVal, void *p)
@@ -101,7 +111,20 @@ public:
         cv::imshow("input image", lagInputImage);
         laguerreRedraw(&params);
 
-        cv::waitKey(0);
+        char key;
+        while ((key = cv::waitKey(0)) != 27)
+        {
+            if (key == 's')
+            {
+                qDebug() << "Saving";
+                cv::imwrite("gl-input.png", lagInputImage*255);
+                cv::imwrite("gl-realKernel.png", lagKernelReal*255);
+                cv::imwrite("gl-imagKernel.png", lagKernelImag*255);
+                cv::imwrite("gl-realResponse.png", lagResponseReal*255);
+                cv::imwrite("gl-imagResponse.png", lagResponseImag*255);
+                cv::imwrite("gl-absResponse.png", lagResponseAbs*255);
+            }
+        }
     }
 };
 

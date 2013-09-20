@@ -7,6 +7,7 @@
 #include "linalg/gabor.h"
 #include "linalg/gausslaguerre.h"
 #include "facelib/surfaceprocessor.h"
+#include "biometrics/scorelevelfusionwrapper.h"
 
 FilterBankClassifier::FilterBankClassifier(const QString &source, bool isGabor)
 {
@@ -17,6 +18,8 @@ void FilterBankClassifier::load(const QString &dirPath, const QString &prefix1, 
 {
     QDir pcaDir(dirPath, prefix1 + "-" + prefix2 + "-*-pca");
     QStringList pcaFiles = pcaDir.entryList();
+
+    if (pcaFiles.count() == 0) return;
 
     QDir normParamsDir(dirPath, prefix1 + "-" + prefix2 + "-*-normParams");
     QStringList normParamsFiles = normParamsDir.entryList();
@@ -50,17 +53,27 @@ double FilterBankClassifier::compare(const QVector<Vector> &first, const QVector
     return result;
 }
 
-void FilterBanksClassifiers::load(const QString &dirPath, const QString &prefix)
+FilterBanksClassifiers::FilterBanksClassifiers(bool isGabor)
 {
-    depth.load(dirPath, prefix, "depth");
-    index.load(dirPath, prefix, "index");
-    gauss.load(dirPath, prefix, "gauss");
-    mean.load(dirPath, prefix, "mean");
-    eigencur.load(dirPath, prefix, "eigencur");
-    textureE.load(dirPath, prefix, "textureE");
+    dict["depth"] = FilterBankClassifier("depth", isGabor);
+    dict["index"] = FilterBankClassifier("index", isGabor);
+    dict["mean"] = FilterBankClassifier("mean", isGabor);
+    dict["gauss"] = FilterBankClassifier("gauss", isGabor);
+    dict["eigencur"] = FilterBankClassifier("eigencur", isGabor);
+    dict["textureE"] = FilterBankClassifier("textureE", isGabor);
 }
 
-QVector<double> FilterBanksClassifiers::compare(const FilterBanksVectors &first, const FilterBanksVectors &second)
+void FilterBanksClassifiers::load(const QString &dirPath, const QString &prefix)
+{
+    dict["depth"].load(dirPath, prefix, "depth");
+    dict["index"].load(dirPath, prefix, "index");
+    dict["gauss"].load(dirPath, prefix, "gauss");
+    dict["mean"].load(dirPath, prefix, "mean");
+    dict["eigencur"].load(dirPath, prefix, "eigencur");
+    dict["textureE"].load(dirPath, prefix, "textureE");
+}
+
+/*QVector<double> FilterBanksClassifiers::compare(const FilterBanksVectors &first, const FilterBanksVectors &second)
 {
     QVector<double> result;
     result << index.compare(first.index, second.index)
@@ -70,30 +83,199 @@ QVector<double> FilterBanksClassifiers::compare(const FilterBanksVectors &first,
            << depth.compare(first.depth, second.depth)
            << textureE.compare(first.textureE, second.textureE);
     return result;
-}
+}*/
 
-FaceClassifier::FaceClassifier(const QString &dirPath) : fusion(dirPath + QDir::separator() + "final"),  gaussLaguerre(false), gabor(true)
+FaceClassifier::FaceClassifier()
 {
-    isocurves.extractor = ZScorePCAExtractor(dirPath + QDir::separator() + "isocurves-pca",
-                                             dirPath + QDir::separator() + "isocurves-normparams");
-    isocurves.metric.w = Vector::fromFile(dirPath + QDir::separator() + "isocurves-selWeights");
-
-    gaussLaguerre.load(dirPath + QDir::separator(), "gl");
-    gabor.load(dirPath + QDir::separator(), "gabor");
+    bankClassifiers["gabor"] = FilterBanksClassifiers(true);
+    bankClassifiers["gl"] = FilterBanksClassifiers(false);
 }
 
-double FaceClassifier::compare(FaceTemplate &first, FaceTemplate &second)
+FaceClassifier::FaceClassifier(const QString &dirPath) : fusion(dirPath + QDir::separator() + "final")
+{
+    // load units
+    QString unitsPath = dirPath + QDir::separator() + "units";
+    assert(QFile::exists(unitsPath));
+    QFile unitsFile(unitsPath);
+    unitsFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QTextStream unitsStream(&unitsFile);
+    while (!unitsStream.atEnd())
+    {
+        units << unitsStream.readLine();
+    }
+
+    bankClassifiers["gabor"] = FilterBanksClassifiers(true);
+    bankClassifiers["gl"] = FilterBanksClassifiers(false);
+
+    QString isocurvesPca = dirPath + QDir::separator() + "isocurves-pca";
+    QString isocurvesNormparams = dirPath + QDir::separator() + "isocurves-normparams";
+    QString isocurvesWeights = dirPath + QDir::separator() + "isocurves-selWeights";
+    if (QFile::exists(isocurvesPca) && QFile::exists(isocurvesNormparams) && QFile::exists(isocurvesWeights))
+    {
+        isocurves.extractor = ZScorePCAExtractor(isocurvesPca, isocurvesNormparams);
+        isocurves.metric.w = Vector::fromFile(isocurvesWeights);
+    }
+
+    bankClassifiers["gl"].load(dirPath + QDir::separator(), "gl");
+    bankClassifiers["gabor"].load(dirPath + QDir::separator(), "gabor");
+}
+
+double FaceClassifier::compare(const FaceTemplate &first, const FaceTemplate &second)
 {
     QVector<double> scores;
-    scores << isocurves.metric.distance(first.isocurves, second.isocurves);
-    scores += gaussLaguerre.compare(first.gaussLaguerreVectors, second.gaussLaguerreVectors);
-    scores += gabor.compare(first.gaborVectors, second.gaborVectors);
-    double result = fusion.fuse(scores);
-    return result;
+
+    foreach (const QString &unitName, units)
+    {
+        if (unitName.compare("isocurves") == 0)
+        {
+            scores << isocurves.metric.distance(first.isocurves, second.isocurves);
+        }
+        else if (unitName.startsWith("gabor-") || unitName.startsWith("gl-"))
+        {
+            QStringList items = unitName.split("-");
+            QString bankName = items[0];
+            QString sourceName = items[1];
+            scores << this->bankClassifiers[bankName].dict[sourceName].compare(
+                        first.type[bankName].source[sourceName],
+                        second.type[bankName].source[sourceName]);
+        }
+    }
+
+    double d = this->fusion.fuse(scores);
+    return d;
+}
+
+Evaluation FaceClassifier::evaluate(const QVector<FaceTemplate> &templates)
+{
+    QHash<QPair<int, int>, double> distances;
+    int n = templates.count();
+    for (int i = 0; i < n - 1; i++)
+    {
+        for (int j = i + 1; j < n; j++)
+        {
+            double d = compare(templates[i], templates[j]);
+            distances.insertMulti(QPair<int, int>(templates[i].id, templates[j].id), d);
+            //qDebug() << templates[i].id << templates[j].id << (templates[i].id == templates[j].id) << d;
+        }
+    }
+
+    return Evaluation(distances);
+}
+
+ScoreSVMFusion FaceClassifier::relearnFinalFusion(const QVector<FaceTemplate> &templates)
+{
+    QMap<QString, QHash<QPair<int, int>, double> > distancesDict;
+    int n = templates.count();
+    foreach (const QString &unit, units)
+    {
+        distancesDict[unit] = QHash<QPair<int, int>, double>();
+    }
+
+    for (int i = 0; i < n - 1; i++)
+    {
+        for (int j = i + 1; j < n; j++)
+        {
+            const FaceTemplate &t1 = templates[i];
+            const FaceTemplate &t2 = templates[j];
+            QPair<int, int> pair(t1.id, t2.id);
+
+            foreach (const QString &unitName, units)
+            {
+                double d;
+                if (unitName.compare("isocurves") == 0)
+                {
+                    d = isocurves.metric.distance(t1.isocurves, t2.isocurves);
+                }
+                else if (unitName.startsWith("gabor-") || unitName.startsWith("gl-"))
+                {
+                    QStringList items = unitName.split("-");
+                    QString bankName = items[0];
+                    QString sourceName = items[1];
+                    d = bankClassifiers[bankName].dict[sourceName].compare(
+                                t1.type[bankName].source[sourceName],
+                                t2.type[bankName].source[sourceName]);
+                }
+
+                distancesDict[unitName].insertMulti(pair, d);
+            }
+        }
+    }
+
+
+    QList<Evaluation> evaluations;
+    foreach (const QString &unit, units)
+    {
+        Evaluation e(distancesDict[unit]);
+        qDebug() << unit << e.eer;
+        evaluations << e;
+    }
+
+    ScoreSVMFusion newFusion;
+    ScoreLevelFusionWrapper wrapper;
+    QVector<int> selectedIndicies = wrapper.trainClassifier(newFusion, evaluations);
+    QStringList newUnits;
+    foreach (int i, selectedIndicies)
+    {
+        newUnits << units[i];
+    }
+    units = newUnits;
+    return newFusion;
+}
+
+void FaceClassifier::serialize(const QString &dirPath)
+{
+    // units
+    QString unitsPath = dirPath + QDir::separator() + "units";
+    QFile unitsFile(unitsPath);
+    unitsFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream unitsStream(&unitsFile);
+
+    // final fusion
+    fusion.serialize(dirPath + QDir::separator() + "final");
+
+    // individual units
+    foreach (const QString &unit, units)
+    {
+        // unit name
+        unitsStream << unit << "\n";
+
+        if (unit.compare("isocurves") == 0)
+        {
+            QString isocurvesPca = dirPath + QDir::separator() + "isocurves-pca";
+            QString isocurvesNormparams = dirPath + QDir::separator() + "isocurves-normparams";
+            QString isocurvesWeights = dirPath + QDir::separator() + "isocurves-selWeights";
+            isocurves.extractor.serialize(isocurvesPca, isocurvesNormparams);
+            isocurves.metric.w.toFile(isocurvesWeights);
+        }
+        else if (unit.startsWith("gabor-") || unit.startsWith("gl-"))
+        {
+            QStringList items = unit.split("-");
+            QString bankName = items[0];
+            QString sourceName = items[1];
+
+            const FilterBankClassifier &c = bankClassifiers[bankName].dict[sourceName];
+            c.fusion.serialize(dirPath + QDir::separator() + unit + "-wSumFusion");
+            int count = c.projections.count();
+            for (int i = 0; i < count; i++)
+            {
+                QString pcaPath = dirPath + QDir::separator() + unit + "-" + QString::number(i) + "-pca";
+                QString normParamsPath = dirPath + QDir::separator() + unit + "-" + QString::number(i) + "-normParams";
+                c.projections[i].extractor.serialize(pcaPath, normParamsPath);
+            }
+        }
+    }
+}
+
+FaceTemplate::FaceTemplate()
+{
+    type["gl"] = FilterBanksVectors();
+    type["gabor"] = FilterBanksVectors();
 }
 
 FaceTemplate::FaceTemplate(const QString &dirPath, const QString &baseFilename, const FaceClassifier &classifier)
 {
+    type["gl"] = FilterBanksVectors();
+    type["gabor"] = FilterBanksVectors();
     QString path = dirPath.endsWith(QDir::separator()) ? dirPath : dirPath + QDir::separator();
 
     id = baseFilename.split("d")[0].toInt();
@@ -108,14 +290,16 @@ FaceTemplate::FaceTemplate(const QString &dirPath, const QString &baseFilename, 
     isocurves = classifier.isocurves.extractor.extract(IsoCurveProcessing::generateFeatureVector(selected, false));
 
     // gauss-laguerre
-    gaussLaguerreVectors.load(path, baseFilename, classifier.gaussLaguerre);
+    type["gl"].load(path, baseFilename, classifier.bankClassifiers["gl"]);
 
     // gabor
-    gaborVectors.load(path, baseFilename, classifier.gabor);
+    type["gabor"].load(path, baseFilename, classifier.bankClassifiers["gabor"]);
 }
 
 FaceTemplate::FaceTemplate(int id, const Mesh &properlyAlignedMesh, const FaceClassifier &classifier)
 {
+    type["gl"] = FilterBanksVectors();
+    type["gabor"] = FilterBanksVectors();
     this->id = id;
 
     Matrix smoothKernel5 = KernelGenerator::gaussianKernel(5);
@@ -132,8 +316,10 @@ FaceTemplate::FaceTemplate(int id, const Mesh &properlyAlignedMesh, const FaceCl
     Matrix depthImage = depthmap.toMatrix(0, -75, 0);
     depthImage = depthImage(roi);
 
-    gaborVectors.load(depthImage, gaborVectors.depth, classifier.gabor.depth);
-    gaussLaguerreVectors.load(depthImage, gaussLaguerreVectors.depth, classifier.gaussLaguerre.depth);
+    if (classifier.units.contains("gabor-depth"))
+        type["gabor"].source["depth"] = type["gabor"].load(depthImage, classifier.bankClassifiers["gabor"].dict["depth"]);
+    if (classifier.units.contains("gl-depth"))
+        type["gl"].source["depth"] = type["gl"].load(depthImage, classifier.bankClassifiers["gl"].dict["depth"]);
 
     depthmap.applyFilter(smoothKernel7, 3, true);
     CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(depthmap);
@@ -142,29 +328,46 @@ FaceTemplate::FaceTemplate(int id, const Mesh &properlyAlignedMesh, const FaceCl
     cs.curvatureMean.bandPass(-0.1, 0.1, false, false);
     Matrix meanImage = cs.curvatureMean.toMatrix(0, -0.1, 0.1);
     meanImage = meanImage(roi);
-    gaborVectors.load(meanImage, gaborVectors.mean, classifier.gabor.mean);
-    gaussLaguerreVectors.load(meanImage, gaussLaguerreVectors.mean, classifier.gaussLaguerre.mean);
+
+    if (classifier.units.contains("gabor-mean"))
+        type["gabor"].source["mean"] = type["gabor"].load(meanImage, classifier.bankClassifiers["gabor"].dict["mean"]);
+
+    if (classifier.units.contains("gl-mean"))
+        type["gl"].source["mean"] = type["gl"].load(meanImage, classifier.bankClassifiers["gl"].dict["mean"]);
+
 
     // gauss
     cs.curvatureGauss.bandPass(-0.01, 0.01, false, false);
     Matrix gaussImage = cs.curvatureGauss.toMatrix(0, -0.01, 0.01);
     gaussImage = gaussImage(roi);
-    gaborVectors.load(gaussImage, gaborVectors.gauss, classifier.gabor.gauss);
-    gaussLaguerreVectors.load(gaussImage, gaussLaguerreVectors.gauss, classifier.gaussLaguerre.gauss);
+
+    if (classifier.units.contains("gabor-gauss"))
+        type["gabor"].source["gauss"] = type["gabor"].load(gaussImage, classifier.bankClassifiers["gabor"].dict["gauss"]);
+
+    if (classifier.units.contains("gl-gauss"))
+        type["gl"].source["gauss"] = type["gl"].load(gaussImage, classifier.bankClassifiers["gl"].dict["gauss"]);
 
     // index
     cs.curvatureIndex.bandPass(0, 1, false, false);
     Matrix indexImage = cs.curvatureIndex.toMatrix(0, 0, 1);
     indexImage = indexImage(roi);
-    gaborVectors.load(indexImage, gaborVectors.index, classifier.gabor.index);
-    gaussLaguerreVectors.load(indexImage, gaussLaguerreVectors.index, classifier.gaussLaguerre.index);
+
+    if (classifier.units.contains("gabor-index"))
+        type["gabor"].source["index"] = type["gabor"].load(indexImage, classifier.bankClassifiers["gabor"].dict["index"]);
+
+    if (classifier.units.contains("gl-index"))
+        type["gl"].source["index"] = type["gl"].load(indexImage, classifier.bankClassifiers["gl"].dict["index"]);
 
     // eigencur
     cs.curvaturePcl.bandPass(0, 0.0025, false, false);
-    Matrix pclImage = cs.curvaturePcl.toMatrix(0, 0, 0.0025);
-    pclImage = pclImage(roi);
-    gaborVectors.load(pclImage, gaborVectors.eigencur, classifier.gabor.eigencur);
-    gaussLaguerreVectors.load(pclImage, gaussLaguerreVectors.eigencur, classifier.gaussLaguerre.eigencur);
+    Matrix eigencurImage = cs.curvaturePcl.toMatrix(0, 0, 0.0025);
+    eigencurImage = eigencurImage(roi);
+
+    if (classifier.units.contains("gabor-eigencur"))
+        type["gabor"].source["eigencur"] = type["gabor"].load(eigencurImage, classifier.bankClassifiers["gabor"].dict["eigencur"]);
+
+    if (classifier.units.contains("gl-eigencur"))
+        type["gl"].source["eigencur"] = type["gl"].load(eigencurImage, classifier.bankClassifiers["gl"].dict["eigencur"]);
 
     // texture
     Map textureMap = SurfaceProcessor::depthmap(properlyAlignedMesh, converter,
@@ -175,49 +378,132 @@ FaceTemplate::FaceTemplate(int id, const Mesh &properlyAlignedMesh, const FaceCl
     cv::equalizeHist(textureGSImage, textureGSImage);
     textureImage = MatrixConverter::grayscaleImageToDoubleMatrix(textureGSImage);
     textureImage = textureImage(roi);
-    gaborVectors.load(textureImage, gaborVectors.textureE, classifier.gabor.textureE);
-    gaussLaguerreVectors.load(textureImage, gaussLaguerreVectors.textureE, classifier.gaussLaguerre.textureE);
+
+    if (classifier.units.contains("gabor-textureE"))
+        type["gabor"].source["textureE"] = type["gabor"].load(textureImage, classifier.bankClassifiers["gabor"].dict["textureE"]);
+
+    if (classifier.units.contains("gl-textureE"))
+        type["gl"].source["textureE"] = type["gl"].load(textureImage, classifier.bankClassifiers["gl"].dict["textureE"]);
 
     // isocurves
-    cv::Point3d center(0,20,0);
-    VectorOfCurves isocurves;
-    for (int distance = 10; distance <= 50; distance += 10)
+    if (classifier.units.contains("isocurves"))
     {
-        VectorOfPoints isocurve = SurfaceProcessor::isoGeodeticCurve(depthmap, converter, center, distance, 100, 1);
-        isocurves << isocurve;
+        cv::Point3d center(0,20,0);
+        VectorOfCurves isocurves;
+        for (int distance = 10; distance <= 50; distance += 10)
+        {
+            VectorOfPoints isocurve = SurfaceProcessor::isoGeodeticCurve(depthmap, converter, center, distance, 100, 1);
+            isocurves << isocurve;
+        }
+
+        this->isocurves = classifier.isocurves.extractor.extract(IsoCurveProcessing::generateFeatureVector(isocurves, false));
+    }
+}
+
+FaceTemplate::FaceTemplate(int id, const QString &path, const FaceClassifier &classifier)
+{
+    this->id = id;
+    cv::FileStorage storage(path.toStdString(), cv::FileStorage::READ);
+
+    foreach(const QString &unit, classifier.units)
+    {
+        if (unit.compare("isocurves") == 0)
+        {
+            storage["isocurves"] >> isocurves;
+        }
+        else if (unit.startsWith("gabor-") || unit.startsWith("gl-"))
+        {
+            QStringList items = unit.split("-");
+            QString bankName = items[0];
+            QString sourceName = items[1];
+
+            if (!type.contains(bankName))
+                type[bankName] = FilterBanksVectors();
+
+            cv::FileNode node = storage[unit.toStdString()];
+            for (cv::FileNodeIterator it = node.begin(); it != node.end(); ++it)
+            {
+                Matrix m;
+                (*it) >> m;
+
+                if (!type[bankName].source.contains(sourceName))
+                    type[bankName].source[sourceName] = QVector<Vector>();
+
+                type[bankName].source[sourceName] << Vector(m);
+            }
+
+            /*storage << unit.toStdString() << "[";
+
+            const QVector<Vector> &vectors = type[bankName].source[sourceName];
+            foreach(const Vector &v, vectors)
+            {
+                storage << v;
+            }
+
+            storage << "]";*/
+        }
     }
 
-    this->isocurves = classifier.isocurves.extractor.extract(IsoCurveProcessing::generateFeatureVector(isocurves, false));
 }
 
-void FilterBanksVectors::load(const QString &dirPath, const QString &baseFilename, const FilterBanksClassifiers &classifier)
+void FaceTemplate::serialize(const QString &path, const FaceClassifier &classifier)
 {
-    load(dirPath, baseFilename, "depth", depth, classifier.depth);
-    load(dirPath, baseFilename, "index", index, classifier.index);
-    load(dirPath, baseFilename, "gauss", gauss, classifier.gauss);
-    load(dirPath, baseFilename, "mean", mean, classifier.mean);
-    load(dirPath, baseFilename, "eigencur", eigencur, classifier.eigencur);
-    load(dirPath, baseFilename, "textureE", textureE, classifier.textureE);
+    cv::FileStorage storage(path.toStdString(), cv::FileStorage::WRITE);
+
+    foreach(const QString &unit, classifier.units)
+    {
+        if (unit.compare("isocurves") == 0)
+        {
+            storage << unit.toStdString() << isocurves;
+        }
+        else if (unit.startsWith("gabor-") || unit.startsWith("gl-"))
+        {
+            QStringList items = unit.split("-");
+            QString bankName = items[0];
+            QString sourceName = items[1];
+            storage << unit.toStdString() << "[";
+
+            const QVector<Vector> &vectors = type[bankName].source[sourceName];
+            foreach(const Vector &v, vectors)
+            {
+                storage << v;
+            }
+
+            storage << "]";
+        }
+    }
 }
 
-void FilterBanksVectors::load(const Matrix &image, QVector<Vector> &target, const FilterBankClassifier &classifier)
+QVector<Vector> FilterBanksVectors::load(const QString &dirPath, const QString &baseFilename, const FilterBanksClassifiers &classifier)
 {
+    QStringList srcNames;
+    srcNames << "depth" << "index" << "gauss" << "mean" << "eigencur" << "textureE";
+    foreach (const QString &srcName, srcNames)
+    {
+        source[srcName] = load(dirPath, baseFilename, srcName, classifier.dict[srcName]);
+    }
+}
+
+QVector<Vector> FilterBanksVectors::load(const Matrix &image, const FilterBankClassifier &classifier)
+{
+    QVector<Vector> result;
     for (int i = 0; i < classifier.realWavelets.count(); i++)
     {
         Vector rawVector = (classifier.realWavelets[i].rows == 0) ?
                     MatrixConverter::matrixToColumnVector(image) :
                     MatrixConverter::matrixToColumnVector(FilterBank::absResponse(image, classifier.realWavelets[i], classifier.imagWavelets[i]));
-        target << classifier.projections[i].extractor.extract(rawVector);
+        result << classifier.projections[i].extractor.extract(rawVector);
     }
+    return result;
 }
 
-void FilterBanksVectors::load(const QString &dirPath, const QString &baseFilename, const QString &source, QVector<Vector> &target, const FilterBankClassifier &classifier)
+QVector<Vector> FilterBanksVectors::load(const QString &dirPath, const QString &baseFilename, const QString &source, const FilterBankClassifier &classifier)
 {
     Matrix img = MatrixConverter::imageToMatrix(dirPath + source + QDir::separator() + baseFilename + ".png");
     cv::Rect roi(25, 15, 100, 90);
     img = img(roi);
 
-    load(img, target, classifier);
+    return load(img, classifier);
 }
 
 void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVector<Matrix> &imagWavelets, const QString &source, bool gabor)

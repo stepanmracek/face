@@ -101,7 +101,7 @@ public:
     ScoreWeightedSumFusion() {}
     ScoreWeightedSumFusion(const QString &path);
 
-    void serialize(const QString &path);
+    void serialize(const QString &path) const;
 };
 
 class ScoreProductFusion : public ScoreLevelFusionBase
@@ -129,4 +129,4 @@ public:
     void serialize(const QString &path);
 };
 
-#endif // MULTIBIOSYSTEM_H
+#endif // SCORELEVELFUSION_H
