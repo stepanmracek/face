@@ -53,6 +53,126 @@ double FilterBankClassifier::compare(const QVector<Vector> &first, const QVector
     return result;
 }
 
+void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVector<Matrix> &imagWavelets, const QString &source, bool gabor)
+{
+    int kSize = 200;
+
+    QVector<int> p1; QVector<int> p2;
+
+    // Index
+    if (source.compare("index") == 0)
+    {
+        if (gabor)
+        {
+            p1 << 5 << 5 << 6 << 6 << 4 << 5 << 6 << 5 << 4 << 6 << 4;
+            p2 << 8 << 2 << 4 << 1 << 3 << 5 << 3 << 4 << 8 << 2 << 1;
+        }
+        else
+        {
+            p1 << 75 << 0 << 75 << 75 << 100;
+            p2 <<  2 << 0 <<  3 <<  5 <<   1;
+        }
+    }
+
+    // Mean
+    else if (source.compare("mean") == 0)
+    {
+        if (gabor)
+        {
+            p1 << 5 << 6 << 6 << 6 << 4 << 6 << 6 << 5;
+            p2 << 8 << 3 << 8 << 4 << 2 << 6 << 7 << 1;
+        }
+        else
+        {
+            p1 << 75 << 100 << 50 << 100 << 25 << 75 << 75 << 0;
+            p2 <<  3 <<   2 <<  2 <<   4 <<  5 <<  1 <<  5 << 0;
+        }
+    }
+
+    // Depth
+    else if (source.compare("depth") == 0)
+    {
+        if (gabor)
+        {
+            p1 << 6 << 6 << 6 << 5;
+            p2 << 8 << 3 << 6 << 1;
+        }
+        else
+        {
+            p1 << 50 << 50 << 0 << 75 << 25 << 100;
+            p2 <<  1 <<  2 << 0 <<  3 <<  1 <<   4;
+        }
+    }
+
+    // Gauss
+    else if (source.compare("gauss") == 0)
+    {
+        if (gabor)
+        {
+            p1 << 5 << 4 << 6 << 4 << 4 << 5 << 4;
+            p2 << 7 << 4 << 3 << 1 << 5 << 2 << 2;
+        }
+        else
+        {
+            p1 << 50 << 75 << 100 << 75 << 25 << 50 << 100;
+            p2 <<  1 <<  1 <<   5 <<  5 <<  5 <<  2 <<   4;
+        }
+    }
+
+    // Eigencur
+    else if (source.compare("eigencur") == 0)
+    {
+        if (gabor)
+        {
+            p1 << 4 << 5 << 5 << 4 << 6 << 4 << 5;
+            p2 << 8 << 3 << 7 << 1 << 6 << 4 << 8;
+        }
+        else
+        {
+            p1 << 75 << 50 << 100 << 50 << 75 << 50 << 100 << 25 << 75 << 75;
+            p2 <<  4 <<  1 <<   5 << 3 <<   2 <<  4 <<   1 <<  5 <<  3 <<  1;
+        }
+    }
+
+    else if (source.compare("textureE") == 0)
+    {
+        if (gabor)
+        {
+            p1 << 5 << 6 << 5 << 6 << 6 << 4;
+            p2 << 4 << 3 << 6 << 1 << 5 << 2;
+        }
+        else
+        {
+            p1 << 0 << 100 << 100 << 25 << 100 << 75;
+            p2 << 0 <<   3 <<   1 <<  5 <<   4 <<  5;
+        }
+    }
+
+    for (int i = 0; i < p1.count(); i++)
+    {
+        if (p1[i] == 0 && p2[i] == 0)
+        {
+            realWavelets << Matrix(0, 0);
+            imagWavelets << Matrix(0, 0);
+        }
+        else
+        {
+            if (gabor)
+            {
+                realWavelets << Matrix(kSize, kSize);
+                imagWavelets << Matrix(kSize, kSize);
+                Gabor::createWavelet(realWavelets[i], imagWavelets[i], p1[i], p2[i]);
+            }
+            else
+            {
+                realWavelets << Matrix(p1[i], p1[i]);
+                imagWavelets << Matrix(p1[i], p1[i]);
+                GaussLaguerre::createWavelet(realWavelets[i], imagWavelets[i], p2[i], 0, 0);
+            }
+        }
+    }
+}
+
 FilterBanksClassifiers::FilterBanksClassifiers(bool isGabor)
 {
     dict["depth"] = FilterBankClassifier("depth", isGabor);
@@ -72,18 +192,6 @@ void FilterBanksClassifiers::load(const QString &dirPath, const QString &prefix)
     dict["eigencur"].load(dirPath, prefix, "eigencur");
     dict["textureE"].load(dirPath, prefix, "textureE");
 }
-
-/*QVector<double> FilterBanksClassifiers::compare(const FilterBanksVectors &first, const FilterBanksVectors &second)
-{
-    QVector<double> result;
-    result << index.compare(first.index, second.index)
-           << mean.compare(first.mean, second.mean)
-           << gauss.compare(first.gauss, second.gauss)
-           << eigencur.compare(first.eigencur, second.eigencur)
-           << depth.compare(first.depth, second.depth)
-           << textureE.compare(first.textureE, second.textureE);
-    return result;
-}*/
 
 FaceClassifier::FaceClassifier()
 {
@@ -145,6 +253,18 @@ double FaceClassifier::compare(const FaceTemplate &first, const FaceTemplate &se
     return d;
 }
 
+double FaceClassifier::compare(const QList<FaceTemplate> &references, const FaceTemplate &probe)
+{
+    double n = references.count();
+    double s = 0;
+    foreach (const FaceTemplate &reference, references)
+    {
+        s += compare(reference, probe);
+    }
+
+    return s/n;
+}
+
 Evaluation FaceClassifier::evaluate(const QVector<FaceTemplate> &templates)
 {
     QHash<QPair<int, int>, double> distances;
@@ -155,7 +275,28 @@ Evaluation FaceClassifier::evaluate(const QVector<FaceTemplate> &templates)
         {
             double d = compare(templates[i], templates[j]);
             distances.insertMulti(QPair<int, int>(templates[i].id, templates[j].id), d);
+
             //qDebug() << templates[i].id << templates[j].id << (templates[i].id == templates[j].id) << d;
+        }
+    }
+
+    return Evaluation(distances);
+}
+
+Evaluation FaceClassifier::evaluate(const QHash<int, FaceTemplate> &references, const QVector<FaceTemplate> &testTemplates)
+{
+    QHash<QPair<int, int>, double> distances;
+
+    foreach (const FaceTemplate &probe, testTemplates)
+    {
+        int probeID = probe.id;
+
+        foreach (int referenceID, references.uniqueKeys())
+        {
+            double d = compare(references.values(referenceID), probe);
+            distances.insertMulti(QPair<int, int>(referenceID, probeID), d);
+
+            //qDebug() << referenceID << probeID << (referenceID == probeID) << d;
         }
     }
 
@@ -504,124 +645,4 @@ QVector<Vector> FilterBanksVectors::load(const QString &dirPath, const QString &
     img = img(roi);
 
     return load(img, classifier);
-}
-
-void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVector<Matrix> &imagWavelets, const QString &source, bool gabor)
-{
-    int kSize = 200;
-
-    QVector<int> p1; QVector<int> p2;
-
-    // Index
-    if (source.compare("index") == 0)
-    {
-        if (gabor)
-        {
-            p1 << 5 << 5 << 6 << 6 << 4 << 5 << 6 << 5 << 4 << 6 << 4;
-            p2 << 8 << 2 << 4 << 1 << 3 << 5 << 3 << 4 << 8 << 2 << 1;
-        }
-        else
-        {
-            p1 << 75 << 0 << 75 << 75 << 100;
-            p2 <<  2 << 0 <<  3 <<  5 <<   1;
-        }
-    }
-
-    // Mean
-    else if (source.compare("mean") == 0)
-    {
-        if (gabor)
-        {
-            p1 << 5 << 6 << 6 << 6 << 4 << 6 << 6 << 5;
-            p2 << 8 << 3 << 8 << 4 << 2 << 6 << 7 << 1;
-        }
-        else
-        {
-            p1 << 75 << 100 << 50 << 100 << 25 << 75 << 75 << 0;
-            p2 <<  3 <<   2 <<  2 <<   4 <<  5 <<  1 <<  5 << 0;
-        }
-    }
-
-    // Depth
-    else if (source.compare("depth") == 0)
-    {
-        if (gabor)
-        {
-            p1 << 6 << 6 << 6 << 5;
-            p2 << 8 << 3 << 6 << 1;
-        }
-        else
-        {
-            p1 << 50 << 50 << 0 << 75 << 25 << 100;
-            p2 <<  1 <<  2 << 0 <<  3 <<  1 <<   4;
-        }
-    }
-
-    // Gauss
-    else if (source.compare("gauss") == 0)
-    {
-        if (gabor)
-        {
-            p1 << 5 << 4 << 6 << 4 << 4 << 5 << 4;
-            p2 << 7 << 4 << 3 << 1 << 5 << 2 << 2;
-        }
-        else
-        {
-            p1 << 50 << 75 << 100 << 75 << 25 << 50 << 100;
-            p2 <<  1 <<  1 <<   5 <<  5 <<  5 <<  2 <<   4;
-        }
-    }
-
-    // Eigencur
-    else if (source.compare("eigencur") == 0)
-    {
-        if (gabor)
-        {
-            p1 << 4 << 5 << 5 << 4 << 6 << 4 << 5;
-            p2 << 8 << 3 << 7 << 1 << 6 << 4 << 8;
-        }
-        else
-        {
-            p1 << 75 << 50 << 100 << 50 << 75 << 50 << 100 << 25 << 75 << 75;
-            p2 <<  4 <<  1 <<   5 << 3 <<   2 <<  4 <<   1 <<  5 <<  3 <<  1;
-        }
-    }
-
-    else if (source.compare("textureE") == 0)
-    {
-        if (gabor)
-        {
-            p1 << 5 << 6 << 5 << 6 << 6 << 4;
-            p2 << 4 << 3 << 6 << 1 << 5 << 2;
-        }
-        else
-        {
-            p1 << 0 << 100 << 100 << 25 << 100 << 75;
-            p2 << 0 <<   3 <<   1 <<  5 <<   4 <<  5;
-        }
-    }
-
-    for (int i = 0; i < p1.count(); i++)
-    {
-        if (p1[i] == 0 && p2[i] == 0)
-        {
-            realWavelets << Matrix(0, 0);
-            imagWavelets << Matrix(0, 0);
-        }
-        else
-        {
-            if (gabor)
-            {
-                realWavelets << Matrix(kSize, kSize);
-                imagWavelets << Matrix(kSize, kSize);
-                Gabor::createWavelet(realWavelets[i], imagWavelets[i], p1[i], p2[i]);
-            }
-            else
-            {
-                realWavelets << Matrix(p1[i], p1[i]);
-                imagWavelets << Matrix(p1[i], p1[i]);
-                GaussLaguerre::createWavelet(realWavelets[i], imagWavelets[i], p2[i], 0, 0);
-            }
-        }
-    }
 }

@@ -88,7 +88,9 @@ public:
     FaceClassifier(const QString &dirPath);
 
     double compare(const FaceTemplate &first, const FaceTemplate &second);
+    double compare(const QList<FaceTemplate> &references, const FaceTemplate &probe);
     Evaluation evaluate(const QVector<FaceTemplate> &templates);
+    Evaluation evaluate(const QHash<int, FaceTemplate> &references, const QVector<FaceTemplate> &testTemplates);
     ScoreSVMFusion relearnFinalFusion(const QVector<FaceTemplate> &templates);
     void serialize(const QString &dirPath);
 };

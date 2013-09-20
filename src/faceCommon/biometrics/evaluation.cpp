@@ -243,12 +243,12 @@ void Evaluation::outputResultsDET(const QString &path) const
 
 void Evaluation::outputResultsFMR(const QString &path) const
 {
-    Vector(fmr).toFile(path);
+    Common::savePlot(thresholds, fmr, path);
 }
 
 void Evaluation::outputResultsFNMR(const QString &path) const
 {
-    Vector(fnmr).toFile(path);
+    Common::savePlot(thresholds, fnmr, path);
 }
 
 void Evaluation::outputResultsGenuineDistribution(const QString &path, int bins) const

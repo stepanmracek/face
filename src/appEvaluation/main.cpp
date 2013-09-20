@@ -68,7 +68,8 @@ int main(int argc, char *argv[])
     // Kinect
     //EvaluateKinect::learnFromFrgc();
     //EvaluateKinect::createTemplates();
-    EvaluateKinect::evaluate();
+    //EvaluateKinect::evaluateSimple();
+    EvaluateKinect::evaluateRefeference();
 
     return 0;
 }
