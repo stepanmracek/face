@@ -43,7 +43,7 @@ protected:
     void prepareDataForClassification(QVector<Vector> &scores, QVector<int> &classes,
                                       int genuineLabel, int impostorLabel);
 
-    Vector normalizeScore(QVector<double> &score);
+    Vector normalizeScore(QVector<double> &score) const;
 
     virtual void learnImplementation() = 0;
 
@@ -54,7 +54,7 @@ public:
 
     void learn();
 
-    virtual double fuse(QVector<double> &scores) = 0;
+    virtual double fuse(QVector<double> &scores) const = 0;
 
     ScoreLevelFusionBase & addComponent(const Evaluation &component);
 
@@ -85,7 +85,7 @@ private:
 
 public:
     void learnImplementation();
-    double fuse(QVector<double> &scores);
+    double fuse(QVector<double> &scores) const;
 };
 
 class ScoreWeightedSumFusion : public ScoreLevelFusionBase
@@ -96,7 +96,7 @@ private:
 
 public:
     void learnImplementation();
-    double fuse(QVector<double> &scores);
+    double fuse(QVector<double> &scores) const;
 
     ScoreWeightedSumFusion() {}
     ScoreWeightedSumFusion(const QString &path);
@@ -108,7 +108,7 @@ class ScoreProductFusion : public ScoreLevelFusionBase
 {
 public:
     void learnImplementation();
-    double fuse(QVector<double> &scores);
+    double fuse(QVector<double> &scores) const;
 };
 
 class ScoreSVMFusion : public ScoreLevelFusionBase
@@ -116,13 +116,13 @@ class ScoreSVMFusion : public ScoreLevelFusionBase
 private:
     cv::SVM svm;
 
-    cv::Mat colVectorsToFPMatrix(QVector<Vector> &vectors);
-    cv::Mat colVectorToColFPMatrix(QVector<int> &vector);
-    cv::Mat colVectorToColFPMatrix(QVector<double> &vector);
+    cv::Mat colVectorsToFPMatrix(QVector<Vector> &vectors) const;
+    cv::Mat colVectorToColFPMatrix(QVector<int> &vector) const;
+    cv::Mat colVectorToColFPMatrix(QVector<double> &vector) const;
 
 public:
     void learnImplementation();
-    double fuse(QVector<double> &scores);
+    double fuse(QVector<double> &scores) const;
 
     ScoreSVMFusion() {}
     ScoreSVMFusion(const QString &path);

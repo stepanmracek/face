@@ -58,7 +58,7 @@ public:
     void load(const QString &dirPath, const QString &prefix1, const QString &prefix2);
 
     QVector<double> getScores();
-    double compare(const QVector<Vector> &first, const QVector<Vector> &second);
+    double compare(const QVector<Vector> &first, const QVector<Vector> &second) const;
 
     static void addFilterKernels(QVector<Matrix> &realWavelets, QVector<Matrix> &imagWavelets, const QString &source, bool gabor);
 };
@@ -87,10 +87,14 @@ public:
     FaceClassifier();
     FaceClassifier(const QString &dirPath);
 
-    double compare(const FaceTemplate &first, const FaceTemplate &second);
-    double compare(const QList<FaceTemplate> &references, const FaceTemplate &probe);
-    Evaluation evaluate(const QVector<FaceTemplate> &templates);
-    Evaluation evaluate(const QHash<int, FaceTemplate> &references, const QVector<FaceTemplate> &testTemplates);
+    double compare(const FaceTemplate *first, const FaceTemplate *second) const;
+    double compare(const QList<FaceTemplate *> &references, const FaceTemplate *probe) const;
+
+    Evaluation evaluate(const QVector<FaceTemplate *> &templates) const;
+    Evaluation evaluate(const QHash<int, FaceTemplate *> &references, const QVector<FaceTemplate *> &testTemplates) const;
+
+    QMap<int, double> identify(const QHash<int, FaceTemplate *> &references, const FaceTemplate *probe) const;
+
     ScoreSVMFusion relearnFinalFusion(const QVector<FaceTemplate> &templates);
     void serialize(const QString &dirPath);
 };

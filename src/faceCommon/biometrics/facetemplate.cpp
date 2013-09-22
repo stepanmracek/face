@@ -39,7 +39,7 @@ void FilterBankClassifier::load(const QString &dirPath, const QString &prefix1, 
     fusion = ScoreWeightedSumFusion(dirPath + prefix1 + "-" + prefix2 + "-wSumFusion");
 }
 
-double FilterBankClassifier::compare(const QVector<Vector> &first, const QVector<Vector> &second)
+double FilterBankClassifier::compare(const QVector<Vector> &first, const QVector<Vector> &second) const
 {
     int n = first.count();
     assert(n == second.count());
@@ -228,7 +228,7 @@ FaceClassifier::FaceClassifier(const QString &dirPath) : fusion(dirPath + QDir::
     bankClassifiers["gabor"].load(dirPath + QDir::separator(), "gabor");
 }
 
-double FaceClassifier::compare(const FaceTemplate &first, const FaceTemplate &second)
+double FaceClassifier::compare(const FaceTemplate *first, const FaceTemplate *second) const
 {
     QVector<double> scores;
 
@@ -236,7 +236,7 @@ double FaceClassifier::compare(const FaceTemplate &first, const FaceTemplate &se
     {
         if (unitName.compare("isocurves") == 0)
         {
-            scores << isocurves.metric.distance(first.isocurves, second.isocurves);
+            scores << isocurves.metric.distance(first->isocurves, second->isocurves);
         }
         else if (unitName.startsWith("gabor-") || unitName.startsWith("gl-"))
         {
@@ -244,8 +244,8 @@ double FaceClassifier::compare(const FaceTemplate &first, const FaceTemplate &se
             QString bankName = items[0];
             QString sourceName = items[1];
             scores << this->bankClassifiers[bankName].dict[sourceName].compare(
-                        first.type[bankName].source[sourceName],
-                        second.type[bankName].source[sourceName]);
+                        first->type[bankName].source[sourceName],
+                        second->type[bankName].source[sourceName]);
         }
     }
 
@@ -253,19 +253,22 @@ double FaceClassifier::compare(const FaceTemplate &first, const FaceTemplate &se
     return d;
 }
 
-double FaceClassifier::compare(const QList<FaceTemplate> &references, const FaceTemplate &probe)
+double FaceClassifier::compare(const QList<FaceTemplate *> &references, const FaceTemplate *probe) const
 {
     double n = references.count();
     double s = 0;
-    foreach (const FaceTemplate &reference, references)
+    foreach (const FaceTemplate *reference, references)
     {
-        s += compare(reference, probe);
+        double score = compare(reference, probe);
+        s += score;
+
+        //qDebug() << "  " << score;
     }
 
     return s/n;
 }
 
-Evaluation FaceClassifier::evaluate(const QVector<FaceTemplate> &templates)
+Evaluation FaceClassifier::evaluate(const QVector<FaceTemplate*> &templates) const
 {
     QHash<QPair<int, int>, double> distances;
     int n = templates.count();
@@ -274,7 +277,7 @@ Evaluation FaceClassifier::evaluate(const QVector<FaceTemplate> &templates)
         for (int j = i + 1; j < n; j++)
         {
             double d = compare(templates[i], templates[j]);
-            distances.insertMulti(QPair<int, int>(templates[i].id, templates[j].id), d);
+            distances.insertMulti(QPair<int, int>(templates[i]->id, templates[j]->id), d);
 
             //qDebug() << templates[i].id << templates[j].id << (templates[i].id == templates[j].id) << d;
         }
@@ -283,13 +286,13 @@ Evaluation FaceClassifier::evaluate(const QVector<FaceTemplate> &templates)
     return Evaluation(distances);
 }
 
-Evaluation FaceClassifier::evaluate(const QHash<int, FaceTemplate> &references, const QVector<FaceTemplate> &testTemplates)
+Evaluation FaceClassifier::evaluate(const QHash<int, FaceTemplate *> &references, const QVector<FaceTemplate *> &testTemplates) const
 {
     QHash<QPair<int, int>, double> distances;
 
-    foreach (const FaceTemplate &probe, testTemplates)
+    foreach (const FaceTemplate *probe, testTemplates)
     {
-        int probeID = probe.id;
+        int probeID = probe->id;
 
         foreach (int referenceID, references.uniqueKeys())
         {
@@ -301,6 +304,21 @@ Evaluation FaceClassifier::evaluate(const QHash<int, FaceTemplate> &references, 
     }
 
     return Evaluation(distances);
+}
+
+QMap<int, double> FaceClassifier::identify(const QHash<int, FaceTemplate *> &references, const FaceTemplate *probe) const
+{
+    QMap<int, double> result;
+
+    foreach (int referenceID, references.uniqueKeys())
+    {
+        double d = compare(references.values(referenceID), probe);
+        result[referenceID] = d;
+
+        //qDebug() << referenceID << d;
+    }
+
+    return result;
 }
 
 ScoreSVMFusion FaceClassifier::relearnFinalFusion(const QVector<FaceTemplate> &templates)

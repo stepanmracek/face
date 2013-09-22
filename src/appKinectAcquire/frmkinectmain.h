@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QHash>
+#include <QMap>
 
 #include "biometrics/facetemplate.h"
 
@@ -23,12 +24,14 @@ private slots:
 
     void on_btnDelete_clicked();
 
+    void on_btnIdentify_clicked();
+
 private:
     const FaceClassifier &classifier;
     Ui::FrmKinectMain *ui;
-    QHash<int, QString> hashIdToName;
-    QHash<QString, int> hashNameToId;
-    QHash<int, FaceTemplate> database;
+    QMap<int, QString> mapIdToName;
+    QMap<QString, int> mapNameToId;
+    QHash<int, FaceTemplate*> database;
 
     void initDatabase(const QString &dirPath);
 

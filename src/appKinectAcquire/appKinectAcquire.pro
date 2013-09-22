@@ -19,13 +19,16 @@ LIBS += -L../kinect -lkinect
 SOURCES += \
     main.cpp \
     frmkinectmain.cpp \
-    dlgreferenceproperties.cpp
+    dlgreferenceproperties.cpp \
+    dlgidentifyresult.cpp
 
 HEADERS += \
     frmkinectmain.h \
-    dlgreferenceproperties.h
+    dlgreferenceproperties.h \
+    dlgidentifyresult.h
 
 FORMS += \
     frmkinectmain.ui \
-    dlgreferenceproperties.ui
+    dlgreferenceproperties.ui \
+    dlgidentifyresult.ui
 

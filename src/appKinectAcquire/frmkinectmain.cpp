@@ -5,6 +5,7 @@
 #include <QMessageBox>
 
 #include "dlgreferenceproperties.h"
+#include "dlgidentifyresult.h"
 
 #include "linalg/loader.h"
 
@@ -35,23 +36,28 @@ void FrmKinectMain::initDatabase(const QString &dirPath)
         int id = line.left(spaceIndex).toInt();
         QString name = line.right(line.length() - spaceIndex - 1);
 
-        qDebug() << id << name;
+        //qDebug() << id << name;
 
-        hashIdToName[id] = name;
+        mapIdToName[id] = name;
     }
 
     QVector<QString> templateFiles = Loader::listFiles(dirPath, "*.yml", AbsoluteFull);
     foreach(const QString &path, templateFiles)
     {
         int id = QFileInfo(path).baseName().split("-")[0].toInt();
-        QString name = hashIdToName[id];
-        FaceTemplate t(id, path, classifier);
+
+        //if (database.contains(id) && database.values(id).count() >= 4) continue;
+
+        QString name = mapIdToName[id];
+        //qDebug() << path << id << name;
+        FaceTemplate *t = new FaceTemplate(id, path, classifier);
         database.insertMulti(id, t);
 
-        if (!hashNameToId.contains(name))
+        if (!mapNameToId.contains(name))
         {
-            hashNameToId[name] = id;
+            mapNameToId[name] = id;
             ui->listDatabase->addItem(name);
+            //qDebug() << "  " << id << name;
         }
     }
 }
@@ -61,7 +67,7 @@ void FrmKinectMain::on_btnProperties_clicked()
     if (ui->listDatabase->selectedItems().count() < 1) return;
     QString name = ui->listDatabase->selectedItems()[0]->text();
 
-    DlgReferenceProperties props(name, hashIdToName, hashNameToId, database);
+    DlgReferenceProperties props(name, mapIdToName, mapNameToId, database);
     props.exec();
 }
 
@@ -70,16 +76,31 @@ void FrmKinectMain::on_btnDelete_clicked()
     if (ui->listDatabase->selectedItems().count() < 1) return;
     QListWidgetItem *item = ui->listDatabase->selectedItems()[0];
     QString name = item->text();
-    int id = hashNameToId[name];
+    int id = mapNameToId[name];
 
     QMessageBox msg(QMessageBox::Question, "Question", "Delete reference template: " + name + "?", QMessageBox::Yes | QMessageBox::No);
     int button = msg.exec();
 
     if (button == QMessageBox::Yes)
     {
-        hashIdToName.remove(id);
-        hashNameToId.remove(name);
+        mapIdToName.remove(id);
+        mapNameToId.remove(name);
         database.remove(id);
         qDeleteAll(ui->listDatabase->selectedItems());
     }
+}
+
+void FrmKinectMain::on_btnIdentify_clicked()
+{
+    // TODO relaplace with proper code l8
+    if (ui->listDatabase->selectedItems().count() < 1) return;
+    QListWidgetItem *item = ui->listDatabase->selectedItems()[0];
+    QString name = item->text();
+    int id = mapNameToId[name];
+    const FaceTemplate *probe = database.values(id)[0];
+    // end of TODO
+
+    QMap<int, double> result = classifier.identify(database, probe);
+    DlgIdentifyResult dlg(result, mapIdToName, ui->sliderThreshold->value());
+    dlg.exec();
 }

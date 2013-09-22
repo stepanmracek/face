@@ -904,11 +904,11 @@ public:
 
         for (int cluster = 1; cluster < filenamesInClusters.count(); cluster++)
         {
-            QVector<FaceTemplate> templates;
+            QVector<FaceTemplate *> templates;
             for (int i = 0; i < filenamesInClusters[cluster].count(); i++)
             {
                 //qDebug() << i << "/" << filenamesInClusters[cluster].count();
-                templates << FaceTemplate(path, filenamesInClusters[cluster][i], faceClassifier);
+                templates << new FaceTemplate(path, filenamesInClusters[cluster][i], faceClassifier);
             }
 
             QHash<QPair<int, int>, double> distances;
@@ -918,7 +918,7 @@ public:
                 {
                     double d = faceClassifier.compare(templates[i], templates[j]);
                     //qDebug() << "comparing" << i << j << (templates[i].id == templates[j].id) << d;
-                    distances.insertMulti(QPair<int, int>(templates[i].id, templates[j].id), d);
+                    distances.insertMulti(QPair<int, int>(templates[i]->id, templates[j]->id), d);
                 }
             }
             Evaluation eval(distances);

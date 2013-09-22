@@ -163,7 +163,7 @@ void ScoreLevelFusionBase::prepareDataForClassification(QVector<Vector> &scores,
     }
 }
 
-Vector ScoreLevelFusionBase::normalizeScore(QVector<double> &score)
+Vector ScoreLevelFusionBase::normalizeScore(QVector<double> &score) const
 {
     Vector m(score);
     m = m.normalizeComponents(genuineMeans, impostorMeans, false);
@@ -215,7 +215,7 @@ void ScoreLogisticRegressionFusion::learnImplementation()
     logR.learn(scores, classes);
 }
 
-double ScoreLogisticRegressionFusion::fuse(QVector<double> &scores)
+double ScoreLogisticRegressionFusion::fuse(QVector<double> &scores) const
 {
     Vector normalized = normalizeScore(scores);
     // 1 ~ certainly genuine
@@ -251,7 +251,7 @@ void ScoreWeightedSumFusion::learnImplementation()
     }
 }
 
-double ScoreWeightedSumFusion::fuse(QVector<double> &scores)
+double ScoreWeightedSumFusion::fuse(QVector<double> &scores) const
 {
     assert(scores.count() == genuineMeans.count());
     double result = 0.0;
@@ -313,7 +313,7 @@ void ScoreProductFusion::learnImplementation()
     }
 }
 
-double ScoreProductFusion::fuse(QVector<double> &scores)
+double ScoreProductFusion::fuse(QVector<double> &scores) const
 {
     assert(scores.count() == genuineMeans.count());
     double result = 1.0;
@@ -372,7 +372,7 @@ ScoreSVMFusion::ScoreSVMFusion(const QString &path)
     learned = true;
 }
 
-double ScoreSVMFusion::fuse(QVector<double> &scores)
+double ScoreSVMFusion::fuse(QVector<double> &scores) const
 {
     assert(scores.count() == genuineMeans.count());
     for (int i = 0; i < scores.count(); i++)
@@ -384,7 +384,7 @@ double ScoreSVMFusion::fuse(QVector<double> &scores)
     return svmResult;
 }
 
-cv::Mat ScoreSVMFusion::colVectorToColFPMatrix(QVector<int> &vector)
+cv::Mat ScoreSVMFusion::colVectorToColFPMatrix(QVector<int> &vector) const
 {
     int r = vector.count();
     cv::Mat result = cv::Mat::zeros(r, 1, CV_32F);
@@ -396,7 +396,7 @@ cv::Mat ScoreSVMFusion::colVectorToColFPMatrix(QVector<int> &vector)
     return result;
 }
 
-cv::Mat ScoreSVMFusion::colVectorToColFPMatrix(QVector<double> &vector)
+cv::Mat ScoreSVMFusion::colVectorToColFPMatrix(QVector<double> &vector) const
 {
     int r = vector.count();
     cv::Mat result = cv::Mat::zeros(r, 1, CV_32F);
@@ -408,7 +408,7 @@ cv::Mat ScoreSVMFusion::colVectorToColFPMatrix(QVector<double> &vector)
     return result;
 }
 
-cv::Mat ScoreSVMFusion::colVectorsToFPMatrix(QVector<Vector> &vectors)
+cv::Mat ScoreSVMFusion::colVectorsToFPMatrix(QVector<Vector> &vectors) const
 {
     int cols = vectors.count();
     int rows = vectors[0].rows;

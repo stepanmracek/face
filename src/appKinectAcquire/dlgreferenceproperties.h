@@ -2,7 +2,7 @@
 #define DLGREFERENCEPROPERTIES_H
 
 #include <QDialog>
-#include <QHash>
+#include <QMap>
 
 #include "biometrics/facetemplate.h"
 
@@ -15,8 +15,8 @@ class DlgReferenceProperties : public QDialog
     Q_OBJECT
 
 public:
-    explicit DlgReferenceProperties(const QString &name, const QHash<int, QString> &hashIdToName, const QHash<QString, int> &hashNameToId,
-                                    const QHash<int, FaceTemplate> &database, QWidget *parent = 0);
+    explicit DlgReferenceProperties(const QString &name, const QMap<int, QString> &mapIdToName, const QMap<QString, int> &mapNameToId,
+                                    const QHash<int, FaceTemplate*> &database, QWidget *parent = 0);
     ~DlgReferenceProperties();
 
 private:

@@ -31,14 +31,14 @@ public:
     {
         FaceClassifier faceClassifier("../../test/kinect/classifiers/");
 
-        QHash<int, FaceTemplate> references;
-        QVector<FaceTemplate> testTemplates;
+        QHash<int, FaceTemplate *> references;
+        QVector<FaceTemplate *> testTemplates;
 
         QVector<QString> templateFiles = Loader::listFiles("../../test/kinect/", "*.yml", AbsoluteFull);
         foreach(const QString &path, templateFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();
-            FaceTemplate t(id, path, faceClassifier);
+            FaceTemplate *t = new FaceTemplate(id, path, faceClassifier);
 
             if (!references.contains(id) || references.values(id).count() < 4)
             {
@@ -58,13 +58,13 @@ public:
     static void evaluateSimple()
     {
         FaceClassifier faceClassifier("../../test/kinect/classifiers/");
-        QVector<FaceTemplate> templates;
+        QVector<FaceTemplate*> templates;
 
         QVector<QString> templateFiles = Loader::listFiles("../../test/kinect/", "*.yml", AbsoluteFull);
         foreach(const QString &path, templateFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();
-            templates << FaceTemplate(id, path, faceClassifier);
+            templates << new FaceTemplate(id, path, faceClassifier);
         }
 
         Evaluation e = faceClassifier.evaluate(templates);
