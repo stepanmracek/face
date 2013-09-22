@@ -29,6 +29,13 @@ void GLWidget::deleteAll()
     curves.clear();
 }
 
+void GLWidget::clearAll()
+{
+    faces.clear();
+    landmarks.clear();
+    curves.clear();
+}
+
 GLWidget::~GLWidget()
 {
 }

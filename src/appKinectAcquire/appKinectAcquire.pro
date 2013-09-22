@@ -20,15 +20,18 @@ SOURCES += \
     main.cpp \
     frmkinectmain.cpp \
     dlgreferenceproperties.cpp \
-    dlgidentifyresult.cpp
+    dlgidentifyresult.cpp \
+    dlgenroll.cpp
 
 HEADERS += \
     frmkinectmain.h \
     dlgreferenceproperties.h \
-    dlgidentifyresult.h
+    dlgidentifyresult.h \
+    dlgenroll.h
 
 FORMS += \
     frmkinectmain.ui \
     dlgreferenceproperties.ui \
-    dlgidentifyresult.ui
+    dlgidentifyresult.ui \
+    dlgenroll.ui
 

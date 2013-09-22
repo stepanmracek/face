@@ -28,6 +28,10 @@ private slots:
 
     void on_btnVerify_clicked();
 
+    void on_btnEnroll_clicked();
+
+    void on_listDatabase_itemSelectionChanged();
+
 private:
     const FaceClassifier &classifier;
     Ui::FrmKinectMain *ui;
@@ -36,7 +40,7 @@ private:
     QHash<int, FaceTemplate*> database;
 
     void initDatabase(const QString &dirPath);
-
+    void refreshList();
 };
 
 #endif // FRMKINECTMAIN_H

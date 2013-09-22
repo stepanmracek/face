@@ -76,7 +76,7 @@
          <item>
           <widget class="QLabel" name="label">
            <property name="text">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decision threshold. The smaller value means more secure system. The greater value means more convinient system for users.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decision threshold. The smaller value means more secure system. The greater value means system more convinient for users.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="wordWrap">
             <bool>true</bool>
@@ -156,27 +156,39 @@
               <string>Enroll</string>
              </property>
              <property name="icon">
-              <iconset theme="add"/>
+              <iconset theme="add">
+               <normaloff/>
+              </iconset>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="btnDelete">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Remove</string>
              </property>
              <property name="icon">
-              <iconset theme="remove"/>
+              <iconset theme="remove">
+               <normaloff/>
+              </iconset>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="btnProperties">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Properties</string>
              </property>
              <property name="icon">
-              <iconset theme="document-properties"/>
+              <iconset theme="document-properties">
+               <normaloff/>
+              </iconset>
              </property>
             </widget>
            </item>
@@ -199,12 +211,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>193</x>
-     <y>210</y>
+     <x>221</x>
+     <y>549</y>
     </hint>
     <hint type="destinationlabel">
-     <x>320</x>
-     <y>216</y>
+     <x>385</x>
+     <y>551</y>
     </hint>
    </hints>
   </connection>
@@ -215,12 +227,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>310</x>
-     <y>199</y>
+     <x>385</x>
+     <y>551</y>
     </hint>
     <hint type="destinationlabel">
-     <x>227</x>
-     <y>219</y>
+     <x>255</x>
+     <y>549</y>
     </hint>
    </hints>
   </connection>

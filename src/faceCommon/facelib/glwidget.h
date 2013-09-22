@@ -39,6 +39,7 @@ public:
     void addLandmarks(Landmarks *landmarks) { this->landmarks << landmarks; }
     void addCurve(QVector<cv::Point3d> &curve) { curves << curve; }
     void deleteAll();
+    void clearAll();
 
 protected:
     void init();

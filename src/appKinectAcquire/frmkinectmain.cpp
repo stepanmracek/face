@@ -7,6 +7,7 @@
 
 #include "dlgreferenceproperties.h"
 #include "dlgidentifyresult.h"
+#include "dlgenroll.h"
 
 #include "linalg/loader.h"
 
@@ -36,10 +37,8 @@ void FrmKinectMain::initDatabase(const QString &dirPath)
         int spaceIndex = line.indexOf(" ");
         int id = line.left(spaceIndex).toInt();
         QString name = line.right(line.length() - spaceIndex - 1);
-
-        //qDebug() << id << name;
-
         mapIdToName[id] = name;
+        mapNameToId[name] = id;
     }
 
     QVector<QString> templateFiles = Loader::listFiles(dirPath, "*.yml", AbsoluteFull);
@@ -47,20 +46,18 @@ void FrmKinectMain::initDatabase(const QString &dirPath)
     {
         int id = QFileInfo(path).baseName().split("-")[0].toInt();
 
-        //if (database.contains(id) && database.values(id).count() >= 4) continue;
-
         QString name = mapIdToName[id];
-        //qDebug() << path << id << name;
         FaceTemplate *t = new FaceTemplate(id, path, classifier);
         database.insertMulti(id, t);
-
-        if (!mapNameToId.contains(name))
-        {
-            mapNameToId[name] = id;
-            ui->listDatabase->addItem(name);
-            //qDebug() << "  " << id << name;
-        }
     }
+
+    refreshList();
+}
+
+void FrmKinectMain::refreshList()
+{
+    ui->listDatabase->clear();
+    ui->listDatabase->addItems(mapIdToName.values());
 }
 
 void FrmKinectMain::on_btnProperties_clicked()
@@ -68,7 +65,7 @@ void FrmKinectMain::on_btnProperties_clicked()
     if (ui->listDatabase->selectedItems().count() < 1) return;
     QString name = ui->listDatabase->selectedItems()[0]->text();
 
-    DlgReferenceProperties props(name, mapIdToName, mapNameToId, database);
+    DlgReferenceProperties props(name, mapIdToName, mapNameToId, database, this);
     props.exec();
 }
 
@@ -79,7 +76,7 @@ void FrmKinectMain::on_btnDelete_clicked()
     QString name = item->text();
     int id = mapNameToId[name];
 
-    QMessageBox msg(QMessageBox::Question, "Question", "Delete reference template: " + name + "?", QMessageBox::Yes | QMessageBox::No);
+    QMessageBox msg(QMessageBox::Question, "Question", "Delete reference template: " + name + "?", QMessageBox::Yes | QMessageBox::No, this);
     int button = msg.exec();
 
     if (button == QMessageBox::Yes)
@@ -137,6 +134,23 @@ void FrmKinectMain::on_btnVerify_clicked()
 
     bool accepted = (score < ui->sliderThreshold->value());
     QString result =  accepted ? "User " + name + " accepted" : "User " + name + " rejected";
+    result.append(". Comparison score: " + QString::number(score));
     QMessageBox resultMsg(accepted ? QMessageBox::Information : QMessageBox::Critical, "Result", result, QMessageBox::Ok, this);
     resultMsg.exec();
+}
+
+void FrmKinectMain::on_btnEnroll_clicked()
+{
+    DlgEnroll dlgEnroll(mapIdToName, mapNameToId, database, classifier, this);
+    if (dlgEnroll.exec() == QDialog::Accepted)
+    {
+        refreshList();
+    }
+}
+
+void FrmKinectMain::on_listDatabase_itemSelectionChanged()
+{
+    int count = ui->listDatabase->selectedItems().count();
+    ui->btnDelete->setEnabled(count > 0);
+    ui->btnProperties->setEnabled(count > 0);
 }
