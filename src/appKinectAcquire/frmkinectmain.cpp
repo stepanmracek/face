@@ -3,6 +3,7 @@
 
 #include <QListWidgetItem>
 #include <QMessageBox>
+#include <QInputDialog>
 
 #include "dlgreferenceproperties.h"
 #include "dlgidentifyresult.h"
@@ -93,14 +94,49 @@ void FrmKinectMain::on_btnDelete_clicked()
 void FrmKinectMain::on_btnIdentify_clicked()
 {
     // TODO relaplace with proper code l8
-    if (ui->listDatabase->selectedItems().count() < 1) return;
-    QListWidgetItem *item = ui->listDatabase->selectedItems()[0];
-    QString name = item->text();
-    int id = mapNameToId[name];
-    const FaceTemplate *probe = database.values(id)[0];
+    const FaceTemplate *probe;
+    {
+        if (ui->listDatabase->selectedItems().count() < 1) return;
+        QListWidgetItem *item = ui->listDatabase->selectedItems()[0];
+        QString name = item->text();
+        int id = mapNameToId[name];
+        probe = database.values(id)[0];
+    }
     // end of TODO
 
     QMap<int, double> result = classifier.identify(database, probe);
-    DlgIdentifyResult dlg(result, mapIdToName, ui->sliderThreshold->value());
+    DlgIdentifyResult dlg(result, mapIdToName, ui->sliderThreshold->value(), this);
     dlg.exec();
+}
+
+void FrmKinectMain::on_btnVerify_clicked()
+{
+    QString name = QInputDialog::getText(this, "Query", "Enter username");
+    if (name.isNull() || name.isEmpty()) return;
+
+    // TODO relaplace with proper code l8
+    const FaceTemplate *probe;
+    {
+        if (ui->listDatabase->selectedItems().count() < 1) return;
+        QListWidgetItem *item = ui->listDatabase->selectedItems()[0];
+        QString name = item->text();
+        int id = mapNameToId[name];
+        probe = database.values(id)[0];
+    }
+    // end of TODO
+
+    if (!mapNameToId.contains(name))
+    {
+        QMessageBox msg(QMessageBox::Critical, "Error", "User " + name + " is not enrolled", QMessageBox::Ok, this);
+        msg.exec();
+        return;
+    }
+
+    int id = mapNameToId[name];
+    double score = classifier.compare(database.values(id), probe);
+
+    bool accepted = (score < ui->sliderThreshold->value());
+    QString result =  accepted ? "User " + name + " accepted" : "User " + name + " rejected";
+    QMessageBox resultMsg(accepted ? QMessageBox::Information : QMessageBox::Critical, "Result", result, QMessageBox::Ok, this);
+    resultMsg.exec();
 }

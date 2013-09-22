@@ -26,6 +26,8 @@ private slots:
 
     void on_btnIdentify_clicked();
 
+    void on_btnVerify_clicked();
+
 private:
     const FaceClassifier &classifier;
     Ui::FrmKinectMain *ui;
