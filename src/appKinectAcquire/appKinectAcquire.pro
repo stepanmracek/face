@@ -17,5 +17,15 @@ LIBS += -L../kinect -lkinect
 
 
 SOURCES += \
-    main.cpp
+    main.cpp \
+    frmkinectmain.cpp \
+    dlgreferenceproperties.cpp
+
+HEADERS += \
+    frmkinectmain.h \
+    dlgreferenceproperties.h
+
+FORMS += \
+    frmkinectmain.ui \
+    dlgreferenceproperties.ui
 

@@ -9,6 +9,8 @@
 #include "facelib/facealigner.h"
 #include "facelib/surfaceprocessor.h"
 
+#include "frmkinectmain.h"
+
 int scan(int argc, char *argv[])
 {
     Mesh m = Kinect::scanFace(10);
@@ -88,7 +90,14 @@ int align(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    scan(argc, argv);
+    //scan(argc, argv);
     //return align(argc, argv);
     //return scan(argc, argv, "../../test/kinect-face.bin", "../../test/kinect-face.xml");
+
+    FaceClassifier classifier("../../test/kinect/classifiers/");
+
+    QApplication app(argc, argv);
+    FrmKinectMain frmMain("../../test/kinect", classifier);
+    frmMain.show();
+    return app.exec();
 }
