@@ -25,13 +25,15 @@ public:
 
     static VectorOfPoints depthToVectorOfPoints(double *depth);
 
-    static Mesh createMesh(double *depth, uint8_t *rgb);
+    static Mesh *createMesh(double *depth, uint8_t *rgb);
 
     static ImageBGR RGBToColorMatrix(uint8_t *rgb);
 
     static ImageGrayscale RGBToGrayscale(uint8_t *rgb);
 
-    static Mesh scanFace(int scanIterations);
+    static Mesh *scanFace(int scanIterations);
+
+    static Mesh *scanAndAlignFace(int scanIterations, int icpIterations, const QString &alignReferenceOBJPath);
 };
 
 #endif /* KINECT_H_ */

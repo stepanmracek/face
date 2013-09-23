@@ -4,6 +4,7 @@
 #include <libfreenect_sync.h>
 
 #include "facetrack/realtimetrack.h"
+#include "facelib/facealigner.h"
 
 bool Kinect::getDepth(double *depth, bool *mask, double minDistance, double maxDistance)
 {
@@ -150,11 +151,11 @@ VectorOfPoints Kinect::depthToVectorOfPoints(double *depth)
     return result;
 }
 
-Mesh Kinect::createMesh(double *depth, uchar *rgb)
+Mesh *Kinect::createMesh(double *depth, uchar *rgb)
 {
     int DepthIndextoPointIndex[n];
 
-    Mesh result;
+    Mesh *result = new Mesh();
     int i = 0;
     for (int r = 0; r < 480; r++)
     {
@@ -169,10 +170,10 @@ Mesh Kinect::createMesh(double *depth, uchar *rgb)
 
                 // 3d data
                 cv::Point3d p(x, y, z);
-                result.points << p;
+                result->points << p;
                 //std::cout << p.z << std::endl;
 
-                DepthIndextoPointIndex[i] = result.points.size()-1;
+                DepthIndextoPointIndex[i] = result->points.size()-1;
 
                 // texture
                 int i3 = 3*i;
@@ -180,14 +181,14 @@ Mesh Kinect::createMesh(double *depth, uchar *rgb)
                 unsigned char g = rgb[i3 + 1];
                 unsigned char b = rgb[i3 + 2];
                 Color c(b, g, r);
-                result.colors << c;
+                result->colors << c;
             }
 
             i++;
         }
     }
 
-    result.recalculateMinMax();
+    result->recalculateMinMax();
 
     for (int i = 0; i < n; i++)
     {
@@ -205,9 +206,9 @@ Mesh Kinect::createMesh(double *depth, uchar *rgb)
         short downRight = depth[i+641];
 
         if (down != 0 && downRight != 0)
-            result.triangles << cv::Vec3i(DepthIndextoPointIndex[i],DepthIndextoPointIndex[i+640],DepthIndextoPointIndex[i+641]);
+            result->triangles << cv::Vec3i(DepthIndextoPointIndex[i],DepthIndextoPointIndex[i+640],DepthIndextoPointIndex[i+641]);
         if (right != 0 && downRight != 0)
-            result.triangles << cv::Vec3i(DepthIndextoPointIndex[i],DepthIndextoPointIndex[i+641],DepthIndextoPointIndex[i+1]);
+            result->triangles << cv::Vec3i(DepthIndextoPointIndex[i],DepthIndextoPointIndex[i+641],DepthIndextoPointIndex[i+1]);
     }
 
     return result;
@@ -250,7 +251,16 @@ ImageGrayscale Kinect::RGBToGrayscale(uint8_t *rgb)
     return result;
 }
 
-Mesh Kinect::scanFace(int scanIterations)
+Mesh *Kinect::scanAndAlignFace(int scanIterations, int icpIterations, const QString &alignReferenceOBJPath)
+{
+    Mesh *m = Kinect::scanFace(scanIterations);
+    Mesh mean = Mesh::fromOBJ(alignReferenceOBJPath);
+    FaceAligner aligner(mean);
+    aligner.icpAlign(*m, icpIterations);
+    return m;
+}
+
+Mesh *Kinect::scanFace(int scanIterations)
 {
     RealTimeTrack rtTrack;
     int minDistanceFromSensor = 200;
@@ -325,8 +335,8 @@ Mesh Kinect::scanFace(int scanIterations)
     Kinect::getDepth(depth, scanIterations, mask, minDistanceFromSensor, maxDistanceFromSensor);
     Kinect::getRGBIter(rgb, scanIterations);
 
-    Mesh mesh = Kinect::createMesh(depth, rgb);
-    mesh.centralize();
-    mesh.calculateTriangles();
+    Mesh *mesh = Kinect::createMesh(depth, rgb);
+    mesh->centralize();
+    mesh->calculateTriangles();
     return mesh;
 }

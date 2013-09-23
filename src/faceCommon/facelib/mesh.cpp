@@ -35,7 +35,7 @@ void Mesh::recalculateMinMax()
 
 void Mesh::centralize()
 {
-    qDebug() << "Centering";
+    //qDebug() << "Centering";
     double sumx = 0;
     double sumy = 0;
     double sumz = 0;
@@ -61,7 +61,7 @@ void Mesh::centralize()
     minz -= sumz/count;
     maxz -= sumz/count;
 
-    qDebug() << "..done";
+    //qDebug() << "..done";
 }
 
 void Mesh::translate(cv::Point3d translationVector)

@@ -1,9 +1,14 @@
 #include "dlgenroll.h"
 #include "ui_dlgenroll.h"
 
+#include "kinect.h"
+#include "dlgscanface.h"
+
 DlgEnroll::DlgEnroll(QMap<int, QString> &mapIdToName, QMap<QString, int> mapNameToId,
-                     QHash<int, FaceTemplate *> database, const FaceClassifier &classifier, QWidget *parent) :
+                     QHash<int, FaceTemplate *> database, const FaceClassifier &classifier,
+                     const QString &pathToAlignReference, QWidget *parent) :
     mapIdToName(mapIdToName), mapNameToId(mapNameToId), database(database), classifier(classifier),
+    pathToAlignReference(pathToAlignReference),
     QDialog(parent), ui(new Ui::DlgEnroll)
 {
     ui->setupUi(this);
@@ -16,10 +21,10 @@ DlgEnroll::~DlgEnroll()
 
 void DlgEnroll::on_btnAdd_clicked()
 {
-    // TODO: replace with proper code l8
-    int count = ui->listScans->count();
-    scans << Mesh::fromBIN("../../test/kinect/01-0" + QString::number(count+1) + ".bin", false);
-    // end of TODO
+    DlgScanFace dlgScan(pathToAlignReference, this);
+    if (dlgScan.exec() != QDialog::Accepted) return;
+    Mesh *face = dlgScan.result;
+    scans << face;
 
     ui->listScans->addItem(QString::number(ui->listScans->count()+1));
     ui->listScans->item(ui->listScans->count()-1)->setSelected(true);
@@ -32,6 +37,7 @@ void DlgEnroll::on_btnRemove_clicked()
     int index = selection[0].row();
 
     qDeleteAll(ui->listScans->selectedItems());
+    delete scans[index];
     scans.removeAt(index);
 }
 
@@ -44,7 +50,7 @@ void DlgEnroll::on_listScans_itemSelectionChanged()
     if (items.count() > 0)
     {
         int index = ui->listScans->selectionModel()->selectedIndexes()[0].row();
-        ui->glWidget->addFace(&scans[index]);
+        ui->glWidget->addFace(scans[index]);
     }
     ui->glWidget->updateGL();
 }
@@ -74,22 +80,56 @@ void DlgEnroll::on_buttonBox_accepted()
         return;
     }
 
-    // check quality
-    // TODO
-
-    // insert to database
+    // extract templates
     int id = 1;
     int count = mapIdToName.keys().count();
     if (count > 0)
     {
         id = mapIdToName.keys()[count - 1] + 1;
     }
+
+    QProgressDialog progDlg("Extracting templates", QString(), 0, scans.count(), this);
+    progDlg.setWindowModality(Qt::WindowModal);
+    progDlg.setMinimumDuration(100);
+    QList<FaceTemplate*> templates;
+    int index = 0;
+    foreach (const Mesh *m, scans)
+    {
+        progDlg.setValue(index);
+        templates << new FaceTemplate(id, *m, classifier);
+        index++;
+    }
+    progDlg.setValue(scans.count());
+
+    // check quality
+    int templateNum = 1;
+    foreach (const FaceTemplate *t, templates)
+    {
+        double d = classifier.compare(templates, t);
+        qDebug() << "template:" << templateNum << "distance:" << d;
+
+        if (d >= -1.0)
+        {
+            QMessageBox msg(QMessageBox::Question, "Question",
+                            "Template " + QString::number(templateNum) + " does not fulfil quality requirements. Proceed anyway?",
+                            QMessageBox::Yes | QMessageBox::No, this);
+            if (msg.exec() != QMessageBox::Yes)
+            {
+                qDeleteAll(templates);
+                return;
+            }
+        }
+
+        templateNum++;
+    }
+
+    // insert to database
     mapIdToName[id] = name;
     mapNameToId[name] = id;
 
-    foreach (const Mesh &m, scans)
+    foreach (FaceTemplate *t, templates)
     {
-        database.insertMulti(id, new FaceTemplate(id, m, classifier));
+        database.insertMulti(id, t);
     }
 
     qDebug() << "Added" << id << name << "scans: " << database.values(id).count();

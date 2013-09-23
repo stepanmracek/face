@@ -8,8 +8,8 @@ RealTimeTrack::RealTimeTrack()
 {
     qDebug() << "Reading classifiers";
     qDebug() << "face detect:" << faceDetect.load("/usr/share/opencv/haarcascades/haarcascade_frontalface_alt.xml");
-    qDebug() << "eye detect:"<< eyeDetect.load("/usr/share/opencv/haarcascades/haarcascade_eye.xml");
-    qDebug() << "nose detect:"<< noseDetect.load("/usr/share/opencv/haarcascades/haarcascade_mcs_nose.xml");
+    //qDebug() << "eye detect:"<< eyeDetect.load("/usr/share/opencv/haarcascades/haarcascade_eye.xml");
+    //qDebug() << "nose detect:"<< noseDetect.load("/usr/share/opencv/haarcascades/haarcascade_mcs_nose.xml");
     qDebug() << "..done";
 }
 
@@ -20,7 +20,7 @@ std::vector<cv::Rect>  RealTimeTrack::trackFace(ImageGrayscale &img)
     return result;
 }
 
-int RealTimeTrack::trackTest()
+/*int RealTimeTrack::trackTest()
 {
     cv::VideoCapture capture(0);
     if (!capture.isOpened())
@@ -80,4 +80,4 @@ int RealTimeTrack::trackTest()
 
     return 0;
 }
-
+*/

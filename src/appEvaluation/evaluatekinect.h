@@ -27,6 +27,31 @@ class EvaluateKinect
 {
 public:
 
+    static void evaluateReferenceDistances()
+    {
+        FaceClassifier faceClassifier("../../test/kinect/classifiers/");
+
+        QMap<int, FaceTemplate *> references;
+
+        QVector<QString> templateFiles = Loader::listFiles("../../test/kinect/", "*.yml", AbsoluteFull);
+        foreach(const QString &path, templateFiles)
+        {
+            int id = QFileInfo(path).baseName().split("-")[0].toInt();
+            FaceTemplate *t = new FaceTemplate(id, path, faceClassifier);
+            references.insertMulti(id, t);
+        }
+
+        foreach (int id, references.uniqueKeys())
+        {
+            qDebug() << id;
+            QList<FaceTemplate *> ref = references.values(id);
+            foreach (const FaceTemplate *probe, ref)
+            {
+                qDebug() << "  " << faceClassifier.compare(ref, probe);
+            }
+        }
+    }
+
     static void evaluateRefeference()
     {
         FaceClassifier faceClassifier("../../test/kinect/classifiers/");

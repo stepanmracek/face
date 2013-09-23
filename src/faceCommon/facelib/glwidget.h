@@ -41,6 +41,8 @@ public:
     void deleteAll();
     void clearAll();
 
+    Mesh *getFace() { if (faces.empty()) return 0; else return faces[0]; }
+
 protected:
     void init();
     void initializeGL();

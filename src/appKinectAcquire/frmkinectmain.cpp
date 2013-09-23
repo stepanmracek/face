@@ -8,16 +8,18 @@
 #include "dlgreferenceproperties.h"
 #include "dlgidentifyresult.h"
 #include "dlgenroll.h"
+#include "dlgscanface.h"
 
+#include "kinect.h"
 #include "linalg/loader.h"
 
-FrmKinectMain::FrmKinectMain(const QString &databasePath, const FaceClassifier &classifier, QWidget *parent) :
+FrmKinectMain::FrmKinectMain(const QString &databasePath, const FaceClassifier &classifier, const QString &pathToAlignReference, QWidget *parent) :
     classifier(classifier),
+    pathToAlignReference(pathToAlignReference),
     QMainWindow(parent),
     ui(new Ui::FrmKinectMain)
 {
     ui->setupUi(this);
-
     initDatabase(databasePath);
 }
 
@@ -83,6 +85,7 @@ void FrmKinectMain::on_btnDelete_clicked()
     {
         mapIdToName.remove(id);
         mapNameToId.remove(name);
+        qDeleteAll(database.values(id));
         database.remove(id);
         qDeleteAll(ui->listDatabase->selectedItems());
     }
@@ -90,37 +93,29 @@ void FrmKinectMain::on_btnDelete_clicked()
 
 void FrmKinectMain::on_btnIdentify_clicked()
 {
-    // TODO relaplace with proper code l8
-    const FaceTemplate *probe;
-    {
-        if (ui->listDatabase->selectedItems().count() < 1) return;
-        QListWidgetItem *item = ui->listDatabase->selectedItems()[0];
-        QString name = item->text();
-        int id = mapNameToId[name];
-        probe = database.values(id)[0];
-    }
-    // end of TODO
+    DlgScanFace dlgScan(pathToAlignReference, this);
+    if (dlgScan.exec() != QDialog::Accepted) return;
+    Mesh *face = dlgScan.result;
+    FaceTemplate *probe = new FaceTemplate(0, *face, classifier);
+    delete face;
 
     QMap<int, double> result = classifier.identify(database, probe);
+    delete probe;
     DlgIdentifyResult dlg(result, mapIdToName, ui->sliderThreshold->value(), this);
     dlg.exec();
 }
 
 void FrmKinectMain::on_btnVerify_clicked()
 {
-    QString name = QInputDialog::getText(this, "Query", "Enter username");
-    if (name.isNull() || name.isEmpty()) return;
+    bool ok;
+    QString name = QInputDialog::getItem(this, "Query", "Claimed identity:", mapIdToName.values(), 0, false, &ok);
+    if (!ok) return;
 
-    // TODO relaplace with proper code l8
-    const FaceTemplate *probe;
-    {
-        if (ui->listDatabase->selectedItems().count() < 1) return;
-        QListWidgetItem *item = ui->listDatabase->selectedItems()[0];
-        QString name = item->text();
-        int id = mapNameToId[name];
-        probe = database.values(id)[0];
-    }
-    // end of TODO
+    DlgScanFace dlgScan(pathToAlignReference, this);
+    if (dlgScan.exec() != QDialog::Accepted) return;
+    Mesh *face = dlgScan.result;
+    FaceTemplate *probe = new FaceTemplate(0, *face, classifier);
+    delete face;
 
     if (!mapNameToId.contains(name))
     {
@@ -131,6 +126,7 @@ void FrmKinectMain::on_btnVerify_clicked()
 
     int id = mapNameToId[name];
     double score = classifier.compare(database.values(id), probe);
+    delete probe;
 
     bool accepted = (score < ui->sliderThreshold->value());
     QString result =  accepted ? "User " + name + " accepted" : "User " + name + " rejected";
@@ -141,7 +137,7 @@ void FrmKinectMain::on_btnVerify_clicked()
 
 void FrmKinectMain::on_btnEnroll_clicked()
 {
-    DlgEnroll dlgEnroll(mapIdToName, mapNameToId, database, classifier, this);
+    DlgEnroll dlgEnroll(mapIdToName, mapNameToId, database, classifier, pathToAlignReference, this);
     if (dlgEnroll.exec() == QDialog::Accepted)
     {
         refreshList();
