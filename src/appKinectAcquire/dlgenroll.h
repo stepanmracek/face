@@ -28,6 +28,8 @@ private slots:
     void on_listScans_itemSelectionChanged();
     void on_buttonBox_accepted();
 
+    void on_btnExport_clicked();
+
 private:
     Ui::DlgEnroll *ui;
     QMap<int, QString> &mapIdToName;

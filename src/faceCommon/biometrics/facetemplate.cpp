@@ -228,7 +228,7 @@ FaceClassifier::FaceClassifier(const QString &dirPath) : fusion(dirPath + QDir::
     bankClassifiers["gabor"].load(dirPath + QDir::separator(), "gabor");
 }
 
-double FaceClassifier::compare(const FaceTemplate *first, const FaceTemplate *second) const
+double FaceClassifier::compare(const FaceTemplate *first, const FaceTemplate *second, bool debug) const
 {
     QVector<double> scores;
 
@@ -249,17 +249,18 @@ double FaceClassifier::compare(const FaceTemplate *first, const FaceTemplate *se
         }
     }
 
+    if (debug) qDebug() << scores;
     double d = this->fusion.fuse(scores);
     return d;
 }
 
-double FaceClassifier::compare(const QList<FaceTemplate *> &references, const FaceTemplate *probe) const
+double FaceClassifier::compare(const QList<FaceTemplate *> &references, const FaceTemplate *probe, bool debug) const
 {
     double n = references.count();
     double s = 0;
     foreach (const FaceTemplate *reference, references)
     {
-        double score = compare(reference, probe);
+        double score = compare(reference, probe, debug);
         s += score;
 
         //qDebug() << "  " << score;
@@ -605,7 +606,7 @@ FaceTemplate::FaceTemplate(int id, const QString &path, const FaceClassifier &cl
 
 }
 
-void FaceTemplate::serialize(const QString &path, const FaceClassifier &classifier)
+void FaceTemplate::serialize(const QString &path, const FaceClassifier &classifier) const
 {
     cv::FileStorage storage(path.toStdString(), cv::FileStorage::WRITE);
 

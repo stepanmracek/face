@@ -27,6 +27,8 @@ private slots:
     void on_btnEnroll_clicked();
     void on_listDatabase_itemSelectionChanged();
 
+    void on_btnExport_clicked();
+
 private:
     const FaceClassifier &classifier;
     Ui::FrmKinectMain *ui;

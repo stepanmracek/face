@@ -41,7 +41,7 @@ public:
     FaceTemplate(int id, const Mesh &properlyAlignedMesh, const FaceClassifier &classifier);
     FaceTemplate(int id, const QString &path, const FaceClassifier &classifier);
 
-    void serialize(const QString &path, const FaceClassifier &classifier);
+    void serialize(const QString &path, const FaceClassifier &classifier) const;
 };
 
 class FilterBankClassifier
@@ -87,8 +87,8 @@ public:
     FaceClassifier();
     FaceClassifier(const QString &dirPath);
 
-    double compare(const FaceTemplate *first, const FaceTemplate *second) const;
-    double compare(const QList<FaceTemplate *> &references, const FaceTemplate *probe) const;
+    double compare(const FaceTemplate *first, const FaceTemplate *second, bool debug = false) const;
+    double compare(const QList<FaceTemplate *> &references, const FaceTemplate *probe, bool debug = false) const;
 
     Evaluation evaluate(const QVector<FaceTemplate *> &templates) const;
     Evaluation evaluate(const QHash<int, FaceTemplate *> &references, const QVector<FaceTemplate *> &testTemplates) const;

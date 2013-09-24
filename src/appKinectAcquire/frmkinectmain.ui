@@ -38,7 +38,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Identify</string>
+         <string>&amp;Identify</string>
         </property>
        </widget>
       </item>
@@ -50,7 +50,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Verify</string>
+         <string>&amp;Verify</string>
         </property>
        </widget>
       </item>
@@ -153,7 +153,7 @@
            <item>
             <widget class="QPushButton" name="btnEnroll">
              <property name="text">
-              <string>Enroll</string>
+              <string>&amp;Enroll</string>
              </property>
              <property name="icon">
               <iconset theme="add">
@@ -168,7 +168,7 @@
               <bool>false</bool>
              </property>
              <property name="text">
-              <string>Remove</string>
+              <string>&amp;Remove</string>
              </property>
              <property name="icon">
               <iconset theme="remove">
@@ -183,12 +183,25 @@
               <bool>false</bool>
              </property>
              <property name="text">
-              <string>Properties</string>
+              <string>&amp;Properties</string>
              </property>
              <property name="icon">
               <iconset theme="document-properties">
                <normaloff/>
               </iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnExport">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>&amp;Export</string>
+             </property>
+             <property name="icon">
+              <iconset theme="gtk-save"/>
              </property>
             </widget>
            </item>

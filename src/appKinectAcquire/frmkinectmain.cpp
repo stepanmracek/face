@@ -4,6 +4,7 @@
 #include <QListWidgetItem>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QFileDialog>
 
 #include "dlgreferenceproperties.h"
 #include "dlgidentifyresult.h"
@@ -59,7 +60,7 @@ void FrmKinectMain::initDatabase(const QString &dirPath)
 void FrmKinectMain::refreshList()
 {
     ui->listDatabase->clear();
-    ui->listDatabase->addItems(mapIdToName.values());
+    ui->listDatabase->addItems(mapNameToId.keys());
 }
 
 void FrmKinectMain::on_btnProperties_clicked()
@@ -108,7 +109,7 @@ void FrmKinectMain::on_btnIdentify_clicked()
 void FrmKinectMain::on_btnVerify_clicked()
 {
     bool ok;
-    QString name = QInputDialog::getItem(this, "Query", "Claimed identity:", mapIdToName.values(), 0, false, &ok);
+    QString name = QInputDialog::getItem(this, "Query", "Claimed identity:", mapNameToId.keys(), 0, false, &ok);
     if (!ok) return;
 
     DlgScanFace dlgScan(pathToAlignReference, this);
@@ -125,7 +126,7 @@ void FrmKinectMain::on_btnVerify_clicked()
     }
 
     int id = mapNameToId[name];
-    double score = classifier.compare(database.values(id), probe);
+    double score = classifier.compare(database.values(id), probe, true);
     delete probe;
 
     bool accepted = (score < ui->sliderThreshold->value());
@@ -146,7 +147,28 @@ void FrmKinectMain::on_btnEnroll_clicked()
 
 void FrmKinectMain::on_listDatabase_itemSelectionChanged()
 {
-    int count = ui->listDatabase->selectedItems().count();
-    ui->btnDelete->setEnabled(count > 0);
-    ui->btnProperties->setEnabled(count > 0);
+    bool enabled = ui->listDatabase->selectedItems().count() > 0;
+    ui->btnDelete->setEnabled(enabled);
+    ui->btnProperties->setEnabled(enabled);
+    ui->btnExport->setEnabled(enabled);
+}
+
+void FrmKinectMain::on_btnExport_clicked()
+{
+    if (ui->listDatabase->selectedItems().count() < 1) return;
+    QString name = ui->listDatabase->selectedItems()[0]->text();
+    int id = mapNameToId[name];
+
+    QString path = QFileDialog::getExistingDirectory(this);
+    if (path.isNull() || path.isEmpty()) return;
+
+    QList<FaceTemplate*> templates = database.values(id);
+    int index = 1;
+    foreach (const FaceTemplate *t, templates)
+    {
+        QString p = path + QDir::separator() + QString().sprintf("%02d", id) + "-" + QString().sprintf("%02d", index) + ".yml";
+        qDebug() << p;
+        t->serialize(p, classifier);
+        index++;
+    }
 }

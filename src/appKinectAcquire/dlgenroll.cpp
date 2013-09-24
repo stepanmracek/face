@@ -44,7 +44,9 @@ void DlgEnroll::on_btnRemove_clicked()
 void DlgEnroll::on_listScans_itemSelectionChanged()
 {
     QList<QListWidgetItem*> items = ui->listScans->selectedItems();
-    ui->btnRemove->setEnabled(items.count() > 0);
+    bool enabled = items.count() > 0;
+    ui->btnRemove->setEnabled(enabled);
+    ui->btnExport->setEnabled(enabled);
 
     ui->glWidget->clearAll();
     if (items.count() > 0)
@@ -135,4 +137,16 @@ void DlgEnroll::on_buttonBox_accepted()
     qDebug() << "Added" << id << name << "scans: " << database.values(id).count();
 
     accept();
+}
+
+void DlgEnroll::on_btnExport_clicked()
+{
+    QModelIndexList selection = ui->listScans->selectionModel()->selectedIndexes();
+    if (selection.count() < 1) return;
+    int index = selection[0].row();
+
+    QString path = QFileDialog::getSaveFileName(this, QString(), QString(), "*.obj");
+    if (path.isEmpty() || path.isNull()) return;
+
+    scans[index]->writeOBJ(path, '.');
 }

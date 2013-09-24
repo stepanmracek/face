@@ -15,6 +15,8 @@ DlgScanFace::DlgScanFace(const QString &pathToAlignReference, QWidget *parent) :
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(showFace()));
     timer->start(100);
+
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
 
 DlgScanFace::~DlgScanFace()
@@ -24,9 +26,6 @@ DlgScanFace::~DlgScanFace()
 
 void DlgScanFace::showFace()
 {
-    bool b;
-    qDebug() << sizeof(b);
-
     Kinect::getRGB(rgbBuffer);
     frame = Kinect::RGBToGrayscale(rgbBuffer);
     std::vector<cv::Rect> faces = tracker.trackFace(frame);
@@ -45,6 +44,8 @@ void DlgScanFace::showFace()
                     maskIndex++;
                 }
             }
+
+            //cv::rectangle(frame, faces[i], 255);
         }
     }
     else
@@ -52,16 +53,24 @@ void DlgScanFace::showFace()
         memset(mask, 0, 307200); //640*480
     }
 
+    //cv::imshow("face", frame);
+    //cv::waitKey(1);
+
     Kinect::getDepth(depthBuffer, mask, 200, 1000);
     Mesh *m = Kinect::createMesh(depthBuffer, rgbBuffer);
 
+    bool enabled = false;
     ui->widget->deleteAll();
     if (m->points.count() > 0)
     {
         m->centralize();
         ui->widget->addFace(m);
+
+        enabled = true;
     }
     ui->widget->updateGL();
+
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(enabled);
 }
 
 void DlgScanFace::scan()
