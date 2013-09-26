@@ -7,7 +7,7 @@
 
 #include "linalg/common.h"
 #include "facetrack/realtimetrack.h"
-#include "facelib/mesh.h";
+#include "facelib/mesh.h"
 
 namespace Ui {
 class DlgScanFace;

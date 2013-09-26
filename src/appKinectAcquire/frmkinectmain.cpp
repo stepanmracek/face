@@ -61,6 +61,7 @@ void FrmKinectMain::refreshList()
 {
     ui->listDatabase->clear();
     ui->listDatabase->addItems(mapNameToId.keys());
+    setMainButtonsState();
 }
 
 void FrmKinectMain::on_btnProperties_clicked()
@@ -89,6 +90,7 @@ void FrmKinectMain::on_btnDelete_clicked()
         qDeleteAll(database.values(id));
         database.remove(id);
         qDeleteAll(ui->listDatabase->selectedItems());
+        setMainButtonsState();
     }
 }
 
@@ -171,4 +173,11 @@ void FrmKinectMain::on_btnExport_clicked()
         t->serialize(p, classifier);
         index++;
     }
+}
+
+void FrmKinectMain::setMainButtonsState()
+{
+    bool enabled = mapIdToName.count();
+    ui->btnIdentify->setEnabled(enabled);
+    ui->btnVerify->setEnabled(enabled);
 }

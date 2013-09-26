@@ -39,6 +39,7 @@ private:
 
     void initDatabase(const QString &dirPath);
     void refreshList();
+    void setMainButtonsState();
 };
 
 #endif // FRMKINECTMAIN_H

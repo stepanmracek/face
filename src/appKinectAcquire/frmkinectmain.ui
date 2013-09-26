@@ -32,6 +32,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="btnIdentify">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="font">
          <font>
           <pointsize>24</pointsize>
@@ -44,6 +47,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="btnVerify">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="font">
          <font>
           <pointsize>24</pointsize>
@@ -201,7 +207,9 @@
               <string>&amp;Export</string>
              </property>
              <property name="icon">
-              <iconset theme="gtk-save"/>
+              <iconset theme="gtk-save">
+               <normaloff/>
+              </iconset>
              </property>
             </widget>
            </item>

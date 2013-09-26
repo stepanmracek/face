@@ -84,16 +84,62 @@ int align(int argc, char *argv[])
 
     //inputMesh.translate(cv::Point3d(50,0,0));
     //widget.addFace(&inputMesh);
-    widget.show();   
+    widget.show();
 
     return app.exec();
 }
 
+struct Arguments
+{
+    QString classifierDirPath;
+    QString databasePath;
+    QString alignReferencePath;
+};
+
+void printHelp(const QString appName)
+{
+    QTextStream out(stdout);
+    out << "Usage:\n";
+    out << appName << " -db <database> -c <classifier> -a <align model>\n";
+    out << "  <database>    - path to the directory with initial state of the database\n";
+    out << "  <classifier>  - path to the directory that contains serialized face classifier\n";
+    out << "  <align model> - path to the OBJ model used for proper face alignmnet\n";
+}
+
+QString getArgumentValue(const QString &param, const QStringList &args, bool *ok)
+{
+    *ok = true;
+    int index = args.indexOf(QString(param));
+    if (index == -1 || index + 1 == args.count()) { *ok = false; return QString(); }
+    return args[index+1];
+}
+
+Arguments parseArguments(const QStringList &args, bool *ok)
+{
+    Arguments p;
+
+    p.databasePath = getArgumentValue("-db", args, ok);
+    if (!*ok) return p;
+    p.classifierDirPath = getArgumentValue("-c", args, ok);
+    if (!*ok) return p;
+    p.alignReferencePath = getArgumentValue("-a", args, ok);
+
+    return p;
+}
+
 int main(int argc, char *argv[])
 {
-    FaceClassifier classifier("../../test/kinect/classifiers/");
-
     QApplication app(argc, argv);
+    QStringList args = app.arguments();
+    bool ok;
+    Arguments p = parseArguments(args, &ok);
+    if (!ok)
+    {
+        printHelp(args[0]);
+        exit(0);
+    }
+
+    FaceClassifier classifier("../../test/kinect/classifiers/");
     FrmKinectMain frmMain("../../test/kinect", classifier, "../../test/meanForAlign.obj");
     frmMain.show();
 
