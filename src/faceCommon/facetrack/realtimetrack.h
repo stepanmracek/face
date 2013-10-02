@@ -11,11 +11,8 @@
 class RealTimeTrack
 {
     cv::CascadeClassifier faceDetect;
-    //cv::CascadeClassifier eyeDetect;
-    //cv::CascadeClassifier noseDetect;
-
 public:
-    RealTimeTrack();
+    RealTimeTrack(const QString &path);
 
     std::vector<cv::Rect>  trackFace(ImageGrayscale &img);
 

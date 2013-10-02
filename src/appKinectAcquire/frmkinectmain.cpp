@@ -14,9 +14,12 @@
 #include "kinect.h"
 #include "linalg/loader.h"
 
-FrmKinectMain::FrmKinectMain(const QString &databasePath, const FaceClassifier &classifier, const QString &pathToAlignReference, QWidget *parent) :
+FrmKinectMain::FrmKinectMain(const QString &databasePath, const FaceClassifier &classifier,
+                             const QString &pathToAlignReference, const QString &pathToHaarFaceDetect,
+                             QWidget *parent) :
     classifier(classifier),
     pathToAlignReference(pathToAlignReference),
+    pathToHaarFaceDetect(pathToHaarFaceDetect),
     QMainWindow(parent),
     ui(new Ui::FrmKinectMain)
 {
@@ -96,7 +99,7 @@ void FrmKinectMain::on_btnDelete_clicked()
 
 void FrmKinectMain::on_btnIdentify_clicked()
 {
-    DlgScanFace dlgScan(pathToAlignReference, this);
+    DlgScanFace dlgScan(pathToAlignReference, pathToHaarFaceDetect, this);
     if (dlgScan.exec() != QDialog::Accepted) return;
     Mesh *face = dlgScan.result;
     FaceTemplate *probe = new FaceTemplate(0, *face, classifier);
@@ -114,7 +117,7 @@ void FrmKinectMain::on_btnVerify_clicked()
     QString name = QInputDialog::getItem(this, "Query", "Claimed identity:", mapNameToId.keys(), 0, false, &ok);
     if (!ok) return;
 
-    DlgScanFace dlgScan(pathToAlignReference, this);
+    DlgScanFace dlgScan(pathToAlignReference, pathToHaarFaceDetect, this);
     if (dlgScan.exec() != QDialog::Accepted) return;
     Mesh *face = dlgScan.result;
     FaceTemplate *probe = new FaceTemplate(0, *face, classifier);
@@ -140,7 +143,8 @@ void FrmKinectMain::on_btnVerify_clicked()
 
 void FrmKinectMain::on_btnEnroll_clicked()
 {
-    DlgEnroll dlgEnroll(mapIdToName, mapNameToId, database, classifier, pathToAlignReference, this);
+    DlgEnroll dlgEnroll(mapIdToName, mapNameToId, database, classifier,
+                        pathToAlignReference, pathToHaarFaceDetect, this);
     if (dlgEnroll.exec() == QDialog::Accepted)
     {
         refreshList();

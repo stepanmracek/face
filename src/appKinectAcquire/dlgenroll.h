@@ -18,7 +18,8 @@ class DlgEnroll : public QDialog
 public:
     explicit DlgEnroll(QMap<int, QString> &mapIdToName, QMap<QString, int> mapNameToId,
                        QHash<int, FaceTemplate*> database, const FaceClassifier &classifier,
-                       const QString &pathToAlignReference, QWidget *parent);
+                       const QString &pathToAlignReference, const QString &pathToHaarFaceDetect,
+                       QWidget *parent);
 
     ~DlgEnroll();
 
@@ -37,6 +38,7 @@ private:
     QHash<int, FaceTemplate*> &database;
     const FaceClassifier &classifier;
     const QString &pathToAlignReference;
+    const QString &pathToHaarFaceDetect;
 
     QList<Mesh*> scans;
 };

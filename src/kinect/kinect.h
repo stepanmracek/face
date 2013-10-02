@@ -31,9 +31,9 @@ public:
 
     static ImageGrayscale RGBToGrayscale(uint8_t *rgb);
 
-    static Mesh *scanFace(int scanIterations);
+    static Mesh *scanFace(int scanIterations, const QString &faceHaarPath);
 
-    static Mesh *scanAndAlignFace(int scanIterations, int icpIterations, const QString &alignReferenceOBJPath);
+    static Mesh *scanAndAlignFace(int scanIterations, int icpIterations, const QString &alignReferenceOBJPath, const QString &faceHaarPath);
 };
 
 #endif /* KINECT_H_ */

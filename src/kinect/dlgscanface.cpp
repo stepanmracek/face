@@ -4,9 +4,10 @@
 #include "kinect.h"
 #include "facelib/facealigner.h"
 
-DlgScanFace::DlgScanFace(const QString &pathToAlignReference, QWidget *parent) :
+DlgScanFace::DlgScanFace(const QString &pathToAlignReference, const QString &faceHaarPath, QWidget *parent) :
     QDialog(parent), ui(new Ui::DlgScanFace),
-    pathToAlignReference(pathToAlignReference)
+    pathToAlignReference(pathToAlignReference),
+    tracker(faceHaarPath)
 {
     ui->setupUi(this);
 

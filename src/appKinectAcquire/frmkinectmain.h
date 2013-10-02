@@ -16,7 +16,9 @@ class FrmKinectMain : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit FrmKinectMain(const QString &databasePath, const FaceClassifier &classifier, const QString &pathToAlignReference, QWidget *parent = 0);
+    explicit FrmKinectMain(const QString &databasePath, const FaceClassifier &classifier,
+                           const QString &pathToAlignReference, const QString &pathToHaarFaceDetect,
+                           QWidget *parent = 0);
     ~FrmKinectMain();
 
 private slots:
@@ -36,6 +38,7 @@ private:
     QMap<QString, int> mapNameToId;
     QHash<int, FaceTemplate*> database;
     QString pathToAlignReference;
+    QString pathToHaarFaceDetect;
 
     void initDatabase(const QString &dirPath);
     void refreshList();

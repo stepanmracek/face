@@ -18,7 +18,7 @@ class DlgScanFace : public QDialog
     Q_OBJECT
 
 public:
-    explicit DlgScanFace(const QString &pathToAlignReference, QWidget *parent = 0);
+    explicit DlgScanFace(const QString &pathToAlignReference, const QString &faceHaarPath, QWidget *parent = 0);
     ~DlgScanFace();
     Mesh *result;
 

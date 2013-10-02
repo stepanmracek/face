@@ -14,7 +14,7 @@
 
 int scan(int argc, char *argv[])
 {
-    Mesh *m = Kinect::scanFace(10);
+    Mesh *m = Kinect::scanFace(10, "../../test/haar-face.xml");
     Mesh mean = Mesh::fromOBJ("../../test/meanForAlign.obj");
     FaceAligner aligner(mean);
     aligner.icpAlign(*m, 10);
@@ -37,7 +37,7 @@ int scan(int argc, char *argv[])
 
 int scan(int argc, char *argv[], const QString &outputPath, const QString &lmPath)
 {
-    Mesh *m = Kinect::scanFace(10);
+    Mesh *m = Kinect::scanFace(10, "../../test/haar-face.xml");
     bool success;
     Landmarks lm = FaceFeaturesAnotation::anotate(*m, success);
     if (!success)
@@ -59,7 +59,7 @@ int scan(int argc, char *argv[], const QString &outputPath, const QString &lmPat
 
 int align(int argc, char *argv[])
 {
-    Mesh *inputMesh = Kinect::scanFace(10); // Mesh::fromBIN("../../test/kinect-face.bin", false);
+    Mesh *inputMesh = Kinect::scanFace(10, "../../test/haar-face.xml"); // Mesh::fromBIN("../../test/kinect-face.bin", false);
     //Landmarks landmarks("../../test/kinect-face.xml");
 
     QString pca = "../../test/morph-pca.xml";
@@ -94,16 +94,18 @@ struct Arguments
     QString classifierDirPath;
     QString databasePath;
     QString alignReferencePath;
+    QString haarFaceDetectPath;
 };
 
 void printHelp(const QString appName)
 {
     QTextStream out(stdout);
     out << "Usage:\n";
-    out << appName << " -db <database> -c <classifier> -a <align model>\n";
-    out << "  <database>    - path to the directory with initial state of the database\n";
-    out << "  <classifier>  - path to the directory that contains serialized face classifier\n";
-    out << "  <align model> - path to the OBJ model used for proper face alignmnet\n";
+    out << appName << " -db <database> -c <classifier> -a <align model> -h <haar face detect>\n";
+    out << "  <database>         - path to the directory with initial state of the database\n";
+    out << "  <classifier>       - path to the directory that contains serialized face classifier\n";
+    out << "  <align model>      - path to the OBJ model used for proper face alignmnet\n";
+    out << "  <haar face detect> - path to the haar face detector\n";
 }
 
 QString getArgumentValue(const QString &param, const QStringList &args, bool *ok)
@@ -123,6 +125,8 @@ Arguments parseArguments(const QStringList &args, bool *ok)
     p.classifierDirPath = getArgumentValue("-c", args, ok);
     if (!*ok) return p;
     p.alignReferencePath = getArgumentValue("-a", args, ok);
+    if (!*ok) return p;
+    p.haarFaceDetectPath = getArgumentValue("-h", args, ok);
 
     return p;
 }
@@ -139,8 +143,8 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    FaceClassifier classifier("../../test/kinect/classifiers/");
-    FrmKinectMain frmMain("../../test/kinect", classifier, "../../test/meanForAlign.obj");
+    FaceClassifier classifier(p.classifierDirPath);
+    FrmKinectMain frmMain(p.databasePath, classifier, p.alignReferencePath, p.haarFaceDetectPath);
     frmMain.show();
 
     return app.exec();

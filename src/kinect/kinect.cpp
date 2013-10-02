@@ -251,18 +251,18 @@ ImageGrayscale Kinect::RGBToGrayscale(uint8_t *rgb)
     return result;
 }
 
-Mesh *Kinect::scanAndAlignFace(int scanIterations, int icpIterations, const QString &alignReferenceOBJPath)
+Mesh *Kinect::scanAndAlignFace(int scanIterations, int icpIterations, const QString &alignReferenceOBJPath, const QString &faceHaarPath)
 {
-    Mesh *m = Kinect::scanFace(scanIterations);
+    Mesh *m = Kinect::scanFace(scanIterations, faceHaarPath);
     Mesh mean = Mesh::fromOBJ(alignReferenceOBJPath);
     FaceAligner aligner(mean);
     aligner.icpAlign(*m, icpIterations);
     return m;
 }
 
-Mesh *Kinect::scanFace(int scanIterations)
+Mesh *Kinect::scanFace(int scanIterations, const QString &faceHaarPath)
 {
-    RealTimeTrack rtTrack;
+    RealTimeTrack rtTrack(faceHaarPath);
     int minDistanceFromSensor = 200;
     int maxDistanceFromSensor = 800;
 

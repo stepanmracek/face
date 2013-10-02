@@ -815,6 +815,9 @@ public:
               << "gl-index" << "gl-mean" << "gl-gauss" << "gl-eigencur" << "gl-depth" << "gl-textureE"
               << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur" << "gabor-depth" << "gabor-textureE";
 
+        //units << "gabor-textureE" << "gabor-depth" << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur"
+        //      << "gl-textureE" << "gl-depth" << "gl-index" << "gl-mean" << "gl-gauss" << "gl-eigencur";
+
         ScoreWeightedSumFusion fusion;
         QList<Evaluation> trainComponents;
         foreach (const QString &unit, units)
@@ -822,6 +825,7 @@ public:
             QVector<double> trainGenScores = Vector::fromFile(dir + unit + "-0-gen-scores").toQVector();
             QVector<double> trainImpScores = Vector::fromFile(dir + unit + "-0-imp-scores").toQVector();
             trainComponents << Evaluation(trainGenScores, trainImpScores);
+            //qDebug() << Evaluation(trainGenScores, trainImpScores).eer;
         }
 
         QVector<int> selectedUnits = ScoreLevelFusionWrapper::trainClassifier(fusion, trainComponents);
@@ -840,7 +844,7 @@ public:
             Evaluation eval = fusion.evaluate(testEvals);
             qDebug() << eval.eer << eval.fnmrAtFmr(0.01) << eval.fnmrAtFmr(0.001) << eval.fnmrAtFmr(0.0001);
 
-            eval.outputResultsDET(QString::number(i));
+            //eval.outputResultsDET(QString::number(i));
         }
     }
 
@@ -880,7 +884,7 @@ public:
                 Evaluation eval = fusion2.evaluate(testEvals);
                 qDebug() << eval.eer << eval.fnmrAtFmr(0.01) << eval.fnmrAtFmr(0.001) << eval.fnmrAtFmr(0.0001);
 
-                eval.outputResultsDET(QString::number(i));
+                //eval.outputResultsDET(QString::number(i));
             }
         }
     }

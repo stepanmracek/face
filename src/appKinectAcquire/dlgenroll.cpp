@@ -6,9 +6,9 @@
 
 DlgEnroll::DlgEnroll(QMap<int, QString> &mapIdToName, QMap<QString, int> mapNameToId,
                      QHash<int, FaceTemplate *> database, const FaceClassifier &classifier,
-                     const QString &pathToAlignReference, QWidget *parent) :
+                     const QString &pathToAlignReference, const QString &pathToHaarFaceDetect, QWidget *parent) :
     mapIdToName(mapIdToName), mapNameToId(mapNameToId), database(database), classifier(classifier),
-    pathToAlignReference(pathToAlignReference),
+    pathToAlignReference(pathToAlignReference), pathToHaarFaceDetect(pathToHaarFaceDetect),
     QDialog(parent), ui(new Ui::DlgEnroll)
 {
     ui->setupUi(this);
@@ -21,7 +21,7 @@ DlgEnroll::~DlgEnroll()
 
 void DlgEnroll::on_btnAdd_clicked()
 {
-    DlgScanFace dlgScan(pathToAlignReference, this);
+    DlgScanFace dlgScan(pathToAlignReference, pathToHaarFaceDetect, this);
     if (dlgScan.exec() != QDialog::Accepted) return;
     Mesh *face = dlgScan.result;
     scans << face;
