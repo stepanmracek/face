@@ -329,7 +329,7 @@ CurvatureStruct SurfaceProcessor::calculateCurvatures(Map &depthmap)
     double k1;
     double k2;
 
-    qDebug() << "calculating curvatures - k1, k2, pcl";
+    //qDebug() << "calculating curvatures - k1, k2, pcl";
     for (int x = 0; x < depthmap.w; x++)
     {
         for (int y = 0; y < depthmap.h; y++)
@@ -402,7 +402,7 @@ CurvatureStruct SurfaceProcessor::calculateCurvatures(Map &depthmap)
         }
     }
 
-    qDebug() << "calculating curvatures - mean, gaussian, shape index";
+    //qDebug() << "calculating curvatures - mean, gaussian, shape index";
 
     for (int x = 0; x < depthmap.w; x++)
     {

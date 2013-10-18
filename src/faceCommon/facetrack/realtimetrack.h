@@ -8,13 +8,13 @@
 
 #include "linalg/common.h"
 
-class RealTimeTrack
+class RealTimeTracker
 {
-    cv::CascadeClassifier faceDetect;
+    cv::CascadeClassifier classifier;
 public:
-    RealTimeTrack(const QString &path);
+    RealTimeTracker(const QString &path);
 
-    std::vector<cv::Rect>  trackFace(ImageGrayscale &img);
+    std::vector<cv::Rect>  detect(ImageGrayscale &img);
 
     //int trackTest();
 };

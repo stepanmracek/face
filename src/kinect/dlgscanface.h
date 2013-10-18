@@ -25,7 +25,7 @@ public:
 private:
     Ui::DlgScanFace *ui;
     QTimer *timer;
-    RealTimeTrack tracker;
+    RealTimeTracker tracker;
     ImageGrayscale frame;
     u_int8_t rgbBuffer[640*480*3];
     double depthBuffer[640*480];

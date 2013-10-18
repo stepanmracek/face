@@ -88,11 +88,12 @@ FaceAligner::FaceAligner(const QString &dirWithLandmarksAndXYZfiles)
 Procrustes3DResult FaceAligner::icpAlign(Mesh &face, int maxIterations)
 {
     assert(maxIterations >= 1);
+    Procrustes3DResult result;
     LandmarkDetector lmDetector(face);
     Landmarks lm = lmDetector.detect();
+    if (!lm.is(Landmarks::Nosetip)) return result;
     face.translate(-lm.get(Landmarks::Nosetip));
 
-    Procrustes3DResult result;
     for (int iteration = 0; iteration < maxIterations; iteration++)
     {
         // Find correspondence
@@ -121,7 +122,7 @@ Procrustes3DResult FaceAligner::icpAlign(Mesh &face, int maxIterations)
         result.postTranslations << -centralizeReferences;
 
         double d = Procrustes3D::diff(pointsToTransform, referencePoints) / referencePoints.count();
-        qDebug() << "FaceAligner::icpAlign" << (iteration+1) << d;
+        //qDebug() << "FaceAligner::icpAlign" << (iteration+1) << d;
     }
     return result;
 }

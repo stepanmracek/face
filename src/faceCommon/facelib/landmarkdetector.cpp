@@ -82,8 +82,16 @@ void LandmarkDetector::nosetip(Landmarks &l)
     int x = peakDensity.indexToX(i);
     int y = peakDensity.indexToY(i);
 
-    cv::Point3d nosetip = converter.MapToMeshCoords(depth, cv::Point2d(x + cropStartX, y + cropStartY));
-    l.set(Landmarks::Nosetip, nosetip);
+    bool ok;
+    cv::Point3d nosetip = converter.MapToMeshCoords(depth, cv::Point2d(x + cropStartX, y + cropStartY), &ok);
+    if (ok)
+    {
+        l.set(Landmarks::Nosetip, nosetip);
+    }
+    else
+    {
+        qDebug() << "Nose coordinates not found";
+    }
 }
 
 void LandmarkDetector::innerEyeCorners(Landmarks &l)

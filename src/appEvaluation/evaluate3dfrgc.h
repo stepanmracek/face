@@ -844,7 +844,7 @@ public:
             Evaluation eval = fusion.evaluate(testEvals);
             qDebug() << eval.eer << eval.fnmrAtFmr(0.01) << eval.fnmrAtFmr(0.001) << eval.fnmrAtFmr(0.0001);
 
-            //eval.outputResultsDET(QString::number(i));
+            eval.outputResultsDET(QString::number(i));
         }
     }
 
@@ -884,7 +884,7 @@ public:
                 Evaluation eval = fusion2.evaluate(testEvals);
                 qDebug() << eval.eer << eval.fnmrAtFmr(0.01) << eval.fnmrAtFmr(0.001) << eval.fnmrAtFmr(0.0001);
 
-                //eval.outputResultsDET(QString::number(i));
+                eval.outputResultsDET(QString::number(i));
             }
         }
     }

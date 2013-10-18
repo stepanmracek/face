@@ -39,6 +39,8 @@ public:
 
     cv::Point3d get(LandmarkNames name) { return points[name]; }
 
+    bool is(LandmarkNames name) { return points[name] != cv::Point3d(); }
+
     void set(LandmarkNames name, cv::Point3d value) { points[name] = value; }
 
     bool check();

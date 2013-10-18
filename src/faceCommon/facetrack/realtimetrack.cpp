@@ -2,16 +2,16 @@
 
 #include <QDebug>
 
-RealTimeTrack::RealTimeTrack(const QString &path)
+RealTimeTracker::RealTimeTracker(const QString &path)
 {
     // "/usr/share/opencv/haarcascades/haarcascade_frontalface_alt.xml"
-    qDebug() << "face detect:" << faceDetect.load(path.toStdString());
+    qDebug() << "haar tracker loaded:" << classifier.load(path.toStdString());
 }
 
-std::vector<cv::Rect>  RealTimeTrack::trackFace(ImageGrayscale &img)
+std::vector<cv::Rect>  RealTimeTracker::detect(ImageGrayscale &img)
 {
     std::vector<cv::Rect> result;
-    faceDetect.detectMultiScale(img, result);
+    classifier.detectMultiScale(img, result);
     return result;
 }
 

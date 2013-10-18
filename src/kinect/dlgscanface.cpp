@@ -11,11 +11,9 @@ DlgScanFace::DlgScanFace(const QString &pathToAlignReference, const QString &fac
 {
     ui->setupUi(this);
 
-    //capture = cv::VideoCapture(0);
-
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(showFace()));
-    timer->start(100);
+    timer->start(50);
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
@@ -29,7 +27,7 @@ void DlgScanFace::showFace()
 {
     Kinect::getRGB(rgbBuffer);
     frame = Kinect::RGBToGrayscale(rgbBuffer);
-    std::vector<cv::Rect> faces = tracker.trackFace(frame);
+    std::vector<cv::Rect> faces = tracker.detect(frame);
 
     int faceCount = faces.size();
     if (faceCount > 0)

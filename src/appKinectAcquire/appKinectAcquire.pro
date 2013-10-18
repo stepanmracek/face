@@ -21,17 +21,20 @@ SOURCES += \
     frmkinectmain.cpp \
     dlgreferenceproperties.cpp \
     dlgidentifyresult.cpp \
-    dlgenroll.cpp
+    dlgenroll.cpp \
+    dlgrealtimecompare.cpp
 
 HEADERS += \
     frmkinectmain.h \
     dlgreferenceproperties.h \
     dlgidentifyresult.h \
-    dlgenroll.h
+    dlgenroll.h \
+    dlgrealtimecompare.h
 
 FORMS += \
     frmkinectmain.ui \
     dlgreferenceproperties.ui \
     dlgidentifyresult.ui \
-    dlgenroll.ui
+    dlgenroll.ui \
+    dlgrealtimecompare.ui
 

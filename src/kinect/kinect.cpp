@@ -262,7 +262,7 @@ Mesh *Kinect::scanAndAlignFace(int scanIterations, int icpIterations, const QStr
 
 Mesh *Kinect::scanFace(int scanIterations, const QString &faceHaarPath)
 {
-    RealTimeTrack rtTrack(faceHaarPath);
+    RealTimeTracker rtTrack(faceHaarPath);
     int minDistanceFromSensor = 200;
     int maxDistanceFromSensor = 800;
 
@@ -283,7 +283,7 @@ Mesh *Kinect::scanFace(int scanIterations, const QString &faceHaarPath)
         }
 
         grayScaleImg = Kinect::RGBToGrayscale(rgb);
-        std::vector<cv::Rect> faces = rtTrack.trackFace(grayScaleImg);
+        std::vector<cv::Rect> faces = rtTrack.detect(grayScaleImg);
 
         int faceCount = faces.size();
         for (int i = 0; i < faceCount; i++)

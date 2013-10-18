@@ -40,6 +40,8 @@ void Mesh::centralize()
     double sumy = 0;
     double sumz = 0;
     double count = points.count();
+    if (count == 0) return;
+
     foreach(cv::Point3d p, points)
     {
         sumx += p.x;
