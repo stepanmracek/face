@@ -7,6 +7,7 @@
 #include <QFileInfo>
 #include <QMap>
 #include <QList>
+#include <QPair>
 
 class FileData
 {

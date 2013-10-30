@@ -10,9 +10,9 @@ class TestHistogramFeatures
 public:
     static void testFeaturesGeneration(const QString &frgcPath)
     {
-        ImageGrayscale full1 = cv::imread((frgcPath + "zbin-aligned/depth2/02463d652.png").toStdString(), cv::IMREAD_GRAYSCALE);
-        ImageGrayscale full2 = cv::imread((frgcPath + "zbin-aligned/depth2/02463d654.png").toStdString(), cv::IMREAD_GRAYSCALE);
-        ImageGrayscale full3 = cv::imread((frgcPath + "zbin-aligned/depth2/04200d74.png").toStdString(), cv::IMREAD_GRAYSCALE);
+        ImageGrayscale full1 = cv::imread((frgcPath + "zbin-aligned/depth2/02463d652.png").toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
+        ImageGrayscale full2 = cv::imread((frgcPath + "zbin-aligned/depth2/02463d654.png").toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
+        ImageGrayscale full3 = cv::imread((frgcPath + "zbin-aligned/depth2/04200d74.png").toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
         ImageGrayscale cropped1 = full1(cv::Rect(40, 20, 220, 180));
         ImageGrayscale cropped2 = full2(cv::Rect(40, 20, 220, 180));
         ImageGrayscale cropped3 = full3(cv::Rect(40, 20, 220, 180));

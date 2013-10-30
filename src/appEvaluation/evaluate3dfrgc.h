@@ -268,7 +268,7 @@ public:
         QVector<int> allClasses;
         foreach (const QFileInfo &fileInfo, srcFiles)
         {
-            ImageGrayscale full = cv::imread(fileInfo.absoluteFilePath().toStdString(), cv::IMREAD_GRAYSCALE);
+            ImageGrayscale full = cv::imread(fileInfo.absoluteFilePath().toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
             cv::GaussianBlur(full, full, cv::Size(21,21), 0);
             ImageGrayscale cropped = full(cv::Rect(40, 20, 220, 180));
             allImages << cropped;
