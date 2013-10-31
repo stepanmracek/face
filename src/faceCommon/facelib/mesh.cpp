@@ -144,8 +144,8 @@ void Mesh::calculateTriangles()
     }
 
     triangles = Delaunay::process(points2d);
-    int c = triangles.count();
 
+    /*int c = triangles.count();
     QList<int> toRemove;
     for (int i = 0; i < c; i++)
     {
@@ -162,14 +162,14 @@ void Mesh::calculateTriangles()
         d = euclideanDistance(p2, p3);
         if (d > maxd) maxd = d;
 
-        //if (maxd > 30.0)
-        //    toRemove.append(i);
+        if (maxd > 30.0)
+            toRemove.append(i);
     }
 
     for (int i = toRemove.count()-1; i >= 0; i--)
     {
         triangles.remove(toRemove.at(i));
-    }
+    }*/
 
     //qDebug() << "Triangles done, |triangles| =" << triangles.count();
 }
