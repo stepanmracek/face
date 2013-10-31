@@ -12,6 +12,8 @@
 
 #include "frmkinectmain.h"
 
+#include "kinectsensorplugin.h"
+
 int scan(int argc, char *argv[])
 {
     Mesh *m = Kinect::scanFace(10, "../../test/haar-face.xml");
@@ -131,7 +133,7 @@ Arguments parseArguments(const QStringList &args, bool *ok)
     return p;
 }
 
-int main(int argc, char *argv[])
+int mainMSV(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     QStringList args = app.arguments();
@@ -147,5 +149,19 @@ int main(int argc, char *argv[])
     FrmKinectMain frmMain(p.databasePath, classifier, p.alignReferencePath, p.haarFaceDetectPath);
     frmMain.show();
 
+    return app.exec();
+}
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+
+    KinectSensorPlugin plugin("../../test/haar-face.xml");
+    if (!plugin.position()) return 0;
+
+    Mesh * mesh = plugin.scan();
+    GLWidget widget;
+    widget.addFace(mesh);
+    widget.show();
     return app.exec();
 }
