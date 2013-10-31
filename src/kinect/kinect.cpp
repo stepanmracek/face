@@ -151,6 +151,26 @@ VectorOfPoints Kinect::depthToVectorOfPoints(double *depth)
     return result;
 }
 
+void Kinect::depthToMatrix(double *depth, Matrix &out, double nullValue)
+{
+    int i = 0;
+    for (int r = 0; r < 480; r++)
+    {
+        for (int c = 0; c < 640; c++)
+        {
+            out(r, c) = (depth[i] != 0) ? depth[i] : nullValue;
+            i++;
+        }
+    }
+}
+
+Matrix Kinect::depthToMatrix(double *depth, double nullValue)
+{
+    Matrix result = Matrix::zeros(480, 640);
+    depthToMatrix(depth, result, nullValue);
+    return result;
+}
+
 Mesh *Kinect::createMesh(double *depth, uchar *rgb)
 {
     int DepthIndextoPointIndex[n];
@@ -230,9 +250,8 @@ ImageBGR Kinect::RGBToColorMatrix(uint8_t *rgb)
     return result;
 }
 
-ImageGrayscale Kinect::RGBToGrayscale(uint8_t *rgb)
+void Kinect::RGBToGrayscale(uint8_t *rgb, ImageGrayscale &out)
 {
-    ImageGrayscale result(480, 640);
     int i = 0;
     for (int y = 0; y < 480; y++)
     {
@@ -242,12 +261,17 @@ ImageGrayscale Kinect::RGBToGrayscale(uint8_t *rgb)
             double r = rgb[i3 + 2];
             double g = rgb[i3 + 1];
             double b = rgb[i3];
-            //if (x == 0 && y == 0) qDebug() << r;
-            result(y, x) = cv::saturate_cast<uint8_t>(0.299*r + 0.587*g + 0.114*b);
+            out(y, x) = cv::saturate_cast<uint8_t>(0.299*r + 0.587*g + 0.114*b);
 
             i++;
         }
     }
+}
+
+ImageGrayscale Kinect::RGBToGrayscale(uint8_t *rgb)
+{
+    ImageGrayscale result(480, 640);
+    RGBToGrayscale(rgb, result);
     return result;
 }
 

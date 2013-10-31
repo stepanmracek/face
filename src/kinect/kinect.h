@@ -25,11 +25,15 @@ public:
 
     static VectorOfPoints depthToVectorOfPoints(double *depth);
 
+    static Matrix depthToMatrix(double *depth, double nullValue = 0.0);
+    static void depthToMatrix(double *depth, Matrix &out, double nullValue = 0.0);
+
     static Mesh *createMesh(double *depth, uint8_t *rgb);
 
     static ImageBGR RGBToColorMatrix(uint8_t *rgb);
 
     static ImageGrayscale RGBToGrayscale(uint8_t *rgb);
+    static void RGBToGrayscale(uint8_t *rgb, ImageGrayscale &out);
 
     static Mesh *scanFace(int scanIterations, const QString &faceHaarPath);
 
