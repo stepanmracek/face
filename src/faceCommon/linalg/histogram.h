@@ -4,6 +4,8 @@
 #include <QVector>
 #include <QString>
 
+#include "linalg/common.h"
+
 class Histogram
 {
 public:
@@ -15,9 +17,10 @@ public:
     QVector<double> histogramValues;
 
     Histogram() {}
-    Histogram(const QVector<double> &values, int bins, bool normalize, double minValue = 0, double maxValue = 0);
+    Histogram(const QVector<double> &values, int bins, bool normalize, double minValue = 0, double maxValue = 0, bool ignoreOutliers = false);
 
     void savePlot(const QString &path) const;
+    Matrix plot() const;
 };
 
 #endif // HISTOGRAM_H

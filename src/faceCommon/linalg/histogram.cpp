@@ -4,7 +4,7 @@
 
 #include "vector.h"
 
-Histogram::Histogram(const QVector<double> &values, int bins, bool normalize, double minValue, double maxValue)
+Histogram::Histogram(const QVector<double> &values, int bins, bool normalize, double minValue, double maxValue, bool ignoreOutliers)
 {
     histogramCounter.resize(bins);
     histogramValues.resize(bins);
@@ -43,8 +43,17 @@ Histogram::Histogram(const QVector<double> &values, int bins, bool normalize, do
     assert(bins > 1);
 
     double delta = maxValue - minValue;
+    int validCount = 0;
     foreach (double v, values)
     {
+        if (ignoreOutliers)
+        {
+            if (v < minValue || v > maxValue)
+            {
+                continue;
+            }
+        }
+        validCount++;
         if (v < minValue) v = minValue;
         if (v > maxValue) v = maxValue;
         double distance = v - minValue;
@@ -58,7 +67,7 @@ Histogram::Histogram(const QVector<double> &values, int bins, bool normalize, do
     {
         if (normalize)
         {
-            histogramCounter[i] /= values.count();
+            histogramCounter[i] /= validCount;
         }
 
         histogramValues[i] = delta/bins*i + minValue;
@@ -68,4 +77,15 @@ Histogram::Histogram(const QVector<double> &values, int bins, bool normalize, do
 void Histogram::savePlot(const QString &path) const
 {
     Common::savePlot(histogramValues, histogramCounter, path);
+}
+
+Matrix Histogram::plot() const
+{
+    int n = histogramValues.count();
+    Matrix result = Matrix::zeros(100, n*10);
+    for (int i = 0; i < n; i++)
+    {
+        cv::line(result, cv::Point(i*10, 100), cv::Point2i(i*10, 100 - histogramCounter[i]*100), 1.0);
+    }
+    return result;
 }
