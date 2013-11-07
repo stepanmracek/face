@@ -22,8 +22,7 @@ SOURCES += \
     dlgreferenceproperties.cpp \
     dlgidentifyresult.cpp \
     dlgenroll.cpp \
-    dlgrealtimecompare.cpp \
-    kinectsensorplugin.cpp
+    dlgrealtimecompare.cpp
 
 HEADERS += \
     frmkinectmain.h \
@@ -31,7 +30,6 @@ HEADERS += \
     dlgidentifyresult.h \
     dlgenroll.h \
     dlgrealtimecompare.h \
-    kinectsensorplugin.h
 
 FORMS += \
     frmkinectmain.ui \

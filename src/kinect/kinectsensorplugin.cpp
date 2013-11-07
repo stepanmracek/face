@@ -14,29 +14,40 @@ KinectSensorPlugin::KinectSensorPlugin(const QString &faceDetectorPath, const QS
     aligner(Mesh::fromOBJ(objModelPathForAlign)),
     positionInterupted(false)
 {
-    img = ImageGrayscale::zeros(480, 640);
-    Matrix maskMatrix = Matrix::zeros(480, 640);
+    rgbBuffer = new unsigned char[WIDTH * HEIGHT * CHANNELS];
+    depthBuffer = new double[WIDTH * HEIGHT];
+    depthMask = new bool[WIDTH * HEIGHT];
+
+    img = ImageGrayscale::zeros(HEIGHT, WIDTH);
+    Matrix maskMatrix = Matrix::zeros(HEIGHT, WIDTH);
     cv::ellipse(maskMatrix, rotRect, 1.0, CV_FILLED);
     ellipsePointsCount = 0;
-    memset(depthMask, 0, sizeof(bool)*640*480);
+    memset(depthMask, 0, sizeof(bool)*WIDTH*HEIGHT);
     for (int r = 240 - 80; r < 240 + 80; r++)
     {
         for (int c = 320 - 60; c < 320 + 60; c++)
         {
             if (maskMatrix(r, c))
             {
-                depthMask[640*r+c] = true;
+                depthMask[WIDTH*r+c] = true;
                 ellipsePointsCount++;
             }
         }
     }
 }
 
+KinectSensorPlugin::~KinectSensorPlugin()
+{
+    delete rgbBuffer;
+    delete depthBuffer;
+    delete depthMask;
+}
+
 KinectSensorPlugin::PositionResponse KinectSensorPlugin::depthStats()
 {
     int count = 0;
     double sum = 0.0;
-    for (int i = 0; i < 640*480; i++)
+    for (int i = 0; i < HEIGHT*WIDTH; i++)
     {
         if (depthBuffer[i])
         {
@@ -49,9 +60,9 @@ KinectSensorPlugin::PositionResponse KinectSensorPlugin::depthStats()
     double mean = sum/count;
 
     //qDebug() << ratio << mean;
-    if (ratio < 0.5) return NoData;
-    if (mean > 820) return MoveCloser;
-    if (mean < 780) return MoveFar;
+    if (ratio < DATA_RATIO) return NoData;
+    if (mean > POSITIONING_MAX_DISTANCE) return MoveCloser;
+    if (mean < POSITIONING_MIN_DISTANCE) return MoveFar;
     return Ok;
 
     //Kinect::depthToMatrix(depthBuffer, depth);
@@ -70,7 +81,7 @@ void KinectSensorPlugin::putText(const char *text)
 void KinectSensorPlugin::getData()
 {
     Kinect::getRGB(rgbBuffer);
-    Kinect::getDepth(depthBuffer, depthMask, 0.0, 1000.0);
+    Kinect::getDepth(depthBuffer, depthMask, 0.0, MAX_GET_DATA_DISTANCE);
     Kinect::RGBToGrayscale(rgbBuffer, img);
 
     //Matrix d = Kinect::depthToMatrix(depthBuffer);
@@ -133,7 +144,7 @@ void KinectSensorPlugin::position()
         drawGUI();
 
         consecutiveNoData++;
-        if (consecutiveNoData == 50)
+        if (consecutiveNoData == CONSECUTIVE_NO_DATA)
         {
             consecutiveNoData = 0;
             state = Waiting;
@@ -161,14 +172,14 @@ void KinectSensorPlugin::position()
         {
             putText("Hold still");
             consecutiveDetections++;
-            qDebug() << "Face detected";
+            qDebug() << "Consecutive face detections:" << consecutiveDetections;
         }
         else
         {
             consecutiveDetections = 0;
         }
 
-        if (consecutiveDetections == 10)
+        if (consecutiveDetections == CONSECUTIVE_DETECTIONS)
         {
             consecutiveDetections = 0;
             state = Capturing;
@@ -180,7 +191,7 @@ void KinectSensorPlugin::position()
 
 void KinectSensorPlugin::capture()
 {
-    Kinect::getDepth(depthBuffer, 10, depthMask, 600.0, 1000.0);
+    Kinect::getDepth(depthBuffer, 10, depthMask, 0.0, MAX_GET_DATA_DISTANCE);
     Kinect::getRGB(rgbBuffer);
     Kinect::RGBToGrayscale(rgbBuffer, img);
 
@@ -200,13 +211,13 @@ void KinectSensorPlugin::align()
 {
     if (mesh)
     {
-        aligner.icpAlign(*mesh, 20);
+        aligner.icpAlign(*mesh, ICP_ITERATIONS);
     }
 }
 
 bool KinectSensorPlugin::isKinectPluggedIn()
 {
-    return Kinect::isKinectPluggedIn();
+    return Kinect::isKinectPluggedIn(depthBuffer);
 }
 
 void KinectSensorPlugin::deleteMesh()

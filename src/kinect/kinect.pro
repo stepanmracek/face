@@ -7,11 +7,13 @@ INCLUDEPATH += "/usr/include/libfreenect/"
 
 SOURCES += \
     kinect.cpp \
-    dlgscanface.cpp
+    dlgscanface.cpp \
+    kinectsensorplugin.cpp
 
 HEADERS += \
     kinect.h \
-    dlgscanface.h
+    dlgscanface.h \
+    kinectsensorplugin.h
     
 LIBS += `pkg-config --libs opencv` -lGL -lGLU -lfreenect -lfreenect_sync
 

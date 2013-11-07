@@ -156,8 +156,19 @@ int mainMSV(int argc, char *argv[])
 int mainKinect(int argc, char *argv[])
 {
     KinectSensorPlugin plugin("../../test/haar-face.xml", "../../test/meanForAlign.obj");
-    plugin.scanFace();
-    qDebug() << "Second shot";
+
+    if (!plugin.isKinectPluggedIn())
+    {
+        qDebug() << "Kinect not plugged in";
+        return 0;
+    }
+    else
+    {
+        qDebug() << "Kinect detected";
+    }
+
+    //plugin.scanFace();
+    //qDebug() << "Second shot";
     plugin.scanFace();
     Mesh * mesh = plugin.mesh;
     if (!mesh) return 0;

@@ -8,9 +8,20 @@
 class KinectSensorPlugin
 {
 private:
-    unsigned char rgbBuffer[640 * 480 * 3];
-    double depthBuffer[640 * 480];
-    bool depthMask[640 * 480];
+    static const int WIDTH = 640;
+    static const int HEIGHT = 480;
+    static const int CHANNELS = 3;
+    static const int CONSECUTIVE_DETECTIONS = 10;
+    static const int CONSECUTIVE_NO_DATA = 50;
+    static const double DATA_RATIO = 0.5;
+    static const double POSITIONING_MAX_DISTANCE = 870;
+    static const double POSITIONING_MIN_DISTANCE = 830;
+    static const double MAX_GET_DATA_DISTANCE = 1000;
+    static const int ICP_ITERATIONS = 10;
+
+    unsigned char *rgbBuffer;
+    double *depthBuffer;
+    bool *depthMask;
     RealTimeTracker detector;
     cv::RotatedRect rotRect;
     cv::Rect rect;
@@ -32,6 +43,7 @@ public:
     Mesh *mesh;
 
     KinectSensorPlugin(const QString &faceDetectorPath, const QString &objModelPathForAlign);
+    ~KinectSensorPlugin();
 
     void scanFace();
 
@@ -44,7 +56,7 @@ public:
     void align();
     bool isPositionInterupted() { return positionInterupted; }
 
-    static bool isKinectPluggedIn();
+    bool isKinectPluggedIn();
 };
 
 #endif // KINECTSENSORPLUGIN_H

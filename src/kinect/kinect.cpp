@@ -365,10 +365,9 @@ Mesh *Kinect::scanFace(int scanIterations, const QString &faceHaarPath)
     return mesh;
 }
 
-bool Kinect::isKinectPluggedIn()
+bool Kinect::isKinectPluggedIn(double *depthBuffer)
 {
-    freenect_context *ctx;
-    if (freenect_init(&ctx, NULL) < 0) return false;
-    int num = freenect_num_devices(ctx);
-    return num > 0;
+    uint32_t ts = 0;
+    int returnValue = freenect_sync_get_depth((void**)(&depthBuffer), &ts, 0, FREENECT_DEPTH_REGISTERED);
+    return returnValue == 0;
 }
