@@ -99,6 +99,7 @@ void KinectSensorPlugin::drawGUI()
 
 void KinectSensorPlugin::go()
 {
+    //qDebug() << "go()";
     switch (state)
     {
     case Off:
@@ -118,6 +119,7 @@ void KinectSensorPlugin::go()
 
 void KinectSensorPlugin::wait()
 {
+    //qDebug() << "wait()";
     positionInterupted = false;
     getData();
     PositionResponse response = depthStats();
@@ -133,6 +135,8 @@ void KinectSensorPlugin::wait()
 
 void KinectSensorPlugin::position()
 {
+    //qDebug() << "position()";
+    positionInterupted = false;
     static int consecutiveDetections = 0;
     static int consecutiveNoData = 0;
 
@@ -142,7 +146,6 @@ void KinectSensorPlugin::position()
     {
     case NoData:
         drawGUI();
-
         consecutiveNoData++;
         if (consecutiveNoData == CONSECUTIVE_NO_DATA)
         {
@@ -170,8 +173,8 @@ void KinectSensorPlugin::position()
         drawGUI();
         if (faces.size() > 0)
         {
-            putText("Hold still");
             consecutiveDetections++;
+            if (consecutiveDetections < CONSECUTIVE_DETECTIONS) putText("Hold still");
             qDebug() << "Consecutive face detections:" << consecutiveDetections;
         }
         else
@@ -181,6 +184,7 @@ void KinectSensorPlugin::position()
 
         if (consecutiveDetections == CONSECUTIVE_DETECTIONS)
         {
+            putText("Capturing");
             consecutiveDetections = 0;
             state = Capturing;
         }
@@ -194,9 +198,6 @@ void KinectSensorPlugin::capture()
     Kinect::getDepth(depthBuffer, 10, depthMask, 0.0, MAX_GET_DATA_DISTANCE);
     Kinect::getRGB(rgbBuffer);
     Kinect::RGBToGrayscale(rgbBuffer, img);
-
-    drawGUI();
-    putText("Capturing");
 
     mesh = Kinect::createMesh(depthBuffer, rgbBuffer);
     mesh->centralize();
@@ -231,24 +232,28 @@ void KinectSensorPlugin::deleteMesh()
 
 void KinectSensorPlugin::scanFace()
 {
-    state = Waiting;
+    //qDebug() << "scanFace()";
     deleteMesh();
 
     while (!mesh)
     {
-        if (isPositionInterupted())
-        {
-            break;
-        }
         go();
         cv::imshow("KinectSensorPlugin", img);
         char key = cv::waitKey(30);
-        if (key != -1)
+        if (key != -1 || isPositionInterupted())
         {
             break;
         }
     }
-    cv::destroyWindow("KinectSensorPlugin");
+
+    if (mesh)
+    {
+        getData();
+        drawGUI();
+        putText("Processing");
+    }
+    cv::imshow("KinectSensorPlugin", img);
     cv::waitKey(1);
+    cv::destroyWindow("KinectSensorPlugin");
 }
 
