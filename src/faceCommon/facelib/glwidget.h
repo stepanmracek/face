@@ -35,7 +35,7 @@ public:
      */
     void resizeGL(int width, int height);
 
-    void addFace(Mesh *f) { faces << f; }
+    void addFace(Mesh *f) { faces << f; updateGL(); }
     void addLandmarks(Landmarks *landmarks) { this->landmarks << landmarks; }
     void addCurve(QVector<cv::Point3d> &curve) { curves << curve; }
     void deleteAll();

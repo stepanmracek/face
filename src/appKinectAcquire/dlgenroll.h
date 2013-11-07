@@ -6,6 +6,7 @@
 
 #include "facelib/mesh.h"
 #include "biometrics/facetemplate.h"
+#include "kinectsensorplugin.h"
 
 namespace Ui {
 class DlgEnroll;
@@ -18,7 +19,7 @@ class DlgEnroll : public QDialog
 public:
     explicit DlgEnroll(QMap<int, QString> &mapIdToName, QMap<QString, int> mapNameToId,
                        QHash<int, FaceTemplate*> database, const FaceClassifier &classifier,
-                       const QString &pathToAlignReference, const QString &pathToHaarFaceDetect,
+                       KinectSensorPlugin &sensor,
                        QWidget *parent);
 
     ~DlgEnroll();
@@ -32,13 +33,12 @@ private slots:
     void on_btnExport_clicked();
 
 private:
+    KinectSensorPlugin &sensor;
     Ui::DlgEnroll *ui;
     QMap<int, QString> &mapIdToName;
     QMap<QString, int> &mapNameToId;
     QHash<int, FaceTemplate*> &database;
     const FaceClassifier &classifier;
-    const QString &pathToAlignReference;
-    const QString &pathToHaarFaceDetect;
 
     QList<Mesh*> scans;
 };

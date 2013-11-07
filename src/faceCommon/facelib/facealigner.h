@@ -18,7 +18,8 @@ private:
 public:
     Mesh referenceFace;
 
-    FaceAligner(Mesh &referenceFace);
+    FaceAligner() {}
+    FaceAligner(const Mesh &referenceFace);
     FaceAligner(const QString &dirWithLandmarksAndXYZfiles);
 
     Procrustes3DResult icpAlign(Mesh &face, int maxIterations);

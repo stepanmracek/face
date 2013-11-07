@@ -3,6 +3,7 @@
 
 #include "facetrack/realtimetrack.h"
 #include "facelib/mesh.h"
+#include "facelib/facealigner.h"
 
 class KinectSensorPlugin
 {
@@ -14,16 +15,36 @@ private:
     cv::RotatedRect rotRect;
     cv::Rect rect;
     int ellipsePointsCount;
+    FaceAligner aligner;
 
     enum PositionResponse { NoData, Ok, MoveCloser, MoveFar };
     PositionResponse depthStats();
-    void putText(ImageGrayscale &img, const char *text);
+    void putText(const char *text);
+
+    enum State { Off, Waiting, Positioning, Capturing };
+    State state;
+    void drawGUI();
+    void getData();
+    bool positionInterupted;
 
 public:
-    enum State { Off, Waiting, Positioning, Capturing };
-    KinectSensorPlugin(const QString &faceDetectorPath);
-    bool position();
-    Mesh *scan();
+    ImageGrayscale img;
+    Mesh *mesh;
+
+    KinectSensorPlugin(const QString &faceDetectorPath, const QString &objModelPathForAlign);
+
+    void scanFace();
+
+    void go();
+    void off() {}
+    void wait();
+    void position();
+    void capture();
+    void deleteMesh();
+    void align();
+    bool isPositionInterupted() { return positionInterupted; }
+
+    static bool isKinectPluggedIn();
 };
 
 #endif // KINECTSENSORPLUGIN_H

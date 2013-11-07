@@ -38,6 +38,8 @@ public:
     static Mesh *scanFace(int scanIterations, const QString &faceHaarPath);
 
     static Mesh *scanAndAlignFace(int scanIterations, int icpIterations, const QString &alignReferenceOBJPath, const QString &faceHaarPath);
+
+    static bool isKinectPluggedIn();
 };
 
 #endif /* KINECT_H_ */

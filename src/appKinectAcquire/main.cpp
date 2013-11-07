@@ -145,23 +145,34 @@ int mainMSV(int argc, char *argv[])
         exit(0);
     }
 
+    KinectSensorPlugin plugin(p.haarFaceDetectPath, p.alignReferencePath);
     FaceClassifier classifier(p.classifierDirPath);
-    FrmKinectMain frmMain(p.databasePath, classifier, p.alignReferencePath, p.haarFaceDetectPath);
+    FrmKinectMain frmMain(plugin, classifier, p.databasePath);
     frmMain.show();
 
     return app.exec();
 }
 
-int main(int argc, char *argv[])
+int mainKinect(int argc, char *argv[])
 {
+    KinectSensorPlugin plugin("../../test/haar-face.xml", "../../test/meanForAlign.obj");
+    plugin.scanFace();
+    qDebug() << "Second shot";
+    plugin.scanFace();
+    Mesh * mesh = plugin.mesh;
+    if (!mesh) return 0;
+
+    //mesh->colors.clear();
+    SurfaceProcessor::smooth(*mesh, 0.7, 5);
+
     QApplication app(argc, argv);
-
-    KinectSensorPlugin plugin("../../test/haar-face.xml");
-    if (!plugin.position()) return 0;
-
-    Mesh * mesh = plugin.scan();
     GLWidget widget;
     widget.addFace(mesh);
     widget.show();
     return app.exec();
+}
+
+int main(int argc, char *argv[])
+{
+    mainMSV(argc, argv);
 }

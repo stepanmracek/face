@@ -17,7 +17,7 @@ void FaceAligner::init()
     sampleStep = 5;
 }
 
-FaceAligner::FaceAligner(Mesh &referenceFace) : referenceFace(referenceFace)
+FaceAligner::FaceAligner(const Mesh &referenceFace) : referenceFace(referenceFace)
 {
     init();
 }

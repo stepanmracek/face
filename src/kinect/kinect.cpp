@@ -364,3 +364,11 @@ Mesh *Kinect::scanFace(int scanIterations, const QString &faceHaarPath)
     mesh->calculateTriangles();
     return mesh;
 }
+
+bool Kinect::isKinectPluggedIn()
+{
+    freenect_context *ctx;
+    if (freenect_init(&ctx, NULL) < 0) return false;
+    int num = freenect_num_devices(ctx);
+    return num > 0;
+}

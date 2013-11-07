@@ -5,11 +5,16 @@
 #include "linalg/matrixconverter.h"
 #include "linalg/histogram.h"
 
-KinectSensorPlugin::KinectSensorPlugin(const QString &faceDetectorPath) :
+KinectSensorPlugin::KinectSensorPlugin(const QString &faceDetectorPath, const QString &objModelPathForAlign) :
     detector(faceDetectorPath),
     rotRect(cv::Point2f(320, 240), cv::Size2f(120, 160), 0),
-    rect(320 - 60, 240 - 80, 120, 160)
+    rect(320 - 60, 240 - 80, 120, 160),
+    state(Waiting),
+    mesh(0),
+    aligner(Mesh::fromOBJ(objModelPathForAlign)),
+    positionInterupted(false)
 {
+    img = ImageGrayscale::zeros(480, 640);
     Matrix maskMatrix = Matrix::zeros(480, 640);
     cv::ellipse(maskMatrix, rotRect, 1.0, CV_FILLED);
     ellipsePointsCount = 0;
@@ -44,7 +49,7 @@ KinectSensorPlugin::PositionResponse KinectSensorPlugin::depthStats()
     double mean = sum/count;
 
     //qDebug() << ratio << mean;
-    if (ratio < 0.3) return NoData;
+    if (ratio < 0.5) return NoData;
     if (mean > 820) return MoveCloser;
     if (mean < 780) return MoveFar;
     return Ok;
@@ -56,82 +61,183 @@ KinectSensorPlugin::PositionResponse KinectSensorPlugin::depthStats()
     //cv::imshow("histogram", histogramPlot);
 }
 
-void KinectSensorPlugin::putText(ImageGrayscale &img, const char *text)
+void KinectSensorPlugin::putText(const char *text)
 {
     cv::putText(img, text, cv::Point(64, 240), CV_FONT_HERSHEY_SIMPLEX, 1.0, 0, 5);
     cv::putText(img, text, cv::Point(64, 240), CV_FONT_HERSHEY_SIMPLEX, 1.0, 255, 2);
 }
 
-bool KinectSensorPlugin::position()
+void KinectSensorPlugin::getData()
 {
-    ImageGrayscale img(480, 640);
-    //Matrix depth(480, 640);
+    Kinect::getRGB(rgbBuffer);
+    Kinect::getDepth(depthBuffer, depthMask, 0.0, 1000.0);
+    Kinect::RGBToGrayscale(rgbBuffer, img);
 
-    int consecutiveFaceDetection = 0;
-    while (1)
+    //Matrix d = Kinect::depthToMatrix(depthBuffer);
+    //double min, max;
+    //cv::minMaxIdx(d, &min, &max);
+    //cv::imshow("depth", (d-min)/(max-min));
+}
+
+void KinectSensorPlugin::drawGUI()
+{
+    cv::flip(img, img, 1);
+    cv::ellipse(img, rotRect, 0, 2, CV_AA);
+    cv::ellipse(img, rotRect, 255, 1, CV_AA);
+}
+
+void KinectSensorPlugin::go()
+{
+    switch (state)
     {
-        bool detected = false;
-        Kinect::getRGB(rgbBuffer);
-        Kinect::getDepth(depthBuffer, depthMask, 0.0, 1000.0);
-        Kinect::RGBToGrayscale(rgbBuffer, img);
-        PositionResponse response = depthStats();
-        if (response == Ok)
-        {
-            ImageGrayscale roi = img(rect);
-            std::vector<cv::Rect> faces = detector.detect(roi);
-            if (faces.size() > 0)
-            {
-                detected = true;
-                //cv::rectangle(roi, faces[0], 255);
-            }
-        }
+    case Off:
+        off();
+        break;
+    case Waiting:
+        wait();
+        break;
+    case Positioning:
+        position();
+        break;
+    case Capturing:
+        capture();
+        break;
+    }
+}
 
-        cv::flip(img, img, 1);
-        cv::ellipse(img, rotRect, 0, 2, CV_AA);
-        cv::ellipse(img, rotRect, 255, 1, CV_AA);
-        //cv::line(img, cv::Point(0, 240), cv::Point(640, 240), 255);
-        //cv::line(img, cv::Point(320, 0), cv::Point(320, 480), 255);
-        //cv::rectangle(img, rect, 255);
-        if (response == MoveCloser)
+void KinectSensorPlugin::wait()
+{
+    positionInterupted = false;
+    getData();
+    PositionResponse response = depthStats();
+    drawGUI();
+    //img = ImageGrayscale::zeros(img.rows, img.cols);
+    putText("Waiting for input");
+    if (response == Ok || response == MoveCloser || response == MoveFar)
+    {
+        qDebug() << "Positioning";
+        state = Positioning;
+    }
+}
+
+void KinectSensorPlugin::position()
+{
+    static int consecutiveDetections = 0;
+    static int consecutiveNoData = 0;
+
+    getData();
+    PositionResponse response = depthStats();
+    switch (response)
+    {
+    case NoData:
+        drawGUI();
+
+        consecutiveNoData++;
+        if (consecutiveNoData == 50)
         {
-            putText(img, "Move closer");
+            consecutiveNoData = 0;
+            state = Waiting;
+            positionInterupted = true;
         }
-        else if (response == MoveFar)
+        //putText("Fit your entire face into the ellipse");
+        break;
+    case MoveCloser:
+        drawGUI();
+        putText("Move closer");
+        consecutiveNoData = 0;
+        break;
+    case MoveFar:
+        drawGUI();
+        putText("Move far");
+        consecutiveNoData = 0;
+        break;
+    case Ok:
+        consecutiveNoData = 0;
+        ImageGrayscale roi = img(rect);
+        cv::equalizeHist(roi, roi);
+        std::vector<cv::Rect> faces = detector.detect(roi);
+        drawGUI();
+        if (faces.size() > 0)
         {
-            putText(img, "Move far");
-        }
-        if (detected)
-        {
-            putText(img, "Ok");
-            consecutiveFaceDetection ++;
-            qDebug() << "consecutiveFaceDetection:" << consecutiveFaceDetection;
-            if (consecutiveFaceDetection > 5)
-            {
-                cv::destroyAllWindows();
-                return true;
-            }
+            putText("Hold still");
+            consecutiveDetections++;
+            qDebug() << "Face detected";
         }
         else
         {
-            consecutiveFaceDetection = 0;
+            consecutiveDetections = 0;
         }
 
-        cv::imshow("rgb", img);
-        //cv::imshow("depth", (depth-750)/250);
-        char key = cv::waitKey(30);
-        if (key == 27) break;
+        if (consecutiveDetections == 10)
+        {
+            consecutiveDetections = 0;
+            state = Capturing;
+        }
+
+        break;
     }
-
-    cv::destroyAllWindows();
-    return false;
 }
 
-Mesh *KinectSensorPlugin::scan()
+void KinectSensorPlugin::capture()
 {
-    Kinect::getDepth(depthBuffer, 5, depthMask, 600.0, 1000.0);
+    Kinect::getDepth(depthBuffer, 10, depthMask, 600.0, 1000.0);
     Kinect::getRGB(rgbBuffer);
-    Mesh *result = Kinect::createMesh(depthBuffer, rgbBuffer);
-    result->centralize();
-    result->calculateTriangles();
-    return result;
+    Kinect::RGBToGrayscale(rgbBuffer, img);
+
+    drawGUI();
+    putText("Capturing");
+
+    mesh = Kinect::createMesh(depthBuffer, rgbBuffer);
+    mesh->centralize();
+    mesh->calculateTriangles();
+
+    //aligner.icpAlign(*mesh, 20);
+
+    state = Waiting;
 }
+
+void KinectSensorPlugin::align()
+{
+    if (mesh)
+    {
+        aligner.icpAlign(*mesh, 20);
+    }
+}
+
+bool KinectSensorPlugin::isKinectPluggedIn()
+{
+    return Kinect::isKinectPluggedIn();
+}
+
+void KinectSensorPlugin::deleteMesh()
+{
+    if (mesh)
+    {
+        delete mesh;
+        mesh = 0;
+    }
+}
+
+void KinectSensorPlugin::scanFace()
+{
+    state = Waiting;
+    deleteMesh();
+
+    while (!mesh)
+    {
+        if (isPositionInterupted())
+        {
+            break;
+        }
+        go();
+        cv::imshow("KinectSensorPlugin", img);
+        char key = cv::waitKey(30);
+        if (key != -1)
+        {
+            break;
+        }
+    }
+    cv::destroyWindow("KinectSensorPlugin");
+    cv::waitKey(1);
+}
+

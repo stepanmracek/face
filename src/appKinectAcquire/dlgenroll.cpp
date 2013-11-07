@@ -6,9 +6,9 @@
 
 DlgEnroll::DlgEnroll(QMap<int, QString> &mapIdToName, QMap<QString, int> mapNameToId,
                      QHash<int, FaceTemplate *> database, const FaceClassifier &classifier,
-                     const QString &pathToAlignReference, const QString &pathToHaarFaceDetect, QWidget *parent) :
+                     KinectSensorPlugin &sensor, QWidget *parent) :
     mapIdToName(mapIdToName), mapNameToId(mapNameToId), database(database), classifier(classifier),
-    pathToAlignReference(pathToAlignReference), pathToHaarFaceDetect(pathToHaarFaceDetect),
+    sensor(sensor),
     QDialog(parent), ui(new Ui::DlgEnroll)
 {
     ui->setupUi(this);
@@ -21,10 +21,12 @@ DlgEnroll::~DlgEnroll()
 
 void DlgEnroll::on_btnAdd_clicked()
 {
-    DlgScanFace dlgScan(pathToAlignReference, pathToHaarFaceDetect, this);
-    if (dlgScan.exec() != QDialog::Accepted) return;
-    Mesh *face = dlgScan.result;
-    scans << face;
+    sensor.scanFace();
+    if (!sensor.mesh) return;
+    sensor.align();
+
+    scans << sensor.mesh;
+    sensor.mesh = 0;
 
     ui->listScans->addItem(QString::number(ui->listScans->count()+1));
     ui->listScans->item(ui->listScans->count()-1)->setSelected(true);

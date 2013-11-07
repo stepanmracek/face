@@ -6,6 +6,7 @@
 #include <QMap>
 
 #include "biometrics/facetemplate.h"
+#include "kinectsensorplugin.h"
 
 namespace Ui {
 class FrmKinectMain;
@@ -16,8 +17,9 @@ class FrmKinectMain : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit FrmKinectMain(const QString &databasePath, const FaceClassifier &classifier,
-                           const QString &pathToAlignReference, const QString &pathToHaarFaceDetect,
+    explicit FrmKinectMain(KinectSensorPlugin &sensor,
+                           const FaceClassifier &classifier,
+                           const QString &databasePath,
                            QWidget *parent = 0);
     ~FrmKinectMain();
 
@@ -32,13 +34,12 @@ private slots:
     void on_btnExport_clicked();
 
 private:
-    const FaceClassifier &classifier;
     Ui::FrmKinectMain *ui;
+    KinectSensorPlugin &sensor;
+    const FaceClassifier &classifier;
     QMap<int, QString> mapIdToName;
     QMap<QString, int> mapNameToId;
     QHash<int, FaceTemplate*> database;
-    QString pathToAlignReference;
-    QString pathToHaarFaceDetect;
 
     void initDatabase(const QString &dirPath);
     void refreshList();

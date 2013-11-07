@@ -10,20 +10,17 @@
 #include "dlgidentifyresult.h"
 #include "dlgenroll.h"
 #include "dlgscanface.h"
-#include "dlgrealtimecompare.h"
 
 #include "kinect.h"
 #include "linalg/loader.h"
 #include "biometrics/realtimeclassifier.h"
 
-FrmKinectMain::FrmKinectMain(const QString &databasePath, const FaceClassifier &classifier,
-                             const QString &pathToAlignReference, const QString &pathToHaarFaceDetect,
+FrmKinectMain::FrmKinectMain(KinectSensorPlugin &sensor, const FaceClassifier &classifier, const QString &databasePath,
                              QWidget *parent) :
+    ui(new Ui::FrmKinectMain),
+    sensor(sensor),
     classifier(classifier),
-    pathToAlignReference(pathToAlignReference),
-    pathToHaarFaceDetect(pathToHaarFaceDetect),
-    QMainWindow(parent),
-    ui(new Ui::FrmKinectMain)
+    QMainWindow(parent)
 {
     ui->setupUi(this);
     initDatabase(databasePath);
@@ -101,20 +98,17 @@ void FrmKinectMain::on_btnDelete_clicked()
 
 void FrmKinectMain::on_btnIdentify_clicked()
 {
-    RealTimeClassifier rtClassifier(classifier, ui->sliderThreshold->value(), database, pathToAlignReference);
-    DlgRealTimeCompare dlg(&rtClassifier, mapIdToName, pathToHaarFaceDetect, this);
+    sensor.scanFace();
+    if (!sensor.mesh) return;
+    sensor.align();
+
+    FaceTemplate *probe = new FaceTemplate(0, *sensor.mesh, classifier);
+    sensor.deleteMesh();
+
+    QMap<int, double> result = classifier.identify(database, probe);
+    delete probe;
+    DlgIdentifyResult dlg(result, mapIdToName, ui->sliderThreshold->value(), this);
     dlg.exec();
-
-    //DlgScanFace dlgScan(pathToAlignReference, pathToHaarFaceDetect, this);
-    //if (dlgScan.exec() != QDialog::Accepted) return;
-    //Mesh *face = dlgScan.result;
-    //FaceTemplate *probe = new FaceTemplate(0, *face, classifier);
-    //delete face;
-
-    //QMap<int, double> result = classifier.identify(database, probe);
-    //delete probe;
-    //DlgIdentifyResult dlg(result, mapIdToName, ui->sliderThreshold->value(), this);
-    //dlg.exec();
 }
 
 void FrmKinectMain::on_btnVerify_clicked()
@@ -123,11 +117,12 @@ void FrmKinectMain::on_btnVerify_clicked()
     QString name = QInputDialog::getItem(this, "Query", "Claimed identity:", mapNameToId.keys(), 0, false, &ok);
     if (!ok) return;
 
-    DlgScanFace dlgScan(pathToAlignReference, pathToHaarFaceDetect, this);
-    if (dlgScan.exec() != QDialog::Accepted) return;
-    Mesh *face = dlgScan.result;
-    FaceTemplate *probe = new FaceTemplate(0, *face, classifier);
-    delete face;
+    sensor.scanFace();
+    if (!sensor.mesh) return;
+    sensor.align();
+
+    FaceTemplate *probe = new FaceTemplate(0, *sensor.mesh, classifier);
+    sensor.deleteMesh();
 
     if (!mapNameToId.contains(name))
     {
@@ -150,7 +145,7 @@ void FrmKinectMain::on_btnVerify_clicked()
 void FrmKinectMain::on_btnEnroll_clicked()
 {
     DlgEnroll dlgEnroll(mapIdToName, mapNameToId, database, classifier,
-                        pathToAlignReference, pathToHaarFaceDetect, this);
+                        sensor, this);
     if (dlgEnroll.exec() == QDialog::Accepted)
     {
         refreshList();
