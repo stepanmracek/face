@@ -538,6 +538,15 @@ Mesh::Mesh(const Mesh &src)
     curvatures = src.curvatures;
 }
 
+bool Mesh::equals(const Mesh &other)
+{
+    return points == other.points &&
+            triangles == other.triangles &&
+            normals == other.normals &&
+            colors == other.colors &&
+            curvatures == other.curvatures;
+}
+
 Mesh::~Mesh()
 {
     //qDebug() << "deleting mesh";
@@ -652,6 +661,30 @@ void Mesh::writeBINZ(const QString &path)
     qDebug() << "...done";
 }
 
+char *Mesh::toCharArray(int *resultLength)
+{
+    // write to datastream
+    QByteArray byteArray;
+    QDataStream stream(&byteArray, QIODevice::WriteOnly);
+    writeToDataStream(stream);
+
+    // copy to array of bytes
+    *resultLength = byteArray.size();
+    char *array = new char[*resultLength];
+    memcpy(array, byteArray.constData(), sizeof(char) * (*resultLength));
+
+    return array;
+}
+
+Mesh Mesh::fromCharArray(char *data, int length)
+{
+    QByteArray byteArray(data, length);
+    QDataStream stream(&byteArray, QIODevice::ReadOnly);
+    Mesh result;
+    fromDataStream(stream, result);
+    return result;
+}
+
 void Mesh::fromDataStream(QDataStream &stream, Mesh &mesh)
 {
     int pCount;
@@ -747,19 +780,24 @@ void Mesh::printStats()
     qDebug() << "triangles: "<< triangles.count();
 }
 
-VectorOfPoints Mesh::getNearestPoints(VectorOfPoints input)
+void Mesh::trainPointIndex(cv::flann::Index &index, cv::Mat &features, const cv::flann::IndexParams &params) const
 {
+    //qDebug() << "trainPointIndex()...";
     int n = points.size();
-    cv::Mat features(n, 3, CV_32F);
+    features = cv::Mat(n, 3, CV_32F);
     for (int i = 0; i < n; i++)
     {
         features.at<float>(i, 0) = points[i].x;
         features.at<float>(i, 1) = points[i].y;
         features.at<float>(i, 2) = points[i].z;
     }
-    cv::flann::LinearIndexParams indexParams; //KDTreeIndexParams
-    cv::flann::Index index(features, indexParams);
 
+    index.build(features, params);
+    //qDebug() << "...ok";
+}
+
+VectorOfPoints Mesh::getNearestPoints(const VectorOfPoints &input, cv::flann::Index &index) const
+{
     VectorOfPoints resultPoints;
     for (int i = 0; i < input.count(); i++)
     {
@@ -776,6 +814,14 @@ VectorOfPoints Mesh::getNearestPoints(VectorOfPoints input)
     }
 
     return resultPoints;
+}
+
+VectorOfPoints Mesh::getNearestPoints(const VectorOfPoints &input) const
+{
+    cv::flann::Index index;
+    cv::Mat features;
+    trainPointIndex(index, features, cv::flann::LinearIndexParams());
+    return getNearestPoints(input, index);
 }
 
 Mesh Mesh::zLevelSelect(double zValue)

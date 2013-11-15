@@ -14,7 +14,7 @@ RealTimeClassifier::RealTimeClassifier(const FaceClassifier &classifier, double 
 
 }
 
-void RealTimeClassifier::compare(Mesh *in)
+void RealTimeClassifier::compare(const Mesh *in)
 {
     comparing = true;
 
@@ -25,8 +25,8 @@ void RealTimeClassifier::compare(Mesh *in)
     }
 
     Mesh probe(*in);
-    aligner.icpAlign(probe, 10);
     probe.calculateTriangles();
+    aligner.icpAlign(probe, 10, FaceAligner::NoseTipDetection);
 
     FaceTemplate probeTemplate(0, probe, classifier);
     QMap<int, double> result = classifier.identify(database, &probeTemplate);

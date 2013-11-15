@@ -163,8 +163,10 @@ Vector IsoCurveProcessing::generateFeatureVector(const VectorOfCurves &isocurves
             fv << p.x;
             fv << p.y;
             fv << p.z;
+            //qDebug() << isocurves.indexOf(isocurve) << fv.count();
         }
     }
+    //exit(0);
     return Vector(fv);
 }
 

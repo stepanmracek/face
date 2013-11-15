@@ -47,21 +47,6 @@ bool Common::matrixContainsNan(const Matrix &m)
 	return false;
 }
 
-void Common::getMinMax(Matrix &m, double &min, double &max)
-{
-    max = -INFINITY;
-    min = INFINITY;
-    for (int y = 0; y < m.rows; y++)
-    {
-        for (int x = 0; x < m.cols; x++)
-        {
-            double v = m(y, x);
-            if (v > max) max = v;
-            if (v < min) min = v;
-        }
-    }
-}
-
 void Common::savePlot(const QVector<double> &x, const QVector<double> &y, const QVector<double> &z, const QString &path)
 {
     int n = x.count();
@@ -138,6 +123,20 @@ void Common::savePlot(const QVector<double> values[], int axisCount, const QStri
 
         out <<  "\n";
     }
+}
+
+void Common::saveMatrix(const Matrix &m, const QString &path)
+{
+    cv::FileStorage storage(path.toStdString(), cv::FileStorage::WRITE);
+    storage << "m" << m;
+}
+
+Matrix Common::loadMatrix(const QString &path)
+{
+    cv::FileStorage storage(path.toStdString(), cv::FileStorage::READ);
+    Matrix m;
+    storage["m"] >> m;
+    return m;
 }
 
 void Common::saveMap(QMap<double, double> &map, const QString &path)

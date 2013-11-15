@@ -41,4 +41,5 @@ HEADERS += \
     testhistogramfeatures.h \
     testdistance.h \
     testlogisticregression.h \
-    testlaguerrewavelet.h
+    testlaguerrewavelet.h \
+    testfacealigner.h

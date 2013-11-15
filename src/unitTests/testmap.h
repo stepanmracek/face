@@ -21,7 +21,7 @@ public:
         Matrix mat = deserialized.toMatrix(0.5);
         cv::imshow("deserialized", mat);
         double min, max;
-        Common::getMinMax(mat, min, max);
+        cv::minMaxIdx(mat, &min, &max);
         qDebug() << min << max;
         cv::waitKey();
     }

@@ -22,7 +22,7 @@ public:
     int minDistanceId;
     bool comparing;
 
-    void compare(Mesh *in);
+    void compare(const Mesh *in);
 };
 
 #endif // REALTIMECLASSIFIER_H

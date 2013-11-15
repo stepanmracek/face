@@ -24,7 +24,7 @@ public:
     static void smooth(Map &map, double alpha, int steps);
     static void smooth(Mesh &mesh, double alpha, int steps);
 
-    static CurvatureStruct calculateCurvatures(Map &depthmap);
+    static CurvatureStruct calculateCurvatures(Map &depthmap, bool pcl = true);
 
     static Map depthmap(const Mesh &mesh, MapConverter &converter, double scaleCoef, SurfaceDataToProcess dataToProcess);
     static Map depthmap(const Mesh &mesh, MapConverter &converter, cv::Point2d meshStart, cv::Point2d meshEnd, double scaleCoef, SurfaceDataToProcess dataToProcess);

@@ -103,6 +103,20 @@ public:
 
         return data;
     }
+
+    static Matrix equalize(const Matrix &in)
+    {
+        ImageGrayscale gs = DoubleMatrixToGrayscaleImage(in);
+        cv::equalizeHist(gs, gs);
+        return grayscaleImageToDoubleMatrix(gs);
+    }
+
+    static Matrix scale(const Matrix &in, double scaleFactor)
+    {
+        Matrix result;
+        cv::resize(in, result, cv::Size(in.cols*scaleFactor, in.rows*scaleFactor));
+        return result;
+    }
 };
 
 #endif // MATRIXCONVERTER_H

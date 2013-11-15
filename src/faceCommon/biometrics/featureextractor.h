@@ -69,12 +69,7 @@ public:
 
     void serialize(const QString &pcaPath, const QString &normParamsPath) const;
 
-    Vector extract(const Vector &rawData) const
-    {
-        Vector projected = pca.project(rawData);
-        Normalization::zScoreNormalization(projected, normParams);
-        return projected;
-    }
+    Vector extract(const Vector &rawData) const;
 
     int outputLen() { return pca.getModes(); }
 

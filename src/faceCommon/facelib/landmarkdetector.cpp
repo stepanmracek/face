@@ -44,8 +44,11 @@ LandmarkDetector::LandmarkDetector(Mesh &mesh) : mesh(mesh)
     depth.getCropParams(cropStartX, cropWidth, cropStartY, cropHeight);
     croppedDepth = depth.subMap(cropStartX, cropWidth, cropStartY, cropHeight);
 
+    //cv::imshow("depth", croppedDepth.toMatrix());
+    //cv::waitKey();
+
     // calculate curvature
-    curvature = SurfaceProcessor::calculateCurvatures(croppedDepth);
+    curvature = SurfaceProcessor::calculateCurvatures(croppedDepth, false);
 
     // density maps
     peakDensity = curvature.peaks.densityMap(peakDensityWindowsSize, true);
@@ -73,6 +76,7 @@ Landmarks LandmarkDetector::detect()
 
 void LandmarkDetector::nosetip(Landmarks &l)
 {
+    //qDebug() << "  nose tip";
     int i = peakDensity.maxIndex();
     if (i < 0)
     {

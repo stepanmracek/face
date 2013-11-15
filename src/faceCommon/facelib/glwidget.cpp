@@ -88,7 +88,7 @@ void GLWidget::paintGL()
     float color[] = {0.0f,0.75f,0.75f};
     //float color[] = {214.0/255.0, 180.0/255.0, 155.0/255.0};
     glColor3fv(color);
-    foreach(Mesh *face, faces)
+    foreach(const Mesh *face, faces)
     {
         if (face->triangles.count() == 0)
         {
@@ -99,8 +99,8 @@ void GLWidget::paintGL()
             int n = face->points.size();
             for (int i = 0; i < n; i++)
             {
-                cv::Point3d &p = face->points[i];
-                Color &c = face->colors[i];
+                const cv::Point3d &p = face->points[i];
+                const Color &c = face->colors[i];
                 glColor3b(c[2]/2,c[1]/2,c[0]/2);
                 glVertex3f(p.x/10, p.y/10, p.z/10);
 
@@ -218,6 +218,26 @@ void GLWidget::paintGL()
             glEnd();
         }
     }
+
+    glBegin(GL_LINES);
+
+        glLineWidth(5);
+        glDisable(GL_LIGHTING);
+        glDisable(GL_LIGHT0);
+
+        glColor3f(1, 0, 0);
+        glVertex3f(0, 0, 0);
+        glVertex3f(10, 0, 0);
+
+        glColor3f(0, 1, 0);
+        glVertex3f(0, 0, 0);
+        glVertex3f(0, 10, 0);
+
+        glColor3f(0, 0, 1);
+        glVertex3f(0, 0, 0);
+        glVertex3f(0, 0, 10);
+
+    glEnd();
 }
 
 

@@ -10,6 +10,7 @@
 #include "dlgidentifyresult.h"
 #include "dlgenroll.h"
 #include "dlgscanface.h"
+#include "dlgrealtimecompare.h"
 
 #include "kinect.h"
 #include "linalg/loader.h"
@@ -98,6 +99,10 @@ void FrmKinectMain::on_btnDelete_clicked()
 
 void FrmKinectMain::on_btnIdentify_clicked()
 {
+    /*RealTimeClassifier rtc(classifier, ui->sliderThreshold->value(), database, "../../test/meanForAlign.obj");
+    DlgRealTimeCompare dlg(&rtc, mapIdToName, "../../test/haar-face.xml");
+    dlg.exec();*/
+
     sensor.scanFace();
     if (!sensor.mesh) return;
     sensor.align();

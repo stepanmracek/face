@@ -15,14 +15,21 @@ private:
     int sampleStep;
     void init();
 
+    void AlignNoseTip(Mesh &face);
+    void alignMaxZ(Mesh &face);
+    void alignCentralize(Mesh &face);
+
 public:
-    Mesh referenceFace;
+    enum PreAlignTransform { None, NoseTipDetection, MaxZ, Centralize };
+
+    const Mesh referenceFace;
 
     FaceAligner() {}
     FaceAligner(const Mesh &referenceFace);
-    FaceAligner(const QString &dirWithLandmarksAndXYZfiles);
+    //FaceAligner(const QString &dirWithLandmarksAndXYZfiles);
 
-    Procrustes3DResult icpAlign(Mesh &face, int maxIterations);
+    Procrustes3DResult icpAlignDeprecated(Mesh &face, int maxIterations);
+    void icpAlign(Mesh &face, int maxIterations, PreAlignTransform preAlign);
     //Procrustes3DResult icpAlignRotAndScale(Mesh &face, int maxIterations, int rotationAfter);
 };
 

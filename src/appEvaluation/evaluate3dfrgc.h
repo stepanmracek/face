@@ -65,7 +65,7 @@ public:
             //if (!proceed) continue;
 
             Mesh mesh = Mesh::fromBIN(srcFileInfo.absoluteFilePath());
-            aligner.icpAlign(mesh, 15);
+            aligner.icpAlignDeprecated(mesh, 15);
 
             QString resultPath = outDirPath + srcFileInfo.baseName() + ".binz";
             mesh.writeBINZ(resultPath);
@@ -76,10 +76,38 @@ public:
         }
     }
 
-    static int createIsoCurves()
+    static void align2()
     {
-        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
-        QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/isocurves2/";
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/bin/";
+        QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
+
+        FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj"));
+        MapConverter converter;
+
+        QDir srcDir(srcDirPath, "*.bin");
+        QFileInfoList srcFiles = srcDir.entryInfoList();
+        foreach (const QFileInfo &srcFileInfo, srcFiles)
+        {
+            Mesh mesh = Mesh::fromBIN(srcFileInfo.absoluteFilePath());
+            aligner.icpAlign(mesh, 15, FaceAligner::NoseTipDetection);
+
+            QString resultPath = outDirPath + srcFileInfo.baseName() + ".binz";
+            mesh.writeBINZ(resultPath);
+
+            Map texture = SurfaceProcessor::depthmap(mesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_I);
+            Matrix m = texture.toMatrix(0, 0, 255);
+            cv::circle(m, cv::Point(100,100), 3, 255, -1);
+            QString resultTexturePath = outDirPath + srcFileInfo.baseName() + ".png";
+            cv::imwrite(resultTexturePath.toStdString(), m*255);
+            cv::imshow("test", m);
+            cv::waitKey(1);
+        }
+    }
+
+    static void createIsoCurves()
+    {
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
+        QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/isocurves2/";
         QDir srcDir(srcDirPath, "*.binz");
         QFileInfoList srcFiles = srcDir.entryInfoList();
         foreach (const QFileInfo &srcFileInfo, srcFiles)
@@ -87,33 +115,33 @@ public:
             QString resultPath = outDirPath + srcFileInfo.baseName() + ".xml";
             if (QFile::exists(resultPath)) continue;
 
+            QVector<VectorOfPoints> isoCurves;
             Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
-            LandmarkDetector detector(mesh);
-            Landmarks lm = detector.detect();
-            cv::Point3d nosetip = lm.get(Landmarks::Nosetip);
-            mesh.translate(-nosetip);
+            isoCurves = FaceTemplate::getIsoGeodesicCurves(mesh);
+            Serialization::serializeVectorOfPointclouds(isoCurves, resultPath);
+            //LandmarkDetector detector(mesh);
+            //Landmarks lm = detector.detect();
+            //cv::Point3d nosetip = lm.get(Landmarks::Nosetip);
+            //mesh.translate(-nosetip);
 
-            MapConverter converter;
+            /*MapConverter converter;
             Map depth = SurfaceProcessor::depthmap(mesh, converter, 2, ZCoord);
             Matrix gaussKernel = KernelGenerator::gaussianKernel(7);
             depth.applyFilter(gaussKernel, 3, true);
 
-            QVector<VectorOfPoints> isoCurves;
             int startD = 10;
             for (int d = startD; d <= 100; d += 10)
             {
                 VectorOfPoints isoCurve = SurfaceProcessor::isoGeodeticCurve(depth, converter, cv::Point3d(0,20,0), d, 100, 2);
                 isoCurves << isoCurve;
-            }
-
-            Serialization::serializeVectorOfPointclouds(isoCurves, resultPath);
+            }*/
         }
     }
 
     static void evaluateIsoCurves()
     {
         //int modulo = 1;
-        QString dirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/isocurves2/";
+        QString dirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/isocurves/";
         QVector<SubjectIsoCurves> data = IsoCurveProcessing::readDirectory(dirPath, "d", "*.xml");
         IsoCurveProcessing::selectIsoCurves(data, 0, 5);
         IsoCurveProcessing::stats(data);
@@ -177,45 +205,55 @@ public:
 
     static void createTextures()
     {
-        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
         QDir srcDir(srcDirPath, "*.binz");
         QFileInfoList srcFiles = srcDir.entryInfoList();
-        MapConverter converter;
 
-        QMap<SurfaceDataToProcess, QString> dests;
-        //dests[Texture_R] = "textureR";
-        //dests[Texture_G] = "textureG";
-        //dests[Texture_B] = "textureB";
-        dests[Texture_I] = "textureI";
+        QStringList nans;
 
+        QStringList curvatureNames;
+        curvatureNames << "depth" << "mean" << "gauss" << "index" << "eigencur";
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
-            Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
+            Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath(), false);
+            Matrix equalized = FaceTemplate::getTexture(mesh);
 
-            foreach (SurfaceDataToProcess dataToProcess, dests.keys())
+            QString out = srcDirPath + "textureE/" + srcFileInfo.baseName() + ".gz";
+            if (Common::matrixContainsNan(equalized))
+                nans << "depth-" + srcFileInfo.baseName();
+            Common::saveMatrix(equalized, out);
+
+            QList<Matrix> curvatures = FaceTemplate::getDeMeGaInEi(mesh);
+            int index = 0;
+            foreach (const QString &curvatureName, curvatureNames)
             {
-                Map texture = SurfaceProcessor::depthmap(mesh, converter, cv::Point2d(-75, -75), cv::Point2d(75, 75), 1, dataToProcess);
-                Matrix matrix = texture.toMatrix(0, 0, 255);
+                QString out = srcDirPath + curvatureName + "/" + srcFileInfo.baseName() + ".gz";
+                if (Common::matrixContainsNan(curvatures[index]))
+                    nans << curvatureName + "-" + srcFileInfo.baseName();
+                Common::saveMatrix(curvatures[index], out);
 
-                ImageGrayscale image = MatrixConverter::DoubleMatrixToGrayscaleImage(matrix);
-                cv::equalizeHist(image, image);
-                QString out = srcDirPath + "textureE/" + srcFileInfo.baseName() + ".png";
-                cv::imwrite(out.toStdString(), image);
+                //qDebug() << out;
+                //cv::imshow(curvatureName.toStdString(), curvatures[index]);
+                //cv::waitKey();
 
-                //QString out = srcDirPath + dests[dataToProcess] + "/" + srcFileInfo.baseName() + ".png";
-                //cv::imwrite(out.toStdString(), image*255);
+                index++;
             }
         }
+
+        qDebug() << nans;
     }
 
     static int createMaps()
     {
-        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
+        return -1;
+
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
         QDir srcDir(srcDirPath, "*.binz");
         QFileInfoList srcFiles = srcDir.entryInfoList();
         MapConverter converter;
 
         Matrix smoothKernel2 = KernelGenerator::gaussianKernel(5);
+        cv::Rect roi(25, 15, 100, 90);
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
             Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
@@ -223,13 +261,19 @@ public:
                                                       cv::Point2d(-75, -75),
                                                       cv::Point2d(75, 75),
                                                       1, ZCoord);
+
+            ///qDebug() << depthmap.maxValue();
             //allZValues << depthmap.getUsedValues();
 
             QString out;
-            depthmap.bandPass(-75, 0, false, false);
-            Matrix depthImage = depthmap.toMatrix(0, -75, 0);
+            depthmap.bandPass(-70, 10, false, false);
+            Matrix depthImage = depthmap.toMatrix(0, -70, 10);
             out = srcDirPath + "depth/" + srcFileInfo.baseName() + ".png";
-            cv::imwrite(out.toStdString(), depthImage*255);
+            cv::imwrite(out.toStdString(), depthImage(roi)*255);
+
+            //cv::imshow("depth", depthImage);
+            //cv::waitKey(0);
+            //continue;
 
             Map smoothedDepthmap = depthmap;
             smoothedDepthmap.applyFilter(smoothKernel2, 7, true);
@@ -238,22 +282,22 @@ public:
             cs.curvatureMean.bandPass(-0.1, 0.1, false, false);
             Matrix meanImage = cs.curvatureMean.toMatrix(0, -0.1, 0.1);
             out = srcDirPath + "mean/" + srcFileInfo.baseName() + ".png";
-            cv::imwrite(out.toStdString(), meanImage*255);
+            cv::imwrite(out.toStdString(), meanImage(roi)*255);
 
             cs.curvatureGauss.bandPass(-0.01, 0.01, false, false);
             Matrix gaussImage = cs.curvatureGauss.toMatrix(0, -0.01, 0.01);
             out = srcDirPath + "gauss/" + srcFileInfo.baseName() + ".png";
-            cv::imwrite(out.toStdString(), gaussImage*255);
+            cv::imwrite(out.toStdString(), gaussImage(roi)*255);
 
             cs.curvatureIndex.bandPass(0, 1, false, false);
             Matrix indexImage = cs.curvatureIndex.toMatrix(0, 0, 1);
             out = srcDirPath + "index/" + srcFileInfo.baseName() + ".png";
-            cv::imwrite(out.toStdString(), indexImage*255);
+            cv::imwrite(out.toStdString(), indexImage(roi)*255);
 
             cs.curvaturePcl.bandPass(0, 0.0025, false, false);
             Matrix pclImage = cs.curvaturePcl.toMatrix(0, 0, 0.0025);
             out = srcDirPath + "eigencur/" + srcFileInfo.baseName() + ".png";
-            cv::imwrite(out.toStdString(), pclImage*255);
+            cv::imwrite(out.toStdString(), pclImage(roi)*255);
         }
     }
 
@@ -498,7 +542,7 @@ public:
         }
     }
 
-    static int createCurves()
+    static void createCurves()
     {
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
         QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/curves2/";
@@ -565,13 +609,12 @@ public:
 
     static void evaluateFilterBankFusion()
     {
-        QString source = "textureE";
-        bool isGabor = true;
+        QString source = "depth";
+        bool isGabor = false;
         QString filterType = (isGabor ? QString("gabor") : QString("gl"));
 
         // Declare variables
-        QString path = "/home/stepo/data/frgc/spring2004/zbin-aligned/" + source;
-        cv::Rect roi(25, 15, 100, 90);
+        QString path = "/home/stepo/data/frgc/spring2004/zbin-aligned2/" + source;
         double pcaThreshold = 0.995;
         int clusters = 5;
 
@@ -587,7 +630,7 @@ public:
         {
             QVector<Matrix> images;
             QVector<int> classes;
-            Loader::loadImages(path, images, &classes, "*.png", "d", -1, roi);
+            Loader::loadMatrices(path, images, classes, "d", "*.gz");
             for (int i = 0; i < realWavelets.count(); i++)
             {
                 qDebug() << source << i;
@@ -595,9 +638,15 @@ public:
                 foreach(const Matrix &img, images)
                 {
                     if (realWavelets[i].rows == 0)
-                        rawVectors << MatrixConverter::matrixToColumnVector(img);
+                    {
+                        rawVectors << MatrixConverter::matrixToColumnVector(MatrixConverter::scale(img, 0.5));
+                    }
                     else
-                        rawVectors << MatrixConverter::matrixToColumnVector(FilterBank::absResponse(img, realWavelets[i], imagWavelets[i]));
+                    {
+                        rawVectors << MatrixConverter::matrixToColumnVector(
+                                          MatrixConverter::scale(
+                                              FilterBank::absResponse(img, realWavelets[i], imagWavelets[i]), 0.5));
+                    }
                 }
 
                 QList<QVector<Vector> > vectorsInClusters;
@@ -624,38 +673,49 @@ public:
 
 
         // evaluate
-        //for (int c = 1; c < clusters; c++)
-        //{
-        //    Evaluation result = fusion.evaluate(testData[c]);
-        //    result.outputResults(filterType + "-" + source + "-" + QString::number(c-1), 50);
-        //    qDebug() << result.eer;
-        //}
+        for (int c = 1; c < clusters; c++)
+        {
+            Evaluation result = fusion.evaluate(testData[c]);
+            result.outputResults(filterType + "-" + source + "-" + QString::number(c-1), 50);
+            qDebug() << result.eer;
+        }
     }
 
     static void trainGaborFusion()
     {
-        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/textureE";
-        cv::Rect roi(25, 15, 100, 90);
+        QString data = "depth";
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/" + data;
+        qDebug() << srcDirPath;
         int kSize = 200;
         double pcaThreshold = 0.995;
         QVector<Matrix> srcImages;
         QVector<int> classes;
-        Loader::loadImages(srcDirPath, srcImages, &classes, "*.png", "d", 866, roi);
+        Loader::loadMatrices(srcDirPath, srcImages, classes, "d", "*.gz", 867);
 
         QList<QVector<Matrix> > srcImagesInClusters;
         QList<QVector<int> > classesInClusters;
         BioDataProcessing::divideToNClusters(srcImages, classes, 2, srcImagesInClusters, classesInClusters);
 
+        for (int i = 0; i < srcImagesInClusters.count(); i++)
+        {
+            qDebug() << i << srcImagesInClusters[i].count();
+        }
+
         QList<Evaluation> components;
         QVector<Vector> trainVectors;
         foreach(const Matrix &srcImg, srcImagesInClusters[0])
-            trainVectors << MatrixConverter::matrixToColumnVector(srcImg);
+        {
+            trainVectors << MatrixConverter::matrixToColumnVector(MatrixConverter::scale(srcImg, 0.5));
+        }
         QVector<Vector> testVectors;
         foreach(const Matrix &srcImg, srcImagesInClusters[1])
-            testVectors << MatrixConverter::matrixToColumnVector(srcImg);
+        {
+            testVectors << MatrixConverter::matrixToColumnVector(MatrixConverter::scale(srcImg, 0.5));
+        }
 
         ZPCACorrW pcaCor(trainVectors, pcaThreshold, trainVectors);
         components << Evaluation(testVectors, classesInClusters[1], pcaCor.extractor, pcaCor.metric);
+        qDebug() << components.last().eer;
 
         Matrix realWavelet(kSize, kSize);
         Matrix imagWavelet(kSize, kSize);
@@ -667,23 +727,31 @@ public:
         {
             for (int orientation = 1; orientation <= 8; orientation++)
             {
-                qDebug() << index << freq << orientation;
                 freqs[index] = freq;
                 ornts[index] = orientation;
-                index++;
                 Gabor::createWavelet(realWavelet, imagWavelet, freq, orientation);
 
                 QVector<Vector> trainVectors;
                 foreach(const Matrix &srcImg, srcImagesInClusters[0])
-                    trainVectors << MatrixConverter::matrixToColumnVector(Gabor::absResponse(srcImg, realWavelet, imagWavelet));
+                {
+                    trainVectors << MatrixConverter::matrixToColumnVector(
+                                        MatrixConverter::scale(
+                                            Gabor::absResponse(srcImg, realWavelet, imagWavelet), 0.5));
+                }
 
                 ZPCACorrW pcaCor(trainVectors, pcaThreshold, trainVectors);
 
                 QVector<Vector> vectors;
                 foreach(const Matrix &srcImg, srcImagesInClusters[1])
-                    vectors << MatrixConverter::matrixToColumnVector(Gabor::absResponse(srcImg, realWavelet, imagWavelet));
+                {
+                    vectors << MatrixConverter::matrixToColumnVector(
+                                   MatrixConverter::scale(
+                                       Gabor::absResponse(srcImg, realWavelet, imagWavelet), 0.5));
+                }
 
                 components << Evaluation(vectors, classesInClusters[1], pcaCor.extractor, pcaCor.metric);
+                qDebug() << index << freq << orientation << components.last().eer;
+                index++;
             }
         }
 
@@ -701,15 +769,15 @@ public:
 
     static void evaluateGaborFilterBanks()
     {
-        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
         QStringList sources; sources << "depth" << "eigencur" << "gauss" << "index" << "mean";
-        cv::Rect roi(25, 15, 100, 90);
+        //cv::Rect roi(25, 15, 100, 90);
 
         foreach (const QString &source, sources)
         {
             QVector<Matrix> srcImages;
             QVector<int> classes;
-            Loader::loadImages(srcDirPath + source, srcImages, &classes, "*.png", "d", 866, roi);
+            Loader::loadImages(srcDirPath + source, srcImages, &classes, "*.png", "d", 866); //, roi);
 
             for (int kSize = 200; kSize <= 200; kSize += 50)
             {
@@ -742,27 +810,38 @@ public:
 
     static void trainGaussLaguerreFusion()
     {
-        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/textureE";
-        double pcaSelThreshold = 0.995;
-        cv::Rect roi(25, 15, 100, 90);
+        QString data = "depth";
+        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/" + data;
+        qDebug() << srcDirPath;
+        double pcaThreshold = 0.995;
         QVector<Matrix> srcImages;
         QVector<int> classes;
-        Loader::loadImages(srcDirPath, srcImages, &classes, "*.png", "d", 866, roi);
+        Loader::loadMatrices(srcDirPath, srcImages, classes, "d", "*.gz", 867);
 
         QList<QVector<Matrix> > srcImagesInClusters;
         QList<QVector<int> > classesInClusters;
         BioDataProcessing::divideToNClusters(srcImages, classes, 2, srcImagesInClusters, classesInClusters);
 
+        for (int i = 0; i < srcImagesInClusters.count(); i++)
+        {
+            qDebug() << i << srcImagesInClusters[i].count();
+        }
+
         QList<Evaluation> components;
         QVector<Vector> trainVectors;
         foreach(const Matrix &srcImg, srcImagesInClusters[0])
-            trainVectors << MatrixConverter::matrixToColumnVector(srcImg);
+        {
+            trainVectors << MatrixConverter::matrixToColumnVector(MatrixConverter::scale(srcImg, 0.5));
+        }
         QVector<Vector> testVectors;
         foreach(const Matrix &srcImg, srcImagesInClusters[1])
-            testVectors << MatrixConverter::matrixToColumnVector(srcImg);
+        {
+            testVectors << MatrixConverter::matrixToColumnVector(MatrixConverter::scale(srcImg, 0.5));
+        }
 
-        ZPCACorrW pcaCor(trainVectors, pcaSelThreshold, trainVectors);
+        ZPCACorrW pcaCor(trainVectors, pcaThreshold, trainVectors);
         components << Evaluation(testVectors, classesInClusters[1], pcaCor.extractor, pcaCor.metric);
+        qDebug() << components.last().eer;
 
         QMap<int, int> sizes; sizes[0] = 0;
         QMap<int, int> ns; ns[0] = 0;
@@ -774,10 +853,8 @@ public:
         {
             for (int n = 1; n <= 5; n++)
             {
-                qDebug() << index << kSize << n;
                 sizes[index] = kSize;
                 ns[index] = n;
-                index++;
 
                 Matrix realWavelet(kSize, kSize);
                 Matrix imagWavelet(kSize, kSize);
@@ -785,13 +862,24 @@ public:
 
                 QVector<Vector> trainVectors;
                 foreach(const Matrix &srcImg, srcImagesInClusters[0])
-                    trainVectors << MatrixConverter::matrixToColumnVector(GaussLaguerre::absResponse(srcImg, realWavelet, imagWavelet));
-                ZPCACorrW pcaCor(trainVectors, pcaSelThreshold, trainVectors);
+                {
+                    trainVectors << MatrixConverter::matrixToColumnVector(
+                                        MatrixConverter::scale(
+                                            GaussLaguerre::absResponse(srcImg, realWavelet, imagWavelet), 0.5));
+                }
+                ZPCACorrW pcaCor(trainVectors, pcaThreshold, trainVectors);
 
                 QVector<Vector> testVectors;
                 foreach(const Matrix &srcImg, srcImagesInClusters[1])
-                    testVectors << MatrixConverter::matrixToColumnVector(GaussLaguerre::absResponse(srcImg, realWavelet, imagWavelet));
+                {
+                    testVectors << MatrixConverter::matrixToColumnVector(
+                                       MatrixConverter::scale(
+                                           GaussLaguerre::absResponse(srcImg, realWavelet, imagWavelet), 0.5));
+                }
                 components << Evaluation(testVectors, classesInClusters[1], pcaCor.extractor, pcaCor.metric);
+
+                qDebug() << index << kSize << n << components.last().eer;
+                index++;
             }
         }
 
@@ -809,7 +897,7 @@ public:
 
     static void evaluateFusionWrapper()
     {
-        QString dir = "/home/stepo/git/face/test/frgc/filterBanks/";
+        QString dir = "/home/stepo/git/face/test/frgc/filterBanks2/";
         QStringList units;
         units << "isocurves"
               << "gl-index" << "gl-mean" << "gl-gauss" << "gl-eigencur" << "gl-depth" << "gl-textureE"
@@ -850,7 +938,7 @@ public:
 
     static void evaluateFusionAll()
     {
-        QString dir = "/home/stepo/git/face/test/frgc/filterBanks/";
+        QString dir = "/home/stepo/git/face/test/frgc/filterBanks2/";
         QStringList units;
         units << "isocurves"
               << "gl-index" << "gl-mean" << "gl-gauss" << "gl-eigencur" << "gl-depth" << "gl-textureE"
@@ -882,7 +970,7 @@ public:
                 }
 
                 Evaluation eval = fusion2.evaluate(testEvals);
-                qDebug() << eval.eer << eval.fnmrAtFmr(0.01) << eval.fnmrAtFmr(0.001) << eval.fnmrAtFmr(0.0001);
+                qDebug() << eval.eer << eval.fnmrAtFmr(0.01) << eval.fnmrAtFmr(0.001) << eval.fnmrAtFmr(0.0001) << eval.fnmrAtFmr(0.00001);
 
                 eval.outputResultsDET(QString::number(i));
             }
@@ -891,11 +979,11 @@ public:
 
     static void testSerializedClassifiers()
     {
-        QString classifiersDir = "/home/stepo/git/face/test/frgc/classifiers/";
+        QString classifiersDir = "/home/stepo/git/face/test/frgc/classifiers2/";
         FaceClassifier faceClassifier(classifiersDir);
 
-        QString path = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
-        QVector<QString> filenames = Loader::listFiles(path, "*.binz", baseFilename);
+        QString dataDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
+        QVector<QString> filenames = Loader::listFiles(dataDirPath, "*.binz", baseFilename);
         QVector<int> classes;
         foreach (const QString &f, filenames)
         {
@@ -906,156 +994,24 @@ public:
         QList<QVector<int> > classesInClusters;
         BioDataProcessing::divideToNClusters(filenames, classes, 5, filenamesInClusters, classesInClusters);
 
-        for (int cluster = 1; cluster < filenamesInClusters.count(); cluster++)
+        for (int cluster = 1; cluster <= filenamesInClusters.count(); cluster++)
         {
             QVector<FaceTemplate *> templates;
             for (int i = 0; i < filenamesInClusters[cluster].count(); i++)
             {
-                //qDebug() << i << "/" << filenamesInClusters[cluster].count();
-                templates << new FaceTemplate(path, filenamesInClusters[cluster][i], faceClassifier);
+                int id = classesInClusters[cluster][i];
+                QString fileName = filenamesInClusters[cluster][i] + ".binz";
+                QString path = dataDirPath + fileName;
+                Mesh faceMesh = Mesh::fromBINZ(path, false);
+                templates << new FaceTemplate(id, faceMesh, faceClassifier);
+                qDebug() << cluster << fileName << id << (i+1) << "/" << filenamesInClusters[cluster].count();
+
+                //templates.last()->serialize(dataDirPath + "templates/" + filenamesInClusters[cluster][i], faceClassifier);
             }
 
-            QHash<QPair<int, int>, double> distances;
-            for (int i = 0; i < templates.count() - 1; i++)
-            {
-                for (int j = i + 1; j < templates.count(); j++)
-                {
-                    double d = faceClassifier.compare(templates[i], templates[j]);
-                    //qDebug() << "comparing" << i << j << (templates[i].id == templates[j].id) << d;
-                    distances.insertMulti(QPair<int, int>(templates[i]->id, templates[j]->id), d);
-                }
-            }
-            Evaluation eval(distances);
-            qDebug() << eval.eer;
+            Evaluation eval = faceClassifier.evaluate(templates);
+            qDebug() << cluster << eval.eer;
         }
-    }
-
-    static void evaluateFusionOld()
-    {
-        /*int clusters = 5;
-        // ---------
-        // Histogram
-        // ---------
-        QList<QVector<int> > histClassesInClusters;
-        QList<QVector<Vector> > histVectorsInClusters;
-        ZScorePassExtractor histZPassExtractor;
-        CorrelationWeightedMetric histCorrW;
-        {
-            QString histogramPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/histogram-20-20/";
-            QVector<Vector> histogramVectors;
-            QVector<int> histogramClasses;
-            Loader::loadVectors(histogramPath, histogramVectors, histogramClasses, "d");
-
-            BioDataProcessing::divideToNClusters<Vector>(histogramVectors, histogramClasses, clusters, histVectorsInClusters, histClassesInClusters);
-
-            histZPassExtractor = ZScorePassExtractor(histVectorsInClusters[0]);
-            QVector<Template> histTrainTemplates = Template::createTemplates(histVectorsInClusters[0], histClassesInClusters[0], histZPassExtractor);
-            EERPotential histEerPot(histTrainTemplates);
-
-            histCorrW.w = histEerPot.createSelectionWeightsBasedOnRelativeThreshold(0.8);
-            Evaluation histogramEval(histVectorsInClusters[1], histClassesInClusters[1], histZPassExtractor, histCorrW);
-            //histogramEval.outputResults("../../test/frgc/fusion/histogram", 50);
-            qDebug() << "histogram EER" << histogramEval.eer;
-        }
-
-        // ----------
-        // Iso-curves
-        // ----------
-        QList<QVector<int> > curveClassesInClusters;
-        QList<QVector<Vector> > curveVectorsInClusters;
-        ZScorePCAExtractor curveZPcaExtractor;
-        CorrelationWeightedMetric curvesCorrW;
-        {
-            QString curvesPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/isocurves2/";
-            QVector<SubjectIsoCurves> curves = IsoCurveProcessing::readDirectory(curvesPath, "d", "*.xml");
-            IsoCurveProcessing::selectIsoCurves(curves, 0, 5);
-            QVector<Template> curveTemplates = IsoCurveProcessing::generateTemplates(curves, false);
-
-            QVector<int> curveClasses;
-            QVector<Vector> curveVectors;
-            Template::splitVectorsAndClasses(curveTemplates, curveVectors, curveClasses);
-
-            BioDataProcessing::divideToNClusters(curveVectors, curveClasses, clusters, curveVectorsInClusters, curveClassesInClusters);
-
-            QList<QVector<int> > curveTrainClassesInClusters;
-            QList<QVector<Vector> > curveTrainVectorsInClusters;
-            BioDataProcessing::divideToNClusters(curveVectorsInClusters[0], curveClassesInClusters[0], 2,
-                                                 curveTrainVectorsInClusters, curveTrainClassesInClusters);
-
-            PCA curvePca(curveTrainVectorsInClusters[0]);
-            curveZPcaExtractor = ZScorePCAExtractor(curvePca, curveTrainVectorsInClusters[1]);
-            QVector<Template> curveTrainTemplates = Template::createTemplates(curveTrainVectorsInClusters[1],
-                                                                              curveTrainClassesInClusters[1],
-                                                                              curveZPcaExtractor);
-            EERPotential curveEerPot(curveTrainTemplates);
-
-            curvesCorrW.w = curveEerPot.createSelectionWeightsBasedOnRelativeThreshold(0.1);
-            Evaluation curveEval(curveVectorsInClusters[1], curveClassesInClusters[1], curveZPcaExtractor, curvesCorrW);
-            //curveEval.outputResults("../../test/frgc/fusion/iso-curves", 50);
-            qDebug() << "iso-curves" << curveEval.eer;
-        }
-
-        // -----
-        // Depth
-        // -----
-        QList<QVector<Vector> > depthVectorsInClusters;
-        QList<QVector<int> > depthClassesInClusters;
-        ZScorePCAExtractor depthZPcaExtractor;
-        CorrelationMetric depthCorr;
-        {
-            QString depthPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/depth2";
-            cv::Rect depthRoi(50, 30, 200, 180);
-
-            QVector<Vector> depthVectors;
-            QVector<Matrix> depthImages;
-            QVector<int> depthClasses;
-            Loader::loadImages(depthPath, depthImages, &depthClasses, "*.png", "d");
-            for (int i = 0; i < depthImages.count(); i++)
-            {
-                depthVectors.append(MatrixConverter::matrixToColumnVector(depthImages[i](depthRoi)));
-            }
-
-            BioDataProcessing::divideToNClusters(depthVectors, depthClasses, clusters, depthVectorsInClusters, depthClassesInClusters);
-
-            PCA depthPca(depthVectorsInClusters[0]);
-            depthPca.modesSelectionThreshold(0.995);
-            depthZPcaExtractor = ZScorePCAExtractor(depthPca, depthVectorsInClusters[0]);
-
-            Evaluation depthEval(depthVectorsInClusters[1], depthClassesInClusters[1], depthZPcaExtractor, depthCorr);
-            //depthEval.outputResults("../../test/frgc/fusion/depth", 50);
-            qDebug() << "depth" << depthEval.eer;
-        }
-
-        // ------
-        // Fusion
-        // ------
-
-        int n = histClassesInClusters[1].count();
-        assert(n == curveClassesInClusters[1].count());
-        assert(n == depthClassesInClusters[1].count());
-        for (int i = 0; i < n; i++)
-        {
-            assert(histClassesInClusters[1][i] = curveClassesInClusters[1][i]);
-            assert(histClassesInClusters[1][i] = depthClassesInClusters[1][i]);
-        }
-
-        ScoreWeightedSumFusion svmFusion;
-        svmFusion.addComponent(ScoreLevelFusionComponent(histVectorsInClusters[1],
-                               histClassesInClusters[1], &histZPassExtractor, &histCorrW));
-        svmFusion.addComponent(ScoreLevelFusionComponent(curveVectorsInClusters[1],
-                               curveClassesInClusters[1], &curveZPcaExtractor, &curvesCorrW));
-        svmFusion.addComponent(ScoreLevelFusionComponent(depthVectorsInClusters[1],
-                               depthClassesInClusters[1], &depthZPcaExtractor, &depthCorr));
-        svmFusion.learn();
-
-        for (int i = 2; i < clusters; i++)
-        {
-            QList<QVector<Vector> > vectors;
-            vectors << histVectorsInClusters[i] << curveVectorsInClusters[i] << depthVectorsInClusters[i];
-            Evaluation fusionEval = svmFusion.evaluate(vectors, histClassesInClusters[i]);
-            qDebug() << fusionEval.eer;
-        }
-        //fusionEval.outputResults("../../test/frgc/fusion/fusion", 50);*/
     }
 };
 

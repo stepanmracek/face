@@ -35,13 +35,13 @@ public:
      */
     void resizeGL(int width, int height);
 
-    void addFace(Mesh *f) { faces << f; updateGL(); }
+    void addFace(const Mesh *f) { faces << f; updateGL(); }
     void addLandmarks(Landmarks *landmarks) { this->landmarks << landmarks; }
     void addCurve(QVector<cv::Point3d> &curve) { curves << curve; }
     void deleteAll();
     void clearAll();
 
-    Mesh *getFace() { if (faces.empty()) return 0; else return faces[0]; }
+    const Mesh *getFace() { if (faces.empty()) return 0; else return faces[0]; }
 
 protected:
     void init();
@@ -54,7 +54,7 @@ protected:
     void timerEvent(QTimerEvent *) { refreshData(); }
 
 private:
-    QVector<Mesh*> faces;
+    QVector<const Mesh*> faces;
     QVector<Landmarks*> landmarks;
     QVector<QVector<cv::Point3d> > curves;
 

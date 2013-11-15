@@ -311,7 +311,7 @@ double dist(double x1, double y1, double x2, double y2)
     return sqrt(pow(x1-y1, 2) + pow(x2-y2, 2));
 }
 
-CurvatureStruct SurfaceProcessor::calculateCurvatures(Map &depthmap)
+CurvatureStruct SurfaceProcessor::calculateCurvatures(Map &depthmap, bool pcl)
 {
     CurvatureStruct c;
 
@@ -382,22 +382,25 @@ CurvatureStruct SurfaceProcessor::calculateCurvatures(Map &depthmap)
                 c.curvatureK2.set(x, y, k2);
 
                 // PCL
-                Matrix pcaData(3, 9);
-                pcaData(0, 0) = x-1; pcaData(1, 0) = y-1; pcaData(2, 0) = depthmap.get(x-1, y-1);
-                pcaData(0, 1) = x  ; pcaData(1, 1) = y-1; pcaData(2, 1) = depthmap.get(x  , y-1);
-                pcaData(0, 2) = x+1; pcaData(1, 2) = y-1; pcaData(2, 2) = depthmap.get(x+1, y-1);
-                pcaData(0, 3) = x-1; pcaData(1, 3) = y  ; pcaData(2, 3) = depthmap.get(x-1, y  );
-                pcaData(0, 4) = x  ; pcaData(1, 4) = y  ; pcaData(2, 4) = depthmap.get(x  , y  );
-                pcaData(0, 5) = x+1; pcaData(1, 5) = y  ; pcaData(2, 5) = depthmap.get(x+1, y  );
-                pcaData(0, 6) = x-1; pcaData(1, 6) = y+1; pcaData(2, 6) = depthmap.get(x-1, y+1);
-                pcaData(0, 7) = x  ; pcaData(1, 7) = y+1; pcaData(2, 7) = depthmap.get(x  , y+1);
-                pcaData(0, 8) = x+1; pcaData(1, 8) = y+1; pcaData(2, 8) = depthmap.get(x+1, y+1);
-                cv::PCA cvPca(pcaData, cv::Mat(), CV_PCA_DATA_AS_COL);
-                double l0 = cvPca.eigenvalues.at<double>(2);
-                double l1 = cvPca.eigenvalues.at<double>(1);
-                double l2 = cvPca.eigenvalues.at<double>(0);
-                double pclCurvature = l0/(l0+l1+l2);
-                c.curvaturePcl.set(x, y, pclCurvature);
+                if (pcl)
+                {
+                    Matrix pcaData(3, 9);
+                    pcaData(0, 0) = x-1; pcaData(1, 0) = y-1; pcaData(2, 0) = depthmap.get(x-1, y-1);
+                    pcaData(0, 1) = x  ; pcaData(1, 1) = y-1; pcaData(2, 1) = depthmap.get(x  , y-1);
+                    pcaData(0, 2) = x+1; pcaData(1, 2) = y-1; pcaData(2, 2) = depthmap.get(x+1, y-1);
+                    pcaData(0, 3) = x-1; pcaData(1, 3) = y  ; pcaData(2, 3) = depthmap.get(x-1, y  );
+                    pcaData(0, 4) = x  ; pcaData(1, 4) = y  ; pcaData(2, 4) = depthmap.get(x  , y  );
+                    pcaData(0, 5) = x+1; pcaData(1, 5) = y  ; pcaData(2, 5) = depthmap.get(x+1, y  );
+                    pcaData(0, 6) = x-1; pcaData(1, 6) = y+1; pcaData(2, 6) = depthmap.get(x-1, y+1);
+                    pcaData(0, 7) = x  ; pcaData(1, 7) = y+1; pcaData(2, 7) = depthmap.get(x  , y+1);
+                    pcaData(0, 8) = x+1; pcaData(1, 8) = y+1; pcaData(2, 8) = depthmap.get(x+1, y+1);
+                    cv::PCA cvPca(pcaData, cv::Mat(), CV_PCA_DATA_AS_COL);
+                    double l0 = cvPca.eigenvalues.at<double>(2);
+                    double l1 = cvPca.eigenvalues.at<double>(1);
+                    double l2 = cvPca.eigenvalues.at<double>(0);
+                    double pclCurvature = l0/(l0+l1+l2);
+                    c.curvaturePcl.set(x, y, pclCurvature);
+                }
             }
         }
     }

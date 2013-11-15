@@ -13,6 +13,18 @@
 class TestMesh
 {
 public:
+
+    static void testReadWriteCharArray(const QString &frgcPath)
+    {
+        QString path = frgcPath + "zbin-aligned/02463d652.binz";
+        Mesh m1 = Mesh::fromBINZ(path);
+        int n;
+        char *data = m1.toCharArray(&n);
+        Mesh m2 = Mesh::fromCharArray(data, n);
+        delete [] data;
+        assert(m1.equals(m2));
+    }
+
     static void testXYZLodaderOBJWriter(const QString &srcDirPath, const QString &dstDirPath)
     {
         QDir srcDir(srcDirPath, "*.xyz");

@@ -64,13 +64,17 @@ void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVect
     {
         if (gabor)
         {
-            p1 << 5 << 5 << 6 << 6 << 4 << 5 << 6 << 5 << 4 << 6 << 4;
-            p2 << 8 << 2 << 4 << 1 << 3 << 5 << 3 << 4 << 8 << 2 << 1;
+            //p1 << 5 << 5 << 6 << 6 << 4 << 5 << 6 << 5 << 4 << 6 << 4;
+            //p2 << 8 << 2 << 4 << 1 << 3 << 5 << 3 << 4 << 8 << 2 << 1;
+            p1 << 5 << 4 << 0 << 4 << 4 << 4;
+            p2 << 2 << 8 << 0 << 3 << 6 << 1;
         }
         else
         {
-            p1 << 75 << 0 << 75 << 75 << 100;
-            p2 <<  2 << 0 <<  3 <<  5 <<   1;
+            //p1 << 75 << 0 << 75 << 75 << 100;
+            //p2 <<  2 << 0 <<  3 <<  5 <<   1;
+            p1 << 0 << 75 << 50 << 100 << 100 << 75;
+            p2 << 0 << 1 << 3 << 3 << 2 << 2;
         }
     }
 
@@ -79,13 +83,17 @@ void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVect
     {
         if (gabor)
         {
-            p1 << 5 << 6 << 6 << 6 << 4 << 6 << 6 << 5;
-            p2 << 8 << 3 << 8 << 4 << 2 << 6 << 7 << 1;
+            //p1 << 5 << 6 << 6 << 6 << 4 << 6 << 6 << 5;
+            //p2 << 8 << 3 << 8 << 4 << 2 << 6 << 7 << 1;
+            p1 << 4 << 0 << 6 << 6 << 4 << 4 << 4 << 5 << 6;
+            p2 << 8 << 0 << 3 << 6 << 1 << 3 << 4 << 3 << 8;
         }
         else
         {
-            p1 << 75 << 100 << 50 << 100 << 25 << 75 << 75 << 0;
-            p2 <<  3 <<   2 <<  2 <<   4 <<  5 <<  1 <<  5 << 0;
+            //p1 << 75 << 100 << 50 << 100 << 25 << 75 << 75 << 0;
+            //p2 <<  3 <<   2 <<  2 <<   4 <<  5 <<  1 <<  5 << 0;
+            p1 << 75 << 50 << 0 << 100 << 75;
+            p2 << 1 << 3 << 0 << 4 << 4;
         }
     }
 
@@ -94,13 +102,17 @@ void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVect
     {
         if (gabor)
         {
-            p1 << 6 << 6 << 6 << 5;
-            p2 << 8 << 3 << 6 << 1;
+            //p1 << 6 << 6 << 6 << 5;
+            //p2 << 8 << 3 << 6 << 1;
+            p1 << 4 << 6 << 4 << 6;
+            p2 << 8 << 4 << 1 << 3;
         }
         else
         {
-            p1 << 50 << 50 << 0 << 75 << 25 << 100;
-            p2 <<  1 <<  2 << 0 <<  3 <<  1 <<   4;
+            //p1 << 50 << 50 << 0 << 75 << 25 << 100;
+            //p2 <<  1 <<  2 << 0 <<  3 <<  1 <<   4;
+            p1 << 50 << 50 << 75 << 50 << 25 << 75;
+            p2 << 1 << 3 << 1 << 2 << 4 << 2;
         }
     }
 
@@ -109,13 +121,17 @@ void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVect
     {
         if (gabor)
         {
-            p1 << 5 << 4 << 6 << 4 << 4 << 5 << 4;
-            p2 << 7 << 4 << 3 << 1 << 5 << 2 << 2;
+            //p1 << 5 << 4 << 6 << 4 << 4 << 5 << 4;
+            //p2 << 7 << 4 << 3 << 1 << 5 << 2 << 2;
+            p1 << 4 << 5 << 5 << 4 << 4 << 5 << 4 << 6 << 4;
+            p2 << 8 << 6 << 2 << 1 << 6 << 8 << 4 << 1 << 7;
         }
         else
         {
-            p1 << 50 << 75 << 100 << 75 << 25 << 50 << 100;
-            p2 <<  1 <<  1 <<   5 <<  5 <<  5 <<  2 <<   4;
+            //p1 << 50 << 75 << 100 << 75 << 25 << 50 << 100;
+            //p2 <<  1 <<  1 <<   5 <<  5 <<  5 <<  2 <<   4;
+            p1 << 25 << 100 << 50 << 100 << 75 << 50;
+            p2 << 1 << 4 << 4 << 1 << 5 << 2;
         }
     }
 
@@ -124,27 +140,36 @@ void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVect
     {
         if (gabor)
         {
-            p1 << 4 << 5 << 5 << 4 << 6 << 4 << 5;
-            p2 << 8 << 3 << 7 << 1 << 6 << 4 << 8;
+            //p1 << 4 << 5 << 5 << 4 << 6 << 4 << 5;
+            //p2 << 8 << 3 << 7 << 1 << 6 << 4 << 8;
+            p1 << 5 << 4 << 4 << 5 << 0 << 5 << 6 << 4;
+            p2 << 7 << 2 << 4 << 3 << 0 << 8 << 6 << 1;
         }
         else
         {
-            p1 << 75 << 50 << 100 << 50 << 75 << 50 << 100 << 25 << 75 << 75;
-            p2 <<  4 <<  1 <<   5 << 3 <<   2 <<  4 <<   1 <<  5 <<  3 <<  1;
+            //p1 << 75 << 50 << 100 << 50 << 75 << 50 << 100 << 25 << 75 << 75;
+            //p2 <<  4 <<  1 <<   5 << 3 <<   2 <<  4 <<   1 <<  5 <<  3 <<  1;
+            p1 << 50 << 50 << 100 << 75;
+            p2 << 5 << 2 << 5 << 1;
         }
     }
 
+    // Texture
     else if (source.compare("textureE") == 0)
     {
         if (gabor)
         {
-            p1 << 5 << 6 << 5 << 6 << 6 << 4;
-            p2 << 4 << 3 << 6 << 1 << 5 << 2;
+            //p1 << 5 << 6 << 5 << 6 << 6 << 4;
+            //p2 << 4 << 3 << 6 << 1 << 5 << 2;
+            p1 << 0 << 5 << 5 << 6 << 6 << 6 << 5 << 5 << 4 << 4;
+            p2 << 0 << 3 << 5 << 1 << 4 << 7 << 1 << 6 << 5 << 7;
         }
         else
         {
-            p1 << 0 << 100 << 100 << 25 << 100 << 75;
-            p2 << 0 <<   3 <<   1 <<  5 <<   4 <<  5;
+            //p1 << 0 << 100 << 100 << 25 << 100 << 75;
+            //p2 << 0 <<   3 <<   1 <<  5 <<   4 <<  5;
+            p1 << 0 << 100 << 50 << 25 << 75 << 100 << 50;
+            p2 << 0 << 3 << 4 << 5 << 1 << 4 << 3;
         }
     }
 
@@ -263,7 +288,7 @@ double FaceClassifier::compare(const QList<FaceTemplate *> &references, const Fa
         double score = compare(reference, probe, debug);
         s += score;
 
-        //qDebug() << "  " << score;
+        qDebug() << "  " << score;
     }
 
     return s/n;
@@ -280,7 +305,7 @@ Evaluation FaceClassifier::evaluate(const QVector<FaceTemplate*> &templates) con
             double d = compare(templates[i], templates[j]);
             distances.insertMulti(QPair<int, int>(templates[i]->id, templates[j]->id), d);
 
-            //qDebug() << templates[i].id << templates[j].id << (templates[i].id == templates[j].id) << d;
+            //qDebug() << templates[i]->id << templates[j]->id << (templates[i]->id == templates[j]->id) << d;
         }
     }
 
@@ -322,7 +347,7 @@ QMap<int, double> FaceClassifier::identify(const QHash<int, FaceTemplate *> &ref
     return result;
 }
 
-ScoreSVMFusion FaceClassifier::relearnFinalFusion(const QVector<FaceTemplate> &templates)
+ScoreSVMFusion FaceClassifier::relearnFinalFusion(const QVector<FaceTemplate*> &templates)
 {
     QMap<QString, QHash<QPair<int, int>, double> > distancesDict;
     int n = templates.count();
@@ -335,16 +360,16 @@ ScoreSVMFusion FaceClassifier::relearnFinalFusion(const QVector<FaceTemplate> &t
     {
         for (int j = i + 1; j < n; j++)
         {
-            const FaceTemplate &t1 = templates[i];
-            const FaceTemplate &t2 = templates[j];
-            QPair<int, int> pair(t1.id, t2.id);
+            const FaceTemplate *t1 = templates[i];
+            const FaceTemplate *t2 = templates[j];
+            QPair<int, int> pair(t1->id, t2->id);
 
             foreach (const QString &unitName, units)
             {
                 double d;
                 if (unitName.compare("isocurves") == 0)
                 {
-                    d = isocurves.metric.distance(t1.isocurves, t2.isocurves);
+                    d = isocurves.metric.distance(t1->isocurves, t2->isocurves);
                 }
                 else if (unitName.startsWith("gabor-") || unitName.startsWith("gl-"))
                 {
@@ -352,8 +377,8 @@ ScoreSVMFusion FaceClassifier::relearnFinalFusion(const QVector<FaceTemplate> &t
                     QString bankName = items[0];
                     QString sourceName = items[1];
                     d = bankClassifiers[bankName].dict[sourceName].compare(
-                                t1.type[bankName].source[sourceName],
-                                t2.type[bankName].source[sourceName]);
+                                t1->type[bankName].source[sourceName],
+                                t2->type[bankName].source[sourceName]);
                 }
 
                 distancesDict[unitName].insertMulti(pair, d);
@@ -432,7 +457,7 @@ FaceTemplate::FaceTemplate()
     type["gabor"] = FilterBanksVectors();
 }
 
-FaceTemplate::FaceTemplate(const QString &dirPath, const QString &baseFilename, const FaceClassifier &classifier)
+/*FaceTemplate::FaceTemplate(const QString &dirPath, const QString &baseFilename, const FaceClassifier &classifier)
 {
     type["gl"] = FilterBanksVectors();
     type["gabor"] = FilterBanksVectors();
@@ -441,7 +466,7 @@ FaceTemplate::FaceTemplate(const QString &dirPath, const QString &baseFilename, 
     id = baseFilename.split("d")[0].toInt();
 
     // isocurves
-    VectorOfCurves curves = Serialization::readVectorOfPointclouds(path + "isocurves2" + QDir::separator() + baseFilename + ".xml");
+    VectorOfCurves curves = Serialization::readVectorOfPointclouds(path + "isocurves" + QDir::separator() + baseFilename + ".xml");
     VectorOfCurves selected;
     for (int i = 0; i < 5; i++)
     {
@@ -454,6 +479,65 @@ FaceTemplate::FaceTemplate(const QString &dirPath, const QString &baseFilename, 
 
     // gabor
     type["gabor"].load(path, baseFilename, classifier.bankClassifiers["gabor"]);
+}*/
+
+Matrix FaceTemplate::getTexture(const Mesh &mesh)
+{
+    cv::Rect roi(25, 15, 100, 90);
+    MapConverter converter;
+    Map texture = SurfaceProcessor::depthmap(mesh, converter, cv::Point2d(-75, -75), cv::Point2d(75, 75), 1, Texture_I);
+    Matrix image = texture.toMatrix(0, 0, 255)(roi);
+    Matrix equalized =  MatrixConverter::equalize(image);
+    return equalized;
+}
+
+QList<Matrix> FaceTemplate::getDeMeGaInEi(const Mesh &mesh)
+{
+    QList<Matrix> result;
+
+    cv::Rect roi(25, 15, 100, 90);
+    MapConverter converter;
+    Map depthmap = SurfaceProcessor::depthmap(mesh, converter, cv::Point2d(-75, -75), cv::Point2d(75, 75), 1, ZCoord);
+    depthmap.bandPass(-70, 10, false, false);
+    result << depthmap.toMatrix(0, -70, 10)(roi);
+
+    Matrix smoothKernel = KernelGenerator::gaussianKernel(5);
+
+    Map smoothedDepthmap = depthmap;
+    smoothedDepthmap.applyFilter(smoothKernel, 7, true);
+    CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(smoothedDepthmap);
+
+    cs.curvatureMean.bandPass(-0.1, 0.1, false, false);
+    result << cs.curvatureMean.toMatrix(0, -0.1, 0.1)(roi);
+
+    cs.curvatureGauss.bandPass(-0.01, 0.01, false, false);
+    result << cs.curvatureGauss.toMatrix(0, -0.01, 0.01)(roi);
+
+    cs.curvatureIndex.bandPass(0, 1, false, false);
+    result << cs.curvatureIndex.toMatrix(0, 0, 1)(roi);
+
+    cs.curvaturePcl.bandPass(0, 0.0025, false, false);
+    result << cs.curvaturePcl.toMatrix(0, 0, 0.0025)(roi);
+
+    return result;
+}
+
+VectorOfCurves FaceTemplate::getIsoGeodesicCurves(const Mesh &mesh)
+{
+    MapConverter converter;
+    Map depth = SurfaceProcessor::depthmap(mesh, converter, 2, ZCoord);
+    Matrix gaussKernel = KernelGenerator::gaussianKernel(7);
+    depth.applyFilter(gaussKernel, 3, true);
+
+    QVector<VectorOfPoints> isoCurves;
+    int startD = 10;
+    for (int d = startD; d <= 50; d += 10)
+    {
+        VectorOfPoints isoCurve = SurfaceProcessor::isoGeodeticCurve(depth, converter, cv::Point3d(0,20,0), d, 100, 2);
+        isoCurves << isoCurve;
+    }
+
+    return isoCurves;
 }
 
 FaceTemplate::FaceTemplate(int id, const Mesh &properlyAlignedMesh, const FaceClassifier &classifier)
@@ -462,101 +546,105 @@ FaceTemplate::FaceTemplate(int id, const Mesh &properlyAlignedMesh, const FaceCl
     type["gabor"] = FilterBanksVectors();
     this->id = id;
 
-    Matrix smoothKernel5 = KernelGenerator::gaussianKernel(5);
-    Matrix smoothKernel7 = KernelGenerator::gaussianKernel(7);
-    cv::Rect roi(25, 15, 100, 90);
-    MapConverter converter;
+    double scaleFactor = 0.5;
 
-    // depth
-    Map depthmap = SurfaceProcessor::depthmap(properlyAlignedMesh, converter,
-                                              cv::Point2d(-75, -75), cv::Point2d(75, 75),
-                                              1, ZCoord);
-    depthmap.bandPass(-75, 0, false, false);
-    depthmap.applyFilter(smoothKernel5, 2, true);
-    Matrix depthImage = depthmap.toMatrix(0, -75, 0);
-    depthImage = depthImage(roi);
+    Matrix texture = getTexture(properlyAlignedMesh);
+    QList<Matrix> curvatures = getDeMeGaInEi(properlyAlignedMesh);
 
+    qDebug() << "depth";
     if (classifier.units.contains("gabor-depth"))
-        type["gabor"].source["depth"] = type["gabor"].load(depthImage, classifier.bankClassifiers["gabor"].dict["depth"]);
+    {
+        type["gabor"].source["depth"] = type["gabor"].load(
+                    curvatures[0], classifier.bankClassifiers["gabor"].dict["depth"], scaleFactor);
+    }
     if (classifier.units.contains("gl-depth"))
-        type["gl"].source["depth"] = type["gl"].load(depthImage, classifier.bankClassifiers["gl"].dict["depth"]);
-
-    depthmap.applyFilter(smoothKernel7, 3, true);
-    CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(depthmap);
+    {
+        type["gl"].source["depth"] = type["gl"].load(
+                    curvatures[0], classifier.bankClassifiers["gl"].dict["depth"], scaleFactor);
+    }
 
     // mean
-    cs.curvatureMean.bandPass(-0.1, 0.1, false, false);
-    Matrix meanImage = cs.curvatureMean.toMatrix(0, -0.1, 0.1);
-    meanImage = meanImage(roi);
+    qDebug() << "mean";
 
     if (classifier.units.contains("gabor-mean"))
-        type["gabor"].source["mean"] = type["gabor"].load(meanImage, classifier.bankClassifiers["gabor"].dict["mean"]);
+    {
+        type["gabor"].source["mean"] = type["gabor"].load(
+                    curvatures[1], classifier.bankClassifiers["gabor"].dict["mean"], scaleFactor);
+    }
 
     if (classifier.units.contains("gl-mean"))
-        type["gl"].source["mean"] = type["gl"].load(meanImage, classifier.bankClassifiers["gl"].dict["mean"]);
+    {
+        type["gl"].source["mean"] = type["gl"].load(
+                    curvatures[1], classifier.bankClassifiers["gl"].dict["mean"], scaleFactor);
+    }
 
 
     // gauss
-    cs.curvatureGauss.bandPass(-0.01, 0.01, false, false);
-    Matrix gaussImage = cs.curvatureGauss.toMatrix(0, -0.01, 0.01);
-    gaussImage = gaussImage(roi);
+    qDebug() << "gauss";
 
     if (classifier.units.contains("gabor-gauss"))
-        type["gabor"].source["gauss"] = type["gabor"].load(gaussImage, classifier.bankClassifiers["gabor"].dict["gauss"]);
+    {
+        type["gabor"].source["gauss"] = type["gabor"].load(
+                    curvatures[2], classifier.bankClassifiers["gabor"].dict["gauss"], scaleFactor);
+    }
 
     if (classifier.units.contains("gl-gauss"))
-        type["gl"].source["gauss"] = type["gl"].load(gaussImage, classifier.bankClassifiers["gl"].dict["gauss"]);
+    {
+        type["gl"].source["gauss"] = type["gl"].load(
+                    curvatures[2], classifier.bankClassifiers["gl"].dict["gauss"], scaleFactor);
+    }
 
     // index
-    cs.curvatureIndex.bandPass(0, 1, false, false);
-    Matrix indexImage = cs.curvatureIndex.toMatrix(0, 0, 1);
-    indexImage = indexImage(roi);
+    qDebug() << "index";
 
     if (classifier.units.contains("gabor-index"))
-        type["gabor"].source["index"] = type["gabor"].load(indexImage, classifier.bankClassifiers["gabor"].dict["index"]);
+    {
+        type["gabor"].source["index"] = type["gabor"].load(
+                    curvatures[3], classifier.bankClassifiers["gabor"].dict["index"], scaleFactor);
+    }
 
     if (classifier.units.contains("gl-index"))
-        type["gl"].source["index"] = type["gl"].load(indexImage, classifier.bankClassifiers["gl"].dict["index"]);
+    {
+        type["gl"].source["index"] = type["gl"].load(
+                    curvatures[3], classifier.bankClassifiers["gl"].dict["index"], scaleFactor);
+    }
 
     // eigencur
-    cs.curvaturePcl.bandPass(0, 0.0025, false, false);
-    Matrix eigencurImage = cs.curvaturePcl.toMatrix(0, 0, 0.0025);
-    eigencurImage = eigencurImage(roi);
+    qDebug() << "eigencur";
 
     if (classifier.units.contains("gabor-eigencur"))
-        type["gabor"].source["eigencur"] = type["gabor"].load(eigencurImage, classifier.bankClassifiers["gabor"].dict["eigencur"]);
+    {
+        type["gabor"].source["eigencur"] = type["gabor"].load(
+                    curvatures[4], classifier.bankClassifiers["gabor"].dict["eigencur"], scaleFactor);
+    }
 
     if (classifier.units.contains("gl-eigencur"))
-        type["gl"].source["eigencur"] = type["gl"].load(eigencurImage, classifier.bankClassifiers["gl"].dict["eigencur"]);
+    {
+        type["gl"].source["eigencur"] = type["gl"].load(
+                    curvatures[4], classifier.bankClassifiers["gl"].dict["eigencur"], scaleFactor);
+    }
 
     // texture
-    Map textureMap = SurfaceProcessor::depthmap(properlyAlignedMesh, converter,
-                                                cv::Point2d(-75, -75), cv::Point2d(75, 75),
-                                                1, Texture_I);
-    Matrix textureImage = textureMap.toMatrix(0, 0, 255);
-    ImageGrayscale textureGSImage = MatrixConverter::DoubleMatrixToGrayscaleImage(textureImage);
-    cv::equalizeHist(textureGSImage, textureGSImage);
-    textureImage = MatrixConverter::grayscaleImageToDoubleMatrix(textureGSImage);
-    textureImage = textureImage(roi);
+    qDebug() << "texture";
 
     if (classifier.units.contains("gabor-textureE"))
-        type["gabor"].source["textureE"] = type["gabor"].load(textureImage, classifier.bankClassifiers["gabor"].dict["textureE"]);
+    {
+        type["gabor"].source["textureE"] = type["gabor"].load(
+                    texture, classifier.bankClassifiers["gabor"].dict["textureE"], scaleFactor);
+    }
 
     if (classifier.units.contains("gl-textureE"))
-        type["gl"].source["textureE"] = type["gl"].load(textureImage, classifier.bankClassifiers["gl"].dict["textureE"]);
+    {
+        type["gl"].source["textureE"] = type["gl"].load(
+                    texture, classifier.bankClassifiers["gl"].dict["textureE"], scaleFactor);
+    }
 
     // isocurves
+    qDebug() << "isocurves";
     if (classifier.units.contains("isocurves"))
     {
-        cv::Point3d center(0,20,0);
-        VectorOfCurves isocurves;
-        for (int distance = 10; distance <= 50; distance += 10)
-        {
-            VectorOfPoints isocurve = SurfaceProcessor::isoGeodeticCurve(depthmap, converter, center, distance, 100, 1);
-            isocurves << isocurve;
-        }
-
-        this->isocurves = classifier.isocurves.extractor.extract(IsoCurveProcessing::generateFeatureVector(isocurves, false));
+        VectorOfCurves rawCurves = getIsoGeodesicCurves(properlyAlignedMesh);
+        isocurves = classifier.isocurves.extractor.extract(IsoCurveProcessing::generateFeatureVector(rawCurves, false));
     }
 }
 
@@ -634,7 +722,7 @@ void FaceTemplate::serialize(const QString &path, const FaceClassifier &classifi
     }
 }
 
-QVector<Vector> FilterBanksVectors::load(const QString &dirPath, const QString &baseFilename, const FilterBanksClassifiers &classifier)
+/*QVector<Vector> FilterBanksVectors::load(const QString &dirPath, const QString &baseFilename, const FilterBanksClassifiers &classifier)
 {
     QStringList srcNames;
     srcNames << "depth" << "index" << "gauss" << "mean" << "eigencur" << "textureE";
@@ -642,26 +730,41 @@ QVector<Vector> FilterBanksVectors::load(const QString &dirPath, const QString &
     {
         source[srcName] = load(dirPath, baseFilename, srcName, classifier.dict[srcName]);
     }
-}
+}*/
 
-QVector<Vector> FilterBanksVectors::load(const Matrix &image, const FilterBankClassifier &classifier)
+QVector<Vector> FilterBanksVectors::load(const Matrix &image, const FilterBankClassifier &classifier, double scaleFactor)
 {
+    //double min, max;
+    //cv::minMaxIdx(image, &min, &max);
+    //qDebug() << min << max;
+    //cv::imshow("image", image);
+    //cv::waitKey(0);
+
     QVector<Vector> result;
     for (int i = 0; i < classifier.realWavelets.count(); i++)
     {
-        Vector rawVector = (classifier.realWavelets[i].rows == 0) ?
-                    MatrixConverter::matrixToColumnVector(image) :
-                    MatrixConverter::matrixToColumnVector(FilterBank::absResponse(image, classifier.realWavelets[i], classifier.imagWavelets[i]));
+        Matrix response = (classifier.realWavelets[i].rows == 0) ?
+                    image :
+                    FilterBank::absResponse(image, classifier.realWavelets[i], classifier.imagWavelets[i]);
+        Matrix resized = MatrixConverter::scale(response, 0.5);
+
+        //qDebug() << resized.rows << resized.cols;
+        //cv::minMaxIdx(resized, &min, &max);
+        //cv::imshow("response", (resized-min)/(max-min));
+        //cv::waitKey();
+
+        Vector rawVector = MatrixConverter::matrixToColumnVector(resized);
         result << classifier.projections[i].extractor.extract(rawVector);
     }
     return result;
 }
 
-QVector<Vector> FilterBanksVectors::load(const QString &dirPath, const QString &baseFilename, const QString &source, const FilterBankClassifier &classifier)
+/*QVector<Vector> FilterBanksVectors::load(const QString &dirPath, const QString &baseFilename, const QString &source, const FilterBankClassifier &classifier)
 {
     Matrix img = MatrixConverter::imageToMatrix(dirPath + source + QDir::separator() + baseFilename + ".png");
-    cv::Rect roi(25, 15, 100, 90);
-    img = img(roi);
-
-    return load(img, classifier);
-}
+    //cv::Rect roi(25, 15, 100, 90);
+    //img = img(roi);
+    Matrix resized;
+    cv::resize(img, resized, cv::Size(img.cols/2, img.rows/2));
+    return load(resized, classifier);
+}*/

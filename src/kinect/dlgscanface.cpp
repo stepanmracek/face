@@ -74,7 +74,7 @@ void DlgScanFace::showFace()
 
 void DlgScanFace::scan()
 {
-    Mesh *curFace = ui->widget->getFace();
+    const Mesh *curFace = ui->widget->getFace();
     if (curFace == 0) return;
     timer->stop();
 
@@ -85,7 +85,7 @@ void DlgScanFace::scan()
 
     Mesh mean = Mesh::fromOBJ(pathToAlignReference);
     FaceAligner aligner(mean);
-    aligner.icpAlign(*result, 10);
+    aligner.icpAlign(*result, 10, FaceAligner::NoseTipDetection);
 
     accept();
 }

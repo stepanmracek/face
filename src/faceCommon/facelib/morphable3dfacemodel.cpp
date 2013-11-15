@@ -167,9 +167,11 @@ Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, int iterations)
 
     // instantiate aligner and move the reference face, such the nosetip is at (0,0,0)
     qDebug() << landmarks.get(Landmarks::Nosetip).x << landmarks.get(Landmarks::Nosetip).y << landmarks.get(Landmarks::Nosetip).z;
-    FaceAligner aligner(this->mesh);
-    aligner.referenceFace.translate(-this->landmarks.get(Landmarks::Nosetip));
-    Procrustes3DResult procrustesResult = aligner.icpAlign(inputMesh, iterations);
+
+    Mesh reference(this->mesh);
+    reference.translate(-this->landmarks.get(Landmarks::Nosetip));
+    FaceAligner aligner(reference);
+    Procrustes3DResult procrustesResult = aligner.icpAlignDeprecated(inputMesh, iterations);
     inputMesh.translate(this->landmarks.get(Landmarks::Nosetip));
 
     // morph

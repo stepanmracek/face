@@ -19,7 +19,7 @@ int scan(int argc, char *argv[])
     Mesh *m = Kinect::scanFace(10, "../../test/haar-face.xml");
     Mesh mean = Mesh::fromOBJ("../../test/meanForAlign.obj");
     FaceAligner aligner(mean);
-    aligner.icpAlign(*m, 10);
+    aligner.icpAlign(*m, 10, FaceAligner::NoseTipDetection);
 
     MapConverter c;
     cv::imshow("scan", SurfaceProcessor::depthmap(*m, c, cv::Point2d(-75,-75), cv::Point2d(75,75), 2, Texture_I).toMatrix());

@@ -280,7 +280,7 @@ Mesh *Kinect::scanAndAlignFace(int scanIterations, int icpIterations, const QStr
     Mesh *m = Kinect::scanFace(scanIterations, faceHaarPath);
     Mesh mean = Mesh::fromOBJ(alignReferenceOBJPath);
     FaceAligner aligner(mean);
-    aligner.icpAlign(*m, icpIterations);
+    aligner.icpAlign(*m, icpIterations, FaceAligner::NoseTipDetection);
     return m;
 }
 

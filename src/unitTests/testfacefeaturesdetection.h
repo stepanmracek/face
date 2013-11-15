@@ -61,9 +61,9 @@ public:
         {
             Matrix response = responses[i];
             double min, max, rmin, rmax, imin, imax;
-            Common::getMinMax(response, min, max);
-            Common::getMinMax(bank.realKernels[i], rmin, rmax);
-            Common::getMinMax(bank.imagKernels[i], imin, imax);
+            cv::minMaxIdx(response, &min, &max);
+            cv::minMaxIdx(bank.realKernels[i], &rmin, &rmax);
+            cv::minMaxIdx(bank.imagKernels[i], &imin, &imax);
             cv::imshow("response", (response-min)/(max - min));
             cv::imshow("real", (bank.realKernels[i]-rmin)/(rmax - rmin));
             cv::imshow("imag", (bank.imagKernels[i]-imin)/(imax - imin));
@@ -268,7 +268,7 @@ public:
         //Map before = SurfaceProcessor::depthmap(face, c, 2, Texture_I);
 
         //Mesh old = face;
-        aligner.icpAlign(face, 10);
+        aligner.icpAlign(face, 10, FaceAligner::NoseTipDetection);
 
         //Map after = SurfaceProcessor::depthmap(face, c, 2, Texture_I);
 

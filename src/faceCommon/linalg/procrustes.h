@@ -116,7 +116,7 @@ public:
 
     static void applyInversedProcrustesResult(QVector<cv::Point3d> &pointCloud, Procrustes3DResult &procrustesResult);
 
-    static double diff(QVector<cv::Point3d> &first, QVector<cv::Point3d> &second);
+    static double diff(const QVector<cv::Point3d> &first, const QVector<cv::Point3d> &second);
 };
 
 #endif // PROCRUSTES_H

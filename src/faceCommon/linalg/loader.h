@@ -44,6 +44,9 @@ public:
     static void loadVectors(const QString &dirPath, QVector<Vector> &vectors, QVector<int> &classes,
                             const char *classSeparator = "-", const char *nameFilter = "*");
 
+    static void loadMatrices(const QString &dirPath, QVector<Matrix> &matrices, QVector<int> &classes,
+                             const char *classSeparator = "-", const char *nameFilter = "*", int maxCount = -1);
+
     static QVector<QString> listFiles(const QString &path, const QString &filter, PathType pathType);
 };
 

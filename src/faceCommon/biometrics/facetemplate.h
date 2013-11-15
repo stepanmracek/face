@@ -18,12 +18,12 @@ class FilterBanksVectors
 public:
     QMap<QString, QVector<Vector> > source;
 
-    QVector<Vector> load(const QString &dirPath, const QString &baseFilename, const FilterBanksClassifiers &classifier);
+    //QVector<Vector> load(const QString &dirPath, const QString &baseFilename, const FilterBanksClassifiers &classifier);
 
-    QVector<Vector> load(const Matrix& image, const FilterBankClassifier &classifier);
+    QVector<Vector> load(const Matrix& image, const FilterBankClassifier &classifier, double scaleFactor);
 
 private:
-    QVector<Vector> load(const QString &dirPath, const QString &baseFilename, const QString &source, const FilterBankClassifier &classifier);
+    //QVector<Vector> load(const QString &dirPath, const QString &baseFilename, const QString &source, const FilterBankClassifier &classifier);
 };
 
 class FaceClassifier; // forward declaration
@@ -37,11 +37,15 @@ public:
     QMap<QString, FilterBanksVectors> type;
 
     FaceTemplate();
-    FaceTemplate(const QString &dirPath, const QString &baseFilename, const FaceClassifier &classifier);
+    //FaceTemplate(const QString &dirPath, const QString &baseFilename, const FaceClassifier &classifier);
     FaceTemplate(int id, const Mesh &properlyAlignedMesh, const FaceClassifier &classifier);
     FaceTemplate(int id, const QString &path, const FaceClassifier &classifier);
 
     void serialize(const QString &path, const FaceClassifier &classifier) const;
+
+    static Matrix getTexture(const Mesh &mesh);
+    static QList<Matrix> getDeMeGaInEi(const Mesh &mesh);
+    static QVector<VectorOfPoints> getIsoGeodesicCurves(const Mesh &mesh);
 };
 
 class FilterBankClassifier
@@ -95,7 +99,7 @@ public:
 
     QMap<int, double> identify(const QHash<int, FaceTemplate *> &references, const FaceTemplate *probe) const;
 
-    ScoreSVMFusion relearnFinalFusion(const QVector<FaceTemplate> &templates);
+    ScoreSVMFusion relearnFinalFusion(const QVector<FaceTemplate *> &templates);
     void serialize(const QString &dirPath);
 };
 

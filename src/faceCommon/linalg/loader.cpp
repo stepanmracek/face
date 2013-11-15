@@ -128,6 +128,33 @@ void Loader::loadImages(const QString &dirPath, QVector<Matrix> &images, QVector
     }
 }
 
+void Loader::loadMatrices(const QString &dirPath, QVector<Matrix> &matrices,
+                          QVector<int> &classes, const char *classSeparator,
+                          const char *nameFilter, int maxCount)
+{
+    matrices.clear();
+    classes.clear();
+
+    QVector<QString> filenames = listFiles(dirPath, nameFilter, Filename);
+    for (int i = 0; i < filenames.count(); i++)
+    {
+        Matrix m = Common::loadMatrix(dirPath + QDir::separator() + filenames[i]);
+        matrices << m;
+
+        if (Common::matrixContainsNan(m))
+        {
+            qDebug() << filenames[i];
+        }
+
+        int indexOfSeparator = filenames.at(i).indexOf(classSeparator);
+        QString classString = filenames.at(i).left(indexOfSeparator);
+        int classNumber = classString.toInt();
+        classes << classNumber;
+
+        if (maxCount > 0 && classes.count() >= maxCount) break;
+    }
+}
+
 void Loader::loadVectors(const QString &dirPath, QVector<Vector> &vectors,
                          QVector<int> &classes, const char *classSeparator, const char *nameFilter)
 {

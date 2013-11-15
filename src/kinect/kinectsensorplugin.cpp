@@ -212,7 +212,7 @@ void KinectSensorPlugin::align()
 {
     if (mesh)
     {
-        aligner.icpAlign(*mesh, ICP_ITERATIONS);
+        aligner.icpAlign(*mesh, ICP_ITERATIONS, FaceAligner::NoseTipDetection);
     }
 }
 

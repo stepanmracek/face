@@ -382,7 +382,7 @@ void Procrustes3D::applyInversedProcrustesResult(QVector<cv::Point3d> &pointClou
     }
 }
 
-double Procrustes3D::diff(QVector<cv::Point3d> &first, QVector<cv::Point3d> &second)
+double Procrustes3D::diff(const QVector<cv::Point3d> &first, const QVector<cv::Point3d> &second)
 {
     int n = first.count();
     assert(n == second.count());

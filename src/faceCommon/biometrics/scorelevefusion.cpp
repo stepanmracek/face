@@ -253,6 +253,7 @@ void ScoreWeightedSumFusion::learnImplementation()
 
 double ScoreWeightedSumFusion::fuse(QVector<double> &scores) const
 {
+    //qDebug() << scores;
     assert(scores.count() == genuineMeans.count());
     double result = 0.0;
     for (int i = 0; i < scores.count(); i++)
@@ -374,13 +375,19 @@ ScoreSVMFusion::ScoreSVMFusion(const QString &path)
 
 double ScoreSVMFusion::fuse(QVector<double> &scores) const
 {
+    //qDebug() << scores;
+
     assert(scores.count() == genuineMeans.count());
     for (int i = 0; i < scores.count(); i++)
         scores[i] = (scores[i]-genuineMeans[i])/(impostorMeans[i]-genuineMeans[i]);
 
+    //qDebug() << scores;
+
     cv::Mat score = colVectorToColFPMatrix(scores);
 
     double svmResult = svm.predict(score, true);
+
+    //qDebug() << svmResult;
     return svmResult;
 }
 
