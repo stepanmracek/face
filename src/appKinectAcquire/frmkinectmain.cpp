@@ -110,7 +110,7 @@ void FrmKinectMain::on_btnIdentify_clicked()
     FaceTemplate *probe = new FaceTemplate(0, *sensor.mesh, classifier);
     sensor.deleteMesh();
 
-    QMap<int, double> result = classifier.identify(database, probe);
+    QMap<int, double> result = classifier.identify(database, probe, FaceClassifier::CompareMeanDistance);
     delete probe;
     DlgIdentifyResult dlg(result, mapIdToName, ui->sliderThreshold->value(), this);
     dlg.exec();
@@ -137,7 +137,7 @@ void FrmKinectMain::on_btnVerify_clicked()
     }
 
     int id = mapNameToId[name];
-    double score = classifier.compare(database.values(id), probe, true);
+    double score = classifier.compare(database.values(id), probe, FaceClassifier::CompareMeanDistance, true);
     delete probe;
 
     bool accepted = (score < ui->sliderThreshold->value());

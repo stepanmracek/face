@@ -16,7 +16,7 @@ private:
     int cropStartY;
     CurvatureStruct curvature;
     Map peakDensity;
-    Map pitDensity;
+    //Map pitDensity;
 
     // detector params
     int stripeWidth;
@@ -28,7 +28,7 @@ private:
     int depthErode;
     int depthLevelSelect;
     int peakDensityWindowsSize;
-    int pitDensityWindowsSize;
+    //int pitDensityWindowsSize;
     int pitsStripeSmoothKernel;
     int minYDistanceFromNosetipToEyes;
     int maxYDistanceFromNosetipToEyes;

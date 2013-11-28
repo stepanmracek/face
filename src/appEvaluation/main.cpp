@@ -31,13 +31,15 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::evaluateFusionAll();
     //Evaluate3dFrgc::testSerializedClassifiers();
 
+    //Evaluate3dFrgc::testFilterBankKernelSizes();
+
     // Kinect
     //EvaluateKinect::learnFromFrgc();
-    //EvaluateKinect::evaluateKinect();
+    EvaluateKinect::evaluateKinect();
     //EvaluateKinect::createTemplates();
     //EvaluateKinect::evaluateSimple();
     //EvaluateKinect::evaluateRefeference();
-    EvaluateKinect::evaluateReferenceDistances();
+    //EvaluateKinect::evaluateReferenceDistances();
 
     return 0;
 }

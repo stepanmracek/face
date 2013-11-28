@@ -83,6 +83,9 @@ public:
 class FaceClassifier
 {
 public:
+
+    enum ComparisonType { CompareMinDistance, CompareMeanDistance, CompareMeanTemplate };
+
     ScoreSVMFusion fusion;
     ZPCACorrW isocurves;
     QMap<QString, FilterBanksClassifiers> bankClassifiers;
@@ -92,12 +95,15 @@ public:
     FaceClassifier(const QString &dirPath);
 
     double compare(const FaceTemplate *first, const FaceTemplate *second, bool debug = false) const;
-    double compare(const QList<FaceTemplate *> &references, const FaceTemplate *probe, bool debug = false) const;
+    double compare(const QList<FaceTemplate *> &references, const FaceTemplate *probe,
+                   ComparisonType comparisonType, bool debug = false) const;
 
     Evaluation evaluate(const QVector<FaceTemplate *> &templates) const;
-    Evaluation evaluate(const QHash<int, FaceTemplate *> &references, const QVector<FaceTemplate *> &testTemplates) const;
+    Evaluation evaluate(const QHash<int, FaceTemplate *> &references, const QVector<FaceTemplate *> &testTemplates,
+                        ComparisonType comparisonType) const;
 
-    QMap<int, double> identify(const QHash<int, FaceTemplate *> &references, const FaceTemplate *probe) const;
+    QMap<int, double> identify(const QHash<int, FaceTemplate *> &references, const FaceTemplate *probe,
+                               ComparisonType comparisonType) const;
 
     ScoreSVMFusion relearnFinalFusion(const QVector<FaceTemplate *> &templates);
     void serialize(const QString &dirPath);

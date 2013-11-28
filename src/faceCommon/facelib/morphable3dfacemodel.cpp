@@ -19,21 +19,20 @@ Morphable3DFaceModel::Morphable3DFaceModel(const QString &pcaPathForZcoord, cons
     Map faceTexture(width, maskRows/width);
     for (int i = 0; i < maskRows; i++)
     {
-        faceDepth.flags[i] = mask(i) ? true : false;
-        faceTexture.flags[i] = mask(i) ? true : false;
+        faceDepth.flags(i/faceDepth.w, i%faceDepth.w) = mask(i) ? true : false;
+        faceTexture.flags(i/faceTexture.w, i%faceTexture.w) = mask(i) ? true : false;
     }
 
     Matrix zcoordMean = pcaForZcoord.getMean();
     Matrix textureMean = pcaForTexture.getMean();
-    assert(zcoordMean.rows == faceDepth.flags.count(1));
     assert(zcoordMean.rows == textureMean.rows);
     int depthIndex = 0;
     for (int i = 0; i < maskRows; i++)
     {
-        if (faceDepth.flags[i])
+        if (faceDepth.flags(i/faceDepth.w, i%faceDepth.w))
         {
-            faceDepth.values[i] = zcoordMean(depthIndex);
-            faceTexture.values[i] = textureMean(depthIndex);
+            faceDepth.values(i/faceDepth.w, i%faceDepth.w) = zcoordMean(depthIndex);
+            faceTexture.values(i/faceTexture.w, i%faceTexture.w) = textureMean(depthIndex);
             depthIndex++;
         }
     }
@@ -111,6 +110,10 @@ Procrustes3DResult Morphable3DFaceModel::align(Mesh &inputMesh, Landmarks &input
 
 void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
 {
+    // coord to index: y*w + x;
+    /*int x = i % w;
+    int y = i / w;*/
+
     MapConverter converter;
     Map depthmap = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, ZCoord);
     Map intensities = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_I);
@@ -118,10 +121,10 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     {
         if (mask(i) == 0)
         {
-            depthmap.flags[i] = false;
-            intensities.flags[i] = false;
+            depthmap.flags(i/depthmap.w, i%depthmap.w) = false;
+            intensities.flags(i/intensities.w, i%intensities.w) = false;
         }
-        else if (!depthmap.flags[i])
+        else if (!depthmap.flags(i/depthmap.w, i%depthmap.w))
         {
             qDebug() << "Morphable3DFaceModel::morphModel, Missing value in input aligned mesh";
             //TODO!
@@ -147,14 +150,16 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     Map textureR = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_R);
     Map textureG = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_G);
     Map textureB = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_B);
-    int n = textureR.values.count();
+    int n = textureR.w * textureR.h;
     assert(n == mask.rows);
     mesh.colors.clear();
     for (int i = 0; i < n; i++)
     {
         if (textureR.flags[i] && mask(i))
         {
-            mesh.colors << Color(textureB.values[i], textureG.values[i], textureR.values[i]);
+            mesh.colors << Color(textureB.values(i/textureB.w, i%textureB.w),
+                                 textureG.values(i/textureG.w, i%textureG.w),
+                                 textureR.values(i/textureR.w, i%textureR.w));
         }
     }
 }
@@ -349,7 +354,7 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
     pca.modesSelectionThreshold(0.95);
     pca.serialize(pcaFile);
 
-    int n = resultZcoordMap.flags.count();
+    int n = resultZcoordMap.w * resultZcoordMap.h;
     QVector<double> flags(n, 0.0);
     for (int i = 0; i < n; i++)
     {

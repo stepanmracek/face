@@ -42,4 +42,5 @@ HEADERS += \
     testdistance.h \
     testlogisticregression.h \
     testlaguerrewavelet.h \
-    testfacealigner.h
+    testfacealigner.h \
+    testtextureprocessing.h

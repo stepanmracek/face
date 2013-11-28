@@ -169,8 +169,7 @@ void FaceAligner::AlignNoseTip(Mesh &face)
 
 void FaceAligner::icpAlign(Mesh &face, int maxIterations, PreAlignTransform preAlign)
 {
-    qDebug() << "icpAlign2()";
-    //assert(maxIterations >= 1);
+    qDebug() << "icpAlign()";
     Procrustes3DResult progress;
 
     switch (preAlign)
@@ -186,17 +185,11 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations, PreAlignTransform preA
         break;
     }
 
-    qDebug() << "index training";
     cv::flann::Index index;
     cv::Mat features;
     face.trainPointIndex(index, features, cv::flann::KMeansIndexParams());
     for (int iteration = 0; iteration < maxIterations; iteration++)
     {
-        /*MapConverter c;
-        Map depth = SurfaceProcessor::depthmap(face, c, 1, Texture_I);
-        cv::imshow("depth", depth.toMatrix());
-        cv::waitKey(50);*/
-
         // Find correspondence
         VectorOfPoints referencePoints = referenceFace.points;
         VectorOfPoints transformedReference = referencePoints;
@@ -210,12 +203,6 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations, PreAlignTransform preA
 
         VectorOfPoints pointsToTransform = face.getNearestPoints(transformedReference, index);
 
-        /*face.points = pointsToTransform;
-        face.colors.clear();
-        face.recalculateMinMax();
-        face.calculateTriangles();
-        return;*/
-
         // translation
         cv::Point3d centralizeReferences = Procrustes3D::centralizedTranslation(referencePoints);
         Procrustes3D::translate(referencePoints, centralizeReferences);
@@ -227,25 +214,11 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations, PreAlignTransform preA
 
         // SVD rotation
         Matrix rotation = Procrustes3D::getOptimalRotation(pointsToTransform, referencePoints);
-        //Procrustes3D::transform(pointsToTransform, rotation);
         face.transform(rotation);
         progress.rotations << rotation;
-
-        //if (iteration == maxIterations - 1)
-        //{
-        //    Procrustes3D::transform(pointsToTransform, rotation);
-        //    qDebug() << "  " << iteration << Procrustes3D::diff(pointsToTransform, referencePoints) / referencePoints.count();
-        //}
 
         // post translation
         face.translate(-centralizeReferences);
         progress.postTranslations << -centralizeReferences;
     }
-
-    //MapConverter c;
-    //Matrix test = SurfaceProcessor::depthmap(face, c, cv::Point(-50,-50), cv::Point(50,50), 2, Texture_I).toMatrix();
-    //cv::circle(test, cv::Point(100,100), 3, 1, -1);
-    //cv::imshow("test", test);
-    //cv::waitKey();
-    //return result;
 }

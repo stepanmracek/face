@@ -15,7 +15,8 @@ class TestGlWidget
 public:
     static int test(int argc, char *argv[])
     {
-        Mesh mesh = Mesh::fromBIN("../../test/kinect/09-01.bin", false);
+        Mesh mesh = Mesh::fromBIN("../../test/kinect/01-01.bin", false);
+        mesh.printStats();
 
         QApplication app(argc, argv);
         GLWidget widget;

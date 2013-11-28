@@ -10,11 +10,12 @@
 class RealTimeClassifier
 {
 public:
-    RealTimeClassifier(const FaceClassifier &classifier, double threshold,
+    RealTimeClassifier(const FaceClassifier &classifier, double threshold, FaceClassifier::ComparisonType comparisonType,
                        const QHash<int, FaceTemplate*> &database, const QString &pathToAlignReference);
 
     const FaceClassifier &classifier;
     double threshold;
+    FaceClassifier::ComparisonType comparisonType;
     const QHash<int, FaceTemplate*> &database;
     Mesh mean;
     FaceAligner aligner;

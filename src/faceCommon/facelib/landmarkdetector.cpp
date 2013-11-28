@@ -1,3 +1,4 @@
+#include <QDateTime>
 #include <opencv/cv.h>
 #include <opencv/cvaux.h>
 #include <opencv/highgui.h>
@@ -20,7 +21,7 @@ LandmarkDetector::LandmarkDetector(Mesh &mesh) : mesh(mesh)
     depthLevelSelect = 0;
     depthScale = 1; //2;
     peakDensityWindowsSize = 21; //10;
-    pitDensityWindowsSize = 11; //5;
+    //pitDensityWindowsSize = 11; //5;
     pitsStripeSmoothKernel = 7; //11;
     minYDistanceFromNosetipToEyes = 20; //40;
     maxYDistanceFromNosetipToEyes = 70; //140;
@@ -33,9 +34,11 @@ LandmarkDetector::LandmarkDetector(Mesh &mesh) : mesh(mesh)
     // smooth
     Matrix smoothKernel = KernelGenerator::gaussianKernel(depthGaussSize);
     depth.applyFilter(smoothKernel, depthGaussIterations, true);
+    //for (int i = 0; i < depthGaussIterations; i++)
+    //    cv::GaussianBlur(depth.values, depth.values, cv::Size(depthGaussSize, depthGaussSize), -1);
 
-    /*cv::imshow("kernel", smoothKernel);
-    cv::imshow("smoothed", depth.toMatrix());*/
+    //cv::imshow("kernel", smoothKernel);
+    //cv::imshow("smoothed", depth.toMatrix());
 
     // erode and select only points with z-coordinate higher or equal than some threshold
     depth.erode(depthErode);
@@ -52,7 +55,7 @@ LandmarkDetector::LandmarkDetector(Mesh &mesh) : mesh(mesh)
 
     // density maps
     peakDensity = curvature.peaks.densityMap(peakDensityWindowsSize, true);
-    pitDensity = curvature.pits.densityMap(pitDensityWindowsSize, false);
+    //pitDensity = curvature.pits.densityMap(pitDensityWindowsSize, false);
 
     /*cv::imshow("depth", depth.toMatrix());
     cv::imshow("croppedDepth", croppedDepth.toMatrix());
@@ -60,7 +63,7 @@ LandmarkDetector::LandmarkDetector(Mesh &mesh) : mesh(mesh)
     cv::imshow("peaks", curvature.peaks.toMatrix(0, 0, 1));
     cv::imshow("pits", curvature.pits.toMatrix(0, 0, 1));
     cv::imshow("peakDensity", peakDensity.toMatrix(0, 0, 1));
-    cv::imshow("pitDensity", pitDensity.toMatrix(0, 0, 1));
+    //cv::imshow("pitDensity", pitDensity.toMatrix(0, 0, 1));
     cv::waitKey();*/
 }
 
@@ -77,14 +80,14 @@ Landmarks LandmarkDetector::detect()
 void LandmarkDetector::nosetip(Landmarks &l)
 {
     //qDebug() << "  nose tip";
-    int i = peakDensity.maxIndex();
-    if (i < 0)
+    int x = -1;
+    int y = -1;
+    peakDensity.maxIndex(x, y);
+    if (x == -1 && y == -1)
     {
         qDebug() << "Nose coordinates not found";
         return;
     }
-    int x = peakDensity.indexToX(i);
-    int y = peakDensity.indexToY(i);
 
     bool ok;
     cv::Point3d nosetip = converter.MapToMeshCoords(depth, cv::Point2d(x + cropStartX, y + cropStartY), &ok);

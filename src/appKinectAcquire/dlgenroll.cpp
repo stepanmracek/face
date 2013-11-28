@@ -109,7 +109,7 @@ void DlgEnroll::on_buttonBox_accepted()
     int templateNum = 1;
     foreach (const FaceTemplate *t, templates)
     {
-        double d = classifier.compare(templates, t);
+        double d = classifier.compare(templates, t, FaceClassifier::CompareMeanDistance);
         qDebug() << "template:" << templateNum << "distance:" << d;
 
         if (d >= -1.0)

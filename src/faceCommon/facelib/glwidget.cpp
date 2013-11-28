@@ -219,7 +219,7 @@ void GLWidget::paintGL()
         }
     }
 
-    glBegin(GL_LINES);
+    /*glBegin(GL_LINES);
 
         glLineWidth(5);
         glDisable(GL_LIGHTING);
@@ -237,7 +237,7 @@ void GLWidget::paintGL()
         glVertex3f(0, 0, 0);
         glVertex3f(0, 0, 10);
 
-    glEnd();
+    glEnd();*/
 }
 
 

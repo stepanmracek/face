@@ -21,7 +21,6 @@ private:
     SurfaceProcessor() {}
 
 public:
-    static void smooth(Map &map, double alpha, int steps);
     static void smooth(Mesh &mesh, double alpha, int steps);
 
     static CurvatureStruct calculateCurvatures(Map &depthmap, bool pcl = true);
@@ -29,8 +28,6 @@ public:
     static Map depthmap(const Mesh &mesh, MapConverter &converter, double scaleCoef, SurfaceDataToProcess dataToProcess);
     static Map depthmap(const Mesh &mesh, MapConverter &converter, cv::Point2d meshStart, cv::Point2d meshEnd, double scaleCoef, SurfaceDataToProcess dataToProcess);
 
-    static QVector<cv::Point3d> isoGeodeticCurve(Mesh &f, cv::Point3d center, double distance, int samples,
-                                                 double mapScaleFactor, double smoothAlpha = 0, int smoothIterations = 0);
     static QVector<cv::Point3d> isoGeodeticCurve(Map &map, MapConverter &converter, cv::Point3d center,
                                                  double distance, int samples, double mapScaleFactor);
 

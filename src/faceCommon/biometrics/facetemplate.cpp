@@ -55,7 +55,7 @@ double FilterBankClassifier::compare(const QVector<Vector> &first, const QVector
 
 void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVector<Matrix> &imagWavelets, const QString &source, bool gabor)
 {
-    int kSize = 200;
+    int kSize = 64;
 
     QVector<int> p1; QVector<int> p2;
 
@@ -279,16 +279,28 @@ double FaceClassifier::compare(const FaceTemplate *first, const FaceTemplate *se
     return d;
 }
 
-double FaceClassifier::compare(const QList<FaceTemplate *> &references, const FaceTemplate *probe, bool debug) const
+double FaceClassifier::compare(const QList<FaceTemplate *> &references, const FaceTemplate *probe,
+                               ComparisonType comparisonType, bool debug) const
 {
     double n = references.count();
     double s = 0;
+
+    QVector<double> scores;
     foreach (const FaceTemplate *reference, references)
     {
         double score = compare(reference, probe, debug);
-        s += score;
+        scores << score;
+    }
 
-        qDebug() << "  " << score;
+    switch (comparisonType)
+    {
+    case FaceClassifier::CompareMinDistance:
+        return Vector(scores).minValue();
+    case FaceClassifier::CompareMeanDistance:
+        return Vector(scores).meanValue();
+    case FaceClassifier::CompareMeanTemplate:
+    default:
+        return 0;
     }
 
     return s/n;
@@ -312,7 +324,9 @@ Evaluation FaceClassifier::evaluate(const QVector<FaceTemplate*> &templates) con
     return Evaluation(distances);
 }
 
-Evaluation FaceClassifier::evaluate(const QHash<int, FaceTemplate *> &references, const QVector<FaceTemplate *> &testTemplates) const
+Evaluation FaceClassifier::evaluate(const QHash<int, FaceTemplate *> &references,
+                                    const QVector<FaceTemplate *> &testTemplates,
+                                    ComparisonType comparisonType) const
 {
     QHash<QPair<int, int>, double> distances;
 
@@ -322,7 +336,7 @@ Evaluation FaceClassifier::evaluate(const QHash<int, FaceTemplate *> &references
 
         foreach (int referenceID, references.uniqueKeys())
         {
-            double d = compare(references.values(referenceID), probe);
+            double d = compare(references.values(referenceID), probe, comparisonType);
             distances.insertMulti(QPair<int, int>(referenceID, probeID), d);
 
             //qDebug() << referenceID << probeID << (referenceID == probeID) << d;
@@ -332,13 +346,15 @@ Evaluation FaceClassifier::evaluate(const QHash<int, FaceTemplate *> &references
     return Evaluation(distances);
 }
 
-QMap<int, double> FaceClassifier::identify(const QHash<int, FaceTemplate *> &references, const FaceTemplate *probe) const
+QMap<int, double> FaceClassifier::identify(const QHash<int, FaceTemplate *> &references,
+                                           const FaceTemplate *probe,
+                                           ComparisonType comparisonType) const
 {
     QMap<int, double> result;
 
     foreach (int referenceID, references.uniqueKeys())
     {
-        double d = compare(references.values(referenceID), probe);
+        double d = compare(references.values(referenceID), probe, comparisonType);
         result[referenceID] = d;
 
         //qDebug() << referenceID << d;
@@ -498,17 +514,30 @@ QList<Matrix> FaceTemplate::getDeMeGaInEi(const Mesh &mesh)
     cv::Rect roi(25, 15, 100, 90);
     MapConverter converter;
     Map depthmap = SurfaceProcessor::depthmap(mesh, converter, cv::Point2d(-75, -75), cv::Point2d(75, 75), 1, ZCoord);
+
+
+    //cv::imshow("getDeMeGaInEi1", depthmap.toMatrix());
     depthmap.bandPass(-70, 10, false, false);
+    //cv::imshow("getDeMeGaInEi2", depthmap.toMatrix());
+
     result << depthmap.toMatrix(0, -70, 10)(roi);
 
     Matrix smoothKernel = KernelGenerator::gaussianKernel(5);
 
     Map smoothedDepthmap = depthmap;
     smoothedDepthmap.applyFilter(smoothKernel, 7, true);
+    //for (int i = 0; i < 7; i++)
+    //    cv::GaussianBlur(smoothedDepthmap.values, smoothedDepthmap.values, cv::Size(5, 5), -1);
+
+    //cv::imshow("getDeMeGaInEi3", smoothedDepthmap.toMatrix());
+
     CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(smoothedDepthmap);
 
+    //cv::imshow("4", cs.curvatureMean.toMatrix());
     cs.curvatureMean.bandPass(-0.1, 0.1, false, false);
     result << cs.curvatureMean.toMatrix(0, -0.1, 0.1)(roi);
+
+
 
     cs.curvatureGauss.bandPass(-0.01, 0.01, false, false);
     result << cs.curvatureGauss.toMatrix(0, -0.01, 0.01)(roi);
@@ -519,6 +548,7 @@ QList<Matrix> FaceTemplate::getDeMeGaInEi(const Mesh &mesh)
     cs.curvaturePcl.bandPass(0, 0.0025, false, false);
     result << cs.curvaturePcl.toMatrix(0, 0, 0.0025)(roi);
 
+    //cv::waitKey();
     return result;
 }
 
@@ -528,6 +558,9 @@ VectorOfCurves FaceTemplate::getIsoGeodesicCurves(const Mesh &mesh)
     Map depth = SurfaceProcessor::depthmap(mesh, converter, 2, ZCoord);
     Matrix gaussKernel = KernelGenerator::gaussianKernel(7);
     depth.applyFilter(gaussKernel, 3, true);
+    //for (int i = 0; i < 3; i++)
+    //    cv::GaussianBlur(depth.values, depth.values, cv::Size(7, 7), -1);
+
 
     QVector<VectorOfPoints> isoCurves;
     int startD = 10;
@@ -734,11 +767,15 @@ void FaceTemplate::serialize(const QString &path, const FaceClassifier &classifi
 
 QVector<Vector> FilterBanksVectors::load(const Matrix &image, const FilterBankClassifier &classifier, double scaleFactor)
 {
+    //static int ii = 0;
     //double min, max;
     //cv::minMaxIdx(image, &min, &max);
+    //cv::imwrite((QString("input")+QString::number(ii)+".png").toStdString(), (image-min)/(max-min)*255);
     //qDebug() << min << max;
-    //cv::imshow("image", image);
+    //cv::imshow("image", (image-min)/(max-min));
     //cv::waitKey(0);
+    //ii++;
+
 
     QVector<Vector> result;
     for (int i = 0; i < classifier.realWavelets.count(); i++)
@@ -746,12 +783,12 @@ QVector<Vector> FilterBanksVectors::load(const Matrix &image, const FilterBankCl
         Matrix response = (classifier.realWavelets[i].rows == 0) ?
                     image :
                     FilterBank::absResponse(image, classifier.realWavelets[i], classifier.imagWavelets[i]);
-        Matrix resized = MatrixConverter::scale(response, 0.5);
+        Matrix resized = MatrixConverter::scale(response, scaleFactor);
 
         //qDebug() << resized.rows << resized.cols;
         //cv::minMaxIdx(resized, &min, &max);
-        //cv::imshow("response", (resized-min)/(max-min));
-        //cv::waitKey();
+        //cv::imwrite((QString::number(ii)+".png").toStdString(), (resized-min)/(max-min)*255);
+        //ii++;
 
         Vector rawVector = MatrixConverter::matrixToColumnVector(resized);
         result << classifier.projections[i].extractor.extract(rawVector);

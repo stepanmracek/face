@@ -47,14 +47,14 @@ public:
             QList<FaceTemplate *> ref = references.values(id);
             foreach (const FaceTemplate *probe, ref)
             {
-                qDebug() << "  " << faceClassifier.compare(ref, probe);
+                qDebug() << "  " << faceClassifier.compare(ref, probe, FaceClassifier::CompareMeanDistance);
             }
         }
     }
 
     static void evaluateRefeference()
     {
-        FaceClassifier faceClassifier("../../test/kinect/classifiers2/");
+        FaceClassifier faceClassifier("../../test/kinect/classifiers/");
 
         QHash<int, FaceTemplate *> references;
         QVector<FaceTemplate *> testTemplates;
@@ -75,14 +75,15 @@ public:
             }
         }
 
-        Evaluation e = faceClassifier.evaluate(references, testTemplates);
-        qDebug() << e.eer << e.maxSameDistance << e.minDifferentDistance;
-        e.outputResults("kinect", 10);
+        Evaluation e = faceClassifier.evaluate(references, testTemplates, FaceClassifier::CompareMeanDistance);
+        qDebug() << e.eer; // << e.fnmrAtFmr(0.01) << e.fnmrAtFmr(0.001) << e.fnmrAtFmr(0.0001);
+        qDebug() << e.maxSameDistance << e.minDifferentDistance;
+        //e.outputResults("kinect", 10);
     }
 
     static void evaluateSimple()
     {
-        FaceClassifier faceClassifier("../../test/kinect/classifiers2/");
+        FaceClassifier faceClassifier("../../test/kinect/classifiers/");
         QVector<FaceTemplate*> templates;
 
         QVector<QString> templateFiles = Loader::listFiles("../../test/kinect/", "*.yml", AbsoluteFull);
@@ -94,6 +95,11 @@ public:
 
         Evaluation e = faceClassifier.evaluate(templates);
         qDebug() << e.eer;
+
+        foreach (FaceTemplate *t, templates)
+        {
+            delete t;
+        }
         //e.outputResults("kinect", 15);
     }
 
@@ -118,7 +124,7 @@ public:
     static void learnFromFrgc()
     {
         FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj", false));
-        FaceClassifier faceClassifier("../../test/frgc/classifiers2/");
+        FaceClassifier faceClassifier("../../test/frgc/classifiers/");
         QVector<FaceTemplate*> templates;
 
         QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.bin", AbsoluteFull);
@@ -131,27 +137,28 @@ public:
         }
 
         ScoreSVMFusion newFusion = faceClassifier.relearnFinalFusion(templates);
-        faceClassifier.serialize("../../test/kinect/classifiers2");
-        newFusion.serialize("../../test/kinect/classifiers2/final");
+        //faceClassifier.serialize("../../test/kinect/classifiers2");
+        //newFusion.serialize("../../test/kinect/classifiers2/final");
     }
 
     static void evaluateKinect()
     {
         FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj", false));
-        FaceClassifier faceClassifier("../../test/kinect/classifiers2/");
+        FaceClassifier faceClassifier("../../test/kinect/classifiers/");
         QVector<FaceTemplate*> templates;
 
         QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.bin", AbsoluteFull);
         foreach(const QString &path, binFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();
-            Mesh face = Mesh::fromBIN(path);
+            Mesh face = Mesh::fromBIN(path, true);
             aligner.icpAlign(face, 10, FaceAligner::NoseTipDetection);
             templates << new FaceTemplate(id, face, faceClassifier);
         }
 
         Evaluation eval = faceClassifier.evaluate(templates);
-        eval.outputResults("kinect", 10);
+        qDebug() << eval.eer;
+        //eval.outputResults("kinect", 10);
     }
 
 };

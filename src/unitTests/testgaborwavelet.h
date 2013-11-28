@@ -27,6 +27,8 @@ Matrix inputImage;
 Matrix responseReal;
 Matrix responseImag;
 Matrix responseAbs;
+Matrix responseSin;
+Matrix responseQbits;
 Matrix realKernel;
 Matrix imagKernel;
 
@@ -50,6 +52,31 @@ void gaborRedraw(GaborParams *gParams)
     Matrix ab2 = re2 + im2;
     cv::sqrt(ab2, responseAbs);
 
+    responseSin = Matrix(responseReal.rows, responseReal.cols);
+    for (int c = 0; c < responseReal.cols; c++)
+    {
+        for (int r = 0; r < responseReal.rows; r++)
+        {
+            responseSin(r,c) = sin(responseImag(r,c)/responseAbs(r,c));
+        }
+    }
+
+    responseQbits = Matrix(responseReal.rows, responseReal.cols);
+    for (int c = 0; c < responseReal.cols; c++)
+    {
+        for (int r = 0; r < responseReal.rows; r++)
+        {
+            double real = responseReal(r,c);
+            double imag = responseImag(r,c);
+            double val = 0.0;
+            if (real > 0.0 && imag > 0.0) val = 0.0;
+            if (real < 0.0 && imag > 0.0) val = 0.25;
+            if (real < 0.0 && imag < 0.0) val = 0.75;
+            if (real > 0.0 && imag < 0.0) val = 1.0;
+            responseQbits(r,c) = val;
+        }
+    }
+
     qDebug() << "showing kernels";
     double min,max;
     cv::minMaxLoc(realKernel, &min, &max);
@@ -72,6 +99,12 @@ void gaborRedraw(GaborParams *gParams)
     cv::minMaxLoc(responseAbs, &min, &max);
     responseAbs = (responseAbs-min)/(max-min);
     cv::imshow("response abs", responseAbs);
+
+    cv::minMaxLoc(responseSin, &min, &max);
+    responseSin = (responseSin-min)/(max-min);
+    cv::imshow("response sin", responseSin);
+
+    cv::imshow("response qbits", responseQbits);
 }
 
 void gaborOnSizeChange(int newVal, void *p)

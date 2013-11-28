@@ -17,7 +17,7 @@ public:
 
         MapConverter converter;
         Map map = SurfaceProcessor::depthmap(m, converter, 2, Curvature);
-        qDebug() << map.minValue() << map.maxValue();
+        //qDebug() << map.minValue() << map.maxValue();
         Matrix mat = map.toMatrix();
         //mat = Matrix::ones(mat.rows, mat.cols) - mat;
         cv::imshow("curvature from 3d", mat);
@@ -27,7 +27,7 @@ public:
         //CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(depth);
     }
 
-    static void testPclCurvatures()
+    /*static void testPclCurvatures()
     {
         Mesh mesh = Mesh::fromBINZ("/home/stepo/data/frgc/spring2004/zbin-aligned/02463d652.binz");
         MapConverter converter;
@@ -42,7 +42,7 @@ public:
         //Histogram pclHistogram(cs.curvaturePcl.getUsedValues(), 20, false);
         //Common::savePlot(pclHistogram.histogramValues, pclHistogram.histogramCounter, "pclHistogram");
         cv::waitKey();
-    }
+    }*/
 };
 
 #endif // TESTSURFACEPROCESSING_H

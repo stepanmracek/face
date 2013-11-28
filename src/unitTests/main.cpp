@@ -24,6 +24,7 @@
 #include "testlogisticregression.h"
 #include "testlaguerrewavelet.h"
 #include "testfacealigner.h"
+#include "testtextureprocessing.h"
 
 #include <QString>
 
@@ -70,7 +71,7 @@ int main(int argc, char *argv[])
 
     //TestSVM::testSVM();
 
-    //TestGaborWavelet::test();
+    TestGaborWavelet::test();
     //TestLaguerreWavelet::test();
 
 	//Annotation a("/home/stepo/SVN/disp-stepan-mracek/test/testASM");
@@ -112,7 +113,7 @@ int main(int argc, char *argv[])
     //TestMesh::readAbsWithTexture(argc, argv);
     //TestMesh::testReadWriteCharArray(frgcPath());
 
-    TestFaceAligner::test(frgcPath(), argc, argv);
+    //TestFaceAligner::test(frgcPath(), argc, argv);
 
     //TestLandmarks::testReadWrite();
 
@@ -129,6 +130,8 @@ int main(int argc, char *argv[])
     //TestDistance::testCosine();
 
     //TestLogisticRegression::test();
+
+    //TestTextureProcessing::testClahe();
 
 	return 0;
 }

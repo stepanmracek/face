@@ -243,64 +243,6 @@ public:
         qDebug() << nans;
     }
 
-    static int createMaps()
-    {
-        return -1;
-
-        QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
-        QDir srcDir(srcDirPath, "*.binz");
-        QFileInfoList srcFiles = srcDir.entryInfoList();
-        MapConverter converter;
-
-        Matrix smoothKernel2 = KernelGenerator::gaussianKernel(5);
-        cv::Rect roi(25, 15, 100, 90);
-        foreach (const QFileInfo &srcFileInfo, srcFiles)
-        {
-            Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
-            Map depthmap = SurfaceProcessor::depthmap(mesh, converter,
-                                                      cv::Point2d(-75, -75),
-                                                      cv::Point2d(75, 75),
-                                                      1, ZCoord);
-
-            ///qDebug() << depthmap.maxValue();
-            //allZValues << depthmap.getUsedValues();
-
-            QString out;
-            depthmap.bandPass(-70, 10, false, false);
-            Matrix depthImage = depthmap.toMatrix(0, -70, 10);
-            out = srcDirPath + "depth/" + srcFileInfo.baseName() + ".png";
-            cv::imwrite(out.toStdString(), depthImage(roi)*255);
-
-            //cv::imshow("depth", depthImage);
-            //cv::waitKey(0);
-            //continue;
-
-            Map smoothedDepthmap = depthmap;
-            smoothedDepthmap.applyFilter(smoothKernel2, 7, true);
-            CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(smoothedDepthmap);
-
-            cs.curvatureMean.bandPass(-0.1, 0.1, false, false);
-            Matrix meanImage = cs.curvatureMean.toMatrix(0, -0.1, 0.1);
-            out = srcDirPath + "mean/" + srcFileInfo.baseName() + ".png";
-            cv::imwrite(out.toStdString(), meanImage(roi)*255);
-
-            cs.curvatureGauss.bandPass(-0.01, 0.01, false, false);
-            Matrix gaussImage = cs.curvatureGauss.toMatrix(0, -0.01, 0.01);
-            out = srcDirPath + "gauss/" + srcFileInfo.baseName() + ".png";
-            cv::imwrite(out.toStdString(), gaussImage(roi)*255);
-
-            cs.curvatureIndex.bandPass(0, 1, false, false);
-            Matrix indexImage = cs.curvatureIndex.toMatrix(0, 0, 1);
-            out = srcDirPath + "index/" + srcFileInfo.baseName() + ".png";
-            cv::imwrite(out.toStdString(), indexImage(roi)*255);
-
-            cs.curvaturePcl.bandPass(0, 0.0025, false, false);
-            Matrix pclImage = cs.curvaturePcl.toMatrix(0, 0, 0.0025);
-            out = srcDirPath + "eigencur/" + srcFileInfo.baseName() + ".png";
-            cv::imwrite(out.toStdString(), pclImage(roi)*255);
-        }
-    }
-
     static void evaluateHistogramFeaturesGenerateStripesBinsMap()
     {
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/depth2";
@@ -345,7 +287,7 @@ public:
         }
     }
 
-    static void evaluateHistogramFeatures()
+    /*static void evaluateHistogramFeatures()
     {
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
         QDir srcDir(srcDirPath, "*.binz");
@@ -358,16 +300,16 @@ public:
         int stripes = 20;
         int bins = 20;
 
-        /*QVector<int> startx; startx << -50 << -50 << -60 << -60 << -60;
-        QVector<int> starty; starty << -30 << -30 << -30 << -40 << -40;
-        QVector<int> endx;   endx   <<  50 <<  50 <<  60 <<  60 <<  60;
-        QVector<int> endy;   endy   <<  50 <<  60 <<  60 <<  60 <<  70;
+        //QVector<int> startx; startx << -50 << -50 << -60 << -60 << -60;
+        //QVector<int> starty; starty << -30 << -30 << -30 << -40 << -40;
+        //QVector<int> endx;   endx   <<  50 <<  50 <<  60 <<  60 <<  60;
+        //QVector<int> endy;   endy   <<  50 <<  60 <<  60 <<  60 <<  70;
 
-        QVector<int> kSizes; kSizes << 3 << 5 << 7 << 9;
-        QVector<int> filterRepeats; filterRepeats << 1 << 2 << 3;
+        //QVector<int> kSizes; kSizes << 3 << 5 << 7 << 9;
+        //QVector<int> filterRepeats; filterRepeats << 1 << 2 << 3;
 
-        QVector<Metrics*> metrics;
-        metrics << new CityblockMetric() << new SumOfSquareDifferences() << new CosineMetric() << new CorrelationMetric();*/
+        //QVector<Metrics*> metrics;
+        //metrics << new CityblockMetric() << new SumOfSquareDifferences() << new CosineMetric() << new CorrelationMetric();
 
         MapConverter mapConverter;
         Matrix gaussKernel = KernelGenerator::gaussianKernel(kSize);
@@ -409,15 +351,15 @@ public:
 
         eerPotential.scores.toFile("eerPotentialTrain");
 
-        /*CorrelationWeightedMetric corrW;
-        double s = 0.8;
-        Vector selectionWeights = eerPotential.createSelectionWeightsBasedOnRelativeThreshold(s);
-        selectionWeights.toFile("../../test/frgc/histogram/selectionWeights");
-        corrW.w = selectionWeights;
+        //CorrelationWeightedMetric corrW;
+        //double s = 0.8;
+        //Vector selectionWeights = eerPotential.createSelectionWeightsBasedOnRelativeThreshold(s);
+        //selectionWeights.toFile("../../test/frgc/histogram/selectionWeights");
+        //corrW.w = selectionWeights;
 
-        Evaluation e2(vectorsInClusters[1], classesInClusters[1], zPassExtractor, corrW);
-        qDebug() << "eerPotential scores" << s << "eer" << e2.eer;*/
-    }
+        //Evaluation e2(vectorsInClusters[1], classesInClusters[1], zPassExtractor, corrW);
+        //qDebug() << "eerPotential scores" << s << "eer" << e2.eer;
+    }*/
 
     static void evaluateTextures()
     {
@@ -542,7 +484,7 @@ public:
         }
     }
 
-    static void createCurves()
+/*    static void createCurves()
     {
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
         QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/curves2/";
@@ -605,7 +547,7 @@ public:
         {
             qDebug() << e.eer;
         }
-    }
+    }*/
 
     static void evaluateFilterBankFusion()
     {
@@ -977,9 +919,39 @@ public:
         }
     }
 
+    static void testFilterBankKernelSizes()
+    {
+        QString classifiersDir = "/home/stepo/git/face/test/frgc/classifiers/";
+        FaceClassifier faceClassifier(classifiersDir);
+
+        foreach (QString bankName, faceClassifier.bankClassifiers.keys())
+        {
+            FilterBanksClassifiers &bankClassifiers = faceClassifier.bankClassifiers[bankName];
+
+            foreach (QString imgTypeName, bankClassifiers.dict.keys())
+            {
+                QVector<Matrix> &bank = bankClassifiers.dict[imgTypeName].realWavelets;
+
+                int n = bank.count();
+                for (int i = 0; i < n; i++)
+                {
+                    Matrix &kernel = bank[i];
+                    if (kernel.rows == 0) continue;
+                    double min,max;
+                    cv::minMaxIdx(kernel, &min, &max);
+                    QString name = bankName+"-"+imgTypeName+"-"+QString::number(i);
+                    qDebug() << name;
+                    cv::imshow(name.toStdString(), (kernel-min)/(max-min));
+                    cv::waitKey(0);
+                    cv::destroyWindow(name.toStdString());
+                }
+            }
+        }
+    }
+
     static void testSerializedClassifiers()
     {
-        QString classifiersDir = "/home/stepo/git/face/test/frgc/classifiers2/";
+        QString classifiersDir = "/home/stepo/git/face/test/frgc/classifiers/";
         FaceClassifier faceClassifier(classifiersDir);
 
         QString dataDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";

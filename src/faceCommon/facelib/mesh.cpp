@@ -415,7 +415,7 @@ Mesh Mesh::fromMap(Map &depth, Map &intensities, bool centralizeLoadedMesh)
 {
     assert(depth.w == intensities.w);
     assert(depth.h == intensities.h);
-    QMap<int, int> coordToIndex;
+    QMap<QPair<int,int>, int> coordToIndex;
 
     Mesh mesh;
     int index = 0;
@@ -431,8 +431,7 @@ Mesh Mesh::fromMap(Map &depth, Map &intensities, bool centralizeLoadedMesh)
                 uchar intensity = intensities.get(x, y);
                 mesh.colors << cv::Vec3b(intensity, intensity, intensity);
 
-                int coord = depth.coordToIndex(x,y);
-                coordToIndex[coord] = index;
+                coordToIndex[QPair<int,int>(x,y)] = index;
                 index++;
             }
         }
@@ -452,16 +451,14 @@ Mesh Mesh::fromMap(Map &depth, Map &intensities, bool centralizeLoadedMesh)
                 depth.isValidCoord(x, y+1) && depth.isSet(x, y+1) &&
                 depth.isValidCoord(x+1, y+1) && depth.isSet(x+1, y+1))
             {
-                mesh.triangles << cv::Vec3i(coordToIndex[depth.coordToIndex(x,y)], coordToIndex[depth.coordToIndex(x,y+1)], coordToIndex[depth.coordToIndex(x+1,y+1)]);
-                //mesh.triangles.append(cv::Vec3i(map.coordToIndex(x,y), map.coordToIndex(x,y+1), map.coordToIndex(x+1,y+1)));
+                mesh.triangles << cv::Vec3i(coordToIndex[QPair<int,int>(x,y)], coordToIndex[QPair<int,int>(x,y+1)], coordToIndex[QPair<int,int>(x+1,y+1)]);
             }
 
             if (depth.isSet(x,y) &&
                 depth.isValidCoord(x+1, y+1) && depth.isSet(x+1, y+1) &&
                 depth.isValidCoord(x+1, y) && depth.isSet(x+1, y))
             {
-                mesh.triangles << cv::Vec3i(coordToIndex[depth.coordToIndex(x,y)], coordToIndex[depth.coordToIndex(x+1,y+1)], coordToIndex[depth.coordToIndex(x+1,y)]);
-                //mesh.triangles.append(cv::Vec3i(map.coordToIndex(x,y), map.coordToIndex(x+1,y+1), map.coordToIndex(x+1,y)));
+                mesh.triangles << cv::Vec3i(coordToIndex[QPair<int,int>(x,y)], coordToIndex[QPair<int,int>(x+1,y+1)], coordToIndex[QPair<int,int>(x+1,y)]);
             }
         }
     }

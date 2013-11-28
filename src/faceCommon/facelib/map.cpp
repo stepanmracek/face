@@ -14,9 +14,8 @@ void Map::init(int _w, int _h)
 {
     w = _w;
     h = _h;
-    int n = w*h;
-    flags = QVector<bool>(n, false);
-    values = QVector<double>(n, 0.0);
+    flags = cv::Mat_<char>::zeros(h, w);
+    values = Matrix::zeros(h, w);
 }
 
 Map::Map(int w, int h)
@@ -28,8 +27,8 @@ Map::Map(const Map &src)
 {
     w = src.w;
     h = src.h;
-    flags = src.flags;
-    values = src.values;
+    flags = src.flags.clone();
+    values = src.values.clone();
 }
 
 /*Map::~Map()
@@ -40,55 +39,57 @@ Map::Map(const Map &src)
 
 void Map::setAll(double v)
 {
-    int n = w*h;
-    for (int i = 0; i < n; i++)
-    {
-        set(i, v);
-    }
+    flags = cv::Mat_<char>::ones(h, w);
+    values = Matrix::ones(h,w)*v;
 }
 
 void Map::unsetAll()
 {
-    int n = w*h;
-    for (int i = 0; i < n; i++)
-    {
-        unset(i);
-    }
+    init(w, h);
 }
 
 void Map::levelSelect(double zLevel)
 {
-    int n = w*h;
-    for (int i = 0; i < n; i++)
+    for (int y = 0; y < h; y++)
     {
-        if (flags[i] && values[i] < zLevel)
+        for (int x = 0; x < w; x++)
         {
-            unset(i);
+            if (flags(y, x) && values(y, x) < zLevel)
+            {
+                unset(x, y);
+            }
         }
     }
 }
 
 void Map::bandPass(double minValue, double maxValue, bool unsetBelowMin, bool unsetAboveMax)
 {
-    int n = w*h;
-    for (int i = 0; i < n; i++)
+    //double min, max;
+    //this->minMax(min, max);
+    //qDebug() << min << max;
+    for (int y = 0; y < h; y++)
     {
-        if (flags[i] && values[i] < minValue)
+        for (int x = 0; x < w; x++)
         {
-            if (unsetBelowMin)
-                unset(i);
-            else
-                values[i] = minValue;
-        }
+            if (flags(y, x) && values(y, x) < minValue)
+            {
+                if (unsetBelowMin)
+                    unset(x, y);
+                else
+                    values(y, x) = minValue;
+            }
 
-        if (flags[i] && values[i] > maxValue)
-        {
-            if (unsetAboveMax)
-                unset(i);
-            else
-                values[i] = maxValue;
+            if (flags(y, x) && values(y, x) > maxValue)
+            {
+                if (unsetAboveMax)
+                    unset(x, y);
+                else
+                    values(y, x) = maxValue;
+            }
         }
     }
+    //this->minMax(min, max);
+    //qDebug() << min << max;
 }
 
 void Map::erode(int kernelSize)
@@ -135,7 +136,25 @@ void Map::erode(int kernelSize)
     }
 }
 
-double Map::minValue() const
+void Map::minMax(double &min, double &max) const
+{
+    min = 1e300;
+    max = -1e300;
+    for (int y = 0; y < h; y++)
+    {
+        for (int x = 0; x < w; x++)
+        {
+            if (flags(y,x))
+            {
+                double v = values(y,x);
+                if (v > max) max = v;
+                if (v < min) min = v;
+            }
+        }
+    }
+}
+
+/*double Map::minValue() const
 {
     double min = 1e300;
     int n = w*h;
@@ -161,36 +180,31 @@ double Map::maxValue() const
         }
     }
     return max;
-}
+}*/
 
 void Map::add(const Map &other)
 {
     assert(w == other.w);
     assert(h == other.h);
-    int n = w*h;
-    for (int i = 0; i < n; i++)
+    for (int y = 0; y < h; y++)
     {
-        if (flags[i] && other.flags[i])
+        for (int x = 0; x < w; x++)
         {
-            values[i] += other.values[i];
-        }
-        else
-        {
-            flags[i] = false;
+            if (flags(y,x) && other.flags(y,x))
+            {
+                values(y,x) += other.values(y,x);
+            }
+            else
+            {
+                unset(x, y);
+            }
         }
     }
 }
 
 void Map::linearTransform(double multiply, double add)
 {
-    int n = w*h;
-    for (int i = 0; i < n; i++)
-    {
-        if (flags[i])
-        {
-            values[i] = multiply*values[i] + add;
-        }
-    }
+    values = multiply*values + add;
 }
 
 MaskedVector Map::horizontalProfile(int y) const
@@ -293,6 +307,52 @@ Map Map::densityMap(int kernelSize, bool fromCenter) const
 {
     assert(kernelSize % 2 == 1);
     assert(kernelSize >= 3);
+    double count = kernelSize*kernelSize;
+    int r = kernelSize/2;
+    double fromCenterToBorder = sqrt(w/2*w/2 + h/2*h/2);
+
+    Map integral(w+r, h+r);
+    Map result(w, h);
+    for (int y = 0; y < h+r; y++)
+    {
+        for (int x = 0; x < w+r; x++)
+        {
+            int i = (int)isSet(x,y) + integral.getSafe(x-1, y, 0) + integral.getSafe(x, y-1, 0) - integral.getSafe(x-1, y-1, 0);
+            //qDebug() << x << y << i;
+            integral.set(x, y, i);
+
+            if (x >= r && y >= r)
+            {
+                int centerX = x-r;
+                int centerY = y-r;
+
+                double A = integral.isValidCoord(x-kernelSize, y-kernelSize) ? integral.getSafe(x-kernelSize, y-kernelSize, 0) : 0;
+                double B = integral.isValidCoord(x, y-kernelSize) ? integral.getSafe(x, y-kernelSize, 0) : 0;
+                double C = integral.isValidCoord(x-kernelSize, y) ? integral.getSafe(x-kernelSize, y, 0) : 0;
+                double D = integral.isValidCoord(x, y) ? integral.getSafe(x, y, 0) : 0;
+                double value = (A + D - B - C)/count;
+
+                //qDebug() << centerX << centerY << value;
+
+                if (fromCenter)
+                {
+                    double toCenter = sqrt((centerX-(w/2))*(centerX-(w/2)) + (centerY-(h/2))*(centerY-(h/2)));
+                    double factor = 1 - (toCenter/fromCenterToBorder);
+                    value = factor*value;
+                }
+
+                result.set(centerX, centerY, value);
+            }
+        }
+    }
+
+    return result;
+}
+
+/*Map Map::densityMap(int kernelSize, bool fromCenter) const
+{
+    assert(kernelSize % 2 == 1);
+    assert(kernelSize >= 3);
     int range = kernelSize/2;
 
     Map density(this->w, this->h);
@@ -328,23 +388,23 @@ Map Map::densityMap(int kernelSize, bool fromCenter) const
         }
     }
     return density;
-}
+}*/
 
-int Map::maxIndex() const
+void Map::maxIndex(int &x, int &y) const
 {
     double max = -1e300;
-    int index = -1;
-    int n = w*h;
-    for (int i = 0; i < n; i++)
+    for (int _y = 0; _y < h; _y++)
     {
-        if (flags[i] && values[i] > max)
+        for (int _x = 0; _x < w; _x++)
         {
-            max = values[i];
-            index = i;
+            if (flags(_y, _x) && values(_y, _x) > max)
+            {
+                max = values(_y, _x);
+                x = _x;
+                y = _y;
+            }
         }
     }
-
-    return index;
 }
 
 Matrix Map::toMatrix(double voidValue, double min, double max) const
@@ -352,17 +412,16 @@ Matrix Map::toMatrix(double voidValue, double min, double max) const
     Matrix result(h, w);
     if (min == 0 && max == 0)
     {
-        min = minValue();
-        max = maxValue();
+        minMax(min, max);
     }
     double delta = max - min;
     for (int y = 0; y < h; y++)
     {
         for (int x = 0; x < w; x++)
         {
-            if (isSet(x, y))
+            if (flags(y, x))
             {
-                double val = get(x, y);
+                double val = values(y, x);
                 if (val != val) val = voidValue;
                 if (val > max) val = max;
                 if (val < min) val = min;
@@ -449,12 +508,14 @@ QVector<double> Map::getUsedValues() const
 {
     QVector<double> result;
 
-    int n = flags.count();
-    for (int i = 0; i < n; i++)
+    for (int y = 0; y < h; y++)
     {
-        if (flags[i])
+        for (int x = 0; x < w; x++)
         {
-            result << values[i];
+            if (flags(y, x))
+            {
+                result << values(y, x);
+            }
         }
     }
 
@@ -463,6 +524,7 @@ QVector<double> Map::getUsedValues() const
 
 void Map::applyFilter(const Matrix &kernel, int times, bool checkSum)
 {
+    //cv::imshow("before", toMatrix());
     assert(kernel.rows % 2 == 1);
     assert(kernel.cols % 2 == 1);
 
@@ -473,7 +535,7 @@ void Map::applyFilter(const Matrix &kernel, int times, bool checkSum)
 
     for (int i = 0; i < times; i++)
     {
-        QVector<double> newValues(w*h);
+        Matrix newValues(h, w);
         for (int y = 0; y < this->h; y++)
         {
             for (int x = 0; x < this->w; x++)
@@ -499,17 +561,31 @@ void Map::applyFilter(const Matrix &kernel, int times, bool checkSum)
                 {
                     newValue = newValue/sumOfKernelValues;
                 }
-                newValues[coordToIndex(x, y)] = newValue;
+                newValues(y, x) = newValue;
             }
         }
 
         values = newValues;
     }
-    /*Matrix src = this->toMatrix();
-    cv::filter2D()*/
+
+    //double min,max;
+    //minMax(min, max);
+    //qDebug() << min << max;
+    //Matrix test;
+    //for (int i = 0; i < times; i++)
+        //cv::GaussianBlur(values, test, cv::Size(kernel.rows, kernel.cols), -1);
+        //cv::filter2D(values, test, CV_64F, kernel);
+    //cv::imshow("after", toMatrix());
+    //cv::minMaxIdx(test, &min, &max);
+    //qDebug() << min << max;
+    //cv::imshow("test", (test-min)/(max-min));
+    //cv::waitKey();
+
+    //Matrix src = this->toMatrix();
+    //cv::filter2D()
 }
 
-Map::Map(const QString &path)
+/*Map::Map(const QString &path)
 {
     cv::FileStorage fs(path.toStdString(), cv::FileStorage::READ);
     w = (int)fs["w"];
@@ -527,9 +603,9 @@ Map::Map(const QString &path)
     {
         flags << (stdFlags[i] == 1);
     }
-}
+}*/
 
-void Map::serialize(const QString &path)
+/*void Map::serialize(const QString &path)
 {
     cv::FileStorage fs(path.toStdString(), cv::FileStorage::WRITE);
     fs << "w" << w;
@@ -549,4 +625,4 @@ void Map::serialize(const QString &path)
         fs << values[i];
     }
     fs << "]";
-}
+}*/

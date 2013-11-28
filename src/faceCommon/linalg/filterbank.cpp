@@ -1,7 +1,7 @@
 #include "filterbank.h"
 
 
-QVector<Map> FilterBank::getRealResponse(const Map &map) const
+/*QVector<Map> FilterBank::getRealResponse(const Map &map) const
 {
     QVector<Map> result;
     int n = realKernels.count();
@@ -126,7 +126,7 @@ QVector<Matrix> FilterBank::getAbsResponse(const Matrix &mat, const QVector<int>
     }
 
     return result;
-}
+}*/
 
 Matrix FilterBank::absResponse(const Matrix &image, const Matrix &realKernel, const Matrix &imagKernel)
 {
@@ -146,7 +146,7 @@ Matrix FilterBank::absResponse(const Matrix &image, const Matrix &realKernel, co
     return ab;
 }
 
-QVector<Matrix> FilterBank::getAbsRealImagResponse(const Matrix &mat,
+/*QVector<Matrix> FilterBank::getAbsRealImagResponse(const Matrix &mat,
                                                    const QVector<int> *absSelectedIndicies,
                                                    const QVector<int> *realSelectedIndicies,
                                                    const QVector<int> *imagSelectedIndicies) const
@@ -158,4 +158,4 @@ QVector<Matrix> FilterBank::getAbsRealImagResponse(const Matrix &mat,
     result += getImagResponse(mat, imagSelectedIndicies);
 
     return result;
-}
+}*/

@@ -20,6 +20,7 @@ class Mesh
 {
 public:
     VectorOfPoints points;
+    //Matrix pointsMat;
     VectorOfTriangles triangles;
     VectorOfColors colors;
     VectorOfPoints normals;

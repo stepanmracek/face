@@ -7,66 +7,6 @@
 #include "util.h"
 #include "linalg/pca.h"
 
-void SurfaceProcessor::smooth(Map &map, double alpha, int steps)
-{
-    Map newMap(map.w, map.h);
-    int n = map.w*map.h;
-
-    for (int i = 0; i < steps; i++)
-    {
-        qDebug() << "Smoothing, step:" << (i+1) << "/" << steps;
-        for (int j = 0; j < n; j++)
-            newMap.unset(j);
-
-        for (int y = 0; y < map.h; y++)
-        {
-            for (int x = 0; x < map.w; x++)
-            {
-                if (!map.isSet(x,y)) continue;
-
-                double otherSum = 0.0;
-                int otherCount = 0;
-                //newZ.set(x, y,  map.values[j]);
-
-                int delta = 1;
-                for (int xShift = -delta; xShift <= delta; xShift++)
-                {
-                    for (int yShift = -delta; yShift <= delta; yShift++)
-                    {
-                        if (xShift == 0 && yShift == 0) continue;
-
-                        int x2 = x+xShift; int y2 = y+yShift;
-                        if (x2 < 0 || x2 >= map.w || y2 < 0 || y2 > map.h) continue;
-
-                        if (map.isSet(x2, y2))
-                        {
-                            otherSum += (map.get(x2, y2) - map.get(x,y));
-                            otherCount++;
-                        }
-                    }
-                }
-
-                if (otherCount > 0)
-                {
-                    newMap.set(x, y, otherSum/otherCount);
-                }
-                else
-                {
-                    newMap.set(x, y, map.get(x, y));
-                }
-            }
-        }
-
-        for (int j = 0; j < n; j++)
-        {
-            if (map.flags[j] && newMap.flags[j])
-            {
-                map.values[j] = map.values[j] + alpha*newMap.values[j];
-            }
-        }
-    }
-}
-
 void SurfaceProcessor::smooth(Mesh &mesh, double alpha, int steps)
 {
     // neighbours initialization
@@ -252,10 +192,11 @@ void SurfaceProcessor::depthmap(const Mesh &mesh, Map &map, cv::Point2d meshStar
                                                          x2, y2, z2d,
                                                          x3, y3, z3d,
                                                          x, y);
-                        int index = map.coordToIndex(x, (map.h-1)-y);
-                        if (!map.flags[index] || (map.flags[index] && map.values[index] < val))
+                        int y2 = (map.h-1)-y;
+                        //int index = map.coordToIndex(x, (map.h-1)-y);
+                        if (!map.flags(y2, x) || (map.flags(y2, x) && map.values(y2, x) < val))
                         {
-                            map.set(index, val);
+                            map.set(x, y2, val);
                         }
                     }
                     fillCounter++;
@@ -405,6 +346,10 @@ CurvatureStruct SurfaceProcessor::calculateCurvatures(Map &depthmap, bool pcl)
         }
     }
 
+    //cv::imshow("depthmap", depthmap.toMatrix());
+    //cv::imshow("mean", c.curvatureK1.toMatrix());
+    //cv::waitKey(0);
+
     //qDebug() << "calculating curvatures - mean, gaussian, shape index";
 
     for (int x = 0; x < depthmap.w; x++)
@@ -536,20 +481,6 @@ QVector<cv::Point3d> SurfaceProcessor::isoGeodeticCurve(Map &map, MapConverter &
     }
 
     return result;
-}
-
-QVector<cv::Point3d> SurfaceProcessor::isoGeodeticCurve(Mesh &f, cv::Point3d center, double distance, int samples,
-                                                        double mapScaleFactor, double smoothAlpha, int smoothIterations)
-{
-    MapConverter converter;
-    Map map = depthmap(f, converter, mapScaleFactor, ZCoord);
-
-    if (smoothIterations > 0)
-    {
-        smooth(map, smoothAlpha, smoothIterations);
-    }
-
-    return isoGeodeticCurve(map, converter, center, distance, samples, mapScaleFactor);
 }
 
 QVector<double> SurfaceProcessor::isoGeodeticCurveToEuclDistance(const QVector<cv::Point3d> &isoCuvre, cv::Point3d center)
