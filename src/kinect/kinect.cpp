@@ -175,7 +175,8 @@ Mesh *Kinect::createMesh(double *depth, uchar *rgb)
 {
     int DepthIndextoPointIndex[n];
 
-    Mesh *result = new Mesh();
+    VectorOfPoints points;
+    VectorOfColors colors;
     int i = 0;
     for (int r = 0; r < 480; r++)
     {
@@ -190,10 +191,9 @@ Mesh *Kinect::createMesh(double *depth, uchar *rgb)
 
                 // 3d data
                 cv::Point3d p(x, y, z);
-                result->points << p;
-                //std::cout << p.z << std::endl;
+                points << p;
 
-                DepthIndextoPointIndex[i] = result->points.size()-1;
+                DepthIndextoPointIndex[i] = points.size()-1;
 
                 // texture
                 int i3 = 3*i;
@@ -201,13 +201,23 @@ Mesh *Kinect::createMesh(double *depth, uchar *rgb)
                 unsigned char g = rgb[i3 + 1];
                 unsigned char b = rgb[i3 + 2];
                 Color c(b, g, r);
-                result->colors << c;
+                colors << c;
             }
 
             i++;
         }
     }
 
+    Mesh *result = new Mesh();
+    int pCount = points.count();
+    result->pointsMat = Matrix(pCount, 3);
+    for (int r = 0; r < pCount; r++)
+    {
+        result->pointsMat(r, 0) = points[r].x;
+        result->pointsMat(r, 1) = points[r].y;
+        result->pointsMat(r, 2) = points[r].z;
+    }
+    result->colors = colors;
     result->recalculateMinMax();
 
     for (int i = 0; i < n; i++)
@@ -371,3 +381,11 @@ bool Kinect::isKinectPluggedIn(double *depthBuffer)
     int returnValue = freenect_sync_get_depth((void**)(&depthBuffer), &ts, 0, FREENECT_DEPTH_REGISTERED);
     return returnValue == 0;
 }
+
+void Kinect::setLEDs(LEDState s){
+    freenect_sync_set_led((freenect_led_options)(s), 0);
+}
+void Kinect::stop(){
+    freenect_sync_stop();
+}
+

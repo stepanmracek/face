@@ -2,6 +2,9 @@ QT += core gui opengl widgets
 TARGET = faceCommon
 TEMPLATE = lib
 
+QMAKE_CXXFLAGS+= -fopenmp
+QMAKE_LFLAGS +=  -fopenmp
+
 LIBS += `pkg-config --libs opencv` -lGL -lGLU
 
 SOURCES += \
@@ -43,8 +46,6 @@ SOURCES += \
     linalg/pointcloud.cpp \
     facelib/facefeaturesanotation.cpp \
     facelib/landmarks.cpp \
-    facelib/morphable3dfacemodel.cpp \
-    facelib/morphable3dfacemodelwidget.cpp \
     facelib/widgetmeshselect.cpp \
     linalg/kernelgenerator.cpp \
     linalg/gabor.cpp \
@@ -114,8 +115,6 @@ HEADERS += \
     linalg/pointcloud.h \
     facelib/facefeaturesanotation.h \
     facelib/landmarks.h \
-    facelib/morphable3dfacemodel.h \
-    facelib/morphable3dfacemodelwidget.h \
     facelib/widgetmeshselect.h \
     linalg/kernelgenerator.h \
     linalg/gabor.h \
@@ -134,5 +133,4 @@ HEADERS += \
     biometrics/realtimeclassifier.h
 
 FORMS += \
-    facelib/morphable3dfacemodelwidget.ui \
     facelib/widgetmeshselect.ui

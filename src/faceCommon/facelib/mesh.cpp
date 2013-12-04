@@ -13,47 +13,23 @@
 
 void Mesh::recalculateMinMax()
 {
-    minx = 1e300;
-    maxx = -1e300;
-    miny = 1e300;
-    maxy = -1e300;
-    minz = 1e300;
-    maxz = -1e300;
-
-    int n = points.size();
-    for (int i = 0; i < n; i++)
-    {
-        cv::Point3d &p = points[i];
-        if (p.x > maxx) maxx = p.x;
-        if (p.x < minx) minx = p.x;
-        if (p.y > maxy) maxy = p.y;
-        if (p.y < miny) miny = p.y;
-        if (p.z > maxz) maxz = p.z;
-        if (p.z < minz) minz = p.z;
-    }
+    cv::minMaxIdx(pointsMat.colRange(0,1), &minx, &maxx);
+    cv::minMaxIdx(pointsMat.colRange(1,2), &miny, &maxy);
+    cv::minMaxIdx(pointsMat.colRange(2,3), &minz, &maxz);
 }
 
 void Mesh::centralize()
 {
-    //qDebug() << "Centering";
-    double sumx = 0;
-    double sumy = 0;
-    double sumz = 0;
-    double count = points.count();
-    if (count == 0) return;
+    int count = pointsMat.rows;
+    double sumx = cv::sum(pointsMat.colRange(0,1))[0];
+    double sumy = cv::sum(pointsMat.colRange(1,2))[0];
+    double sumz = cv::sum(pointsMat.colRange(2,3))[0];
 
-    foreach(cv::Point3d p, points)
+    for (int i = 0; i < count; i++)
     {
-        sumx += p.x;
-        sumy += p.y;
-        sumz += p.z;
-    }
-
-    for (int i = 0; i < points.count(); i++)
-    {
-        points[i].x -= sumx/count;
-        points[i].y -= sumy/count;
-        points[i].z -= sumz/count;
+        pointsMat(i, 0) -= sumx/count;
+        pointsMat(i, 1) -= sumy/count;
+        pointsMat(i, 2) -= sumz/count;
     }
 
     minx -= sumx/count;
@@ -62,13 +38,11 @@ void Mesh::centralize()
     maxy -= sumy/count;
     minz -= sumz/count;
     maxz -= sumz/count;
-
-    //qDebug() << "..done";
 }
 
 void Mesh::translate(cv::Point3d translationVector)
 {
-    Procrustes3D::translate(points, translationVector);
+    Procrustes3D::translate(pointsMat, translationVector);
     minx += translationVector.x;
     miny += translationVector.y;
     minz += translationVector.z;
@@ -79,7 +53,7 @@ void Mesh::translate(cv::Point3d translationVector)
 
 void Mesh::scale(cv::Point3d scaleParam)
 {
-    Procrustes3D::scale(points, scaleParam);
+    Procrustes3D::scale(pointsMat, scaleParam);
     minx *= scaleParam.x;
     miny *= scaleParam.y;
     minz *= scaleParam.z;
@@ -95,83 +69,28 @@ void Mesh::rotate(cv::Vec3d xyz)
 
 void Mesh::rotate(double x, double y, double z)
 {
-    /*Matrix Rx = (Matrix(3,3) <<
-                 1, 0, 0,
-                 0, cos(x), -sin(x),
-                 0, sin(x), cos(x));
-    Matrix Ry = (Matrix(3,3) <<
-                 cos(y), 0, sin(y),
-                 0, 1, 0,
-                 -sin(y), 0, cos(y));
-    Matrix Rz = (Matrix(3,3) <<
-                 cos(z), -sin(z), 0,
-                 sin(z), cos(z), 0,
-                 0, 0, 1);
-    Matrix R = Rx*Ry*Rz;
-
-    int n = points.count();
-    for (int i = 0; i < n; i++)
-    {
-        cv::Point3d &p = points[i];
-
-        Matrix v = (Matrix(3,1) << p.x, p.y, p.z);
-        Matrix newV = R*v;
-
-        p.x = newV(0);
-        p.y = newV(1);
-        p.z = newV(2);
-    }*/
-    Procrustes3D::rotate(points, x, y, z);
+    Procrustes3D::rotate(pointsMat, x, y, z);
     recalculateMinMax();
 }
 
 void Mesh::transform(Matrix &m)
 {
-    Procrustes3D::transform(points, m);
-
+    Procrustes3D::transform(pointsMat, m);
     recalculateMinMax();
 }
 
 void Mesh::calculateTriangles()
 {
-    //qDebug() << "Calculating triangles";
-
     QVector<cv::Point2d> points2d;
-    foreach(cv::Point3d p3d, points)
+    for (int r = 0; r < pointsMat.rows; r++)
     {
-        cv::Point2d p; p.x = p3d.x; p.y = p3d.y;
+        cv::Point2d p;
+        p.x = pointsMat(r, 0);
+        p.y = pointsMat(r, 1);
         points2d.append(p);
     }
 
     triangles = Delaunay::process(points2d);
-
-    /*int c = triangles.count();
-    QList<int> toRemove;
-    for (int i = 0; i < c; i++)
-    {
-        double maxd = 0.0;
-
-        cv::Point3d &p1 = points[triangles[i][0]];
-        cv::Point3d &p2 = points[triangles[i][1]];
-        cv::Point3d &p3 = points[triangles[i][2]];
-
-        double d = euclideanDistance(p1, p2);
-        if (d > maxd) maxd = d;
-        d = euclideanDistance(p1, p3);
-        if (d > maxd) maxd = d;
-        d = euclideanDistance(p2, p3);
-        if (d > maxd) maxd = d;
-
-        if (maxd > 30.0)
-            toRemove.append(i);
-    }
-
-    for (int i = toRemove.count()-1; i >= 0; i--)
-    {
-        triangles.remove(toRemove.at(i));
-    }*/
-
-    //qDebug() << "Triangles done, |triangles| =" << triangles.count();
 }
 
 Mesh Mesh::fromXYZ(const QString &filename, bool centralizeLoadedMesh)
@@ -185,8 +104,8 @@ Mesh Mesh::fromXYZ(const QString &filename, bool centralizeLoadedMesh)
     assert(opened);
     QTextStream in(&f);
 
-    Mesh mesh;
     double x,y,z;
+    VectorOfPoints points;
     while (!in.atEnd())
     {
         in >> x; in >> y; in >> z;
@@ -194,24 +113,13 @@ Mesh Mesh::fromXYZ(const QString &filename, bool centralizeLoadedMesh)
         if (in.status() == QTextStream::ReadPastEnd)
             break;
 
-        if (x > mesh.maxx) mesh.maxx = x;
-        if (x < mesh.minx) mesh.minx = x;
-        if (y > mesh.maxy) mesh.maxy = y;
-        if (y < mesh.miny) mesh.miny = y;
-        if (z > mesh.maxz) mesh.maxz = z;
-        if (z < mesh.minz) mesh.minz = z;
-
         cv::Point3d p;
         p.x = x; p.y = y; p.z = z;
-        mesh.points.append(p);
+        points.append(p);
     }
     f.close();
 
-    if (centralizeLoadedMesh)
-        mesh.centralize();
-
-    mesh.calculateTriangles();
-    return mesh;
+    return Mesh::fromPointcloud(points, centralizeLoadedMesh);
 }
 
 Mesh Mesh::fromABS(const QString &filename, bool centralizeLoadedMesh)
@@ -230,8 +138,6 @@ Mesh Mesh::fromABS(const QString &filename, bool centralizeLoadedMesh)
     in.readLine();
     int mapwidth;
     in >> mapwidth;
-
-    Mesh mesh;
 
     in.readLine();
     in.readLine();
@@ -268,6 +174,7 @@ Mesh Mesh::fromABS(const QString &filename, bool centralizeLoadedMesh)
     }
     qDebug() << "z points loaded";
 
+    VectorOfPoints points;
     for (int i = 0; i < total; i++)
     {
         if (flags[i])
@@ -276,7 +183,7 @@ Mesh Mesh::fromABS(const QString &filename, bool centralizeLoadedMesh)
             p.x = xPoints[i];
             p.y = yPoints[i];
             p.z = zPoints[i];
-            mesh.points.append(p);
+            points.append(p);
         }
     }
 
@@ -284,12 +191,7 @@ Mesh Mesh::fromABS(const QString &filename, bool centralizeLoadedMesh)
     delete [] yPoints;
     delete [] zPoints;
 
-    mesh.recalculateMinMax();
-    if (centralizeLoadedMesh)
-        mesh.centralize();
-    mesh.calculateTriangles();
-
-    return mesh;
+    return Mesh::fromPointcloud(points, centralizeLoadedMesh);
 }
 
 Mesh Mesh::fromABS(const QString &filename, const QString &texture, bool centralizeLoadedMesh)
@@ -312,8 +214,6 @@ Mesh Mesh::fromABS(const QString &filename, const QString &texture, bool central
     int mapwidth;
     in >> mapwidth;
 
-    Mesh mesh;
-
     in.readLine();
     in.readLine();
 
@@ -325,17 +225,9 @@ Mesh Mesh::fromABS(const QString &filename, const QString &texture, bool central
     double *yPoints = new double[total];
     double *zPoints = new double[total];
 
-    //QMap<int, int> totalToUsed;
-    int used = 0;
     for (int i = 0; i < total; i++)
     {
         in >> (flags[i]);
-
-        /*if (flags[i])
-        {
-            totalToUsed[i] = used;
-            used++;
-        }*/
     }
     qDebug() << "flags loaded";
 
@@ -357,6 +249,8 @@ Mesh Mesh::fromABS(const QString &filename, const QString &texture, bool central
     }
     qDebug() << "z points loaded";
 
+    VectorOfPoints points;
+    VectorOfColors colors;
     for (int i = 0; i < total; i++)
     {
         if (flags[i])
@@ -365,24 +259,11 @@ Mesh Mesh::fromABS(const QString &filename, const QString &texture, bool central
             p.x = xPoints[i];
             p.y = yPoints[i];
             p.z = zPoints[i];
-            mesh.points.append(p);
+            points.append(p);
 
             int x = i % 640;
             int y = i / 640;
-            mesh.colors << image(y, x);
-
-            /*if (x == 639) continue;
-            if (y == 479) continue;
-            if (flags[i+1] && flags[i+640])
-            {
-                mesh.triangles << cv::Vec3i(totalToUsed[i], totalToUsed[i+1], totalToUsed[i+640]);
-            }
-
-            if (y == 0) continue;
-            if (flags[i+639] && flags[i+640])
-            {
-                mesh.triangles << cv::Vec3i(totalToUsed[i], totalToUsed[i+640], totalToUsed[i+639]);
-            }*/
+            colors << image(y, x);
         }
     }
 
@@ -390,23 +271,28 @@ Mesh Mesh::fromABS(const QString &filename, const QString &texture, bool central
     delete [] yPoints;
     delete [] zPoints;
 
-    mesh.recalculateMinMax();
-    if (centralizeLoadedMesh)
-        mesh.centralize();
-
-    mesh.calculateTriangles();
+    Mesh mesh = Mesh::fromPointcloud(points, centralizeLoadedMesh);
+    mesh.colors = colors;
     return mesh;
 }
 
-Mesh Mesh::fromPointcloud(VectorOfPoints &pointcloud, bool centralizeLoadedMesh)
+Mesh Mesh::fromPointcloud(VectorOfPoints &pointcloud, bool centralizeLoadedMesh, bool calculateTriangles)
 {
     Mesh m;
-    m.points = VectorOfPoints(pointcloud);
-    m.calculateTriangles();
-    m.recalculateMinMax();
 
-    if (centralizeLoadedMesh)
-        m.centralize();
+    int n = pointcloud.count();
+    m.pointsMat = Matrix(n, 3);
+    for (int i = 0; i < n; i++)
+    {
+        const cv::Point3d &p = pointcloud.at(i);
+        m.pointsMat(i, 0) = p.x;
+        m.pointsMat(i, 1) = p.y;
+        m.pointsMat(i, 2) = p.z;
+    }
+
+    if (calculateTriangles) m.calculateTriangles();
+    m.recalculateMinMax();
+    if (centralizeLoadedMesh) m.centralize();
 
     return m;
 }
@@ -417,7 +303,8 @@ Mesh Mesh::fromMap(Map &depth, Map &intensities, bool centralizeLoadedMesh)
     assert(depth.h == intensities.h);
     QMap<QPair<int,int>, int> coordToIndex;
 
-    Mesh mesh;
+    VectorOfPoints points;
+    VectorOfColors colors;
     int index = 0;
     for (int y = 0; y < depth.h; y++)
     {
@@ -427,9 +314,10 @@ Mesh Mesh::fromMap(Map &depth, Map &intensities, bool centralizeLoadedMesh)
             {
                 assert(intensities.isSet(x,y));
 
-                mesh.points << cv::Point3d(x, depth.h-y-1, depth.get(x,y));
+                points << cv::Point3d(x, depth.h-y-1, depth.get(x,y));
+
                 uchar intensity = intensities.get(x, y);
-                mesh.colors << cv::Vec3b(intensity, intensity, intensity);
+                colors << cv::Vec3b(intensity, intensity, intensity);
 
                 coordToIndex[QPair<int,int>(x,y)] = index;
                 index++;
@@ -437,10 +325,8 @@ Mesh Mesh::fromMap(Map &depth, Map &intensities, bool centralizeLoadedMesh)
         }
     }
 
-    if (centralizeLoadedMesh)
-        mesh.centralize();
-
-    mesh.recalculateMinMax();
+    Mesh mesh = Mesh::fromPointcloud(points, centralizeLoadedMesh, false);
+    mesh.colors = colors;
 
     // triangles
     for (int y = 0; y < depth.h; y++)
@@ -477,7 +363,8 @@ Mesh Mesh::fromOBJ(const QString &filename, bool centralizeLoadedMesh)
     assert(fileOpened);
     QTextStream in(&f);
 
-    Mesh result;
+    VectorOfPoints points;
+    VectorOfTriangles triangles;
     while (!in.atEnd())
     {
         QString line = in.readLine();
@@ -489,7 +376,7 @@ Mesh Mesh::fromOBJ(const QString &filename, bool centralizeLoadedMesh)
             double y = items[2].toDouble();
             double z = items[3].toDouble();
 
-            result.points << cv::Point3d(x,y,z);
+            points << cv::Point3d(x,y,z);
         }
         else if (items[0].compare("f") == 0)
         {
@@ -497,15 +384,12 @@ Mesh Mesh::fromOBJ(const QString &filename, bool centralizeLoadedMesh)
             int t2 = items[2].toInt()-1;
             int t3 = items[3].toInt()-1;
 
-            result.triangles << cv::Vec3i(t1, t2, t3);
+            triangles << cv::Vec3i(t1, t2, t3);
         }
     }
 
-    if (centralizeLoadedMesh)
-        result.centralize();
-
-    result.recalculateMinMax();
-
+    Mesh result = Mesh::fromPointcloud(points, centralizeLoadedMesh, false);
+    result.triangles = triangles;
     return result;
 }
 
@@ -528,20 +412,16 @@ Mesh::Mesh(const Mesh &src)
     minz = src.minz;
     maxz = src.maxz;
 
-    points = src.points;
+    pointsMat = src.pointsMat.clone();
     triangles = src.triangles;
-    normals = src.normals;
     colors = src.colors;
-    curvatures = src.curvatures;
 }
 
 bool Mesh::equals(const Mesh &other)
 {
-    return points == other.points &&
+    return cv::countNonZero(pointsMat - other.pointsMat) == 0 &&
             triangles == other.triangles &&
-            normals == other.normals &&
-            colors == other.colors &&
-            curvatures == other.curvatures;
+            colors == other.colors;
 }
 
 Mesh::~Mesh()
@@ -560,11 +440,11 @@ void Mesh::writeOBJ(const QString &path, char decimalPoint)
     outFile.open(QFile::WriteOnly);
     QTextStream outStream(&outFile);
 
-    int pointCount = points.size();
-    for (int i = 0; i < pointCount; i++)
+    for (int r = 0; r < pointsMat.rows; r++)
     {
-        cv::Point3d &p = points[i];
-        outStream << "v " << formatNumber(p.x, decimalPoint) << " " << formatNumber(p.y, decimalPoint) << " " << formatNumber(p.z, decimalPoint) << endl;
+        outStream << "v " << formatNumber(pointsMat(r, 0), decimalPoint)
+                  << " " << formatNumber(pointsMat(r, 1), decimalPoint)
+                  << " " << formatNumber(pointsMat(r, 2), decimalPoint) << endl;
     }
 
     int tCount = triangles.count();
@@ -583,13 +463,11 @@ void Mesh::writeOFF(const QString &path)
 
     outStream << "OFF" << endl;
 
-    outStream << points.size() << " " << triangles.size() << " 0" << endl;
+    outStream << pointsMat.rows << " " << triangles.size() << " 0" << endl;
 
-    int pointCount = points.size();
-    for (int i = 0; i < pointCount; i++)
-    {
-        cv::Point3d &p = points[i];
-        outStream << p.x << " " << p.y << " " << p.z << endl;
+    for (int r = 0; r < pointsMat.rows; r++)
+    {;
+        outStream << pointsMat(r, 0) << " " << pointsMat(r, 1) << " " << pointsMat(r, 2) << endl;
     }
 
     int tCount = triangles.count();
@@ -602,12 +480,12 @@ void Mesh::writeOFF(const QString &path)
 
 void Mesh::writeToDataStream(QDataStream &stream)
 {
-    stream << points.count();
-    foreach (const cv::Point3d &p, points)
+    stream << pointsMat.rows;
+    for (int r = 0; r < pointsMat.rows; r++)
     {
-        stream << p.x;
-        stream << p.y;
-        stream << p.z;
+        stream << pointsMat(r, 0);
+        stream << pointsMat(r, 1);
+        stream << pointsMat(r, 2);
     }
 
     stream << triangles.count();
@@ -686,12 +564,16 @@ void Mesh::fromDataStream(QDataStream &stream, Mesh &mesh)
 {
     int pCount;
     stream >> pCount;
-    mesh.points = VectorOfPoints(pCount);
-    for (int i = 0; i < pCount; i++)
+
+    mesh.pointsMat = Matrix(pCount, 3);
+    for (int r = 0; r < pCount; r++)
     {
         double x,y,z;
         stream >> x; stream >> y; stream >> z;
-        mesh.points[i] = cv::Point3d(x, y, z);
+
+        mesh.pointsMat(r, 0) = x;
+        mesh.pointsMat(r, 1) = y;
+        mesh.pointsMat(r, 2) = z;
     }
 
     int tCount;
@@ -773,97 +655,82 @@ void Mesh::printStats()
     qDebug() << "x-range: " << minx << maxx;
     qDebug() << "y-range: "<< miny << maxy;
     qDebug() << "z-range: "<< minz << maxz;
-    qDebug() << "points: "<< points.count();
+    qDebug() << "points: "<< pointsMat.rows;
     qDebug() << "triangles: "<< triangles.count();
 }
 
 void Mesh::trainPointIndex(cv::flann::Index &index, cv::Mat &features, const cv::flann::IndexParams &params) const
 {
-    //qDebug() << "trainPointIndex()...";
-    int n = points.size();
-    features = cv::Mat(n, 3, CV_32F);
-    for (int i = 0; i < n; i++)
-    {
-        features.at<float>(i, 0) = points[i].x;
-        features.at<float>(i, 1) = points[i].y;
-        features.at<float>(i, 2) = points[i].z;
-    }
-
+    features = cv::Mat(pointsMat.rows, 3, CV_32F);
+    pointsMat.convertTo(features, CV_32F);
     index.build(features, params);
-    //qDebug() << "...ok";
 }
 
-VectorOfPoints Mesh::getNearestPoints(const VectorOfPoints &input, cv::flann::Index &index) const
+void Mesh::getNearestPoints(const Matrix &input, cv::flann::Index &index, Matrix &output) const
 {
-    VectorOfPoints resultPoints;
-    for (int i = 0; i < input.count(); i++)
+    for (int r = 0; r < input.rows; r++)
     {
-        cv::Mat query(1, 3, CV_32F);
-        query.at<float>(0, 0) = input[i].x;
-        query.at<float>(0, 1) = input[i].y;
-        query.at<float>(0, 2) = input[i].z;
+        cv::Mat query;
+        input.row(r).convertTo(query, CV_32F);
+
         std::vector<int> resultIndicies;
         std::vector<float> resultDistances;
         index.knnSearch(query, resultIndicies, resultDistances, 1);
 
         int pIndex = resultIndicies[0];
-        resultPoints << points[pIndex];
+        output(r, 0) = pointsMat(pIndex, 0);
+        output(r, 1) = pointsMat(pIndex, 1);
+        output(r, 2) = pointsMat(pIndex, 2);
     }
-
-    return resultPoints;
 }
 
-VectorOfPoints Mesh::getNearestPoints(const VectorOfPoints &input) const
+void Mesh::getNearestPoints(const Matrix &input, Matrix output) const
 {
     cv::flann::Index index;
     cv::Mat features;
     trainPointIndex(index, features, cv::flann::LinearIndexParams());
-    return getNearestPoints(input, index);
+    getNearestPoints(input, index, output);
 }
 
 Mesh Mesh::zLevelSelect(double zValue)
 {
-    Mesh result;
-    for (int i = 0; i < points.count(); i++)
+    VectorOfPoints newPoints;
+    VectorOfColors newColors;
+    for (int r = 0; r < pointsMat.rows; r++)
     {
-        if (points[i].z >= zValue)
+        if (pointsMat(r, 2) >= zValue)
         {
-            result.points << points[i];
+            newPoints << cv::Point3d(pointsMat(r, 0), pointsMat(r, 1), pointsMat(r, 2));
             if (colors.count() > 0)
             {
-                result.colors << colors[i];
-            }
-            if (normals.count() > 0)
-            {
-                result.normals << normals[i];
+                newColors << colors[r];
             }
         }
     }
-    result.recalculateMinMax();
-    result.calculateTriangles();
+
+    Mesh result = Mesh::fromPointcloud(newPoints, false, true);
+    result.colors = newColors;
     return result;
 }
 
 Mesh Mesh::radiusSelect(double radius, cv::Point3d center)
 {
-
-    Mesh result;
-    for (int i = 0; i < points.count(); i++)
+    VectorOfPoints newPoints;
+    VectorOfColors newColors;
+    for (int r = 0; r < pointsMat.rows; r++)
     {
-        if (euclideanDistance(points[i], center) < radius)
+        cv::Point3d p(pointsMat(r, 0), pointsMat(r, 1), pointsMat(r, 2));
+        if (euclideanDistance(p, center) <= radius)
         {
-            result.points << points[i];
+            newPoints << p;
             if (colors.count() > 0)
             {
-                result.colors << colors[i];
-            }
-            if (normals.count() > 0)
-            {
-                result.normals << normals[i];
+                newColors << colors[r];
             }
         }
     }
-    result.recalculateMinMax();
-    result.calculateTriangles();
+
+    Mesh result = Mesh::fromPointcloud(newPoints, false, true);
+    result.colors = newColors;
     return result;
 }

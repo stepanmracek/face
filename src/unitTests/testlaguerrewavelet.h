@@ -16,13 +16,11 @@ struct LaguerreParams
         this->size = size;
         n = 1;
         k = 0;
-        j = 0;
     }
 
     int size;
     int n;
     int k;
-    int j;
 };
 
 Matrix lagInputImage;
@@ -34,12 +32,10 @@ Matrix lagKernelImag;
 
 void laguerreRedraw(LaguerreParams *params)
 {
-    qDebug() << "redraw";
-    lagKernelReal = Matrix(params->size, params->size);
-    lagKernelImag = Matrix(params->size, params->size);
-    GaussLaguerre::createWavelet(lagKernelReal, lagKernelImag, params->n, params->k, params->j);
+    lagKernelReal = Matrix();
+    lagKernelImag = Matrix();
+    GaussLaguerre::createWavelet(lagKernelReal, lagKernelImag, params->size, params->n, params->k);
 
-    qDebug() << "applying filters";
     cv::filter2D(lagInputImage, lagResponseReal, -1, lagKernelReal);
     cv::filter2D(lagInputImage, lagResponseImag, -1, lagKernelImag);
 
@@ -50,7 +46,6 @@ void laguerreRedraw(LaguerreParams *params)
     Matrix ab2 = re2 + im2;
     cv::sqrt(ab2, lagResponseAbs);
 
-    qDebug() << "showing kernels";
     double min,max;
     cv::minMaxLoc(lagKernelReal, &min, &max);
     lagKernelReal = (lagKernelReal-min)/(max-min);
@@ -60,7 +55,6 @@ void laguerreRedraw(LaguerreParams *params)
     lagKernelImag = (lagKernelImag-min)/(max-min);
     cv::imshow("imag kernel", lagKernelImag);
 
-    qDebug() << "showing result";
     cv::minMaxLoc(lagResponseReal, &min, &max);
     lagResponseReal = (lagResponseReal-min)/(max-min);
     cv::imshow("response real", lagResponseReal);
@@ -105,7 +99,6 @@ public:
         cv::createTrackbar("size", "input image", &params.size, 200, laguerreOnSizeChange, &params);
         cv::createTrackbar("n", "input image", &params.n, 5, laguerreOnNChange, &params);
         cv::createTrackbar("k", "input image", &params.k, 5, laguerreOnKChange, &params);
-        cv::createTrackbar("j", "input image", &params.j, 5, laguerreOnKChange, &params);
 
         lagInputImage = MatrixConverter::imageToMatrix("/mnt/data/frgc/spring2004/zbin-aligned/textureE/02463d652.png");
         cv::imshow("input image", lagInputImage);

@@ -4,7 +4,6 @@
 
 #include "kinect.h"
 #include "facelib/glwidget.h"
-#include "facelib/morphable3dfacemodel.h"
 #include "facelib/facefeaturesanotation.h"
 #include "facelib/facealigner.h"
 #include "facelib/surfaceprocessor.h"

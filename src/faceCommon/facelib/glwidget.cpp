@@ -96,20 +96,20 @@ void GLWidget::paintGL()
             glDisable(GL_LIGHT0);
 
             glBegin(GL_POINTS);
-            int n = face->points.size();
+            int n = face->pointsMat.rows;
             for (int i = 0; i < n; i++)
             {
-                const cv::Point3d &p = face->points[i];
+                const Matrix &p = face->pointsMat;
                 const Color &c = face->colors[i];
                 glColor3b(c[2]/2,c[1]/2,c[0]/2);
-                glVertex3f(p.x/10, p.y/10, p.z/10);
+                glVertex3f(p(i, 0)/10, p(i, 1)/10, p(i, 2)/10);
 
             }
             glEnd();
         }
         else
         {
-            bool texture = face->colors.size() == face->points.size();
+            bool texture = face->colors.size() == face->pointsMat.rows;
             if (!texture)
             {
                 glEnable(GL_LIGHTING);
@@ -125,6 +125,7 @@ void GLWidget::paintGL()
             glPointSize(1);
             glBegin(GL_TRIANGLES);
             int c = face->triangles.count();
+            const Matrix &p = face->pointsMat;
             for (int i = 0; i < c; i++)
             {
                 int p1 = face->triangles[i][0];
@@ -132,14 +133,14 @@ void GLWidget::paintGL()
                 int p3 = face->triangles[i][2];
 
                 // U = p2 - p1
-                float ux = face->points[p2].x - face->points[p1].x;
-                float uy = face->points[p2].y - face->points[p1].y;
-                float uz = face->points[p2].z - face->points[p1].z;
+                float ux = p(p2, 0) - p(p1, 0);
+                float uy = p(p2, 1) - p(p1, 1);
+                float uz = p(p2, 2) - p(p1, 2);
 
                 // V = p3 - p1
-                float vx = face->points[p3].x - face->points[p1].x;
-                float vy = face->points[p3].y - face->points[p1].y;
-                float vz = face->points[p3].z - face->points[p1].z;
+                float vx = p(p3, 0) - p(p1, 0);
+                float vy = p(p3, 1) - p(p1, 1);
+                float vz = p(p3, 2) - p(p1, 2);
 
                 // n = cross(U,V)
                 float nx = uy*vz - uz*vy;
@@ -159,19 +160,19 @@ void GLWidget::paintGL()
                 {
                     glColor3b(face->colors[p1][2]/2,face->colors[p1][1]/2,face->colors[p1][0]/2);
                 }
-                glVertex3f(face->points[p1].x, face->points[p1].y, face->points[p1].z);
+                glVertex3f(p(p1, 0), p(p1, 1), p(p1, 2));
 
                 if (texture)
                 {
                     glColor3b(face->colors[p2][2]/2,face->colors[p2][1]/2,face->colors[p2][0]/2);
                 }
-                glVertex3f(face->points[p2].x, face->points[p2].y, face->points[p2].z);
+                glVertex3f(p(p2, 0), p(p2, 1), p(p2, 2));
 
                 if (texture)
                 {
                     glColor3b(face->colors[p3][2]/2,face->colors[p3][1]/2,face->colors[p3][0]/2);
                 }
-                glVertex3f(face->points[p3].x, face->points[p3].y, face->points[p3].z);
+                glVertex3f(p(p3, 0), p(p3, 1), p(p3, 2));
             }
 
             glEnd();

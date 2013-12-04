@@ -1,8 +1,8 @@
 #include <QApplication>
 #include <QString>
 
-#include "facelib/morphable3dfacemodel.h"
-#include "facelib/morphable3dfacemodelwidget.h"
+#include "morphable3dfacemodel.h"
+#include "morphable3dfacemodelwidget.h"
 
 int main(int argc, char *argv[])
 {

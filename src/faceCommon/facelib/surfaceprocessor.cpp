@@ -10,8 +10,10 @@
 void SurfaceProcessor::smooth(Mesh &mesh, double alpha, int steps)
 {
     // neighbours initialization
+    qDebug() << "Smoothing, neighbours initialization";
+
     QMap<int, QSet<int> > neighbours;
-    int pc = mesh.points.count();
+    int pc = mesh.pointsMat.rows;
     for (int i = 0; i < pc; i++)
     {
         QSet<int> l;
@@ -19,7 +21,6 @@ void SurfaceProcessor::smooth(Mesh &mesh, double alpha, int steps)
     }
 
     int tc = mesh.triangles.count();
-    qDebug() << "Smoothing, neighbours initialization";
     for (int i = 0; i < tc; i++)
     {
         neighbours[mesh.triangles[i][0]] << mesh.triangles[i][1];
@@ -45,9 +46,9 @@ void SurfaceProcessor::smooth(Mesh &mesh, double alpha, int steps)
             double sumz = 0.0;
             foreach(int neighbour, neighbours[j])
             {
-                sumx += (mesh.points[neighbour].x - mesh.points[j].x);
-                sumy += (mesh.points[neighbour].y - mesh.points[j].y);
-                sumz += (mesh.points[neighbour].z - mesh.points[j].z);
+                sumx += (mesh.pointsMat(neighbour, 0) - mesh.pointsMat(j, 0));
+                sumy += (mesh.pointsMat(neighbour, 1) - mesh.pointsMat(j, 1));
+                sumz += (mesh.pointsMat(neighbour, 2) - mesh.pointsMat(j, 2));
             }
             newx[j] = sumx/neighbours[j].count();
             newy[j] = sumy/neighbours[j].count();
@@ -56,9 +57,56 @@ void SurfaceProcessor::smooth(Mesh &mesh, double alpha, int steps)
 
         for (int j = 0; j < pc; j++)
         {
-            mesh.points[j].x += alpha * newx[j];
-            mesh.points[j].y += alpha * newy[j];
-            mesh.points[j].z += alpha * newz[j];
+            mesh.pointsMat(j, 0) += alpha * newx[j];
+            mesh.pointsMat(j, 1) += alpha * newy[j];
+            mesh.pointsMat(j, 2) += alpha * newz[j];
+        }
+    }
+}
+
+void SurfaceProcessor::zsmooth(Mesh &mesh, double alpha, int steps)
+{
+    // neighbours initialization
+    qDebug() << "Smoothing, neighbours initialization";
+
+    QMap<int, QSet<int> > neighbours;
+    int pc = mesh.pointsMat.rows;
+    for (int i = 0; i < pc; i++)
+    {
+        QSet<int> l;
+        neighbours[i] = l;
+    }
+
+    int tc = mesh.triangles.count();
+    for (int i = 0; i < tc; i++)
+    {
+        neighbours[mesh.triangles[i][0]] << mesh.triangles[i][1];
+        neighbours[mesh.triangles[i][0]] << mesh.triangles[i][2];
+
+        neighbours[mesh.triangles[i][1]] << mesh.triangles[i][0];
+        neighbours[mesh.triangles[i][1]] << mesh.triangles[i][2];
+
+        neighbours[mesh.triangles[i][2]] << mesh.triangles[i][0];
+        neighbours[mesh.triangles[i][2]] << mesh.triangles[i][1];
+    }
+
+    QVector<double> newz(pc);
+    for (int i = 0; i < steps; i++)
+    {
+        qDebug() << "Smoothing, step:" << (i+1) << "/" << steps;
+        for (int j = 0; j < pc; j++)
+        {
+            double sumz = 0.0;
+            foreach(int neighbour, neighbours[j])
+            {
+                sumz += (mesh.pointsMat(neighbour, 2) - mesh.pointsMat(j, 2));
+            }
+            newz[j] = sumz/neighbours[j].count();
+        }
+
+        for (int j = 0; j < pc; j++)
+        {
+            mesh.pointsMat(j, 2) += alpha * newz[j];
         }
     }
 }
@@ -116,20 +164,20 @@ void SurfaceProcessor::depthmap(const Mesh &mesh, Map &map, cv::Point2d meshStar
     {
         //qDebug() << "triangle"<<i<<"/"<<f->triangleCount;
         const cv::Vec3i &t = mesh.triangles[i];
-        double x1d = mesh.points[t[0]].x;
-        double y1d = mesh.points[t[0]].y;
-        double x2d = mesh.points[t[1]].x;
-        double y2d = mesh.points[t[1]].y;
-        double x3d = mesh.points[t[2]].x;
-        double y3d = mesh.points[t[2]].y;
+        double x1d = mesh.pointsMat(t[0], 0);
+        double y1d = mesh.pointsMat(t[0], 1);
+        double x2d = mesh.pointsMat(t[1], 0);
+        double y2d = mesh.pointsMat(t[1], 1);
+        double x3d = mesh.pointsMat(t[2], 0);
+        double y3d = mesh.pointsMat(t[2], 1);
 
         double z1d, z2d, z3d;
         switch (dataToProcess)
         {
         case ZCoord:
-            z1d = mesh.points[t[0]].z;
-            z2d = mesh.points[t[1]].z;
-            z3d = mesh.points[t[2]].z;
+            z1d = mesh.pointsMat(t[0], 2);
+            z2d = mesh.pointsMat(t[1], 2);
+            z3d = mesh.pointsMat(t[2], 2);
             break;
         case Texture_I:
             z1d = 0.299*mesh.colors[t[0]][2] + 0.587*mesh.colors[t[0]][1] + 0.114*mesh.colors[t[0]][0];
@@ -151,10 +199,6 @@ void SurfaceProcessor::depthmap(const Mesh &mesh, Map &map, cv::Point2d meshStar
             z2d = mesh.colors[t[1]][0];
             z3d = mesh.colors[t[2]][0];
             break;
-        case Curvature:
-            z1d = mesh.curvatures[t[0]];
-            z2d = mesh.curvatures[t[1]];
-            z3d = mesh.curvatures[t[2]];
         }
 
         int x1 = convert3DmodelToMap(x1d, meshStart.x, meshEnd.x, map.w);
@@ -493,72 +537,3 @@ QVector<double> SurfaceProcessor::isoGeodeticCurveToEuclDistance(const QVector<c
     return result;
 }
 
-void SurfaceProcessor::calculateNormals(Mesh &mesh, int knn)
-{
-    assert(knn >= 3);
-    int n = mesh.points.size();
-
-    qDebug() << "Calculating normals";
-    qDebug() << "  features matrix";
-    cv::Mat features(n, 3, CV_32F);
-    for (int i = 0; i < n; i++)
-    {
-        features.at<float>(i, 0) = mesh.points[i].x;
-        features.at<float>(i, 1) = mesh.points[i].y;
-        features.at<float>(i, 2) = mesh.points[i].z;
-    }
-    qDebug() << "  kd tree";
-    cv::flann::LinearIndexParams indexParams;
-    cv::flann::Index kdTree(features, indexParams);
-
-    qDebug() << "  normals";
-    mesh.normals = VectorOfPoints(n);
-    mesh.curvatures = QVector<double>(n);
-    std::vector<int> resultIndicies;
-    std::vector<float> resultDistances;
-    cv::Mat query(1, 3, CV_32F);
-    for (int i = 0; i < n; i++)
-    {
-        query.at<float>(0, 0) = mesh.points[i].x;
-        query.at<float>(0, 1) = mesh.points[i].y;
-        query.at<float>(0, 2) = mesh.points[i].z;   
-
-        kdTree.knnSearch(query, resultIndicies, resultDistances, knn);
-        /*kdTree.radiusSearch(query, resultIndicies, resultDistances, 2.0, 100);
-        for (int j = 0; j < resultIndicies.size(); j++)
-        {
-            qDebug() << i << j << resultIndicies[j] << resultDistances[j];
-        }*/
-
-        QVector<Vector> points;
-        for (int j = 0; j < knn; j++)
-        {
-            Vector p(3);
-            int k = resultIndicies[j];
-            p(0) = mesh.points[k].x;
-            p(1) = mesh.points[k].y;
-            p(2) = mesh.points[k].z;
-            points << p;
-        }
-        PCA pca(points);
-        mesh.normals[i].x = pca.cvPca.eigenvectors.at<double>(2, 0);
-        mesh.normals[i].y = pca.cvPca.eigenvectors.at<double>(2, 1);
-        mesh.normals[i].z = pca.cvPca.eigenvectors.at<double>(2, 2);
-
-        if (mesh.normals[i].z < 0)
-        {
-            mesh.normals[i].x = -mesh.normals[i].x;
-            mesh.normals[i].y = -mesh.normals[i].y;
-            mesh.normals[i].z = -mesh.normals[i].z;
-        }
-
-        // curvature
-        double l0 = pca.cvPca.eigenvalues.at<double>(2);
-        double l1 = pca.cvPca.eigenvalues.at<double>(1);
-        double l2 = pca.cvPca.eigenvalues.at<double>(0);
-        mesh.curvatures[i] = l0/(l0+l1+l2);
-
-        //mesh.curvatures[i] = fabs(atan(mesh.normals[i].z/mesh.normals[i].y));
-        //mesh.curvatures[i] = fabs(atan(sqrt(mesh.normals[i].y*mesh.normals[i].y + mesh.normals[i].z*mesh.normals[i].z)/mesh.normals[i].x));
-    }
-}

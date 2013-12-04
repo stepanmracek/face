@@ -39,7 +39,7 @@ private:
     const FaceClassifier &classifier;
     QMap<int, QString> mapIdToName;
     QMap<QString, int> mapNameToId;
-    QHash<int, FaceTemplate*> database;
+    QHash<int, Face3DTemplate*> database;
 
     void initDatabase(const QString &dirPath);
     void refreshList();

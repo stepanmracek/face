@@ -16,7 +16,6 @@
 #include "testglwidget.h"
 #include "testmesh.h"
 #include "testlandmarks.h"
-#include "testsurfaceprocessing.h"
 #include "testanotation.h"
 #include "testmap.h"
 #include "testhistogramfeatures.h"
@@ -71,7 +70,7 @@ int main(int argc, char *argv[])
 
     //TestSVM::testSVM();
 
-    TestGaborWavelet::test();
+    //TestGaborWavelet::test();
     //TestLaguerreWavelet::test();
 
 	//Annotation a("/home/stepo/SVN/disp-stepan-mracek/test/testASM");
@@ -113,7 +112,8 @@ int main(int argc, char *argv[])
     //TestMesh::readAbsWithTexture(argc, argv);
     //TestMesh::testReadWriteCharArray(frgcPath());
 
-    //TestFaceAligner::test(frgcPath(), argc, argv);
+    TestFaceAligner::test(frgcPath(), argc, argv);
+    //TestFaceAligner::testOpenMP();
 
     //TestLandmarks::testReadWrite();
 

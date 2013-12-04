@@ -2,15 +2,14 @@
 
 GaussLaguerre::GaussLaguerre(int size)
 {
-    int j = 0;
     for (int n = 1; n <= 4; n++) // frequency
     {
         for (int k = 0; k <= 5; k++) // size
         {
-            Matrix re = Matrix::zeros(size, size);
-            Matrix im = Matrix::zeros(size, size);
+            Matrix re = Matrix();
+            Matrix im = Matrix();
 
-            createWavelet(re, im, n, k, j);
+            createWavelet(re, im, size, n, k);
 
             realKernels << re;
             imagKernels << im;
@@ -31,13 +30,14 @@ double over(double n, double k)
     return ((double)factorial(n))/(factorial(k) * factorial(n-k));
 }
 
-void GaussLaguerre::createWavelet(Matrix &real, Matrix &imag, int n, int k, int j)
+void GaussLaguerre::createWavelet(Matrix &real, Matrix &imag, int kernelSize, int n, int k)
 {
-    int size = real.rows;
-    assert(size > 0);
-    assert(size == real.cols);
-    assert(size == imag.rows);
-    assert(size == imag.cols);
+    int j = 0;
+
+    int size = pow(2, ceil(log2(kernelSize*0.75)));
+
+    real = Matrix(size, size);
+    imag = Matrix(size, size);
 
     for (int y = 0; y < size; y++)
     {
@@ -45,13 +45,16 @@ void GaussLaguerre::createWavelet(Matrix &real, Matrix &imag, int n, int k, int 
         for (int x = 0; x < size; x++)
         {
             double realX = size/2 - x;
-            double r = sqrt(realX*realX + realY*realY)/(size/4);
+            double r = sqrt(realX*realX + realY*realY)/(kernelSize/4);
             double theta = atan2(realY, realX);
 
             real(y, x) = h(r, theta, n, k, j) * cos(n * theta);
             imag(y, x) = h(r, theta, n, k, j) * sin(n * theta);
         }
     }
+
+    //powerOfTwoEnvelope(real);
+    //powerOfTwoEnvelope(imag);
 }
 
 double GaussLaguerre::L(double r, int n, int k)

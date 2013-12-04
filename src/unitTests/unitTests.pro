@@ -11,6 +11,9 @@ TEMPLATE = app
 
 INCLUDEPATH += "../faceCommon"
 
+QMAKE_CXXFLAGS+= -fopenmp
+QMAKE_LFLAGS +=  -fopenmp
+
 LIBS += -L../faceCommon -lfaceCommon
 LIBS += `pkg-config --libs opencv` -lGL -lGLU -lfreenect -lfreenect_sync
 
@@ -35,7 +38,6 @@ HEADERS += \
     testdiscriminativepotential.h \
     testdelaunay.h \
     testbiodataprocessing.h \
-    testsurfaceprocessing.h \
     testanotation.h \
     testmap.h \
     testhistogramfeatures.h \

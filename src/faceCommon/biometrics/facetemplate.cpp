@@ -55,8 +55,6 @@ double FilterBankClassifier::compare(const QVector<Vector> &first, const QVector
 
 void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVector<Matrix> &imagWavelets, const QString &source, bool gabor)
 {
-    int kSize = 64;
-
     QVector<int> p1; QVector<int> p2;
 
     // Index
@@ -64,15 +62,11 @@ void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVect
     {
         if (gabor)
         {
-            //p1 << 5 << 5 << 6 << 6 << 4 << 5 << 6 << 5 << 4 << 6 << 4;
-            //p2 << 8 << 2 << 4 << 1 << 3 << 5 << 3 << 4 << 8 << 2 << 1;
             p1 << 5 << 4 << 0 << 4 << 4 << 4;
             p2 << 2 << 8 << 0 << 3 << 6 << 1;
         }
         else
         {
-            //p1 << 75 << 0 << 75 << 75 << 100;
-            //p2 <<  2 << 0 <<  3 <<  5 <<   1;
             p1 << 0 << 75 << 50 << 100 << 100 << 75;
             p2 << 0 << 1 << 3 << 3 << 2 << 2;
         }
@@ -83,15 +77,11 @@ void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVect
     {
         if (gabor)
         {
-            //p1 << 5 << 6 << 6 << 6 << 4 << 6 << 6 << 5;
-            //p2 << 8 << 3 << 8 << 4 << 2 << 6 << 7 << 1;
             p1 << 4 << 0 << 6 << 6 << 4 << 4 << 4 << 5 << 6;
             p2 << 8 << 0 << 3 << 6 << 1 << 3 << 4 << 3 << 8;
         }
         else
         {
-            //p1 << 75 << 100 << 50 << 100 << 25 << 75 << 75 << 0;
-            //p2 <<  3 <<   2 <<  2 <<   4 <<  5 <<  1 <<  5 << 0;
             p1 << 75 << 50 << 0 << 100 << 75;
             p2 << 1 << 3 << 0 << 4 << 4;
         }
@@ -102,15 +92,11 @@ void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVect
     {
         if (gabor)
         {
-            //p1 << 6 << 6 << 6 << 5;
-            //p2 << 8 << 3 << 6 << 1;
             p1 << 4 << 6 << 4 << 6;
             p2 << 8 << 4 << 1 << 3;
         }
         else
         {
-            //p1 << 50 << 50 << 0 << 75 << 25 << 100;
-            //p2 <<  1 <<  2 << 0 <<  3 <<  1 <<   4;
             p1 << 50 << 50 << 75 << 50 << 25 << 75;
             p2 << 1 << 3 << 1 << 2 << 4 << 2;
         }
@@ -121,15 +107,11 @@ void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVect
     {
         if (gabor)
         {
-            //p1 << 5 << 4 << 6 << 4 << 4 << 5 << 4;
-            //p2 << 7 << 4 << 3 << 1 << 5 << 2 << 2;
             p1 << 4 << 5 << 5 << 4 << 4 << 5 << 4 << 6 << 4;
             p2 << 8 << 6 << 2 << 1 << 6 << 8 << 4 << 1 << 7;
         }
         else
         {
-            //p1 << 50 << 75 << 100 << 75 << 25 << 50 << 100;
-            //p2 <<  1 <<  1 <<   5 <<  5 <<  5 <<  2 <<   4;
             p1 << 25 << 100 << 50 << 100 << 75 << 50;
             p2 << 1 << 4 << 4 << 1 << 5 << 2;
         }
@@ -140,15 +122,11 @@ void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVect
     {
         if (gabor)
         {
-            //p1 << 4 << 5 << 5 << 4 << 6 << 4 << 5;
-            //p2 << 8 << 3 << 7 << 1 << 6 << 4 << 8;
             p1 << 5 << 4 << 4 << 5 << 0 << 5 << 6 << 4;
             p2 << 7 << 2 << 4 << 3 << 0 << 8 << 6 << 1;
         }
         else
         {
-            //p1 << 75 << 50 << 100 << 50 << 75 << 50 << 100 << 25 << 75 << 75;
-            //p2 <<  4 <<  1 <<   5 << 3 <<   2 <<  4 <<   1 <<  5 <<  3 <<  1;
             p1 << 50 << 50 << 100 << 75;
             p2 << 5 << 2 << 5 << 1;
         }
@@ -159,15 +137,11 @@ void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVect
     {
         if (gabor)
         {
-            //p1 << 5 << 6 << 5 << 6 << 6 << 4;
-            //p2 << 4 << 3 << 6 << 1 << 5 << 2;
             p1 << 0 << 5 << 5 << 6 << 6 << 6 << 5 << 5 << 4 << 4;
             p2 << 0 << 3 << 5 << 1 << 4 << 7 << 1 << 6 << 5 << 7;
         }
         else
         {
-            //p1 << 0 << 100 << 100 << 25 << 100 << 75;
-            //p2 << 0 <<   3 <<   1 <<  5 <<   4 <<  5;
             p1 << 0 << 100 << 50 << 25 << 75 << 100 << 50;
             p2 << 0 << 3 << 4 << 5 << 1 << 4 << 3;
         }
@@ -184,15 +158,15 @@ void FilterBankClassifier::addFilterKernels(QVector<Matrix> &realWavelets, QVect
         {
             if (gabor)
             {
-                realWavelets << Matrix(kSize, kSize);
-                imagWavelets << Matrix(kSize, kSize);
+                realWavelets << Matrix();
+                imagWavelets << Matrix();
                 Gabor::createWavelet(realWavelets[i], imagWavelets[i], p1[i], p2[i]);
             }
             else
             {
-                realWavelets << Matrix(p1[i], p1[i]);
-                imagWavelets << Matrix(p1[i], p1[i]);
-                GaussLaguerre::createWavelet(realWavelets[i], imagWavelets[i], p2[i], 0, 0);
+                realWavelets << Matrix();
+                imagWavelets << Matrix();
+                GaussLaguerre::createWavelet(realWavelets[i], imagWavelets[i], p1[i], p2[i], 0);
             }
         }
     }
@@ -253,7 +227,7 @@ FaceClassifier::FaceClassifier(const QString &dirPath) : fusion(dirPath + QDir::
     bankClassifiers["gabor"].load(dirPath + QDir::separator(), "gabor");
 }
 
-double FaceClassifier::compare(const FaceTemplate *first, const FaceTemplate *second, bool debug) const
+double FaceClassifier::compare(const Face3DTemplate *first, const Face3DTemplate *second, bool debug) const
 {
     QVector<double> scores;
 
@@ -279,14 +253,14 @@ double FaceClassifier::compare(const FaceTemplate *first, const FaceTemplate *se
     return d;
 }
 
-double FaceClassifier::compare(const QList<FaceTemplate *> &references, const FaceTemplate *probe,
+double FaceClassifier::compare(const QList<Face3DTemplate *> &references, const Face3DTemplate *probe,
                                ComparisonType comparisonType, bool debug) const
 {
     double n = references.count();
     double s = 0;
 
     QVector<double> scores;
-    foreach (const FaceTemplate *reference, references)
+    foreach (const Face3DTemplate *reference, references)
     {
         double score = compare(reference, probe, debug);
         scores << score;
@@ -306,7 +280,7 @@ double FaceClassifier::compare(const QList<FaceTemplate *> &references, const Fa
     return s/n;
 }
 
-Evaluation FaceClassifier::evaluate(const QVector<FaceTemplate*> &templates) const
+Evaluation FaceClassifier::evaluate(const QVector<Face3DTemplate*> &templates) const
 {
     QHash<QPair<int, int>, double> distances;
     int n = templates.count();
@@ -324,13 +298,13 @@ Evaluation FaceClassifier::evaluate(const QVector<FaceTemplate*> &templates) con
     return Evaluation(distances);
 }
 
-Evaluation FaceClassifier::evaluate(const QHash<int, FaceTemplate *> &references,
-                                    const QVector<FaceTemplate *> &testTemplates,
+Evaluation FaceClassifier::evaluate(const QHash<int, Face3DTemplate *> &references,
+                                    const QVector<Face3DTemplate *> &testTemplates,
                                     ComparisonType comparisonType) const
 {
     QHash<QPair<int, int>, double> distances;
 
-    foreach (const FaceTemplate *probe, testTemplates)
+    foreach (const Face3DTemplate *probe, testTemplates)
     {
         int probeID = probe->id;
 
@@ -346,8 +320,8 @@ Evaluation FaceClassifier::evaluate(const QHash<int, FaceTemplate *> &references
     return Evaluation(distances);
 }
 
-QMap<int, double> FaceClassifier::identify(const QHash<int, FaceTemplate *> &references,
-                                           const FaceTemplate *probe,
+QMap<int, double> FaceClassifier::identify(const QHash<int, Face3DTemplate *> &references,
+                                           const Face3DTemplate *probe,
                                            ComparisonType comparisonType) const
 {
     QMap<int, double> result;
@@ -363,7 +337,7 @@ QMap<int, double> FaceClassifier::identify(const QHash<int, FaceTemplate *> &ref
     return result;
 }
 
-ScoreSVMFusion FaceClassifier::relearnFinalFusion(const QVector<FaceTemplate*> &templates)
+ScoreSVMFusion FaceClassifier::relearnFinalFusion(const QVector<Face3DTemplate*> &templates)
 {
     QMap<QString, QHash<QPair<int, int>, double> > distancesDict;
     int n = templates.count();
@@ -376,8 +350,8 @@ ScoreSVMFusion FaceClassifier::relearnFinalFusion(const QVector<FaceTemplate*> &
     {
         for (int j = i + 1; j < n; j++)
         {
-            const FaceTemplate *t1 = templates[i];
-            const FaceTemplate *t2 = templates[j];
+            const Face3DTemplate *t1 = templates[i];
+            const Face3DTemplate *t2 = templates[j];
             QPair<int, int> pair(t1->id, t2->id);
 
             foreach (const QString &unitName, units)
@@ -467,7 +441,7 @@ void FaceClassifier::serialize(const QString &dirPath)
     }
 }
 
-FaceTemplate::FaceTemplate()
+Face3DTemplate::Face3DTemplate()
 {
     type["gl"] = FilterBanksVectors();
     type["gabor"] = FilterBanksVectors();
@@ -497,7 +471,7 @@ FaceTemplate::FaceTemplate()
     type["gabor"].load(path, baseFilename, classifier.bankClassifiers["gabor"]);
 }*/
 
-Matrix FaceTemplate::getTexture(const Mesh &mesh)
+Matrix Face3DTemplate::getTexture(const Mesh &mesh)
 {
     cv::Rect roi(25, 15, 100, 90);
     MapConverter converter;
@@ -507,14 +481,13 @@ Matrix FaceTemplate::getTexture(const Mesh &mesh)
     return equalized;
 }
 
-QList<Matrix> FaceTemplate::getDeMeGaInEi(const Mesh &mesh)
+QList<Matrix> Face3DTemplate::getDeMeGaInEi(const Mesh &mesh)
 {
     QList<Matrix> result;
 
     cv::Rect roi(25, 15, 100, 90);
     MapConverter converter;
     Map depthmap = SurfaceProcessor::depthmap(mesh, converter, cv::Point2d(-75, -75), cv::Point2d(75, 75), 1, ZCoord);
-
 
     //cv::imshow("getDeMeGaInEi1", depthmap.toMatrix());
     depthmap.bandPass(-70, 10, false, false);
@@ -552,7 +525,7 @@ QList<Matrix> FaceTemplate::getDeMeGaInEi(const Mesh &mesh)
     return result;
 }
 
-VectorOfCurves FaceTemplate::getIsoGeodesicCurves(const Mesh &mesh)
+VectorOfCurves Face3DTemplate::getIsoGeodesicCurves(const Mesh &mesh)
 {
     MapConverter converter;
     Map depth = SurfaceProcessor::depthmap(mesh, converter, 2, ZCoord);
@@ -573,7 +546,7 @@ VectorOfCurves FaceTemplate::getIsoGeodesicCurves(const Mesh &mesh)
     return isoCurves;
 }
 
-FaceTemplate::FaceTemplate(int id, const Mesh &properlyAlignedMesh, const FaceClassifier &classifier)
+Face3DTemplate::Face3DTemplate(int id, const Mesh &properlyAlignedMesh, const FaceClassifier &classifier)
 {
     type["gl"] = FilterBanksVectors();
     type["gabor"] = FilterBanksVectors();
@@ -598,29 +571,24 @@ FaceTemplate::FaceTemplate(int id, const Mesh &properlyAlignedMesh, const FaceCl
 
     // mean
     qDebug() << "mean";
-
     if (classifier.units.contains("gabor-mean"))
     {
         type["gabor"].source["mean"] = type["gabor"].load(
                     curvatures[1], classifier.bankClassifiers["gabor"].dict["mean"], scaleFactor);
     }
-
     if (classifier.units.contains("gl-mean"))
     {
         type["gl"].source["mean"] = type["gl"].load(
                     curvatures[1], classifier.bankClassifiers["gl"].dict["mean"], scaleFactor);
     }
 
-
     // gauss
     qDebug() << "gauss";
-
     if (classifier.units.contains("gabor-gauss"))
     {
         type["gabor"].source["gauss"] = type["gabor"].load(
                     curvatures[2], classifier.bankClassifiers["gabor"].dict["gauss"], scaleFactor);
     }
-
     if (classifier.units.contains("gl-gauss"))
     {
         type["gl"].source["gauss"] = type["gl"].load(
@@ -629,13 +597,11 @@ FaceTemplate::FaceTemplate(int id, const Mesh &properlyAlignedMesh, const FaceCl
 
     // index
     qDebug() << "index";
-
     if (classifier.units.contains("gabor-index"))
     {
         type["gabor"].source["index"] = type["gabor"].load(
                     curvatures[3], classifier.bankClassifiers["gabor"].dict["index"], scaleFactor);
     }
-
     if (classifier.units.contains("gl-index"))
     {
         type["gl"].source["index"] = type["gl"].load(
@@ -644,13 +610,11 @@ FaceTemplate::FaceTemplate(int id, const Mesh &properlyAlignedMesh, const FaceCl
 
     // eigencur
     qDebug() << "eigencur";
-
     if (classifier.units.contains("gabor-eigencur"))
     {
         type["gabor"].source["eigencur"] = type["gabor"].load(
                     curvatures[4], classifier.bankClassifiers["gabor"].dict["eigencur"], scaleFactor);
     }
-
     if (classifier.units.contains("gl-eigencur"))
     {
         type["gl"].source["eigencur"] = type["gl"].load(
@@ -659,13 +623,11 @@ FaceTemplate::FaceTemplate(int id, const Mesh &properlyAlignedMesh, const FaceCl
 
     // texture
     qDebug() << "texture";
-
     if (classifier.units.contains("gabor-textureE"))
     {
         type["gabor"].source["textureE"] = type["gabor"].load(
                     texture, classifier.bankClassifiers["gabor"].dict["textureE"], scaleFactor);
     }
-
     if (classifier.units.contains("gl-textureE"))
     {
         type["gl"].source["textureE"] = type["gl"].load(
@@ -681,7 +643,43 @@ FaceTemplate::FaceTemplate(int id, const Mesh &properlyAlignedMesh, const FaceCl
     }
 }
 
-FaceTemplate::FaceTemplate(int id, const QString &path, const FaceClassifier &classifier)
+void Face3DTemplate::deserialize(cv::FileStorage & storage, const FaceClassifier &classifier){
+	foreach(const QString &unit, classifier.units)
+	{
+		if (unit.compare("isocurves") == 0)
+		{
+			storage["isocurves"] >> isocurves;
+		}
+		else if (unit.startsWith("gabor-") || unit.startsWith("gl-"))
+		{
+			QStringList items = unit.split("-");
+			QString bankName = items[0];
+			QString sourceName = items[1];
+
+			if (!type.contains(bankName))
+				type[bankName] = FilterBanksVectors();
+
+			cv::FileNode node = storage[unit.toStdString()];
+			for (cv::FileNodeIterator it = node.begin(); it != node.end(); ++it)
+			{
+				Matrix m;
+				(*it) >> m;
+
+				if (!type[bankName].source.contains(sourceName))
+					type[bankName].source[sourceName] = QVector<Vector>();
+
+				type[bankName].source[sourceName] << Vector(m);
+			}
+		}
+	}
+}
+
+Face3DTemplate::Face3DTemplate(int id, cv::FileStorage & storage, const FaceClassifier &classifier){
+	this->id = id;
+	this->deserialize(storage, classifier);
+}
+
+Face3DTemplate::Face3DTemplate(int id, const QString &path, const FaceClassifier &classifier)
 {
     this->id = id;
     cv::FileStorage storage(path.toStdString(), cv::FileStorage::READ);
@@ -727,10 +725,8 @@ FaceTemplate::FaceTemplate(int id, const QString &path, const FaceClassifier &cl
 
 }
 
-void FaceTemplate::serialize(const QString &path, const FaceClassifier &classifier) const
+void Face3DTemplate::serialize(cv::FileStorage & storage, const FaceClassifier &classifier) const
 {
-    cv::FileStorage storage(path.toStdString(), cv::FileStorage::WRITE);
-
     foreach(const QString &unit, classifier.units)
     {
         if (unit.compare("isocurves") == 0)
@@ -755,6 +751,12 @@ void FaceTemplate::serialize(const QString &path, const FaceClassifier &classifi
     }
 }
 
+void Face3DTemplate::serialize(const QString &path, const FaceClassifier &classifier) const
+{
+    cv::FileStorage storage(path.toStdString(), cv::FileStorage::WRITE);
+    this->serialize(storage, classifier);
+}
+
 /*QVector<Vector> FilterBanksVectors::load(const QString &dirPath, const QString &baseFilename, const FilterBanksClassifiers &classifier)
 {
     QStringList srcNames;
@@ -775,7 +777,6 @@ QVector<Vector> FilterBanksVectors::load(const Matrix &image, const FilterBankCl
     //cv::imshow("image", (image-min)/(max-min));
     //cv::waitKey(0);
     //ii++;
-
 
     QVector<Vector> result;
     for (int i = 0; i < classifier.realWavelets.count(); i++)

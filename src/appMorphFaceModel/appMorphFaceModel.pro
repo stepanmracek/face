@@ -14,4 +14,13 @@ INCLUDEPATH += "../faceCommon"
 LIBS += -L../faceCommon -lfaceCommon
 LIBS += `pkg-config --libs opencv` -lGL -lGLU
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    morphable3dfacemodelwidget.cpp \
+    morphable3dfacemodel.cpp
+
+FORMS += \
+    morphable3dfacemodelwidget.ui
+
+HEADERS += \
+    morphable3dfacemodelwidget.h \
+    morphable3dfacemodel.h

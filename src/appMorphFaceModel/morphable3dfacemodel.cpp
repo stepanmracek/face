@@ -3,7 +3,7 @@
 #include "linalg/procrustes.h"
 #include "facelib/surfaceprocessor.h"
 #include "facelib/facealigner.h"
-#include "landmarks.h"
+#include "facelib/landmarks.h"
 
 Morphable3DFaceModel::Morphable3DFaceModel(const QString &pcaPathForZcoord, const QString &pcaPathForTexture, const QString &pcaFile, const QString &maskPath,
                                            const QString &landmarksPath, int width)
@@ -63,12 +63,12 @@ void Morphable3DFaceModel::setModelParams(Vector &zcoordParams, Vector &textureP
     Vector newZcoords = pcaForZcoord.backProject(zcoordParams);
     Vector newIntensities = pcaForTexture.backProject(textureParams);
     int n = newZcoords.rows;
-    assert(n == mesh.points.count());
+    assert(n == mesh.pointsMat.rows);
     assert(n == newIntensities.rows);
 
     for (int i = 0; i < n; i++)
     {
-        mesh.points[i].z = newZcoords(i);
+        mesh.pointsMat(i, 2) = newZcoords(i);
         uchar intensity = newIntensities(i);
         mesh.colors[i] = Color(intensity, intensity, intensity);
     }
@@ -166,7 +166,10 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
 
 Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, int iterations)
 {
-    // reset model
+    Mesh result(inputMesh);
+    return result;
+
+    /*// reset model
     Vector zeroParams(pca.getModes());
     setModelParams(zeroParams);
 
@@ -188,7 +191,7 @@ Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, int iterations)
     result.recalculateMinMax();
     inputMesh.recalculateMinMax();
 
-    return result;
+    return result;*/
 }
 
 Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations)
@@ -197,8 +200,8 @@ Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, Landmarks &inputLandmarks, int
     morphModel(inputMesh);
     Mesh result(mesh);
     Procrustes3D::applyInversedProcrustesResult(inputLandmarks.points, procrustesResult);
-    Procrustes3D::applyInversedProcrustesResult(inputMesh.points, procrustesResult);
-    Procrustes3D::applyInversedProcrustesResult(result.points, procrustesResult);
+    Procrustes3D::applyInversedProcrustesResult(inputMesh.pointsMat, procrustesResult);
+    Procrustes3D::applyInversedProcrustesResult(result.pointsMat, procrustesResult);
     result.recalculateMinMax();
     inputMesh.recalculateMinMax();
 

@@ -47,7 +47,7 @@ public:
 			assert(first[i] == second[i]);
 	}
 
-    static void align()
+    /*static void align()
     {
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/bin/";
         QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
@@ -74,7 +74,7 @@ public:
             QString resultTexturePath = outDirPath + srcFileInfo.baseName() + ".png";
             cv::imwrite(resultTexturePath.toStdString(), texture.toMatrix(0, 0, 255)*255);
         }
-    }
+    }*/
 
     static void align2()
     {
@@ -117,7 +117,7 @@ public:
 
             QVector<VectorOfPoints> isoCurves;
             Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
-            isoCurves = FaceTemplate::getIsoGeodesicCurves(mesh);
+            isoCurves = Face3DTemplate::getIsoGeodesicCurves(mesh);
             Serialization::serializeVectorOfPointclouds(isoCurves, resultPath);
             //LandmarkDetector detector(mesh);
             //Landmarks lm = detector.detect();
@@ -216,14 +216,14 @@ public:
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
             Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath(), false);
-            Matrix equalized = FaceTemplate::getTexture(mesh);
+            Matrix equalized = Face3DTemplate::getTexture(mesh);
 
             QString out = srcDirPath + "textureE/" + srcFileInfo.baseName() + ".gz";
             if (Common::matrixContainsNan(equalized))
                 nans << "depth-" + srcFileInfo.baseName();
             Common::saveMatrix(equalized, out);
 
-            QList<Matrix> curvatures = FaceTemplate::getDeMeGaInEi(mesh);
+            QList<Matrix> curvatures = Face3DTemplate::getDeMeGaInEi(mesh);
             int index = 0;
             foreach (const QString &curvatureName, curvatureNames)
             {
@@ -789,7 +789,6 @@ public:
         QMap<int, int> ns; ns[0] = 0;
 
         int k = 0;
-        int j = 0;
         int index = 1;
         for (int kSize = 25; kSize <= 100; kSize += 25)
         {
@@ -798,9 +797,9 @@ public:
                 sizes[index] = kSize;
                 ns[index] = n;
 
-                Matrix realWavelet(kSize, kSize);
-                Matrix imagWavelet(kSize, kSize);
-                GaussLaguerre::createWavelet(realWavelet, imagWavelet, n, k, j);
+                Matrix realWavelet;
+                Matrix imagWavelet;
+                GaussLaguerre::createWavelet(realWavelet, imagWavelet, kSize, n, k);
 
                 QVector<Vector> trainVectors;
                 foreach(const Matrix &srcImg, srcImagesInClusters[0])
@@ -968,14 +967,14 @@ public:
 
         for (int cluster = 1; cluster <= filenamesInClusters.count(); cluster++)
         {
-            QVector<FaceTemplate *> templates;
+            QVector<Face3DTemplate *> templates;
             for (int i = 0; i < filenamesInClusters[cluster].count(); i++)
             {
                 int id = classesInClusters[cluster][i];
                 QString fileName = filenamesInClusters[cluster][i] + ".binz";
                 QString path = dataDirPath + fileName;
                 Mesh faceMesh = Mesh::fromBINZ(path, false);
-                templates << new FaceTemplate(id, faceMesh, faceClassifier);
+                templates << new Face3DTemplate(id, faceMesh, faceClassifier);
                 qDebug() << cluster << fileName << id << (i+1) << "/" << filenamesInClusters[cluster].count();
 
                 //templates.last()->serialize(dataDirPath + "templates/" + filenamesInClusters[cluster][i], faceClassifier);

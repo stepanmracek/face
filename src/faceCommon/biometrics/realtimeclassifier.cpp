@@ -1,7 +1,7 @@
 #include "realtimeclassifier.h"
 
 RealTimeClassifier::RealTimeClassifier(const FaceClassifier &classifier, double threshold, FaceClassifier::ComparisonType comparisonType,
-                                       const QHash<int, FaceTemplate *> &database, const QString &pathToAlignReference) :
+                                       const QHash<int, Face3DTemplate *> &database, const QString &pathToAlignReference) :
     classifier(classifier),
     threshold(threshold),
     comparisonType(comparisonType),
@@ -29,7 +29,7 @@ void RealTimeClassifier::compare(const Mesh *in)
     probe.calculateTriangles();
     aligner.icpAlign(probe, 10, FaceAligner::NoseTipDetection);
 
-    FaceTemplate probeTemplate(0, probe, classifier);
+    Face3DTemplate probeTemplate(0, probe, classifier);
     QMap<int, double> result = classifier.identify(database, &probeTemplate, comparisonType);
 
     foreach (int id, result.keys())

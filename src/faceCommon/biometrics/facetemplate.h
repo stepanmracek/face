@@ -28,7 +28,7 @@ private:
 
 class FaceClassifier; // forward declaration
 
-class FaceTemplate
+class Face3DTemplate
 {
 public:
     int id;
@@ -36,16 +36,21 @@ public:
     Vector isocurves;
     QMap<QString, FilterBanksVectors> type;
 
-    FaceTemplate();
+    Face3DTemplate();
     //FaceTemplate(const QString &dirPath, const QString &baseFilename, const FaceClassifier &classifier);
-    FaceTemplate(int id, const Mesh &properlyAlignedMesh, const FaceClassifier &classifier);
-    FaceTemplate(int id, const QString &path, const FaceClassifier &classifier);
+    Face3DTemplate(int id, const Mesh &properlyAlignedMesh, const FaceClassifier &classifier);
+    Face3DTemplate(int id, const QString &path, const FaceClassifier &classifier);
+    Face3DTemplate(int id, cv::FileStorage & storage, const FaceClassifier &classifier);
 
     void serialize(const QString &path, const FaceClassifier &classifier) const;
+    void serialize(cv::FileStorage & storage, const FaceClassifier &classifier) const;
 
     static Matrix getTexture(const Mesh &mesh);
     static QList<Matrix> getDeMeGaInEi(const Mesh &mesh);
     static QVector<VectorOfPoints> getIsoGeodesicCurves(const Mesh &mesh);
+
+private:
+    void deserialize(cv::FileStorage & storage, const FaceClassifier &classifier);
 };
 
 class FilterBankClassifier
@@ -94,18 +99,18 @@ public:
     FaceClassifier();
     FaceClassifier(const QString &dirPath);
 
-    double compare(const FaceTemplate *first, const FaceTemplate *second, bool debug = false) const;
-    double compare(const QList<FaceTemplate *> &references, const FaceTemplate *probe,
+    double compare(const Face3DTemplate *first, const Face3DTemplate *second, bool debug = false) const;
+    double compare(const QList<Face3DTemplate *> &references, const Face3DTemplate *probe,
                    ComparisonType comparisonType, bool debug = false) const;
 
-    Evaluation evaluate(const QVector<FaceTemplate *> &templates) const;
-    Evaluation evaluate(const QHash<int, FaceTemplate *> &references, const QVector<FaceTemplate *> &testTemplates,
+    Evaluation evaluate(const QVector<Face3DTemplate *> &templates) const;
+    Evaluation evaluate(const QHash<int, Face3DTemplate *> &references, const QVector<Face3DTemplate *> &testTemplates,
                         ComparisonType comparisonType) const;
 
-    QMap<int, double> identify(const QHash<int, FaceTemplate *> &references, const FaceTemplate *probe,
+    QMap<int, double> identify(const QHash<int, Face3DTemplate *> &references, const Face3DTemplate *probe,
                                ComparisonType comparisonType) const;
 
-    ScoreSVMFusion relearnFinalFusion(const QVector<FaceTemplate *> &templates);
+    ScoreSVMFusion relearnFinalFusion(const QVector<Face3DTemplate *> &templates);
     void serialize(const QString &dirPath);
 };
 

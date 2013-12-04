@@ -34,14 +34,10 @@ Matrix imagKernel;
 
 void gaborRedraw(GaborParams *gParams)
 {
-    qDebug() << "redraw, size:" << gParams->size
-             << "frequency:" << gParams->frequency
-             << "orientation:" << gParams->orientation;
     realKernel = Matrix(gParams->size, gParams->size);
     imagKernel = Matrix(gParams->size, gParams->size);
     Gabor::createWavelet(realKernel, imagKernel, gParams->frequency, gParams->orientation);
 
-    qDebug() << "applying filters";
     cv::filter2D(inputImage, responseReal, -1, realKernel);
     cv::filter2D(inputImage, responseImag, -1, imagKernel);
 
@@ -77,7 +73,6 @@ void gaborRedraw(GaborParams *gParams)
         }
     }
 
-    qDebug() << "showing kernels";
     double min,max;
     cv::minMaxLoc(realKernel, &min, &max);
     realKernel = (realKernel-min)/(max-min);
@@ -87,7 +82,6 @@ void gaborRedraw(GaborParams *gParams)
     imagKernel = (imagKernel-min)/(max-min);
     cv::imshow("imag kernel", imagKernel);
 
-    qDebug() << "showing result";
     cv::minMaxLoc(responseReal, &min, &max);
     responseReal = (responseReal-min)/(max-min);
     cv::imshow("response real", responseReal);

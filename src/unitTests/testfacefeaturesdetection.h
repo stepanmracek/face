@@ -24,7 +24,6 @@
 #include "linalg/kernelgenerator.h"
 #include "linalg/gabor.h"
 #include "linalg/gausslaguerre.h"
-#include "facelib/morphable3dfacemodel.h"
 
 enum AlignType
 {
@@ -134,47 +133,6 @@ public:
         widget.addLandmarks(&landmarks);
         widget.show();
 
-        return app.exec();
-    }
-
-    static int  testAlign(int argc, char *argv[], QString dirPath, QString fileName)
-    {
-        //Mesh mean = Mesh::fromOBJ("../../test/meanForAlign.obj");
-        Morphable3DFaceModel model("../../test/morph-pca-zcoord.xml",
-                                   "../../test/morph-pca-texture.xml",
-                                   "../../test/morph-pca.xml",
-                                   "../../test/morph-flags",
-                                   "../../test/morph-landmarks.xml",
-                                   200);
-        Mesh mean = model.mesh;
-        mean.translate(-model.landmarks.get(Landmarks::Nosetip));
-
-        FaceAligner aligner(mean);
-        Mesh face = Mesh::fromBIN(dirPath + "bin/" + fileName, true);
-
-        //MapConverter c;
-        //Map before = SurfaceProcessor::depthmap(face, c, 2, Texture_I);
-
-        //Mesh old = face;
-        aligner.icpAlign(face, 10, FaceAligner::NoseTipDetection);
-
-        //Map after = SurfaceProcessor::depthmap(face, c, 2, Texture_I);
-
-        //cv::imshow("before", before.toMatrix());
-        //cv::imshow("after", after.toMatrix());
-        //cv::waitKey(0);
-
-        //old.translate(cv::Point3d(100,0,0));
-        //face.translate(cv::Point3d(-100,0,0));
-        //aligner.meanFace.translate(cv::Point3d(-100,0,0));
-
-        QApplication app(argc, argv);
-        GLWidget widget;
-        widget.setWindowTitle("GL Widget");
-        widget.addFace(&aligner.referenceFace);
-        widget.addFace(&face);
-        //widget.addFace(&old);
-        widget.show();
         return app.exec();
     }
 

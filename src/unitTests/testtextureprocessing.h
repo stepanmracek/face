@@ -45,7 +45,7 @@ public:
         QVector<Vector> vectors;
         foreach (const QString &baseName, names)
         {
-            cv::Mat img = cv::imread((dir + baseName + ".png").toStdString(), cv::IMREAD_GRAYSCALE);
+            cv::Mat img = cv::imread((dir + baseName + ".png").toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
             img = process(img);
 
             vectors << toVector(img);

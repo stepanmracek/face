@@ -7,8 +7,6 @@
 #include <QDir>
 #include <QSet>
 
-#include "facelib/morphable3dfacemodelwidget.h"
-#include "facelib/morphable3dfacemodel.h"
 #include "facelib/surfaceprocessor.h"
 #include "facelib/glwidget.h"
 #include "facelib/facefeaturesanotation.h"
@@ -17,46 +15,6 @@
 class TestMorphableFaceModel
 {
 public:
-
-    static int testModel(int argc, char *argv[], const QString &pcaForZcoord, const QString &pcaForTexture, const QString &pca,
-                         const QString &flags, const QString &landmarksPath)
-    {
-        Morphable3DFaceModel model(pcaForZcoord, pcaForTexture, pca, flags, landmarksPath, 200);
-
-        QApplication app(argc, argv);
-        Morphable3DFaceModelWidget widget;
-        widget.setModel(&model);
-        widget.setWindowTitle("GL Widget");
-        widget.show();
-
-        return app.exec();
-    }
-
-    static int testMorph(int argc, char *argv[], const QString &pcaForZcoord, const QString &pcaForTexture, const QString &pca,
-                         const QString &flags, const QString &landmarksPath, const QString &probeOBJPath)
-    {
-        Morphable3DFaceModel model(pcaForZcoord, pcaForTexture, pca, flags, landmarksPath, 200);
-
-        QFileInfo inputObjInfo(probeOBJPath);
-        assert(inputObjInfo.exists());
-        Mesh inputMesh = Mesh::fromOBJ(probeOBJPath);
-        Landmarks inputLandmarks(inputObjInfo.absolutePath() + QDir::separator() + inputObjInfo.baseName() + ".xml");
-
-        Mesh result = model.morph(inputMesh, inputLandmarks, 10);
-
-        QApplication app(argc, argv);
-
-        GLWidget widgetInput;
-        widgetInput.addFace(&inputMesh);
-        widgetInput.show();
-
-        GLWidget widget;
-        widget.addFace(&result);
-        widget.show();
-
-        return app.exec();
-    }
-
     /*static int testMorphFromKinect(int argc, char *argv[], const QString &pca, const QString &flags, const QString &landmarksPath)
     {
         QApplication app(argc, argv);
@@ -126,8 +84,8 @@ public:
             meshesVec.append(mesh);
         }
 
-        Morphable3DFaceModel::create(meshesVec, landmarksVec, 1, pcaForZcoordFile, pcaForTextureFile, pcaFile,
-                                     flagsFile, meanLadmarksFile, mask, false, false);
+        //Morphable3DFaceModel::create(meshesVec, landmarksVec, 1, pcaForZcoordFile, pcaForTextureFile, pcaFile,
+        //                             flagsFile, meanLadmarksFile, mask, false, false);
     }
 };
 

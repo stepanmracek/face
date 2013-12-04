@@ -88,7 +88,9 @@ public:
 class Procrustes3D
 {
 public:
-    static cv::Point3d centralizedTranslation(const QVector<cv::Point3d> &shape);
+    static cv::Point3d centralizedTranslation(const QVector<cv::Point3d> &points);
+
+    static cv::Point3d centralizedTranslation(const Matrix &points);
 
     static Matrix alignRigid(QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to);
 
@@ -96,25 +98,39 @@ public:
 
     static Matrix getOptimalRotation(const QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to);
 
+    static Matrix getOptimalRotation(const Matrix &from, const Matrix &to);
+
     static cv::Point3d getOptimalTranslation(const QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to);
 
     static cv::Point3d getOptimalScale(const QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to);
 
     static void rotate(QVector<cv::Point3d> &points, double x, double y, double z);
 
-    static void transform(cv::Point3d &p, Matrix &m);
+    static void rotate(Matrix &points, double x, double y, double z);
 
-    static void transform(QVector<cv::Point3d> &points, Matrix &m);
+    static void transform(cv::Point3d &p, Matrix const &m);
+
+    static void transform(QVector<cv::Point3d> &points, const Matrix &m);
+
+    static void transform(Matrix &points, const Matrix &m);
+
+    static void inverseTransform(Matrix &points, const Matrix &m);
 
     static QVector<cv::Point3d> getMeanShape(const QVector<QVector<cv::Point3d> > &vectorOfPointclouds);
 
     static void scale(QVector<cv::Point3d> &points, cv::Point3d scaleParams);
+
+    static void scale(Matrix &points, cv::Point3d scaleParams);
+
+    static void translate(Matrix &points, cv::Point3d shift);
 
     static void translate(QVector<cv::Point3d> &points, cv::Point3d shift);
 
     static double getShapeVariation(const QVector<QVector<cv::Point3d> > &vectorOfPointclouds, QVector<cv::Point3d> &mean);
 
     static void applyInversedProcrustesResult(QVector<cv::Point3d> &pointCloud, Procrustes3DResult &procrustesResult);
+
+    static void applyInversedProcrustesResult(Matrix &pointCloud, Procrustes3DResult &procrustesResult);
 
     static double diff(const QVector<cv::Point3d> &first, const QVector<cv::Point3d> &second);
 };

@@ -1,7 +1,7 @@
 #include "dlgrealtimecompare.h"
 #include "ui_dlgrealtimecompare.h"
 
-#include <QtConcurrent/QtConcurrentRun>
+#include <QtConcurrentRun>
 
 #include "kinect.h"
 

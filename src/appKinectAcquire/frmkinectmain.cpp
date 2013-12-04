@@ -53,7 +53,7 @@ void FrmKinectMain::initDatabase(const QString &dirPath)
         int id = QFileInfo(path).baseName().split("-")[0].toInt();
 
         QString name = mapIdToName[id];
-        FaceTemplate *t = new FaceTemplate(id, path, classifier);
+        Face3DTemplate *t = new Face3DTemplate(id, path, classifier);
         database.insertMulti(id, t);
     }
 
@@ -107,7 +107,7 @@ void FrmKinectMain::on_btnIdentify_clicked()
     if (!sensor.mesh) return;
     sensor.align();
 
-    FaceTemplate *probe = new FaceTemplate(0, *sensor.mesh, classifier);
+    Face3DTemplate *probe = new Face3DTemplate(0, *sensor.mesh, classifier);
     sensor.deleteMesh();
 
     QMap<int, double> result = classifier.identify(database, probe, FaceClassifier::CompareMeanDistance);
@@ -126,7 +126,7 @@ void FrmKinectMain::on_btnVerify_clicked()
     if (!sensor.mesh) return;
     sensor.align();
 
-    FaceTemplate *probe = new FaceTemplate(0, *sensor.mesh, classifier);
+    Face3DTemplate *probe = new Face3DTemplate(0, *sensor.mesh, classifier);
     sensor.deleteMesh();
 
     if (!mapNameToId.contains(name))
@@ -174,9 +174,9 @@ void FrmKinectMain::on_btnExport_clicked()
     QString path = QFileDialog::getExistingDirectory(this);
     if (path.isNull() || path.isEmpty()) return;
 
-    QList<FaceTemplate*> templates = database.values(id);
+    QList<Face3DTemplate*> templates = database.values(id);
     int index = 1;
-    foreach (const FaceTemplate *t, templates)
+    foreach (const Face3DTemplate *t, templates)
     {
         QString p = path + QDir::separator() + QString().sprintf("%02d", id) + "-" + QString().sprintf("%02d", index) + ".yml";
         qDebug() << p;

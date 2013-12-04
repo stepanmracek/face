@@ -38,16 +38,15 @@ void Gabor::gaborFunc(int x, int y, double omega, double theta, double sigma, do
 
 void Gabor::createWavelet(Matrix &real, Matrix &imag, int frequency, int orientation)
 {
-    int size = real.rows;
-    assert(size > 0);
-    assert(size == real.cols);
-    assert(size == imag.rows);
-    assert(size == imag.cols);
-
     double omegaMax = M_PI_2;
     double lambda = M_SQRT2;
     double omega = omegaMax * pow(lambda, -(frequency - 1));
     double sigma = M_PI / omega;
+
+    int size = pow(2, ceil(log2(sigma*6)));
+    real = Matrix(size, size);
+    imag = Matrix(size, size);
+
     double theta = (orientation-1)*M_PI*0.125;
 
     for (int y = 0; y < size; y++)

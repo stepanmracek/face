@@ -225,13 +225,13 @@ Vector Procrustes2D::getMeanShape(QVector<Vector> &vectors)
 
 // ------------------------------------------------------------------------------
 
-cv::Point3d Procrustes3D::centralizedTranslation(const QVector<cv::Point3d> &shape)
+cv::Point3d Procrustes3D::centralizedTranslation(const QVector<cv::Point3d> &points)
 {
     cv::Point3d mean(0,0,0);
-    int numberOfPoints = shape.count();
+    int numberOfPoints = points.count();
     for (int j = 0; j < numberOfPoints; j++)
     {
-        mean += shape[j];
+        mean += points[j];
     }
     mean.x /= numberOfPoints;
     mean.y /= numberOfPoints;
@@ -239,6 +239,15 @@ cv::Point3d Procrustes3D::centralizedTranslation(const QVector<cv::Point3d> &sha
 
     cv::Point3d shift = -mean;
     return shift;
+}
+
+cv::Point3d Procrustes3D::centralizedTranslation(const Matrix &points)
+{
+    double meanx = cv::sum(points.col(0))[0]/points.rows;
+    double meany = cv::sum(points.col(1))[0]/points.rows;
+    double meanz = cv::sum(points.col(2))[0]/points.rows;
+
+    return -cv::Point3d(meanx, meany, meanz);
 }
 
 Matrix Procrustes3D::alignRigid(QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to)
@@ -279,6 +288,27 @@ Matrix Procrustes3D::getOptimalRotation(const QVector<cv::Point3d> &from, const 
     return R;
 }
 
+Matrix Procrustes3D::getOptimalRotation(const Matrix &from, const Matrix &to)
+{
+    assert(from.cols == 3);
+    assert(to.cols == 3);
+    assert(from.rows == to.rows);
+
+    // calculate H
+    Matrix H = Matrix::zeros(3, 3);
+    for (int r = 0; r < from.rows; r++)
+    {
+        H += (from.row(r).t() * to.row(r));
+    }
+
+    // SVD(H)
+    cv::SVD svd(H);
+
+    // R = VU^T
+    Matrix R = svd.vt.t() * svd.u.t();
+    return R;
+}
+
 cv::Point3d Procrustes3D::getOptimalTranslation(const QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to)
 {
     cv::Point3d centralizedTranslationFrom = centralizedTranslation(from);
@@ -306,7 +336,26 @@ void Procrustes3D::rotate(QVector<cv::Point3d> &points, double x, double y, doub
     transform(points, R);
 }
 
-void Procrustes3D::transform(cv::Point3d &p, Matrix &m)
+void Procrustes3D::rotate(Matrix &points, double x, double y, double z)
+{
+    Matrix Rx = (Matrix(3,3) <<
+                 1, 0, 0,
+                 0, cos(x), -sin(x),
+                 0, sin(x), cos(x));
+    Matrix Ry = (Matrix(3,3) <<
+                 cos(y), 0, sin(y),
+                 0, 1, 0,
+                 -sin(y), 0, cos(y));
+    Matrix Rz = (Matrix(3,3) <<
+                 cos(z), -sin(z), 0,
+                 sin(z), cos(z), 0,
+                 0, 0, 1);
+    Matrix R = Rx*Ry*Rz;
+
+    transform(points, R);
+}
+
+void Procrustes3D::transform(cv::Point3d &p, const Matrix &m)
 {
     Matrix A = (Matrix(3,1) << p.x, p.y, p.z);
     A = m*A;
@@ -314,7 +363,7 @@ void Procrustes3D::transform(cv::Point3d &p, Matrix &m)
 }
 
 
-void Procrustes3D::transform(QVector<cv::Point3d> &points, Matrix &m)
+void Procrustes3D::transform(QVector<cv::Point3d> &points, const Matrix &m)
 {
     int n = points.count();
     for (int i = 0; i < n; i++)
@@ -322,6 +371,16 @@ void Procrustes3D::transform(QVector<cv::Point3d> &points, Matrix &m)
         cv::Point3d &p = points[i];
         transform(p, m);
     }
+}
+
+void Procrustes3D::transform(Matrix &points, const Matrix &m)
+{
+    points = points*m.t(); //.inv();
+}
+
+void Procrustes3D::inverseTransform(Matrix &points, const Matrix &m)
+{
+    points = points*m;
 }
 
 cv::Point3d Procrustes3D::getOptimalScale(const QVector<cv::Point3d> &from, const QVector<cv::Point3d> &to)
@@ -357,6 +416,16 @@ void Procrustes3D::scale(QVector<cv::Point3d> &points, cv::Point3d scaleParams)
     }
 }
 
+void Procrustes3D::scale(Matrix &points, cv::Point3d scaleParams)
+{
+    for (int r = 0; r < points.rows; r++)
+    {
+        points(r, 0) *= scaleParams.x;
+        points(r, 1) *= scaleParams.y;
+        points(r, 2) *= scaleParams.z;
+    }
+}
+
 void Procrustes3D::translate(QVector<cv::Point3d> &points, cv::Point3d shift)
 {
     int n = points.count();
@@ -366,7 +435,33 @@ void Procrustes3D::translate(QVector<cv::Point3d> &points, cv::Point3d shift)
     }
 }
 
+void Procrustes3D::translate(Matrix &points, cv::Point3d shift)
+{
+    for (int r = 0; r < points.rows; r++)
+    {
+        points(r, 0) = points(r, 0) + shift.x;
+        points(r, 1) = points(r, 1) + shift.y;
+        points(r, 2) = points(r, 2) + shift.z;
+    }
+}
+
 void Procrustes3D::applyInversedProcrustesResult(QVector<cv::Point3d> &pointCloud, Procrustes3DResult &procrustesResult)
+{
+    int n = procrustesResult.rotations.count();
+    assert(n == procrustesResult.scaleParams.count());
+
+    for (int i = n-1; i >= 0; i--)
+    {
+        cv::Point3d s = procrustesResult.scaleParams[i];
+        cv::Point3d invScale(1.0/s.x, 1.0/s.y, 1.0/s.z);
+        scale(pointCloud, invScale);
+
+        Matrix invRot = procrustesResult.rotations[i].inv();
+        transform(pointCloud, invRot);
+    }
+}
+
+void Procrustes3D::applyInversedProcrustesResult(Matrix &pointCloud, Procrustes3DResult &procrustesResult)
 {
     int n = procrustesResult.rotations.count();
     assert(n == procrustesResult.scaleParams.count());

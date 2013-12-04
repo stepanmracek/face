@@ -40,6 +40,20 @@ public:
     static Mesh *scanAndAlignFace(int scanIterations, int icpIterations, const QString &alignReferenceOBJPath, const QString &faceHaarPath);
 
     static bool isKinectPluggedIn(double *depthBuffer);
+
+    static void stop();
+
+    enum LEDState {
+        LED_OFF              = 0, /**< Turn LED off */
+        LED_GREEN            = 1, /**< Turn LED to Green */
+        LED_RED              = 2, /**< Turn LED to Red */
+        LED_YELLOW           = 3, /**< Turn LED to Yellow */
+        LED_BLINK_GREEN      = 4, /**< Make LED blink Green */
+
+        LED_BLINK_RED_YELLOW = 6, /**< Make LED blink Red/Yellow */
+    };
+
+    static void setLEDs(LEDState);
 };
 
 #endif /* KINECT_H_ */

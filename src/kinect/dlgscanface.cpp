@@ -60,12 +60,16 @@ void DlgScanFace::showFace()
 
     bool enabled = false;
     ui->widget->deleteAll();
-    if (m->points.count() > 0)
+    if (m->pointsMat.rows > 0)
     {
         m->centralize();
         ui->widget->addFace(m);
 
         enabled = true;
+    }
+    else
+    {
+        delete m;
     }
     ui->widget->updateGL();
 

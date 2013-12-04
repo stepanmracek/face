@@ -12,7 +12,7 @@ class MapConverter;
 
 enum SurfaceDataToProcess
 {
-    ZCoord, Curvature, Texture_I, Texture_R, Texture_G, Texture_B
+    ZCoord, Texture_I, Texture_R, Texture_G, Texture_B
 };
 
 class SurfaceProcessor
@@ -22,6 +22,7 @@ private:
 
 public:
     static void smooth(Mesh &mesh, double alpha, int steps);
+    static void zsmooth(Mesh &mesh, double alpha, int steps);
 
     static CurvatureStruct calculateCurvatures(Map &depthmap, bool pcl = true);
 
@@ -35,8 +36,6 @@ public:
                                              cv::Point3d end, int samples, double mapScaleFactor);
 
     static QVector<double> isoGeodeticCurveToEuclDistance(const QVector<cv::Point3d> &isoCuvre, cv::Point3d center);
-
-    static void calculateNormals(Mesh &mesh, int knn);
 
 private:
     static void depthmap(const Mesh &f, Map &map, cv::Point2d meshStart, cv::Point2d meshEnd, SurfaceDataToProcess dataToProcess);

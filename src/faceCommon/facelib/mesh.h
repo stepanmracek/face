@@ -19,12 +19,15 @@ class Mesh;
 class Mesh
 {
 public:
-    VectorOfPoints points;
-    //Matrix pointsMat;
+	typedef cv::Vec3i Triangle;
+	typedef cv::Vec3b Color;
+
+	typedef QVector<Triangle> Triangles;
+	typedef QVector<Color> Colors;
+
+    Matrix pointsMat;
     VectorOfTriangles triangles;
     VectorOfColors colors;
-    VectorOfPoints normals;
-    QVector<double> curvatures;
 
     double minx, maxx, miny, maxy, minz, maxz;
     void calculateTriangles();
@@ -36,8 +39,8 @@ public:
     void scale(cv::Point3d scaleParam);
     void transform(Matrix &m);
     void printStats();
-    VectorOfPoints getNearestPoints(const VectorOfPoints &input) const;
-    VectorOfPoints getNearestPoints(const VectorOfPoints &input, cv::flann::Index &index) const;
+    void getNearestPoints(const Matrix &input, Matrix output) const;
+    void getNearestPoints(const Matrix &input, cv::flann::Index &index, Matrix &output) const;
     void trainPointIndex(cv::flann::Index &index, cv::Mat &features, const cv::flann::IndexParams &params) const;
     Mesh zLevelSelect(double zValue);
     Mesh radiusSelect(double radius, cv::Point3d center = cv::Point3d(0,0,0));
@@ -63,7 +66,7 @@ public:
     static Mesh fromOBJ(const QString &filename, bool centralizeLoadedMesh = false);
     static Mesh fromXYZ(const QString &filename, bool centralizeLoadedMesh = false);
     static Mesh fromMap(Map &depth, Map &intensities, bool centralizeLoadedMesh = false);
-    static Mesh fromPointcloud(VectorOfPoints &pointcloud, bool centralizeLoadedMesh = false);
+    static Mesh fromPointcloud(VectorOfPoints &pointcloud, bool centralizeLoadedMesh = false, bool calculateTriangles = true);
 };
 
 #endif // MESH_H

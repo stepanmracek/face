@@ -524,6 +524,12 @@ QVector<double> Map::getUsedValues() const
 
 void Map::applyFilter(const Matrix &kernel, int times, bool checkSum)
 {
+    //for (int i = 0; i < times; i++)
+    //    cv::GaussianBlur(values, values, cv::Size(kernel.rows, kernel.cols), -1);
+    //cv::imshow("gauss", toMatrix());
+    //cv::waitKey(0);
+    //return;
+
     //cv::imshow("before", toMatrix());
     assert(kernel.rows % 2 == 1);
     assert(kernel.cols % 2 == 1);
