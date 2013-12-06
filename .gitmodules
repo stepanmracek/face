@@ -1,0 +1,3 @@
+[submodule "src/faceCommon"]
+	path = src/faceCommon
+	url = git@github.com:stepanmracek/faceCommon.git
