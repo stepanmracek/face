@@ -7,41 +7,93 @@
 
 #include <opencv2/opencv.hpp>
 
-#include <facelib/mesh.h>
-#include <facelib/glwidget.h>
-#include <facelib/surfaceprocessor.h>
+#include "facelib/mesh.h"
+#include "facelib/glwidget.h"
+#include "facelib/surfaceprocessor.h"
+#include "facetrack/realtimetrack.h"
+#include "facelib/facealigner.h"
 
 class DepthSensor
 {
 public:
     Mesh mesh;
+
+    enum PositioningOutput { NoData, MoveCloser, MoveFar, DontMove };
+    PositioningOutput positioningOutput;
+
 private:
+
+    enum SensorState { Off, Waiting, Positioning, Capturing };
+
+    SensorState state;
 
     DepthSense::Context context;
     DepthSense::DepthNode depthNode;
     DepthSense::ColorNode colorNode;
+    RealTimeTracker tracker;
 
-    uint32_t colorFramesCount;
-    uint32_t depthFramesCount;
+    std::vector<DepthSense::FPVertex> vertices;
+    std::vector<int> vertCounter;
+    cv::Mat_<double> depth;
+    cv::Mat_<cv::Vec3b> color;
+    cv::Mat_<uchar> grayscale;
+    cv::Mat_<uchar> gsResized;
+    cv::Rect faceRegion;
 
-    bool g_bDeviceFound;
+    const static int ColorWidth = 640;
+    const static int ColorHeight = 480;
+    const static int DepthWidth = 320;
+    const static int DepthHeight = 240;
 
-    DepthSense::ProjectionHelper* projectionHelper;
-    //DepthSense::StereoCameraParameters stereoCamParams;
+    int desiredConfidence;
+    bool deviceFound;
+    int consecutiveFaceDetects;
+    int consecutiveNoFaceDetects;
+    int faceDetectsToStartPositioning;
+    int noFaceDetectsToStopPositioning;
+    float optimalDistanceMin;
+    float optimalDistanceMax;
+    int consecutiveOptimalDistance;
+    int consecutiveOptimalDistanceToStartCapturing;
+    int desiredCaptureFrames;
+    int currentCaptureFrames;
+
+    void setState(SensorState newState)
+    {
+        state = newState;
+
+        switch(newState)
+        {
+        case Waiting:
+            context.startNodes();
+            context.run();
+
+            consecutiveFaceDetects = 0;
+            consecutiveNoFaceDetects = 0;
+            break;
+        case Positioning:
+            consecutiveOptimalDistance = 0;
+            break;
+        case Capturing:
+            currentCaptureFrames = 0;
+            vertices = std::vector<DepthSense::FPVertex>(DepthWidth*DepthHeight, DepthSense::FPVertex(0.0, 0.0, 0.0));
+            vertCounter = std::vector<int>(DepthWidth*DepthHeight, 0);
+            break;
+        case Off:
+            context.quit();
+            context.stopNodes();
+        }
+    }
 
     /**
      * New color sample event handler
      */
     void onNewColorSample(DepthSense::ColorNode node, DepthSense::ColorNode::NewSampleReceivedData data)
     {
-        if (!positioning) return;
-        //std::cout << "Color " << (colorFramesCount++) << " " << data.colorMap.size() << std::endl;
-
         int i = 0;
-        cv::Mat_<cv::Vec3b> color(480, 640);
-        for (int y = 0; y < 480; y++)
+        for (int y = 0; y < ColorHeight; y++)
         {
-            for (int x = 0; x < 640; x++)
+            for (int x = 0; x < ColorWidth; x++)
             {
                 color(y, x)[0] = data.colorMap[3*i];
                 color(y, x)[1] = data.colorMap[3*i+1];
@@ -49,49 +101,125 @@ private:
                 i++;
             }
         }
-
-        cv::imshow("color", color);
+        cv::cvtColor(color, grayscale, CV_BGR2GRAY);
     }
 
-    bool positioning;
-    void onPositioning(DepthSense::DepthNode &node, DepthSense::DepthNode::NewSampleReceivedData &data)
+    void detectFaces()
     {
-        cv::Mat_<double> depth(240, 320);
-        int i = 0;
-        for (int r = 0; r < 240; r++)
+        cv::resize(grayscale, gsResized, cv::Size(ColorWidth/4, ColorHeight/4));
+        std::vector<cv::Rect> faces = tracker.detect(gsResized);
+        if (faces.size() > 0)
         {
-            for (int c = 0; c < 320; c++)
+            faceRegion = faces[0];
+            consecutiveFaceDetects++;
+            consecutiveNoFaceDetects = 0;
+        }
+        else
+        {
+            faceRegion = cv::Rect();
+            consecutiveFaceDetects = 0;
+            consecutiveNoFaceDetects++;
+        }
+    }
+
+    void onWaiting(DepthSense::DepthNode &node, DepthSense::DepthNode::NewSampleReceivedData &data)
+    {
+        detectFaces();
+
+        if (consecutiveFaceDetects == faceDetectsToStartPositioning)
+        {
+            setState(Positioning);
+        }
+    }
+
+    void distanceOfPointsWithinFaceRegion(DepthSense::DepthNode::NewSampleReceivedData &data)
+    {
+        float sum = 0.0;
+        int count = 0;
+        int n = DepthWidth*DepthHeight;
+        for (int i = 0; i < n; i++)
+        {
+            const DepthSense::UV & uv = data.uvMap[i];
+            if (uv.u == -FLT_MAX || uv.v == -FLT_MAX || data.depthMapFloatingPoint[i] == -2.0 || data.confidenceMap[i] < desiredConfidence) continue;
+            int x = uv.u*ColorWidth/4;
+            int y = uv.v*ColorHeight/4;
+            if (faceRegion.contains(cv::Point(x, y)))
             {
-                double d = data.depthMapFloatingPoint[i++];
-                if (d > 1) d = 1;
-                if (d < 0) d = 0;
-                depth(r, c) = d;
+                //gsResized(cv::Point(x,y)) = 255;
+                sum += data.depthMapFloatingPoint[i];
+                count++;
             }
         }
-        depth = 1 - depth;
-        cv::imshow("depth", depth);
-        if ((char)cv::waitKey(1) == 27)
+
+        float d = sum/count;
+        if (d != d)
         {
-            cv::destroyAllWindows();
-            positioning = false;
-            vertices = std::vector<DepthSense::FPVertex>(320*240, DepthSense::FPVertex(0.0, 0.0, 0.0));
-            vertCounter = std::vector<int>(320*240, 0);
+            positioningOutput = NoData;
+            consecutiveOptimalDistance = 0;
+        }
+        else if (d > optimalDistanceMax)
+        {
+            positioningOutput = MoveCloser;
+            consecutiveOptimalDistance = 0;
+        }
+        else if (d < optimalDistanceMin)
+        {
+            positioningOutput = MoveFar;
+            consecutiveOptimalDistance = 0;
+        }
+        else
+        {
+            positioningOutput = DontMove;
+            consecutiveOptimalDistance++;
         }
     }
 
-    std::vector<DepthSense::FPVertex> vertices;
-    std::vector<int> vertCounter;
+    void onPositioning(DepthSense::DepthNode &node, DepthSense::DepthNode::NewSampleReceivedData &data)
+    {
+        detectFaces();
+
+        if (consecutiveNoFaceDetects == noFaceDetectsToStopPositioning)
+        {
+            setState(Waiting);
+            return;
+        }
+
+        // calculate mean distance within faceRegion
+        float sum = 0.0;
+        int count = 0;
+        int n = DepthWidth*DepthHeight;
+        for (int i = 0; i < n; i++)
+        {
+            const DepthSense::UV & uv = data.uvMap[i];
+            if (uv.u == -FLT_MAX || uv.v == -FLT_MAX || data.depthMapFloatingPoint[i] == -2.0 || data.confidenceMap[i] < desiredConfidence) continue;
+            int x = uv.u*ColorWidth/4;
+            int y = uv.v*ColorHeight/4;
+            if (faceRegion.contains(cv::Point(x, y)))
+            {
+                gsResized(cv::Point(x,y))=255;
+                sum += data.depthMapFloatingPoint[i];
+                count++;
+            }
+        }
+
+        distanceOfPointsWithinFaceRegion(data);
+        if (consecutiveOptimalDistance == consecutiveOptimalDistanceToStartCapturing)
+        {
+            setState(Capturing);
+        }
+    }
+
+
     void onCapturing(DepthSense::DepthNode &node, DepthSense::DepthNode::NewSampleReceivedData &data)
     {
         //projectionHelper->get3DCoordinates();
 
-        static int frames = 0;
-        frames++;
+        currentCaptureFrames++;
         int n = data.verticesFloatingPoint.size();
         for (int i = 0; i < n; i++)
         {
             const DepthSense::FPVertex &vertex = data.verticesFloatingPoint[i];
-            if (vertex.z < 1 && data.confidenceMap[i] > 100)
+            if (vertex.z < 1 && data.confidenceMap[i] > desiredConfidence)
             {
                 vertCounter[i]++;
                 vertices[i].x += vertex.x;
@@ -100,33 +228,101 @@ private:
             }
         }
 
-        if (frames >= 20)
+        if (currentCaptureFrames >= desiredCaptureFrames)
         {
+            currentCaptureFrames = 0;
             VectorOfPoints points;
-
+            VectorOfColors colorsVec;
             for (int i = 0; i < n; i++)
             {
-                const DepthSense::FPVertex &vertex = vertices[i];
-                double count = vertCounter[i];
-                if (count > 0.1)
-                {
-                    points << cv::Point3d(vertex.x/count*100, vertex.y/count*100, -vertex.z/count*100);
-                }
-            }
-            mesh = Mesh::fromPointcloud(points, true, true);
+                int count = vertCounter[i];
+                const DepthSense::UV & uv = data.uvMap[i];
+                if (count == 0 || uv.u == -FLT_MAX || uv.v == -FLT_MAX ||
+                    data.depthMapFloatingPoint[i] == -2.0 || data.confidenceMap[i] < desiredConfidence) continue;
 
-            SurfaceProcessor::zsmooth(mesh, 0.5, 10);
-            context.quit();
+                int x = uv.u*ColorWidth;
+                int y = uv.v*ColorHeight;
+                if (!faceRegion.contains(cv::Point(x/4, y/4))) continue;
+
+                const DepthSense::FPVertex &vertex = vertices[i];
+                points << cv::Point3d(vertex.x/count*1000, vertex.y/count*1000, -vertex.z/count*1000);
+                colorsVec << color(y, x);
+            }
+
+            mesh = Mesh::fromPointcloud(points, true, true);
+            mesh.colors = colorsVec;
+            setState(Off);
         }
     }
 
+    void drawGUI()
+    {
+        cv::Mat gui;
+        cv::flip(grayscale, gui, 1);
+
+        switch (state)
+        {
+        case Waiting:
+            cv::putText(gui, "waiting", cv::Point(10, 450), cv::FONT_HERSHEY_SIMPLEX, 1.0, 255, 1, CV_AA);
+            break;
+        case Positioning:
+            cv::putText(gui, "positioning", cv::Point(10, 450), cv::FONT_HERSHEY_SIMPLEX, 1.0, 255, 1, CV_AA);
+
+            switch (positioningOutput)
+            {
+            case MoveCloser:
+                cv::putText(gui, "Move forward", cv::Point(260, 300), cv::FONT_HERSHEY_SIMPLEX, 1.0, 255, 1, CV_AA);
+                break;
+            case MoveFar:
+                cv::putText(gui, "Move backward", cv::Point(260, 300), cv::FONT_HERSHEY_SIMPLEX, 1.0, 255, 1, CV_AA);
+                break;
+            case DontMove:
+                //ss << "Don't move " << consecutiveOptimalDistance << "/" << consecutiveOptimalDistanceToStartCapturing;
+                cv::putText(gui, "Don't move", cv::Point(260, 300), cv::FONT_HERSHEY_SIMPLEX, 1.0, 255, 1, CV_AA);
+
+                double r = (double)consecutiveOptimalDistance / consecutiveOptimalDistanceToStartCapturing;
+                cv::rectangle(gui, cv::Rect(260, 350, 200, 50), 255, 1);
+                cv::rectangle(gui, cv::Rect(260, 350, 200*r, 50), 255, -1);
+                break;
+            }
+
+            break;
+        case Capturing:
+            //cv::putText(gui, "capturing", cv::Point(10, 450), cv::FONT_HERSHEY_SIMPLEX, 1.0, 255, 1, CV_AA);
+            //ss << "Don't move " << currentCaptureFrames << "/" << desiredCaptureFrames;
+            cv::putText(gui, "Capturing", cv::Point(260, 300), cv::FONT_HERSHEY_SIMPLEX, 1.0, 255, 1, CV_AA);
+
+            double r = (double)currentCaptureFrames / desiredCaptureFrames;
+            cv::rectangle(gui, cv::Rect(260, 350, 200, 50), 255, 1);
+            cv::rectangle(gui, cv::Rect(260, 350, 200*r, 50), 255, -1);
+            break;
+        }
+
+        cv::imshow("positioning demo", gui);
+        cv::waitKey(1);
+    }
 
     /**
      * New depth sample event handler
      */
     void onNewDepthSample(DepthSense::DepthNode node, DepthSense::DepthNode::NewSampleReceivedData data)
     {
-        positioning ? onPositioning(node, data) : onCapturing(node, data);
+        drawGUI();
+
+        switch (state)
+        {
+        case Waiting:
+            onWaiting(node, data);
+            break;
+        case Positioning:
+            onPositioning(node, data);
+            break;
+        case Capturing:
+            onCapturing(node, data);
+            break;
+        }
+
+
     }
 
     void configureDepthNode()
@@ -178,7 +374,6 @@ private:
         {
             printf("TimeoutException\n");
         }
-
     }
 
     void configureColorNode()
@@ -258,34 +453,44 @@ private:
             colorNode.unset();
         if (data.node.is<DepthSense::DepthNode>() && (data.node.as<DepthSense::DepthNode>() == depthNode))
             depthNode.unset();
-        printf("Node disconnected\n");
     }
 
     void onDeviceConnected(DepthSense::Context context, DepthSense::Context::DeviceAddedData data)
     {
-        if (!g_bDeviceFound)
+        if (!deviceFound)
         {
             data.device.nodeAddedEvent().connect(this, &DepthSensor::onNodeConnected);
             data.device.nodeRemovedEvent().connect(this, &DepthSensor::onNodeDisconnected);
-            g_bDeviceFound = true;
+            deviceFound = true;
         }
     }
 
     void onDeviceDisconnected(DepthSense::Context context, DepthSense::Context::DeviceRemovedData data)
     {
-        g_bDeviceFound = false;
-        printf("Device disconnected\n");
+        deviceFound = false;
     }
 
 public:
 
-    DepthSensor()
+    DepthSensor(const QString &haarFaceDetectorPath, int desiredConfidence = 200, int faceDetectsToStartPositioning = 20,
+                int noFaceDetectsToStopPositioning = 60, float optimalDistanceMin = 0.25f, float optimalDistanceMax = 0.45f,
+                int consecutiveOptimalDistanceToStartCapturing = 20, int desiredCaptureFrames = 20) :
+        tracker(haarFaceDetectorPath),
+        state(DepthSensor::Waiting),
+        desiredConfidence(desiredConfidence),
+        consecutiveFaceDetects(0),
+        consecutiveNoFaceDetects(0),
+        faceDetectsToStartPositioning(faceDetectsToStartPositioning),
+        noFaceDetectsToStopPositioning(noFaceDetectsToStopPositioning),
+        deviceFound(false),
+        optimalDistanceMin(optimalDistanceMin),
+        optimalDistanceMax(optimalDistanceMax),
+        consecutiveOptimalDistanceToStartCapturing(consecutiveOptimalDistanceToStartCapturing),
+        desiredCaptureFrames(desiredCaptureFrames),
+        positioningOutput(DepthSensor::NoData)
     {
-        positioning = true;
-        colorFramesCount = 0;
-        depthFramesCount = 0;
-        g_bDeviceFound = false;
-        //projectionHelper = NULL;
+        depth = cv::Mat_<double>(DepthHeight, DepthWidth);
+        color = cv::Mat_<cv::Vec3b>(ColorHeight, ColorWidth);
 
         context = DepthSense::Context::create("localhost");
 
@@ -298,44 +503,50 @@ public:
         // We are only interested in the first device
         if (devices.size() >= 1)
         {
-            g_bDeviceFound = true;
-
+            deviceFound = true;
             devices[0].nodeAddedEvent().connect(this, &DepthSensor::onNodeConnected);
             devices[0].nodeRemovedEvent().connect(this, &DepthSensor::onNodeDisconnected);
 
             std::vector<DepthSense::Node> nodes = devices[0].getNodes();
-
-            printf("Found %lu nodes\n",nodes.size());
-
             for (int n = 0; n < (int)nodes.size();n++)
                 configureNode(nodes[n]);
         }
     }
 
-    void run()
+    ~DepthSensor()
     {
-        context.startNodes();
-        context.run();
-        context.stopNodes();
-
         if (colorNode.isSet()) context.unregisterNode(colorNode);
         if (depthNode.isSet()) context.unregisterNode(depthNode);
+    }
 
-        //if (projectionHelper)
-        //    delete projectionHelper;
+    void scan()
+    {
+        setState(Waiting);
     }
 };
 
 /*----------------------------------------------------------------------------*/
 int main(int argc, char* argv[])
 {
-    DepthSensor sensor;
-    sensor.run();
+    FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj"));
+    DepthSensor sensor("../../test/haar-face.xml");
+
+    sensor.scan();
+    Mesh m1 = sensor.mesh;
+    SurfaceProcessor::smooth(m1, 0.1, 10);
+    aligner.icpAlign(m1, 5, FaceAligner::NoseTipDetection);
 
     QApplication app(argc, argv);
     GLWidget w;
-    w.addFace(&sensor.mesh);
+    w.addFace(&m1);
     w.show();
+
+    QString filename = QInputDialog::getText(&w, "filename", "Filename:");
+    if (!filename.isEmpty())
+    {
+        m1.writeBINZ(filename + ".binz");
+        //sensor.writeRawData(filename + ".raw");
+    }
 
     return app.exec();
 }

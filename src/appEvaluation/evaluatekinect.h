@@ -127,24 +127,25 @@ public:
         FaceClassifier faceClassifier("../../test/frgc/classifiers/");
         QVector<Face3DTemplate*> templates;
 
-        QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.bin", AbsoluteFull);
+        QVector<QString> binFiles = Loader::listFiles("../../test/softKinetic/02/", "*.binz", AbsoluteFull);
         foreach(const QString &path, binFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();
-            Mesh face = Mesh::fromBIN(path);
+            Mesh face = Mesh::fromBINZ(path);
+            SurfaceProcessor::smooth(face, 0.5, 5);
             aligner.icpAlign(face, 10, FaceAligner::NoseTipDetection);
             templates << new Face3DTemplate(id, face, faceClassifier);
         }
 
         ScoreSVMFusion newFusion = faceClassifier.relearnFinalFusion(templates);
-        faceClassifier.serialize("../../test/kinect/classifiers2");
-        newFusion.serialize("../../test/kinect/classifiers2/final");
+        //faceClassifier.serialize("../../test/kinect/classifiers2");
+        //newFusion.serialize("../../test/kinect/classifiers2/final");
     }
 
     static void evaluateKinect()
     {
         FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj", false));
-        FaceClassifier faceClassifier("../../test/kinect/classifiers/");
+        FaceClassifier faceClassifier("../../test/kinect/classifiers2/");
         QVector<Face3DTemplate*> templates;
 
         QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.bin", AbsoluteFull);
@@ -154,11 +155,28 @@ public:
             Mesh face = Mesh::fromBIN(path, true);
             aligner.icpAlign(face, 10, FaceAligner::NoseTipDetection);
             templates << new Face3DTemplate(id, face, faceClassifier);
+            templates.last()->serialize("../../test/kinect/" + QFileInfo(path).baseName() + ".xml", faceClassifier);
         }
 
         Evaluation eval = faceClassifier.evaluate(templates);
         qDebug() << eval.eer;
         //eval.outputResults("kinect", 10);
+    }
+
+    static void evaluateSerializedKinect()
+    {
+        FaceClassifier faceClassifier("../../test/kinect/classifiers2/");
+        QVector<Face3DTemplate*> templates;
+
+        QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.xml", AbsoluteFull);
+        foreach(const QString &path, binFiles)
+        {
+            int id = QFileInfo(path).baseName().split("-")[0].toInt();
+            templates << new Face3DTemplate(id, path, faceClassifier);
+        }
+
+        Evaluation eval = faceClassifier.evaluate(templates);
+        qDebug() << eval.eer;
     }
 
 };

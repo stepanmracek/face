@@ -34,8 +34,9 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::testFilterBankKernelSizes();
 
     // Kinect
-    //EvaluateKinect::learnFromFrgc();
-    EvaluateKinect::evaluateKinect();
+    EvaluateKinect::learnFromFrgc();
+    //EvaluateKinect::evaluateKinect();
+    //EvaluateKinect::evaluateSerializedKinect();
     //EvaluateKinect::createTemplates();
     //EvaluateKinect::evaluateSimple();
     //EvaluateKinect::evaluateRefeference();
