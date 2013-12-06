@@ -7,12 +7,11 @@ SUBDIRS += \
     unitTests \
     integrationTests \
     # wrappers
-    kinect \
+    faceSensors \
     #pclWrapper \
     #vosm \
     # apps
     appEvaluation \
     appMorphFaceModel \
     appKinectAcquire \
-    appHEF \
-    softKinetic
+    appHEF
