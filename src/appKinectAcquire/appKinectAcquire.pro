@@ -9,11 +9,11 @@ QT += core gui opengl widgets
 TARGET = appKinectAcquire
 TEMPLATE = app
 
-INCLUDEPATH += "../faceCommon" "../kinect"
+INCLUDEPATH += "../faceCommon" "../faceSensors/kinect"
 
 LIBS += `pkg-config --libs opencv` -lGL -lGLU
 LIBS += -L../faceCommon -lfaceCommon
-LIBS += -L../kinect -lkinect
+LIBS += -L../faceSensors/kinect -lkinect
 
 
 SOURCES += \

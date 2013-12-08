@@ -47,36 +47,7 @@ public:
 			assert(first[i] == second[i]);
 	}
 
-    /*static void align()
-    {
-        QString srcDirPath = "/home/stepo/data/frgc/spring2004/bin/";
-        QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned/";
-
-        Mesh mean = Mesh::fromOBJ("../../test/meanForAlign.obj");
-        FaceAligner aligner(mean);
-        MapConverter converter;
-
-        QDir srcDir(srcDirPath, "*.bin");
-        QFileInfoList srcFiles = srcDir.entryInfoList();
-        //bool proceed = false;
-        foreach (const QFileInfo &srcFileInfo, srcFiles)
-        {
-            //if (srcFileInfo.baseName().compare("04626d357") == 0) proceed = true;
-            //if (!proceed) continue;
-
-            Mesh mesh = Mesh::fromBIN(srcFileInfo.absoluteFilePath());
-            aligner.icpAlignDeprecated(mesh, 15);
-
-            QString resultPath = outDirPath + srcFileInfo.baseName() + ".binz";
-            mesh.writeBINZ(resultPath);
-
-            Map texture = SurfaceProcessor::depthmap(mesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_I);
-            QString resultTexturePath = outDirPath + srcFileInfo.baseName() + ".png";
-            cv::imwrite(resultTexturePath.toStdString(), texture.toMatrix(0, 0, 255)*255);
-        }
-    }*/
-
-    static void align2()
+    static void align()
     {
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/bin/";
         QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
@@ -954,7 +925,7 @@ public:
         FaceClassifier faceClassifier(classifiersDir);
 
         QString dataDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
-        QVector<QString> filenames = Loader::listFiles(dataDirPath, "*.binz", baseFilename);
+        QVector<QString> filenames = Loader::listFiles(dataDirPath, "*.binz", BaseFilename);
         QVector<int> classes;
         foreach (const QString &f, filenames)
         {
@@ -982,6 +953,48 @@ public:
 
             Evaluation eval = faceClassifier.evaluate(templates);
             qDebug() << cluster << eval.eer;
+        }
+    }
+
+    static void createTemplates()
+    {
+        FaceClassifier classifier("../../test/frgc/classifiers");
+        QString dir = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
+        QVector<QString> files = Loader::listFiles(dir, "*.binz", BaseFilename);
+        foreach (const QString &file, files)
+        {
+            Mesh face = Mesh::fromBINZ(dir + file + ".binz");
+            Face3DTemplate t(0, face, classifier);
+            t.serialize(dir + "templates/" + file + ".xml.gz", classifier);
+        }
+    }
+
+    static void evaluateSerializedTemplates()
+    {
+        FaceClassifier classifier("../../test/frgc/classifiers");
+        QString dir = "/home/stepo/data/frgc/spring2004/zbin-aligned2/templates";
+        QVector<QString> files = Loader::listFiles(dir, "*.xml.gz", AbsoluteFull);
+        QVector<Face3DTemplate *> allTemplates;
+        QVector<int> allClasses;
+        qDebug() << "loading...";
+        foreach (const QString &file, files)
+        {
+            int id = file.split('/').last().split('d').at(0).toInt();
+            allTemplates << new Face3DTemplate(id, file, classifier);
+            allClasses << id;
+        }
+
+        qDebug() << "dividing...";
+        int clustersCount = 5;
+        QList<QVector<Face3DTemplate *> > templatesInClusters;
+        QList<QVector<int> > classesInClusters;
+        BioDataProcessing::divideToNClusters(allTemplates, allClasses, clustersCount, templatesInClusters, classesInClusters);
+
+        qDebug() << "evaluating...";
+        for (int i = 0; i < clustersCount; i++)
+        {
+            Evaluation e = classifier.evaluate(templatesInClusters[i]);
+            qDebug() << e.eer;
         }
     }
 };

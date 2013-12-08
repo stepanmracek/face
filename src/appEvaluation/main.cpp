@@ -30,11 +30,12 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::evaluateFusionWrapper();
     //Evaluate3dFrgc::evaluateFusionAll();
     //Evaluate3dFrgc::testSerializedClassifiers();
-
     //Evaluate3dFrgc::testFilterBankKernelSizes();
+    //Evaluate3dFrgc::createTemplates();
+    Evaluate3dFrgc::evaluateSerializedTemplates();
 
     // Kinect
-    EvaluateKinect::learnFromFrgc();
+    //EvaluateKinect::learnFromFrgc();
     //EvaluateKinect::evaluateKinect();
     //EvaluateKinect::evaluateSerializedKinect();
     //EvaluateKinect::createTemplates();
