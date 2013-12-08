@@ -1,0 +1,6 @@
+[submodule "src/faceCommon"]
+	path = src/faceCommon
+	url = git@github.com:stepanmracek/faceCommon
+[submodule "src/faceSensors"]
+	path = src/faceSensors
+	url = git@github.com:stepanmracek/faceSensors
