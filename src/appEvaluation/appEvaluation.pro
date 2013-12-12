@@ -24,4 +24,5 @@ HEADERS += \
     evaluatefeaturelevelfusion.h \
     evaluateICA.h \
     evaluate3dfrgc.h \
-    evaluatekinect.h
+    evaluatekinect.h \
+    evaluatesoftkinetic.h

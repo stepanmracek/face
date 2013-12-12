@@ -7,6 +7,7 @@
 #include "evaluate3dfrgc.h"*/
 #include "evaluatekinect.h"
 #include "evaluate3dfrgc.h"
+#include "evaluatesoftkinetic.h"
 
 int main(int argc, char *argv[])
 {
@@ -32,7 +33,7 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::testSerializedClassifiers();
     //Evaluate3dFrgc::testFilterBankKernelSizes();
     //Evaluate3dFrgc::createTemplates();
-    Evaluate3dFrgc::evaluateSerializedTemplates();
+    //Evaluate3dFrgc::evaluateSerializedTemplates();
 
     // Kinect
     //EvaluateKinect::learnFromFrgc();
@@ -42,6 +43,9 @@ int main(int argc, char *argv[])
     //EvaluateKinect::evaluateSimple();
     //EvaluateKinect::evaluateRefeference();
     //EvaluateKinect::evaluateReferenceDistances();
+
+    // SoftKinetic
+    EvaluateSoftKinetic::evaluate();
 
     return 0;
 }

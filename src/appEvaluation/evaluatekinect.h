@@ -127,19 +127,20 @@ public:
         FaceClassifier faceClassifier("../../test/frgc/classifiers/");
         QVector<Face3DTemplate*> templates;
 
-        QVector<QString> binFiles = Loader::listFiles("../../test/softKinetic/02/", "*.binz", AbsoluteFull);
+        QVector<QString> binFiles = Loader::listFiles("../../test/softKinetic/01/", "*.binz", AbsoluteFull);
         foreach(const QString &path, binFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();
             Mesh face = Mesh::fromBINZ(path);
-            SurfaceProcessor::smooth(face, 0.5, 5);
+            SurfaceProcessor::zsmooth(face, 0.5, 5);
             aligner.icpAlign(face, 10, FaceAligner::NoseTipDetection);
             templates << new Face3DTemplate(id, face, faceClassifier);
+
+
         }
 
-        ScoreSVMFusion newFusion = faceClassifier.relearnFinalFusion(templates);
-        //faceClassifier.serialize("../../test/kinect/classifiers2");
-        //newFusion.serialize("../../test/kinect/classifiers2/final");
+        FaceClassifier newClassifier = faceClassifier.relearnFinalFusion(templates, true);
+        newClassifier.serialize("../../test/kinect/classifiers2");
     }
 
     static void evaluateKinect()

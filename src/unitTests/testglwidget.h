@@ -9,14 +9,23 @@
 #include "facelib/landmarks.h"
 #include "facelib/surfaceprocessor.h"
 #include "linalg/serialization.h"
+#include "linalg/loader.h"
+#include "facelib/facealigner.h"
 
 class TestGlWidget
 {
 public:
+
     static int test(int argc, char *argv[])
     {
-        Mesh mesh = Mesh::fromBIN("../../test/kinect/01-01.bin", false);
+        Mesh mesh = Mesh::fromBINZ("../../test/softKinetic/01/03-02.binz", false);
+
+        //for (int i = 0; i < 10; i++)
+        //    SurfaceProcessor::zsmoothFlann(mesh, 50.0, 1, 1);
+        SurfaceProcessor::zsmooth(mesh, 0.5, 10);
+
         mesh.printStats();
+        //mesh.colors.clear();
 
         QApplication app(argc, argv);
         GLWidget widget;

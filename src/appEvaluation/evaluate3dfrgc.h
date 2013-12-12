@@ -669,7 +669,7 @@ public:
         }
 
         ScoreWeightedSumFusion fusion;
-        QVector<int> keys = ScoreLevelFusionWrapper::trainClassifier(fusion, components);
+        QVector<int> keys = ScoreLevelFusionWrapper::trainClassifier(fusion, components, true);
         QString fString, oString;
         foreach (int k, keys)
         {
@@ -796,7 +796,7 @@ public:
         }
 
         ScoreWeightedSumFusion fusion;
-        QVector<int> keys = ScoreLevelFusionWrapper::trainClassifier(fusion, components);
+        QVector<int> keys = ScoreLevelFusionWrapper::trainClassifier(fusion, components, true);
         QString sString, nString;
         foreach (int k, keys)
         {
@@ -828,7 +828,7 @@ public:
             //qDebug() << Evaluation(trainGenScores, trainImpScores).eer;
         }
 
-        QVector<int> selectedUnits = ScoreLevelFusionWrapper::trainClassifier(fusion, trainComponents);
+        QVector<int> selectedUnits = ScoreLevelFusionWrapper::trainClassifier(fusion, trainComponents, true);
 
         for (int i = 0; i <= 3; i++)
         {
