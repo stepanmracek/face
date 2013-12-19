@@ -104,9 +104,9 @@ int main(int argc, char *argv[])
     //                                  "/run/media/stepo/frgc/frgc-spring2004-obj-centralized/04200d74.obj");
     //TestMorphableFaceModel::testMorphFromKinect(argc, argv, "test/align-pca.xml", "test/align-flags", "test/align-landmarks.xml");
 
-    TestGlWidget::test(argc, argv);
+    //TestGlWidget::test(argc, argv);
 
-    //TestMesh::testXYZLodaderOBJWriter("/media/data/frgc/xyz/Spring2004", "/media/data/frgc/obj-centralized/Spring2004");
+    TestMesh::testBINZLodaderOBJWriter("/media/data/frgc/spring2004/zbin-aligned2", "/home/stepo/obj");
     //TestMesh::testBinReadWrite(argc, argv, frgcPath());
     //TestMesh::testReadBinWriteBinzReadBinz(argc, argv, frgcPath());
     //TestMesh::readAbsWithTexture(argc, argv);

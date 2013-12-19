@@ -25,14 +25,15 @@ public:
         assert(m1.equals(m2));
     }
 
-    static void testXYZLodaderOBJWriter(const QString &srcDirPath, const QString &dstDirPath)
+    static void testBINZLodaderOBJWriter(const QString &srcDirPath, const QString &dstDirPath)
     {
-        QDir srcDir(srcDirPath, "*.xyz");
+        QDir srcDir(srcDirPath, "*.binz");
         QFileInfoList srcEntries = srcDir.entryInfoList();
         foreach (const QFileInfo &srcFileInfo, srcEntries)
         {
-            Mesh srcMesh = Mesh::fromXYZ(srcFileInfo.absoluteFilePath(), true);
+            Mesh srcMesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath(), true);
             QString dstFilePath = dstDirPath + QDir::separator() + srcFileInfo.baseName() + ".obj";
+            qDebug() << "writing OBJ";
             srcMesh.writeOBJ(dstFilePath, '.');
         }
     }
