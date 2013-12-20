@@ -35,6 +35,9 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::createTemplates();
     //Evaluate3dFrgc::evaluateSerializedTemplates();
 
+    // sandbox
+    Evaluate3dFrgc::evaluatePhaseFilterResponse();
+
     // Kinect
     //EvaluateKinect::learnFromFrgc();
     //EvaluateKinect::evaluateKinect();
@@ -45,7 +48,7 @@ int main(int argc, char *argv[])
     //EvaluateKinect::evaluateReferenceDistances();
 
     // SoftKinetic
-    EvaluateSoftKinetic::evaluate();
+    //EvaluateSoftKinetic::evaluate();
 
     return 0;
 }

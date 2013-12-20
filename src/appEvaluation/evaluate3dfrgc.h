@@ -16,6 +16,7 @@
 #include "biometrics/featureextractor.h"
 #include "biometrics/discriminativepotential.h"
 #include "biometrics/scorelevefusion.h"
+#include "biometrics/filterfeatureextractor.h"
 #include "facelib/mesh.h"
 #include "facelib/surfaceprocessor.h"
 #include "facelib/landmarkdetector.h"
@@ -996,6 +997,60 @@ public:
             Evaluation e = classifier.evaluate(templatesInClusters[i]);
             qDebug() << e.eer;
         }
+    }
+
+    static void evaluatePhaseFilterResponse()
+    {
+        int N = 200;
+        HammingMetric m;
+        QStringList types; types << "depth" << "index" << "mean" << "gauss" << "eigencur" << "textureE";
+        QVector<double> scales; scales /*<< 1 << 0.75*/ << 0.5 << 0.25 << 0.2 << 0.1;
+        QVector<int> sigmas; sigmas << 1 << 2 << 3 << 4 << 5 << 6 << 7;
+        QVector<int> thetas; thetas << 0 << 1 << 2 << 3 << 4 << 5 << 6 << 7;
+        QString dir = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
+
+        QList<Evaluation> evals;
+        foreach(QString type, types)
+        {
+            QVector<Matrix> images;
+            QVector<int> ids;
+            QVector<QString> files = Loader::listFiles(dir + type + "/", "*.gz", BaseFilename);
+            foreach (const QString &file, files)
+            {
+                qDebug() << file;
+                images << Common::loadMatrix(dir + type + "/" + file + ".gz");
+                ids << file.split('d').at(0).toInt();
+
+                if (ids.count() == N) break;
+            }
+
+            foreach(double scale, scales)
+            {
+                foreach(int sigma, sigmas)
+                {
+                    foreach (int theta, thetas)
+                    {
+                        Matrix realKernel, imagKernel;
+                        Gabor::createWavelet(realKernel, imagKernel, sigma, theta);
+                        FilterFeatureExtractor extractor(realKernel, imagKernel, scale);
+
+                        QVector<Template> templates;
+                        for (int i = 0; i < N; i++)
+                        {
+                            templates << Template(ids[i], extractor.extractPhaseBinaryCode(images[i]));
+                        }
+
+                        Evaluation e(templates, m);
+                        qDebug() << scale << sigma << theta << e.eer;
+                        evals << e;
+                    }
+                }
+            }
+        }
+
+        ScoreSVMFusion fusion;
+        ScoreLevelFusionWrapper wrapper;
+        wrapper.trainClassifier(fusion, evals, true);
     }
 };
 
