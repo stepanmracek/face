@@ -82,10 +82,7 @@ int main(int argc, char *argv[])
     //TestKinect::testFaceDetect(argc, argv);
     //TestKinect::testScan(argc, argv);
 
-    //TestFaceFeatuesDetection::testDepthmapProcessing(argc, argv, "/home/stepo/face.obj");
-    //return TestFaceFeatuesDetection::testFilters(argc, argv, "/home/stepo/face.obj");
     //TestFaceFeatuesDetection::testLandmarkDetection(argc, argv, frgcPath() + "02463d652.abs.xyz");
-    //TestFaceFeatuesDetection::testAlign(argc, argv, frgcPath(), "04265d345.bin");
     //TestFaceFeatuesDetection::testBatchLandmarkDetection(argc, argv, frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::testSuccessBatchLandmarkDetection(frgcPath() + "frgc-spring2004-obj-centralized");
     //TestFaceFeatuesDetection::testIsoGeodeticCurves(argc, argv);
@@ -106,7 +103,7 @@ int main(int argc, char *argv[])
 
     //TestGlWidget::test(argc, argv);
 
-    TestMesh::testBINZLodaderOBJWriter("/media/data/frgc/spring2004/zbin-aligned2", "/home/stepo/obj");
+    //TestMesh::testBINZLodaderOBJWriter("/media/data/frgc/spring2004/zbin-aligned2", "/home/stepo/obj");
     //TestMesh::testBinReadWrite(argc, argv, frgcPath());
     //TestMesh::testReadBinWriteBinzReadBinz(argc, argv, frgcPath());
     //TestMesh::readAbsWithTexture(argc, argv);
@@ -117,13 +114,11 @@ int main(int argc, char *argv[])
 
     //TestLandmarks::testReadWrite();
 
-    //TestSurfaceProcessing::testNormals();
-    //TestSurfaceProcessing::testPclCurvatures();
-
     //TestAnotation::test("/home/stepo/data/frgc/spring2004/bin");
     //TestFaceFeatuesDetection::testGoodAnotation(frgcPath() + "bin/");
 
     //TestMap::testSerialization(frgcPath() + "04225d402.abs.xyz");
+    TestMap::testSmoothing();
 
     //TestHistogramFeatures::testFeaturesGeneration(frgcPath());
 

@@ -7,6 +7,7 @@
 #include "evaluate3dfrgc.h"*/
 #include "evaluatekinect.h"
 #include "evaluate3dfrgc.h"
+#include "evaluate3dfrgc2.h"
 #include "evaluatesoftkinetic.h"
 
 int main(int argc, char *argv[])
@@ -36,7 +37,10 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::evaluateSerializedTemplates();
 
     // sandbox
-    Evaluate3dFrgc::evaluatePhaseFilterResponse();
+    //Evaluate3dFrgc2::evaluateFilterResponse();
+    //Evaluate3dFrgc2::learnFilterResponseFusion();
+    //Evaluate3dFrgc2::serializeExtractor();
+    Evaluate3dFrgc2::deserialize();
 
     // Kinect
     //EvaluateKinect::learnFromFrgc();

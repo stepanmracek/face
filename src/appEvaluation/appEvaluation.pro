@@ -25,4 +25,5 @@ HEADERS += \
     evaluateICA.h \
     evaluate3dfrgc.h \
     evaluatekinect.h \
-    evaluatesoftkinetic.h
+    evaluatesoftkinetic.h \
+    evaluate3dfrgc2.h
