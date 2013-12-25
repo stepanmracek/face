@@ -13,6 +13,7 @@
 #include "biometrics/zpcacorrw.h"
 #include "biometrics/multiextractor.h"
 #include "biometrics/multitemplate.h"
+#include "biometrics/multibiomertricsautotuner.h"
 
 class Evaluate3dFrgc2
 {
@@ -351,6 +352,20 @@ public:
             Evaluation e = extractor.evaluate(templates);
             qDebug() << e.eer;
         }
+    }
+
+    static void autoTuner()
+    {
+        MultiBiomertricsAutoTuner::Input frgcData =
+                MultiBiomertricsAutoTuner::Input::fromDirectoryWithExportedCurvatureImages("/home/stepo/data/frgc/spring2004/zbin-aligned2/", "d", 300);
+
+        MultiBiomertricsAutoTuner::Input kinectData =
+                MultiBiomertricsAutoTuner::Input::fromDirectoryWithAlignedBinMeshes("../../test/kinect/", "-");
+
+        MultiBiomertricsAutoTuner::Settings settings(MultiBiomertricsAutoTuner::FCT_SVM, "allUnits");
+
+        MultiExtractor extractor = MultiBiomertricsAutoTuner::train(frgcData, kinectData, settings);
+        extractor.serialize("kinect");
     }
 };
 

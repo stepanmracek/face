@@ -9,6 +9,9 @@ QT += core gui opengl widgets
 TARGET = appEvaluation
 TEMPLATE = app
 
+QMAKE_CXXFLAGS+= -fopenmp
+QMAKE_LFLAGS +=  -fopenmp
+
 INCLUDEPATH += "../faceCommon"
 
 LIBS += -L../faceCommon -lfaceCommon
