@@ -47,7 +47,7 @@ void FrmKinectMain::initDatabase(const QString &dirPath)
         mapNameToId[name] = id;
     }
 
-    QVector<QString> templateFiles = Loader::listFiles(dirPath, "*.yml", AbsoluteFull);
+    QVector<QString> templateFiles = Loader::listFiles(dirPath, "*.yml", Loader::AbsoluteFull);
     foreach(const QString &path, templateFiles)
     {
         int id = QFileInfo(path).baseName().split("-")[0].toInt();

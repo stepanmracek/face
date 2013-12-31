@@ -39,7 +39,7 @@ public:
     static void testClahe()
     {
         QString dir = "/home/stepo/data/frgc/spring2004/zbin-aligned2/textureI/";
-        QVector<QString> names = Loader::listFiles(dir, "*.png", BaseFilename);
+        QVector<QString> names = Loader::listFiles(dir, "*.png", Loader::BaseFilename);
 
         QVector<int> classes;
         QVector<Vector> vectors;

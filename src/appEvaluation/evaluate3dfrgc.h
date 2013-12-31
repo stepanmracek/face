@@ -926,7 +926,7 @@ public:
         FaceClassifier faceClassifier(classifiersDir);
 
         QString dataDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
-        QVector<QString> filenames = Loader::listFiles(dataDirPath, "*.binz", BaseFilename);
+        QVector<QString> filenames = Loader::listFiles(dataDirPath, "*.binz", Loader::BaseFilename);
         QVector<int> classes;
         foreach (const QString &f, filenames)
         {
@@ -961,7 +961,7 @@ public:
     {
         FaceClassifier classifier("../../test/frgc/classifiers");
         QString dir = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
-        QVector<QString> files = Loader::listFiles(dir, "*.binz", BaseFilename);
+        QVector<QString> files = Loader::listFiles(dir, "*.binz", Loader::BaseFilename);
         foreach (const QString &file, files)
         {
             Mesh face = Mesh::fromBINZ(dir + file + ".binz");
@@ -974,7 +974,7 @@ public:
     {
         FaceClassifier classifier("../../test/frgc/classifiers");
         QString dir = "/home/stepo/data/frgc/spring2004/zbin-aligned2/templates";
-        QVector<QString> files = Loader::listFiles(dir, "*.xml.gz", AbsoluteFull);
+        QVector<QString> files = Loader::listFiles(dir, "*.xml.gz", Loader::AbsoluteFull);
         QVector<Face3DTemplate *> allTemplates;
         QVector<int> allClasses;
         qDebug() << "loading...";

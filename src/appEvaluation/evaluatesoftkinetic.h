@@ -72,7 +72,7 @@ public:
         QVector<Mesh> meshes;
         QVector<int> ids;
 
-        QVector<QString> binFiles = Loader::listFiles("../../test/softKinetic/02/", "*.binz", AbsoluteFull);
+        QVector<QString> binFiles = Loader::listFiles("../../test/softKinetic/02/", "*.binz", Loader::AbsoluteFull);
         foreach(const QString &path, binFiles)
         {
             ids << QFileInfo(path).baseName().split("-")[0].toInt();
@@ -125,7 +125,7 @@ public:
         FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj", false));
         QString dir("../../test/softKinetic/02/");
 
-        QVector<QString> fileNames = Loader::listFiles(dir, "*.binz", Filename);
+        QVector<QString> fileNames = Loader::listFiles(dir, "*.binz", Loader::Filename);
         foreach(const QString &fileName, fileNames) {
             Mesh m = Mesh::fromBINZ(dir + fileName);
             aligner.icpAlign(m, 10, FaceAligner::NoseTipDetection);
@@ -145,7 +145,7 @@ public:
         FaceClassifier c("test");
         FaceAligner a(Mesh::fromOBJ("../../test/meanForAlign.obj"));
 
-        QVector<QString> binFiles = Loader::listFiles("../../test/softKinetic/02/", "*.binz", AbsoluteFull);
+        QVector<QString> binFiles = Loader::listFiles("../../test/softKinetic/02/", "*.binz", Loader::AbsoluteFull);
         QVector<Face3DTemplate *> templates;
         foreach(const QString &path, binFiles)
         {

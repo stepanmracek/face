@@ -33,7 +33,7 @@ public:
 
         QMap<int, Face3DTemplate *> references;
 
-        QVector<QString> templateFiles = Loader::listFiles("../../test/kinect/", "*.yml", AbsoluteFull);
+        QVector<QString> templateFiles = Loader::listFiles("../../test/kinect/", "*.yml", Loader::AbsoluteFull);
         foreach(const QString &path, templateFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();
@@ -59,7 +59,7 @@ public:
         QHash<int, Face3DTemplate *> references;
         QVector<Face3DTemplate *> testTemplates;
 
-        QVector<QString> templateFiles = Loader::listFiles("../../test/kinect/", "*.yml", AbsoluteFull);
+        QVector<QString> templateFiles = Loader::listFiles("../../test/kinect/", "*.yml", Loader::AbsoluteFull);
         foreach(const QString &path, templateFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();
@@ -86,7 +86,7 @@ public:
         FaceClassifier faceClassifier("../../test/kinect/classifiers/");
         QVector<Face3DTemplate*> templates;
 
-        QVector<QString> templateFiles = Loader::listFiles("../../test/kinect/", "*.yml", AbsoluteFull);
+        QVector<QString> templateFiles = Loader::listFiles("../../test/kinect/", "*.yml", Loader::AbsoluteFull);
         foreach(const QString &path, templateFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();
@@ -108,7 +108,7 @@ public:
         FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj", false));
         FaceClassifier faceClassifier("../../test/kinect/classifiers2/");
 
-        QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.bin", AbsoluteFull);
+        QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.bin", Loader::AbsoluteFull);
         foreach(const QString &path, binFiles)
         {
             QString baseName = QFileInfo(path).baseName();
@@ -127,7 +127,7 @@ public:
         FaceClassifier faceClassifier("../../test/frgc/classifiers/");
         QVector<Face3DTemplate*> templates;
 
-        QVector<QString> binFiles = Loader::listFiles("../../test/softKinetic/01/", "*.binz", AbsoluteFull);
+        QVector<QString> binFiles = Loader::listFiles("../../test/softKinetic/01/", "*.binz", Loader::AbsoluteFull);
         foreach(const QString &path, binFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();
@@ -149,7 +149,7 @@ public:
         FaceClassifier faceClassifier("../../test/kinect/classifiers2/");
         QVector<Face3DTemplate*> templates;
 
-        QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.bin", AbsoluteFull);
+        QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.bin", Loader::AbsoluteFull);
         foreach(const QString &path, binFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();
@@ -169,7 +169,7 @@ public:
         FaceClassifier faceClassifier("../../test/kinect/classifiers2/");
         QVector<Face3DTemplate*> templates;
 
-        QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.xml", AbsoluteFull);
+        QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.xml", Loader::AbsoluteFull);
         foreach(const QString &path, binFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();

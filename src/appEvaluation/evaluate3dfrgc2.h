@@ -123,7 +123,7 @@ public:
         QString dir = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
 
         QVector<int> ids;
-        QVector<QString> files = Loader::listFiles(dir + types[0] + "/", "*.gz", BaseFilename);
+        QVector<QString> files = Loader::listFiles(dir + types[0] + "/", "*.gz", Loader::BaseFilename);
         foreach (const QString &file, files)
         {
             ids << file.split('d').at(0).toInt();
@@ -156,8 +156,8 @@ public:
 
     static void learnFilterResponseFusion()
     {
-        QVector<QString> impFiles = Loader::listFiles(".", "imp-*", Filename);
-        QVector<QString> genFiles = Loader::listFiles(".", "gen-*", Filename);
+        QVector<QString> impFiles = Loader::listFiles(".", "imp-*", Loader::Filename);
+        QVector<QString> genFiles = Loader::listFiles(".", "gen-*", Loader::Filename);
 
         QList<Evaluation> evals;
         for (int i = 0; i < impFiles.count(); i++)
@@ -251,7 +251,7 @@ public:
         QString dir = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
 
         QVector<int> ids;
-        QVector<QString> files = Loader::listFiles(dir + types[0] + "/", "*.gz", BaseFilename);
+        QVector<QString> files = Loader::listFiles(dir + types[0] + "/", "*.gz", Loader::BaseFilename);
 
         if (imageCount > 0 && imageCount <= files.count())
             files.resize(imageCount);
