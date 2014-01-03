@@ -17,7 +17,7 @@ public:
     {
         Mesh mesh = Mesh::fromXYZ(pathToXYZ);
         MapConverter c;
-        Map map = SurfaceProcessor::depthmap(mesh, c, 1.0, ZCoord);
+        Map map = SurfaceProcessor::depthmap(mesh, c, 1.0, SurfaceProcessor::ZCoord);
         map.serialize("serializedMap.map");
 
         Map deserialized("serializedMap.map");

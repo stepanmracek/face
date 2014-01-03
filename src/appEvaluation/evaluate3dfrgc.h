@@ -66,7 +66,7 @@ public:
             QString resultPath = outDirPath + srcFileInfo.baseName() + ".binz";
             mesh.writeBINZ(resultPath);
 
-            Map texture = SurfaceProcessor::depthmap(mesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_I);
+            Map texture = SurfaceProcessor::depthmap(mesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, SurfaceProcessor::Texture_I);
             Matrix m = texture.toMatrix(0, 0, 255);
             cv::circle(m, cv::Point(100,100), 3, 255, -1);
             QString resultTexturePath = outDirPath + srcFileInfo.baseName() + ".png";

@@ -67,7 +67,7 @@ public:
             Landmarks l(lPath);
 
             MapConverter converter;
-            Map depth = SurfaceProcessor::depthmap(m, converter, 1.0, ZCoord);
+            Map depth = SurfaceProcessor::depthmap(m, converter, 1.0, SurfaceProcessor::ZCoord);
             Matrix img = depth.toMatrix() * 255;
 
             for (int i = 0; i < l.points.size(); i++)
@@ -100,7 +100,7 @@ public:
             Landmarks l(lPath);
 
             MapConverter converter;
-            Map depthmap = SurfaceProcessor::depthmap(m, converter, 1.0, ZCoord);
+            Map depthmap = SurfaceProcessor::depthmap(m, converter, 1.0, SurfaceProcessor::ZCoord);
 
             QString ptsPath = dirPath + QDir::separator() + info.baseName() + ".pts";
             QFile ptsFile(ptsPath);

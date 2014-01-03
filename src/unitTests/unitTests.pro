@@ -45,4 +45,5 @@ HEADERS += \
     testlogisticregression.h \
     testlaguerrewavelet.h \
     testfacealigner.h \
-    testtextureprocessing.h
+    testtextureprocessing.h \
+    test.h

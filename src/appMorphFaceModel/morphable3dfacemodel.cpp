@@ -115,8 +115,8 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     int y = i / w;*/
 
     MapConverter converter;
-    Map depthmap = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, ZCoord);
-    Map intensities = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_I);
+    Map depthmap = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, SurfaceProcessor::ZCoord);
+    Map intensities = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, SurfaceProcessor::Texture_I);
     for (int i = 0; i < mask.rows; i++)
     {
         if (mask(i) == 0)
@@ -147,9 +147,9 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     setModelParams(normalizedZcoordParams, textureParams);
 
     // direct copy of input mesh texture to the model
-    Map textureR = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_R);
-    Map textureG = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_G);
-    Map textureB = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, Texture_B);
+    Map textureR = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, SurfaceProcessor::Texture_R);
+    Map textureG = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, SurfaceProcessor::Texture_G);
+    Map textureB = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, SurfaceProcessor::Texture_B);
     int n = textureR.w * textureR.h;
     assert(n == mask.rows);
     mesh.colors.clear();
@@ -291,14 +291,14 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
         Map depth = SurfaceProcessor::depthmap(mesh, converter,
                                                cv::Point2d(-mapMask.w/2, -mapMask.h/2),
                                                cv::Point2d(mapMask.w/2, mapMask.h/2),
-                                               1.0, ZCoord);
+                                               1.0, SurfaceProcessor::ZCoord);
         resultZcoordMap.add(depth);
         depthMaps.append(depth);
 
         Map texture = SurfaceProcessor::depthmap(mesh, converter,
                                                cv::Point2d(-mapMask.w/2, -mapMask.h/2),
                                                cv::Point2d(mapMask.w/2, mapMask.h/2),
-                                               1.0, Texture_I);
+                                               1.0, SurfaceProcessor::Texture_I);
         resultTextureMap.add(texture);
         textureMaps.append(texture);
 

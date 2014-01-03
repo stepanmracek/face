@@ -4,6 +4,7 @@
 #include "facelib/facealigner.h"
 #include "biometrics/facetemplate.h"
 #include "facelib/surfaceprocessor.h"
+#include "biometrics/multibiomertricsautotuner.h"
 
 class EvaluateSoftKinetic
 {
@@ -123,44 +124,72 @@ public:
     static int checkAligning(int argc, char *argv[])
     {
         FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj", false));
-        QString dir("../../test/softKinetic/02/");
+        QString dir("../../test/softKinetic/03/DS32528233700098_radim/");
 
         QVector<QString> fileNames = Loader::listFiles(dir, "*.binz", Loader::Filename);
         foreach(const QString &fileName, fileNames) {
             Mesh m = Mesh::fromBINZ(dir + fileName);
-            aligner.icpAlign(m, 10, FaceAligner::NoseTipDetection);
+            SurfaceProcessor::mdenoising(m, 0.02f, 10, 10);
+            aligner.icpAlign(m, 100, FaceAligner::TemplateMatching);
             MapConverter mc;
-            Map texture = SurfaceProcessor::depthmap(m, mc, cv::Point(-100,-100), cv::Point(100,100), 1.0, Texture_I);
+            Map texture = SurfaceProcessor::depthmap(m, mc, cv::Point(-100,-100), cv::Point(100,100), 1.0, SurfaceProcessor::Texture_I);
             Matrix mat = texture.toMatrix();
             cv::circle(mat, cv::Point(100,100), 2, 1.0);
-            cv::imshow(fileName.toStdString(), mat);
+            cv::circle(mat, cv::Point(100,100), 1, 0.0);
+            cv::imshow("face", mat);
             cv::waitKey();
-            cv::destroyAllWindows();
         }
         return 0;
     }
 
-    static void evaluate()
+    static void createMultiExtractor()
     {
-        FaceClassifier c("test");
-        FaceAligner a(Mesh::fromOBJ("../../test/meanForAlign.obj"));
+        FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj", false));
+        QString dir("../../test/softKinetic/03/DS32528233700078_stepan/");
 
-        QVector<QString> binFiles = Loader::listFiles("../../test/softKinetic/02/", "*.binz", Loader::AbsoluteFull);
-        QVector<Face3DTemplate *> templates;
-        foreach(const QString &path, binFiles)
-        {
-            int id = QFileInfo(path).baseName().split("-")[0].toInt();
-            Mesh m = Mesh::fromBINZ(path);
+        QVector<int> ids;
+        QVector<Mesh> meshes;
+        QVector<QString> fileNames = Loader::listFiles(dir, "*.binz", Loader::Filename);
+        foreach(const QString &fileName, fileNames) {
+            Mesh m = Mesh::fromBINZ(dir + fileName);
+            SurfaceProcessor::mdenoising(m, 0.02f, 10, 10);
+            aligner.icpAlign(m, 20, FaceAligner::TemplateMatching);
 
-            a.icpAlign(m, 10, FaceAligner::NoseTipDetection);
-            SurfaceProcessor::zsmooth(m, 0.5, 5);
-
-            templates << new Face3DTemplate(id, m, c);
+            ids << fileName.split('-')[0].toInt();
+            meshes << m;
         }
 
-        Evaluation e = c.evaluate(templates);
-        qDebug() << e.eer;
-        e.outputResults(".", 10);
+        MultiBiomertricsAutoTuner::Input frgcData =
+                MultiBiomertricsAutoTuner::Input::fromDirectoryWithExportedCurvatureImages("/home/stepo/data/frgc/spring2004/zbin-aligned2/", "d", 300);
+
+        MultiBiomertricsAutoTuner::Input softKineticData =
+                MultiBiomertricsAutoTuner::Input::fromAlignedMeshes(ids, meshes);
+
+        MultiBiomertricsAutoTuner::Settings settings(MultiBiomertricsAutoTuner::FCT_SVM, "allUnits");
+
+        MultiExtractor extractor = MultiBiomertricsAutoTuner::train(frgcData, softKineticData, settings);
+        extractor.serialize("softKinetic");
+    }
+
+    static void evaluateMultiExtractor()
+    {
+        MultiExtractor extractor("softKinetic");
+        FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj", false));
+        QString dir("../../test/softKinetic/03/DS32528233700098_radim/");
+
+        QVector<MultiTemplate> templates;
+        QVector<QString> fileNames = Loader::listFiles(dir, "*.binz", Loader::Filename);
+        foreach(const QString &fileName, fileNames) {
+            Mesh m = Mesh::fromBINZ(dir + fileName);
+            SurfaceProcessor::mdenoising(m, 0.02f, 10, 10);
+            aligner.icpAlign(m, 100, FaceAligner::TemplateMatching);
+
+            int id = fileName.split('-')[0].toInt();
+            templates << extractor.extract(m, 1, id);
+        }
+
+        Evaluation evaluation = extractor.evaluate(templates);
+        qDebug() << evaluation.eer;
     }
 };
 

@@ -1,3 +1,4 @@
+#include "test.h"
 #include "testvector.h"
 #include "testprocrustes.h"
 #include "testpca.h"
@@ -34,6 +35,7 @@ QString frgcPath()
 
 int main(int argc, char *argv[])
 {
+    Test::DoG();
     //TestVector::testConstructor();
     //TestVector::testBasicOperations();
     //TestProcrustes::testRotateAndScale();
@@ -118,7 +120,7 @@ int main(int argc, char *argv[])
     //TestFaceFeatuesDetection::testGoodAnotation(frgcPath() + "bin/");
 
     //TestMap::testSerialization(frgcPath() + "04225d402.abs.xyz");
-    TestMap::testSmoothing();
+    //TestMap::testSmoothing();
 
     //TestHistogramFeatures::testFeaturesGeneration(frgcPath());
 
