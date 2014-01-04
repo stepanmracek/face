@@ -10,6 +10,10 @@
 #include "evaluate3dfrgc2.h"
 #include "evaluatesoftkinetic.h"
 
+int Evaluate3dFrgc2::ksize1 = 3;
+int Evaluate3dFrgc2::ksize2 = 5;
+bool Evaluate3dFrgc2::equalizeDoG = false;
+
 int main(int argc, char *argv[])
 {
     //Evaluate3dFrgc::createBIN();
@@ -37,11 +41,8 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::evaluateSerializedTemplates();
 
     // sandbox
-    //Evaluate3dFrgc2::evaluateFilterResponse();
-    //Evaluate3dFrgc2::learnFilterResponseFusion();
-    //Evaluate3dFrgc2::serializeExtractor();
-    //Evaluate3dFrgc2::deserialize();
     //Evaluate3dFrgc2::autoTuner();
+    //Evaluate3dFrgc2::evaluateDoGTexture();
 
     // Kinect
     //EvaluateKinect::learnFromFrgc();

@@ -188,7 +188,7 @@ public:
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
             Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath(), false);
-            Matrix equalized = Face3DTemplate::getTexture(mesh);
+            /*Matrix equalized = Face3DTemplate::getTexture(mesh, true);
 
             QString out = srcDirPath + "textureE/" + srcFileInfo.baseName() + ".gz";
             if (Common::matrixContainsNan(equalized))
@@ -203,13 +203,14 @@ public:
                 if (Common::matrixContainsNan(curvatures[index]))
                     nans << curvatureName + "-" + srcFileInfo.baseName();
                 Common::saveMatrix(curvatures[index], out);
-
-                //qDebug() << out;
-                //cv::imshow(curvatureName.toStdString(), curvatures[index]);
-                //cv::waitKey();
-
                 index++;
-            }
+            }*/
+
+            Matrix texture = Face3DTemplate::getTexture(mesh, false);
+            QString out = srcDirPath + "textureI/" + srcFileInfo.baseName() + ".gz";
+            if (Common::matrixContainsNan(texture))
+                nans << "textureI-" + srcFileInfo.baseName();
+            Common::saveMatrix(texture, out);
         }
 
         qDebug() << nans;

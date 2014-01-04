@@ -165,16 +165,16 @@ public:
         MultiBiomertricsAutoTuner::Input softKineticData =
                 MultiBiomertricsAutoTuner::Input::fromAlignedMeshes(ids, meshes);
 
-        MultiBiomertricsAutoTuner::Settings settings(MultiBiomertricsAutoTuner::FCT_SVM, "allUnits");
-
+        MultiBiomertricsAutoTuner::Settings settings(MultiBiomertricsAutoTuner::Settings::FCT_SVM, MultiBiomertricsAutoTuner::Settings::FS_Wrapper, "allUnits");
         MultiExtractor extractor = MultiBiomertricsAutoTuner::train(frgcData, softKineticData, settings);
-        extractor.serialize("softKinetic");
+        extractor.serialize("softKineticDoG");
     }
 
     static void evaluateMultiExtractor()
     {
-        MultiExtractor extractor("softKinetic");
+        MultiExtractor extractor("softKineticDoG");
         FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj", false));
+        //QString dir("../../test/softKinetic/03/DS32528233700078_stepan/");
         QString dir("../../test/softKinetic/03/DS32528233700098_radim/");
 
         QVector<MultiTemplate> templates;
