@@ -35,7 +35,7 @@ QString frgcPath()
 
 int main(int argc, char *argv[])
 {
-    Test::DoG();
+    //Test::DoG();
     //TestVector::testConstructor();
     //TestVector::testBasicOperations();
     //TestProcrustes::testRotateAndScale();
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
     //TestMesh::readAbsWithTexture(argc, argv);
     //TestMesh::testReadWriteCharArray(frgcPath());
 
-    //TestFaceAligner::test(frgcPath(), argc, argv);
+    TestFaceAligner::test(frgcPath(), argc, argv);
     //TestFaceAligner::testOpenMP();
 
     //TestLandmarks::testReadWrite();
