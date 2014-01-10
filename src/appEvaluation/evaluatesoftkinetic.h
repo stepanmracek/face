@@ -184,7 +184,7 @@ public:
         MultiBiomertricsAutoTuner::Input softKineticData =
                 MultiBiomertricsAutoTuner::Input::fromAlignedMeshes(ids, meshes);
 
-        MultiBiomertricsAutoTuner::Settings settings(MultiBiomertricsAutoTuner::Settings::FCT_SVM, MultiBiomertricsAutoTuner::Settings::FS_Wrapper, unitsFile);
+        MultiBiomertricsAutoTuner::Settings settings(MultiBiomertricsAutoTuner::Settings::FCT_SVM, unitsFile);
         MultiExtractor extractor = MultiBiomertricsAutoTuner::train(frgcData, softKineticData, settings);
 
         extractor.serialize(outputDir);

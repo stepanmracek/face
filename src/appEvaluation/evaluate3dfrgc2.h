@@ -27,7 +27,7 @@ private:
         MultiBiomertricsAutoTuner::Input kinectData =
                 MultiBiomertricsAutoTuner::Input::fromDirectoryWithAlignedBinMeshes("../../test/kinect/", "-");
 
-        MultiBiomertricsAutoTuner::Settings settings(MultiBiomertricsAutoTuner::Settings::FCT_SVM, MultiBiomertricsAutoTuner::Settings::FS_Wrapper, "allUnits");
+        MultiBiomertricsAutoTuner::Settings settings(MultiBiomertricsAutoTuner::Settings::FCT_SVM, "allUnits");
 
         MultiExtractor extractor = MultiBiomertricsAutoTuner::train(frgcData, kinectData, settings);
         extractor.serialize("kinect");
