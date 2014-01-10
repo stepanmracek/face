@@ -142,15 +142,11 @@ public:
         return 0;
     }
 
-    static void createMultiExtractor()
+    static void loadBinZMeshes(const QString &dir, const FaceAligner &aligner, QVector<int> &ids, QVector<Mesh> &meshes)
     {
-        FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj", false));
-        QString dir("../../test/softKinetic/03/DS32528233700078_stepan/");
-
-        QVector<int> ids;
-        QVector<Mesh> meshes;
         QVector<QString> fileNames = Loader::listFiles(dir, "*.binz", Loader::Filename);
-        foreach(const QString &fileName, fileNames) {
+        foreach(const QString &fileName, fileNames)
+        {
             Mesh m = Mesh::fromBINZ(dir + fileName);
             SurfaceProcessor::mdenoising(m, 0.02f, 10, 10);
             aligner.icpAlign(m, 20, FaceAligner::TemplateMatching);
@@ -158,16 +154,38 @@ public:
             ids << fileName.split('-')[0].toInt();
             meshes << m;
         }
+    }
+
+    static void createMultiExtractor(int argc, char *argv[])
+    {
+        if (argc != 7)
+        {
+            qDebug() << "usage:" << argv[0] << "meanForAlign.obj unitsFile FRGCdir targetSoftKineticDir evaluationSoftKineticDir outputDir";
+            return;
+        }
+
+        char *meanFaceForAlign = argv[1];
+        char *unitsFile = argv[2];
+        char *frgcDirectory = argv[3];
+        char *targetSoftKineticDir = argv[4];
+        char *evaluationSoftKineticDir = argv[5];
+        char *outputDir = argv[6];
+
+        FaceAligner aligner(Mesh::fromOBJ(meanFaceForAlign, false));
+        QVector<int> ids;
+        QVector<Mesh> meshes;
+        loadBinZMeshes(targetSoftKineticDir, aligner, ids, meshes);
 
         MultiBiomertricsAutoTuner::Input frgcData =
-                MultiBiomertricsAutoTuner::Input::fromDirectoryWithExportedCurvatureImages("/home/stepo/data/frgc/spring2004/zbin-aligned2/", "d", 300);
+                MultiBiomertricsAutoTuner::Input::fromDirectoryWithExportedCurvatureImages(frgcDirectory, "d", 300);
 
         MultiBiomertricsAutoTuner::Input softKineticData =
                 MultiBiomertricsAutoTuner::Input::fromAlignedMeshes(ids, meshes);
 
-        MultiBiomertricsAutoTuner::Settings settings(MultiBiomertricsAutoTuner::Settings::FCT_SVM, MultiBiomertricsAutoTuner::Settings::FS_Wrapper, "allUnits");
+        MultiBiomertricsAutoTuner::Settings settings(MultiBiomertricsAutoTuner::Settings::FCT_SVM, MultiBiomertricsAutoTuner::Settings::FS_Wrapper, unitsFile);
         MultiExtractor extractor = MultiBiomertricsAutoTuner::train(frgcData, softKineticData, settings);
-        extractor.serialize("softKineticDoG");
+
+        extractor.serialize(outputDir);
     }
 
     static void evaluateMultiExtractor()

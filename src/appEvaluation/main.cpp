@@ -55,8 +55,8 @@ int main(int argc, char *argv[])
 
     // SoftKinetic
     //EvaluateSoftKinetic::checkAligning(argc, argv);
-    //EvaluateSoftKinetic::createMultiExtractor();
-    EvaluateSoftKinetic::evaluateMultiExtractor();
+    EvaluateSoftKinetic::createMultiExtractor(argc, argv);
+    //EvaluateSoftKinetic::evaluateMultiExtractor();
 
     return 0;
 }
