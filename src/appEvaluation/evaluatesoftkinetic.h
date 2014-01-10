@@ -176,9 +176,11 @@ public:
         QVector<Mesh> meshes;
         loadBinZMeshes(targetSoftKineticDir, aligner, ids, meshes);
 
+        qDebug() << "loading FRGC";
         MultiBiomertricsAutoTuner::Input frgcData =
                 MultiBiomertricsAutoTuner::Input::fromDirectoryWithExportedCurvatureImages(frgcDirectory, "d", 300);
 
+        qDebug() << "SoftKinetic data";
         MultiBiomertricsAutoTuner::Input softKineticData =
                 MultiBiomertricsAutoTuner::Input::fromAlignedMeshes(ids, meshes);
 
