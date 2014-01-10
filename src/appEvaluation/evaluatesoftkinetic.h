@@ -142,39 +142,61 @@ public:
         return 0;
     }
 
-    static void loadBinZMeshes(const QString &dir, const FaceAligner &aligner, QVector<int> &ids, QVector<Mesh> &meshes)
+    static void loadBinZMeshes(const QString &dir, const FaceAligner &aligner, QVector<int> &ids, QVector<Mesh> &meshes, int icpIterations, int smoothIterations, float smoothCoef)
     {
         QVector<QString> fileNames = Loader::listFiles(dir, "*.binz", Loader::Filename);
         foreach(const QString &fileName, fileNames)
         {
             Mesh m = Mesh::fromBINZ(dir + fileName);
-            SurfaceProcessor::mdenoising(m, 0.02f, 10, 10);
-            aligner.icpAlign(m, 20, FaceAligner::TemplateMatching);
+            SurfaceProcessor::mdenoising(m, smoothCoef, smoothIterations, smoothIterations); // 0.02f, 10, 10);
+            aligner.icpAlign(m, icpIterations, FaceAligner::TemplateMatching); // 20
 
             ids << fileName.split('-')[0].toInt();
             meshes << m;
         }
     }
 
+    static Evaluation evaluateMultiExtractor(const MultiExtractor &extractor, const FaceAligner &aligner, const QString &evalPath, int icpIterations, int smoothIterations, float smoothCoef)
+    {
+        QVector<int> ids;
+        QVector<Mesh> meshes;
+        loadBinZMeshes(evalPath, aligner, ids, meshes, icpIterations, smoothIterations, smoothCoef);
+        int n = ids.count();
+        QVector<MultiTemplate> templates;
+        for (int i = 0; i < n; i++)
+        {
+            templates << extractor.extract(meshes[i], 1, ids[i]);
+        }
+
+        return extractor.evaluate(templates);
+    }
+
     static void createMultiExtractor(int argc, char *argv[])
     {
-        if (argc != 7)
+        if (argc != 13)
         {
-            qDebug() << "usage:" << argv[0] << "meanForAlign.obj unitsFile FRGCdir targetSoftKineticDir evaluationSoftKineticDir outputDir";
+            qDebug() << "usage:" << argv[0] << "meanForAlign.obj unitsFile FRGCdir targetSoftKineticDir evaluationSoftKineticDir";
+            qDebug() << "   trainICPiters testICPiters trainSmoothCoef testSmoothCoef trainSmoothIters testSmoothIters outputDir";
             return;
         }
 
-        char *meanFaceForAlign = argv[1];
-        char *unitsFile = argv[2];
-        char *frgcDirectory = argv[3];
-        char *targetSoftKineticDir = argv[4];
-        char *evaluationSoftKineticDir = argv[5];
-        char *outputDir = argv[6];
+        QString meanFaceForAlign = argv[1];
+        QString unitsFile = argv[2];
+        QString frgcDirectory = argv[3];
+        QString targetSoftKineticDir = argv[4];
+        QString evaluationSoftKineticDir = argv[5];
+        int trainICPiters = QString(argv[6]).toInt();
+        int testICPiters = QString(argv[7]).toInt();
+        float trainSmoothCoef = QString(argv[8]).toFloat();
+        float testSmoothCoef = QString(argv[9]).toFloat();
+        int trainSmoothIters = QString(argv[10]).toInt();
+        int testSmoothIters = QString(argv[11]).toInt();
+        QString outputDir = argv[12];
 
         FaceAligner aligner(Mesh::fromOBJ(meanFaceForAlign, false));
         QVector<int> ids;
         QVector<Mesh> meshes;
-        loadBinZMeshes(targetSoftKineticDir, aligner, ids, meshes);
+        loadBinZMeshes(targetSoftKineticDir, aligner, ids, meshes, trainICPiters, trainSmoothIters, trainSmoothCoef);
 
         qDebug() << "loading FRGC";
         MultiBiomertricsAutoTuner::Input frgcData =
@@ -188,6 +210,10 @@ public:
         MultiExtractor extractor = MultiBiomertricsAutoTuner::train(frgcData, softKineticData, settings);
 
         extractor.serialize(outputDir);
+
+        Evaluation eval = evaluateMultiExtractor(extractor, aligner, evaluationSoftKineticDir, testICPiters, testSmoothIters, testSmoothCoef);
+        qDebug() << eval.eer;
+        eval.outputResults(outputDir + "/eval", 10);
     }
 
     static void evaluateMultiExtractor()
