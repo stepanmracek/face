@@ -139,7 +139,8 @@ public:
 
         }
 
-        FaceClassifier newClassifier = faceClassifier.relearnFinalFusion(templates, true);
+        FaceClassifier newClassifier;
+        faceClassifier.relearnFinalFusion(templates, newClassifier, true);
         newClassifier.serialize("../../test/kinect/classifiers2");
     }
 

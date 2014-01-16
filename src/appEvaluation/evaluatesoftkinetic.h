@@ -102,7 +102,8 @@ public:
                 templates << new Face3DTemplate(ids[i], in, faceClassifier);
             }
 
-            FaceClassifier c = faceClassifier.relearnFinalFusion(templates, false);
+            FaceClassifier c;
+            faceClassifier.relearnFinalFusion(templates, c, false);
 
             qDeleteAll(templates);
             templates.clear();
@@ -144,15 +145,21 @@ public:
 
     static void loadBinZMeshes(const QString &dir, const FaceAligner &aligner, QVector<int> &ids, QVector<Mesh> &meshes, int icpIterations, int smoothIterations, float smoothCoef)
     {
-        QVector<QString> fileNames = Loader::listFiles(dir, "*.binz", Loader::Filename);
-        foreach(const QString &fileName, fileNames)
+        const QVector<QString> fileNames = Loader::listFiles(dir, "*.binz", Loader::Filename);
+        int n = fileNames.count();
+        ids.resize(n);
+        meshes.resize(n);
+
+        //foreach(const QString &fileName, fileNames)
+        //#pragma omp parallel for
+        for (int i = 0; i < n; i++)
         {
-            Mesh m = Mesh::fromBINZ(dir + fileName);
+            Mesh m = Mesh::fromBINZ(dir + fileNames[i]);
             SurfaceProcessor::mdenoising(m, smoothCoef, smoothIterations, smoothIterations); // 0.02f, 10, 10);
             aligner.icpAlign(m, icpIterations, FaceAligner::TemplateMatching); // 20
 
-            ids << fileName.split('-')[0].toInt();
-            meshes << m;
+            ids[i] = fileNames[i].split('-')[0].toInt();
+            meshes[i] = m;
         }
     }
 
@@ -168,6 +175,7 @@ public:
             templates << extractor.extract(meshes[i], 1, ids[i]);
         }
 
+        extractor.createPerSubjectScoreCharts(templates, "scoremap");
         return extractor.evaluate(templates);
     }
 
@@ -218,24 +226,38 @@ public:
 
     static void evaluateMultiExtractor()
     {
-        MultiExtractor extractor("softKineticDoG");
+        MultiExtractor extractor("../../test/softKinetic/out1");
         FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj", false));
-        //QString dir("../../test/softKinetic/03/DS32528233700078_stepan/");
-        QString dir("../../test/softKinetic/03/DS32528233700098_radim/");
+        QString dir("../../test/softKinetic/03/stepan/");
+        //QString dir("../../test/softKinetic/03/radim/");
+        //QString dir("../../test/softKinetic/03/honza/");
 
-        QVector<MultiTemplate> templates;
-        QVector<QString> fileNames = Loader::listFiles(dir, "*.binz", Loader::Filename);
-        foreach(const QString &fileName, fileNames) {
-            Mesh m = Mesh::fromBINZ(dir + fileName);
+        qDebug() << evaluateMultiExtractor(extractor, aligner, dir, 100, 10, 0.02).eer;
+    }
+
+    static void evaluateAging()
+    {
+        MultiExtractor extractor("../../test/softKinetic/out1");
+        FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj", false));
+        QString dir("../../test/softKinetic/03/stepan/");
+        const QVector<QString> fileNames = Loader::listFiles(dir, "1000*.binz", Loader::Filename);
+
+        MultiTemplate reference;
+        for (int i = 0; i < fileNames.count(); i++)
+        {
+            Mesh m = Mesh::fromBINZ(dir + fileNames[i]);
             SurfaceProcessor::mdenoising(m, 0.02f, 10, 10);
             aligner.icpAlign(m, 100, FaceAligner::TemplateMatching);
 
-            int id = fileName.split('-')[0].toInt();
-            templates << extractor.extract(m, 1, id);
-        }
+            if (i == 0)
+            {
+                reference = extractor.extract(m, 1, 1);
+                continue;
+            }
 
-        Evaluation evaluation = extractor.evaluate(templates);
-        qDebug() << evaluation.eer;
+            MultiTemplate probe = extractor.extract(m, 1, 1);
+            qDebug() << extractor.compare(reference, probe);
+        }
     }
 };
 

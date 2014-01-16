@@ -1,7 +1,11 @@
 #include "dlgrealtimecompare.h"
 #include "ui_dlgrealtimecompare.h"
 
-#include <QtConcurrentRun>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    #include <QtConcurrent/QtConcurrentRun>
+#else
+    #include <QtConcurrentRun>
+#endif
 
 #include "kinect.h"
 

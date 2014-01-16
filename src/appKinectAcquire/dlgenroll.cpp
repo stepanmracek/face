@@ -21,12 +21,11 @@ DlgEnroll::~DlgEnroll()
 
 void DlgEnroll::on_btnAdd_clicked()
 {
-    sensor.scanFace();
-    if (!sensor.mesh) return;
+    sensor.scan();
     sensor.align();
 
-    scans << sensor.mesh;
-    sensor.mesh = 0;
+    scans << new Mesh(sensor.mesh());
+    sensor.deleteMesh();
 
     ui->listScans->addItem(QString::number(ui->listScans->count()+1));
     ui->listScans->item(ui->listScans->count()-1)->setSelected(true);

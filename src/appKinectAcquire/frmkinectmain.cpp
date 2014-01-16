@@ -99,15 +99,11 @@ void FrmKinectMain::on_btnDelete_clicked()
 
 void FrmKinectMain::on_btnIdentify_clicked()
 {
-    /*RealTimeClassifier rtc(classifier, ui->sliderThreshold->value(), database, "../../test/meanForAlign.obj");
-    DlgRealTimeCompare dlg(&rtc, mapIdToName, "../../test/haar-face.xml");
-    dlg.exec();*/
-
-    sensor.scanFace();
-    if (!sensor.mesh) return;
+    sensor.scan();
     sensor.align();
+    Mesh m = sensor.mesh();
 
-    Face3DTemplate *probe = new Face3DTemplate(0, *sensor.mesh, classifier);
+    Face3DTemplate *probe = new Face3DTemplate(0, m, classifier);
     sensor.deleteMesh();
 
     QMap<int, double> result = classifier.identify(database, probe, FaceClassifier::CompareMeanDistance);
@@ -122,11 +118,11 @@ void FrmKinectMain::on_btnVerify_clicked()
     QString name = QInputDialog::getItem(this, "Query", "Claimed identity:", mapNameToId.keys(), 0, false, &ok);
     if (!ok) return;
 
-    sensor.scanFace();
-    if (!sensor.mesh) return;
+    sensor.scan();
     sensor.align();
+    Mesh m = sensor.mesh();
 
-    Face3DTemplate *probe = new Face3DTemplate(0, *sensor.mesh, classifier);
+    Face3DTemplate *probe = new Face3DTemplate(0, m, classifier);
     sensor.deleteMesh();
 
     if (!mapNameToId.contains(name))

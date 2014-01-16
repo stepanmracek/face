@@ -89,16 +89,15 @@ int mainKinect(int argc, char *argv[])
 
     //plugin.scanFace();
     //qDebug() << "Second shot";
-    plugin.scanFace();
-    Mesh * mesh = plugin.mesh;
-    if (!mesh) return 0;
+    plugin.scan();
+    Mesh mesh = plugin.mesh();
 
     //mesh->colors.clear();
-    SurfaceProcessor::smooth(*mesh, 0.7, 5);
+    SurfaceProcessor::smooth(mesh, 0.7, 5);
 
     QApplication app(argc, argv);
     GLWidget widget;
-    widget.addFace(mesh);
+    widget.addFace(&mesh);
     widget.show();
     return app.exec();
 }
