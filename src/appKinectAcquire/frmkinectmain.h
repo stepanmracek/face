@@ -18,7 +18,7 @@ class FrmKinectMain : public QMainWindow
 
 public:
     explicit FrmKinectMain(KinectSensorPlugin &sensor,
-                           const FaceClassifier &classifier,
+                           const Face::Biometrics::FaceClassifier &classifier,
                            const QString &databasePath,
                            QWidget *parent = 0);
     ~FrmKinectMain();
@@ -36,10 +36,10 @@ private slots:
 private:
     Ui::FrmKinectMain *ui;
     KinectSensorPlugin &sensor;
-    const FaceClassifier &classifier;
+    const Face::Biometrics::FaceClassifier &classifier;
     QMap<int, QString> mapIdToName;
     QMap<QString, int> mapNameToId;
-    QHash<int, Face3DTemplate*> database;
+    QHash<int, Face::Biometrics::Face3DTemplate*> database;
 
     void initDatabase(const QString &dirPath);
     void refreshList();

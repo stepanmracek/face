@@ -9,14 +9,14 @@
 class TestFaceAligner
 {
 private:
-    static void oldRotate(Mesh &m, double x, double y, double z)
+    static void oldRotate(Face::FaceData::Mesh &m, double x, double y, double z)
     {
-        VectorOfPoints points;
+        Face::FaceData::VectorOfPoints points;
         for (int r = 0; r < m.pointsMat.rows; r++)
         {
             points << cv::Point3d(m.pointsMat(r, 0), m.pointsMat(r, 1), m.pointsMat(r, 2));
         }
-        Procrustes3D::rotate(points, x, y, z);
+        Face::LinAlg::Procrustes3D::rotate(points, x, y, z);
         for (int r = 0; r < m.pointsMat.rows; r++)
         {
             m.pointsMat(r, 0) = points[r].x;
@@ -28,14 +28,14 @@ private:
 public:
     static void test(const QString &frgcPath, int argc, char *argv[])
     {
-        FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj"));
-        Mesh probe = Mesh::fromBINZ("../../test/softKinetic/03/DS32528233700098_radim/3000-20131224112242.binz");
+        Face::FaceData::FaceAligner aligner(Face::FaceData::Mesh::fromOBJ("../../test/meanForAlign.obj"));
+        Face::FaceData::Mesh probe = Face::FaceData::Mesh::fromBINZ("../../test/softKinetic/03/DS32528233700098_radim/3000-20131224112242.binz");
 
         for (int iterations = 10; iterations <= 100; iterations++)
         {
-            Mesh m(probe);
+            Face::FaceData::Mesh m(probe);
             QDateTime now = QDateTime::currentDateTime();
-            aligner.icpAlign(m, iterations, FaceAligner::TemplateMatching);
+            aligner.icpAlign(m, iterations, Face::FaceData::FaceAligner::TemplateMatching);
             qDebug() << iterations << now.msecsTo(QDateTime::currentDateTime());
         }
 

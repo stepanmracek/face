@@ -14,9 +14,9 @@ public:
         Matrix B = (cv::Mat_<double>(4,3) << 0,0,0, 1,0,0, 1,0,1, 0,0,1);
         Matrix A = (cv::Mat_<double>(4,3) << 0,-0.1,0, 1,-0.2,0, 1,0.1,1, 0,0.2,1);
 
-        Matrix R = SVD::procrustes(A, B);
+        Matrix R = Face::LinAlg::SVD::procrustes(A, B);
         Matrix A2 = A*R;
-        Common::printMatrix(A2);
+        Face::LinAlg::Common::printMatrix(A2);
     }
 };
 

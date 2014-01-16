@@ -10,7 +10,7 @@ class TestAnotation
 public:
     static void test(const QString &path)
     {
-        FaceFeaturesAnotation::anotateBINs(path, true, false);
+        Face::FaceData::FaceFeaturesAnotation::anotateBINs(path, true, false);
     }
 };
 

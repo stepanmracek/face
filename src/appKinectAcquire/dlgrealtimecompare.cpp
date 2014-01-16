@@ -9,7 +9,7 @@
 
 #include "kinect.h"
 
-DlgRealTimeCompare::DlgRealTimeCompare(RealTimeClassifier *classifier, const QMap<int, QString> &mapIdToName,
+DlgRealTimeCompare::DlgRealTimeCompare(Face::Biometrics::RealTimeClassifier *classifier, const QMap<int, QString> &mapIdToName,
                                        const QString &faceHaarPath, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DlgRealTimeCompare),
@@ -60,7 +60,7 @@ void DlgRealTimeCompare::showFace()
     }
 
     Kinect::getDepth(depthBuffer, mask, 200, 1000);
-    Mesh *m = Kinect::createMesh(depthBuffer, rgbBuffer);
+    Face::FaceData::Mesh *m = Kinect::createMesh(depthBuffer, rgbBuffer);
     m->centralize();
 
     ui->widget->deleteAll();
@@ -68,5 +68,5 @@ void DlgRealTimeCompare::showFace()
     ui->widget->updateGL();
 
     if (classifier->comparing || faceCount == 0) return;
-    QtConcurrent::run(classifier, &RealTimeClassifier::compare, ui->widget->getFace());
+    QtConcurrent::run(classifier, &Face::Biometrics::RealTimeClassifier::compare, ui->widget->getFace());
 }

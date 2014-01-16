@@ -29,41 +29,41 @@ public:
 
     static void evaluateReferenceDistances()
     {
-        FaceClassifier faceClassifier("../../test/kinect/classifiers2/");
+        Face::Biometrics::FaceClassifier faceClassifier("../../test/kinect/classifiers2/");
 
-        QMap<int, Face3DTemplate *> references;
+        QMap<int, Face::Biometrics::Face3DTemplate *> references;
 
-        QVector<QString> templateFiles = Loader::listFiles("../../test/kinect/", "*.yml", Loader::AbsoluteFull);
+        QVector<QString> templateFiles = Face::LinAlg::Loader::listFiles("../../test/kinect/", "*.yml", Face::LinAlg::Loader::AbsoluteFull);
         foreach(const QString &path, templateFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();
-            Face3DTemplate *t = new Face3DTemplate(id, path, faceClassifier);
+            Face::Biometrics::Face3DTemplate *t = new Face::Biometrics::Face3DTemplate(id, path, faceClassifier);
             references.insertMulti(id, t);
         }
 
         foreach (int id, references.uniqueKeys())
         {
             qDebug() << id;
-            QList<Face3DTemplate *> ref = references.values(id);
-            foreach (const Face3DTemplate *probe, ref)
+            QList<Face::Biometrics::Face3DTemplate *> ref = references.values(id);
+            foreach (const Face::Biometrics::Face3DTemplate *probe, ref)
             {
-                qDebug() << "  " << faceClassifier.compare(ref, probe, FaceClassifier::CompareMeanDistance);
+                qDebug() << "  " << faceClassifier.compare(ref, probe, Face::Biometrics::FaceClassifier::CompareMeanDistance);
             }
         }
     }
 
     static void evaluateRefeference()
     {
-        FaceClassifier faceClassifier("../../test/kinect/classifiers/");
+        Face::Biometrics::FaceClassifier faceClassifier("../../test/kinect/classifiers/");
 
-        QHash<int, Face3DTemplate *> references;
-        QVector<Face3DTemplate *> testTemplates;
+        QHash<int, Face::Biometrics::Face3DTemplate *> references;
+        QVector<Face::Biometrics::Face3DTemplate *> testTemplates;
 
-        QVector<QString> templateFiles = Loader::listFiles("../../test/kinect/", "*.yml", Loader::AbsoluteFull);
+        QVector<QString> templateFiles = Face::LinAlg::Loader::listFiles("../../test/kinect/", "*.yml", Face::LinAlg::Loader::AbsoluteFull);
         foreach(const QString &path, templateFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();
-            Face3DTemplate *t = new Face3DTemplate(id, path, faceClassifier);
+            Face::Biometrics::Face3DTemplate *t = new Face::Biometrics::Face3DTemplate(id, path, faceClassifier);
 
             if (!references.contains(id) || references.values(id).count() < 2)
             {
@@ -75,7 +75,8 @@ public:
             }
         }
 
-        Evaluation e = faceClassifier.evaluate(references, testTemplates, FaceClassifier::CompareMeanDistance);
+        Face::Biometrics::Evaluation e = faceClassifier.evaluate(references, testTemplates,
+                                                                 Face::Biometrics::FaceClassifier::CompareMeanDistance);
         qDebug() << e.eer; // << e.fnmrAtFmr(0.01) << e.fnmrAtFmr(0.001) << e.fnmrAtFmr(0.0001);
         qDebug() << e.maxSameDistance << e.minDifferentDistance;
         //e.outputResults("kinect", 10);
@@ -83,20 +84,20 @@ public:
 
     static void evaluateSimple()
     {
-        FaceClassifier faceClassifier("../../test/kinect/classifiers/");
-        QVector<Face3DTemplate*> templates;
+        Face::Biometrics::FaceClassifier faceClassifier("../../test/kinect/classifiers/");
+        QVector<Face::Biometrics::Face3DTemplate*> templates;
 
-        QVector<QString> templateFiles = Loader::listFiles("../../test/kinect/", "*.yml", Loader::AbsoluteFull);
+        QVector<QString> templateFiles = Face::LinAlg::Loader::listFiles("../../test/kinect/", "*.yml", Face::LinAlg::Loader::AbsoluteFull);
         foreach(const QString &path, templateFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();
-            templates << new Face3DTemplate(id, path, faceClassifier);
+            templates << new Face::Biometrics::Face3DTemplate(id, path, faceClassifier);
         }
 
-        Evaluation e = faceClassifier.evaluate(templates);
+        Face::Biometrics::Evaluation e = faceClassifier.evaluate(templates);
         qDebug() << e.eer;
 
-        foreach (Face3DTemplate *t, templates)
+        foreach (Face::Biometrics::Face3DTemplate *t, templates)
         {
             delete t;
         }
@@ -105,79 +106,77 @@ public:
 
     static void createTemplates()
     {
-        FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj", false));
-        FaceClassifier faceClassifier("../../test/kinect/classifiers2/");
+        Face::FaceData::FaceAligner aligner(Face::FaceData::Mesh::fromOBJ("../../test/meanForAlign.obj", false));
+        Face::Biometrics::FaceClassifier faceClassifier("../../test/kinect/classifiers2/");
 
-        QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.bin", Loader::AbsoluteFull);
+        QVector<QString> binFiles = Face::LinAlg::Loader::listFiles("../../test/kinect/", "*.bin", Face::LinAlg::Loader::AbsoluteFull);
         foreach(const QString &path, binFiles)
         {
             QString baseName = QFileInfo(path).baseName();
             int id = baseName.split("-")[0].toInt();
-            Mesh face = Mesh::fromBIN(path);
-            aligner.icpAlign(face, 10, FaceAligner::NoseTipDetection);
+            Face::FaceData::Mesh face = Face::FaceData::Mesh::fromBIN(path);
+            aligner.icpAlign(face, 10, Face::FaceData::FaceAligner::NoseTipDetection);
 
-            Face3DTemplate t(id, face, faceClassifier);
+            Face::Biometrics::Face3DTemplate t(id, face, faceClassifier);
             t.serialize("../../test/kinect/" + baseName + ".yml.gz", faceClassifier);
         }
     }
 
     static void learnFromFrgc()
     {
-        FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj", false));
-        FaceClassifier faceClassifier("../../test/frgc/classifiers/");
-        QVector<Face3DTemplate*> templates;
+        Face::FaceData::FaceAligner aligner(Face::FaceData::Mesh::fromOBJ("../../test/meanForAlign.obj", false));
+        Face::Biometrics::FaceClassifier faceClassifier("../../test/frgc/classifiers/");
+        QVector<Face::Biometrics::Face3DTemplate*> templates;
 
-        QVector<QString> binFiles = Loader::listFiles("../../test/softKinetic/01/", "*.binz", Loader::AbsoluteFull);
+        QVector<QString> binFiles = Face::LinAlg::Loader::listFiles("../../test/softKinetic/01/", "*.binz", Face::LinAlg::Loader::AbsoluteFull);
         foreach(const QString &path, binFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();
-            Mesh face = Mesh::fromBINZ(path);
-            SurfaceProcessor::zsmooth(face, 0.5, 5);
-            aligner.icpAlign(face, 10, FaceAligner::NoseTipDetection);
-            templates << new Face3DTemplate(id, face, faceClassifier);
-
-
+            Face::FaceData::Mesh face = Face::FaceData::Mesh::fromBINZ(path);
+            Face::FaceData::SurfaceProcessor::zsmooth(face, 0.5, 5);
+            aligner.icpAlign(face, 10, Face::FaceData::FaceAligner::NoseTipDetection);
+            templates << new Face::Biometrics::Face3DTemplate(id, face, faceClassifier);
         }
 
-        FaceClassifier newClassifier;
+        Face::Biometrics::FaceClassifier newClassifier;
         faceClassifier.relearnFinalFusion(templates, newClassifier, true);
         newClassifier.serialize("../../test/kinect/classifiers2");
     }
 
     static void evaluateKinect()
     {
-        FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj", false));
-        FaceClassifier faceClassifier("../../test/kinect/classifiers2/");
-        QVector<Face3DTemplate*> templates;
+        Face::FaceData::FaceAligner aligner(Face::FaceData::Mesh::fromOBJ("../../test/meanForAlign.obj", false));
+        Face::Biometrics::FaceClassifier faceClassifier("../../test/kinect/classifiers2/");
+        QVector<Face::Biometrics::Face3DTemplate*> templates;
 
-        QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.bin", Loader::AbsoluteFull);
+        QVector<QString> binFiles = Face::LinAlg::Loader::listFiles("../../test/kinect/", "*.bin", Face::LinAlg::Loader::AbsoluteFull);
         foreach(const QString &path, binFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();
-            Mesh face = Mesh::fromBIN(path, true);
-            aligner.icpAlign(face, 10, FaceAligner::NoseTipDetection);
-            templates << new Face3DTemplate(id, face, faceClassifier);
+            Face::FaceData::Mesh face = Face::FaceData::Mesh::fromBIN(path, true);
+            aligner.icpAlign(face, 10, Face::FaceData::FaceAligner::NoseTipDetection);
+            templates << new Face::Biometrics::Face3DTemplate(id, face, faceClassifier);
             templates.last()->serialize("../../test/kinect/" + QFileInfo(path).baseName() + ".xml", faceClassifier);
         }
 
-        Evaluation eval = faceClassifier.evaluate(templates);
+        Face::Biometrics::Evaluation eval = faceClassifier.evaluate(templates);
         qDebug() << eval.eer;
         //eval.outputResults("kinect", 10);
     }
 
     static void evaluateSerializedKinect()
     {
-        FaceClassifier faceClassifier("../../test/kinect/classifiers2/");
-        QVector<Face3DTemplate*> templates;
+        Face::Biometrics::FaceClassifier faceClassifier("../../test/kinect/classifiers2/");
+        QVector<Face::Biometrics::Face3DTemplate*> templates;
 
-        QVector<QString> binFiles = Loader::listFiles("../../test/kinect/", "*.xml", Loader::AbsoluteFull);
+        QVector<QString> binFiles = Face::LinAlg::Loader::listFiles("../../test/kinect/", "*.xml", Face::LinAlg::Loader::AbsoluteFull);
         foreach(const QString &path, binFiles)
         {
             int id = QFileInfo(path).baseName().split("-")[0].toInt();
-            templates << new Face3DTemplate(id, path, faceClassifier);
+            templates << new Face::Biometrics::Face3DTemplate(id, path, faceClassifier);
         }
 
-        Evaluation eval = faceClassifier.evaluate(templates);
+        Face::Biometrics::Evaluation eval = faceClassifier.evaluate(templates);
         qDebug() << eval.eer;
     }
 

@@ -44,7 +44,7 @@ public:
                            const QString &pcaForZcoordFile, const QString &pcaForTextureFile,
                            const QString &pcaFile, const QString &flagsFile)
     {
-        Map mask(200,200);
+        Face::FaceData::Map mask(200,200);
         cv::Point f1(100, 62);
         cv::Point f2(100, 112);
         for (int y = 0; y < 200; y++)
@@ -52,7 +52,7 @@ public:
             for (int x = 0; x < 200; x++)
             {
                 cv::Point p(x, y);
-                double d = euclideanDistance(p, f1) + euclideanDistance(p, f2);
+                double d = Face::LinAlg::euclideanDistance(p, f1) + Face::LinAlg::euclideanDistance(p, f2);
                 if (d < 125)
                 {
                     mask.set(x, y, 0);
@@ -60,8 +60,8 @@ public:
             }
         }
 
-        QVector<Mesh> meshesVec;
-        QVector<VectorOfPoints> landmarksVec;
+        QVector<Face::FaceData::Mesh> meshesVec;
+        QVector<Face::FaceData::VectorOfPoints> landmarksVec;
         QSet<QString> usedIDs;
 
         QDir dir(dirPath, "*.xml");
@@ -73,12 +73,12 @@ public:
             if (usedIDs.contains(id)) continue;
             usedIDs.insert(id);
 
-            Landmarks landmarks(fileInfo.absoluteFilePath());
+            Face::FaceData::Landmarks landmarks(fileInfo.absoluteFilePath());
             assert(landmarks.check());
-            Mesh mesh = Mesh::fromBIN(dirPath + QDir::separator() + fileInfo.baseName() + ".bin");
+            Face::FaceData::Mesh mesh = Face::FaceData::Mesh::fromBIN(dirPath + QDir::separator() + fileInfo.baseName() + ".bin");
 
-            mesh.translate(-landmarks.get(Landmarks::Nosetip));
-            Procrustes3D::translate(landmarks.points, -landmarks.get(Landmarks::Nosetip));
+            mesh.translate(-landmarks.get(Face::FaceData::Landmarks::Nosetip));
+            Face::LinAlg::Procrustes3D::translate(landmarks.points, -landmarks.get(Face::FaceData::Landmarks::Nosetip));
 
             landmarksVec.append(landmarks.points);
             meshesVec.append(mesh);

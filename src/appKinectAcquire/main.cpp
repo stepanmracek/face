@@ -66,7 +66,7 @@ int mainMSV(int argc, char *argv[])
     }
 
     KinectSensorPlugin plugin(p.haarFaceDetectPath, p.alignReferencePath);
-    FaceClassifier classifier(p.classifierDirPath);
+    Face::Biometrics::FaceClassifier classifier(p.classifierDirPath);
     FrmKinectMain frmMain(plugin, classifier, p.databasePath);
     frmMain.show();
 
@@ -90,10 +90,10 @@ int mainKinect(int argc, char *argv[])
     //plugin.scanFace();
     //qDebug() << "Second shot";
     plugin.scan();
-    Mesh mesh = plugin.mesh();
+    Face::FaceData::Mesh mesh = plugin.mesh();
 
     //mesh->colors.clear();
-    SurfaceProcessor::smooth(mesh, 0.7, 5);
+    Face::FaceData::SurfaceProcessor::smooth(mesh, 0.7, 5);
 
     QApplication app(argc, argv);
     GLWidget widget;

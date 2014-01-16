@@ -14,40 +14,41 @@
 class Morphable3DFaceModel
 {
 public:
-    PCA pcaForZcoord;
-    PCA pcaForTexture;
-    PCA pca;
+    Face::LinAlg::PCA pcaForZcoord;
+    Face::LinAlg::PCA pcaForTexture;
+    Face::LinAlg::PCA pca;
 
-    Mesh mesh;
-    Landmarks landmarks;
+    Face::FaceData::Mesh mesh;
+    Face::FaceData::Landmarks landmarks;
     Matrix mask;
 
     Morphable3DFaceModel(const QString &pcaPathForZcoord, const QString &pcaPathForTexture, const QString &pcaFile,
                          const QString &maskPath, const QString &landmarksPath, int width);
 
-    void setModelParams(Vector &commonParams);
-    void setModelParams(Vector &zcoordParams, Vector &textureParams);
+    void setModelParams(Face::LinAlg::Vector &commonParams);
+    void setModelParams(Face::LinAlg::Vector &zcoordParams, Face::LinAlg::Vector &textureParams);
 
-    Mesh morph(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations);
-    Mesh morph(Mesh &inputMesh, int iterations);
+    Face::FaceData::Mesh morph(Face::FaceData::Mesh &inputMesh, Face::FaceData::Landmarks &inputLandmarks, int iterations);
+    Face::FaceData::Mesh morph(Face::FaceData::Mesh &inputMesh, int iterations);
 
-    static void align(QVector<Mesh> &meshes,
-                      QVector<VectorOfPoints> &controlPoints,
+    static void align(QVector<Face::FaceData::Mesh> &meshes,
+                      QVector<Face::FaceData::VectorOfPoints> &controlPoints,
                       int iterations, bool scale, bool centralize);
 
-    static void create(QVector<Mesh> &meshes,
-                       QVector<VectorOfPoints> &controlPoints,
+    static void create(QVector<Face::FaceData::Mesh> &meshes,
+                       QVector<Face::FaceData::VectorOfPoints> &controlPoints,
                        int iterations,
                        const QString &pcaForZcoordFile,
                        const QString &pcaForTextureFile,
                        const QString &pcaFile,
                        const QString &flagsFile,
                        const QString &meanControlPointsFile,
-                       Map &mapMask, bool scale, bool centralize);
+                       Face::FaceData::Map &mapMask, bool scale, bool centralize);
 
 private:
-    Procrustes3DResult align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations, bool scale);
-    void morphModel(Mesh &alignedMesh);
+    Face::LinAlg::Procrustes3DResult align(Face::FaceData::Mesh &inputMesh, Face::FaceData::Landmarks &inputLandmarks,
+                                           int iterations, bool scale);
+    void morphModel(Face::FaceData::Mesh &alignedMesh);
 };
 
 #endif // MORPHABLE3DFACEMODEL_H

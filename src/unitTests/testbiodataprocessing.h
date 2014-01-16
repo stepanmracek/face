@@ -19,18 +19,18 @@ class TestBioDataProcessing
 public:
     static void testDivideTemplatesToClusters()
     {
-        QVector<Vector> allVectors;
+        QVector<Face::LinAlg::Vector> allVectors;
         QVector<int> allClasses;
-        Loader::loadImages(dataPath(), allVectors, &allClasses, "*.png", "d");
-        QVector<Template> allTemplates = Template::joinVectorsAndClasses(allVectors, allClasses);
+        Face::LinAlg::Loader::loadImages(dataPath(), allVectors, &allClasses, "*.png", "d");
+        QVector<Face::Biometrics::Template> allTemplates = Face::Biometrics::Template::joinVectorsAndClasses(allVectors, allClasses);
 
         qDebug() << "dividing...";
-        QList<QVector<Template> > templatesInClusters = BioDataProcessing::divideTemplatesToClusters(allTemplates, 20);
+        QList<QVector<Face::Biometrics::Template> > templatesInClusters = Face::Biometrics::BioDataProcessing::divideTemplatesToClusters(allTemplates, 20);
         QSet<int> allPreviousClasses;
-        foreach (const QVector<Template> &cluster, templatesInClusters)
+        foreach (const QVector<Face::Biometrics::Template> &cluster, templatesInClusters)
         {
             QSet<int> currentClasses;
-            foreach (const Template &t, cluster)
+            foreach (const Face::Biometrics::Template &t, cluster)
             {
                 currentClasses << t.subjectID;
                 assert(!allPreviousClasses.contains(t.subjectID));
@@ -43,14 +43,14 @@ public:
 
     static void testDivideVectorsToClusters()
     {
-        QVector<Vector> allVectors;
+        QVector<Face::LinAlg::Vector> allVectors;
         QVector<int> allClasses;
-        Loader::loadImages(dataPath(), allVectors, &allClasses, "*.png", "d");
+        Face::LinAlg::Loader::loadImages(dataPath(), allVectors, &allClasses, "*.png", "d");
 
         qDebug() << "dividing...";
-        QList<QVector<Vector> > vectorsInClusters;
+        QList<QVector<Face::LinAlg::Vector> > vectorsInClusters;
         QList<QVector<int> > classesInClusters;
-        BioDataProcessing::divideVectorsToClusters(allVectors, allClasses, 20, vectorsInClusters, classesInClusters);
+        Face::Biometrics::BioDataProcessing::divideVectorsToClusters(allVectors, allClasses, 20, vectorsInClusters, classesInClusters);
 
         QSet<int> allPreviousClasses;
         foreach (const QVector<int> &cluster, classesInClusters)
@@ -69,14 +69,14 @@ public:
 
     static void testDivideToNClusters()
     {
-        QVector<Vector> allVectors;
+        QVector<Face::LinAlg::Vector> allVectors;
         QVector<int> allClasses;
-        Loader::loadImages(dataPath(), allVectors, &allClasses, "*.png", "d");
+        Face::LinAlg::Loader::loadImages(dataPath(), allVectors, &allClasses, "*.png", "d");
 
         qDebug() << "dividing...";
-        QList<QVector<Vector> > vectorsInClusters;
+        QList<QVector<Face::LinAlg::Vector> > vectorsInClusters;
         QList<QVector<int> > classesInClusters;
-        BioDataProcessing::divideToNClusters(allVectors, allClasses, 10, vectorsInClusters, classesInClusters);
+        Face::Biometrics::BioDataProcessing::divideToNClusters(allVectors, allClasses, 10, vectorsInClusters, classesInClusters);
 
         QSet<int> allPreviousClasses;
         for (int i = 0; i < 10; i++)

@@ -22,12 +22,12 @@ private:
         return input;
     }
 
-    static Vector toVector(cv::Mat &input)
+    static Face::LinAlg::Vector toVector(cv::Mat &input)
     {
         cv::Mat resized;
         cv::resize(input, resized, cv::Size(input.cols/2, input.rows/2));
-        Matrix m = MatrixConverter::grayscaleImageToDoubleMatrix(resized);
-        return MatrixConverter::matrixToColumnVector(m);
+        Matrix m = Face::LinAlg::MatrixConverter::grayscaleImageToDoubleMatrix(resized);
+        return Face::LinAlg::MatrixConverter::matrixToColumnVector(m);
     }
 
     static int getId(const QString &baseName)
@@ -39,10 +39,10 @@ public:
     static void testClahe()
     {
         QString dir = "/home/stepo/data/frgc/spring2004/zbin-aligned2/textureI/";
-        QVector<QString> names = Loader::listFiles(dir, "*.png", Loader::BaseFilename);
+        QVector<QString> names = Face::LinAlg::Loader::listFiles(dir, "*.png", Face::LinAlg::Loader::BaseFilename);
 
         QVector<int> classes;
-        QVector<Vector> vectors;
+        QVector<Face::LinAlg::Vector> vectors;
         foreach (const QString &baseName, names)
         {
             cv::Mat img = cv::imread((dir + baseName + ".png").toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
@@ -52,12 +52,12 @@ public:
             classes << getId(baseName);
         }
 
-        QList<QVector<Vector> > vecsInClusters;
+        QList<QVector<Face::LinAlg::Vector> > vecsInClusters;
         QList<QVector<int> > classesInClusters;
-        BioDataProcessing::divideToNClusters(vectors, classes, 5, vecsInClusters, classesInClusters);
+        Face::Biometrics::BioDataProcessing::divideToNClusters(vectors, classes, 5, vecsInClusters, classesInClusters);
 
-        ZPCACorrW pca(vecsInClusters[0], 0.995, vecsInClusters[1]);
-        Evaluation e(vecsInClusters[2], classesInClusters[2], pca.extractor, pca.metric);
+        Face::Biometrics::ZPCACorrW pca(vecsInClusters[0], 0.995, vecsInClusters[1]);
+        Face::Biometrics::Evaluation e(vecsInClusters[2], classesInClusters[2], pca.extractor, pca.metric);
         qDebug() << e.eer;
     }
 };

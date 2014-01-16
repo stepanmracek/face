@@ -20,34 +20,34 @@ class TestLDA
 public:
     static void testLDASimple2D()
     {
-        LDA lda;
+        Face::LinAlg::LDA lda;
 
-        QVector<Vector> vectors;
+        QVector<Face::LinAlg::Vector> vectors;
         QVector<int> classMembership;
 
         // first class
-        Vector a1(2); a1(0) = 0; a1(1) = 0;
+        Face::LinAlg::Vector a1(2); a1(0) = 0; a1(1) = 0;
         vectors.append(a1);
         classMembership.append(1);
 
-        Vector b1(2); b1(0) = 0; b1(1) = 1;
+        Face::LinAlg::Vector b1(2); b1(0) = 0; b1(1) = 1;
         vectors.append(b1);
         classMembership.append(1);
 
-        Vector c1(2); c1(0) = 1; c1(1) = 1;
+        Face::LinAlg::Vector c1(2); c1(0) = 1; c1(1) = 1;
         vectors.append(c1);
         classMembership.append(1);
 
         // second class
-        Vector a2(2); a2(0) = 1; a2(1) = 0;
+        Face::LinAlg::Vector a2(2); a2(0) = 1; a2(1) = 0;
         vectors.append(a2);
         classMembership.append(2);
 
-        Vector b2(2); b2(0) = 2; b2(1) = 0;
+        Face::LinAlg::Vector b2(2); b2(0) = 2; b2(1) = 0;
         vectors.append(b2);
         classMembership.append(2);
 
-        Vector c2(2); c2(0) = 2; c2(1) = 1;
+        Face::LinAlg::Vector c2(2); c2(0) = 2; c2(1) = 1;
         vectors.append(c2);
         classMembership.append(2);
 
@@ -65,61 +65,61 @@ public:
 
     static void testLDAFaces()
     {
-        QVector<Vector> vectors;
-        QVector<Vector> vectors2;
+        QVector<Face::LinAlg::Vector> vectors;
+        QVector<Face::LinAlg::Vector> vectors2;
         QVector<int> classMembership;
         QVector<int> classMembership2;
         QString path("/media/data/SVN/disp-stepan-mracek/databases/orl");
         QString path2("/media/data/SVN/disp-stepan-mracek/databases/orl2");
 
         // load images
-        Loader::loadImages(path, vectors, &classMembership, "*.pgm");
-        Loader::loadImages(path2, vectors2, &classMembership2, "*.pgm");
+        Face::LinAlg::Loader::loadImages(path, vectors, &classMembership, "*.pgm");
+        Face::LinAlg::Loader::loadImages(path2, vectors2, &classMembership2, "*.pgm");
 
         // train
-        LDAofPCA fisher(vectors, classMembership);
+        Face::LinAlg::LDAofPCA fisher(vectors, classMembership);
 
         // project
         qDebug() << "Creating templates";
         int n = vectors.count();
-        QVector<Template> ldaTemplates;
-        QVector<Template> pcaTemplates;
-        QVector<Template> ldaTemplates2;
-        QVector<Template> pcaTemplates2;
-        QVector<Vector> mahalSamples;
+        QVector<Face::Biometrics::Template> ldaTemplates;
+        QVector<Face::Biometrics::Template> pcaTemplates;
+        QVector<Face::Biometrics::Template> ldaTemplates2;
+        QVector<Face::Biometrics::Template> pcaTemplates2;
+        QVector<Face::LinAlg::Vector> mahalSamples;
         for (int i = 0; i < n; i++)
         {
-            Template ldaTemplate;
+            Face::Biometrics::Template ldaTemplate;
             ldaTemplate.subjectID = classMembership[i];
             ldaTemplate.featureVector = fisher.project(vectors[i]);
             ldaTemplates.append(ldaTemplate);
 
             mahalSamples.append(ldaTemplate.featureVector);
 
-            Template pcaTemplate;
+            Face::Biometrics::Template pcaTemplate;
             pcaTemplate.subjectID = classMembership[i];
             pcaTemplate.featureVector = fisher.pca.project(vectors[i]);
             pcaTemplates.append(pcaTemplate);
 
-            Template ldaTemplate2;
+            Face::Biometrics::Template ldaTemplate2;
             ldaTemplate2.subjectID = classMembership2[i];
             ldaTemplate2.featureVector = fisher.project(vectors2[i]);
             ldaTemplates2.append(ldaTemplate2);
 
-            Template pcaTemplate2;
+            Face::Biometrics::Template pcaTemplate2;
             pcaTemplate2.subjectID = classMembership2[i];
             pcaTemplate2.featureVector = fisher.pca.project(vectors2[i]);
             pcaTemplates2.append(pcaTemplate2);
         }
 
-        EuclideanMetric eucl;
-        Evaluation evalLDA(ldaTemplates, eucl);
-        Evaluation evalPCA(pcaTemplates, eucl);
-        Evaluation evalLDA2(ldaTemplates2, eucl);
-        Evaluation evalPCA2(pcaTemplates2, eucl);
+        Face::LinAlg::EuclideanMetric eucl;
+        Face::Biometrics::Evaluation evalLDA(ldaTemplates, eucl);
+        Face::Biometrics::Evaluation evalPCA(pcaTemplates, eucl);
+        Face::Biometrics::Evaluation evalLDA2(ldaTemplates2, eucl);
+        Face::Biometrics::Evaluation evalPCA2(pcaTemplates2, eucl);
 
-        MahalanobisMetric mahal(mahalSamples);
-        Evaluation evalLDAonTestWithMahal(ldaTemplates2, mahal);
+        Face::LinAlg::MahalanobisMetric mahal(mahalSamples);
+        Face::Biometrics::Evaluation evalLDAonTestWithMahal(ldaTemplates2, mahal);
 
         qDebug() << "PCA on training set:" << evalPCA.eer;
         qDebug() << "LDA on training set:" << evalLDA.eer;

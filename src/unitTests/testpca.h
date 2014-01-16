@@ -21,27 +21,27 @@ public:
     static void testPCASimple()
     {
         // load vectors
-        QVector<Vector> vectors;
+        QVector<Face::LinAlg::Vector> vectors;
         QDir dir("vectorsToAlign");
         dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
         QStringList filenames = dir.entryList();
 
         for (int i = 0; i < filenames.count(); i++)
         {
-            Vector v = Vector::fromTwoColsFile("vectorsToAlign/" + filenames[i]);
+            Face::LinAlg::Vector v = Face::LinAlg::Vector::fromTwoColsFile("vectorsToAlign/" + filenames[i]);
             vectors.append(v);
         }
 
         // align them
-        Procrustes2D::procrustesAnalysis(vectors);
+        Face::LinAlg::Procrustes2D::procrustesAnalysis(vectors);
 
-        PCA pca(vectors);
+        Face::LinAlg::PCA pca(vectors);
         for (int i = 0; i < vectors.count(); i++)
         {
-            Vector projected = pca.project(vectors[i]);
-            Vector backProjected = pca.backProject(projected);
+            Face::LinAlg::Vector projected = pca.project(vectors[i]);
+            Face::LinAlg::Vector backProjected = pca.backProject(projected);
             Matrix diffMat = vectors[i] - backProjected;
-            Vector diff(diffMat);
+            Face::LinAlg::Vector diff(diffMat);
             qDebug() << i<< diff.magnitude();
         }
     }
@@ -49,56 +49,56 @@ public:
     static void testPCAStorage()
     {
         // load vectors
-        QVector<Vector> vectors;
+        QVector<Face::LinAlg::Vector> vectors;
         QDir dir("vectorsToAlign");
         dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
         QStringList filenames = dir.entryList();
 
         for (int i = 0; i < filenames.count(); i++)
         {
-            Vector v = Vector::fromTwoColsFile("vectorsToAlign/" + filenames[i]);
+            Face::LinAlg::Vector v = Face::LinAlg::Vector::fromTwoColsFile("vectorsToAlign/" + filenames[i]);
             vectors.append(v);
         }
 
         // align them
-        Procrustes2D::procrustesAnalysis(vectors);
+        Face::LinAlg::Procrustes2D::procrustesAnalysis(vectors);
 
-        PCA pca(vectors);
+        Face::LinAlg::PCA pca(vectors);
         pca.serialize("myPCA.yml");
 
-        PCA pca2("myPCA.yml");
+        Face::LinAlg::PCA pca2("myPCA.yml");
         for (int i = 0; i < vectors.count(); i++)
         {
             Matrix projected = pca2.project(vectors[i]);
             Matrix backProjected = pca2.backProject(projected);
             Matrix diffMat = vectors[i] - backProjected;
-            Vector diff = diffMat;
+            Face::LinAlg::Vector diff = diffMat;
             qDebug() << i<< diff.magnitude();
         }
     }
 
     char * winname;
     int trackbarValues[10];
-    Vector parameters;
-    PCA pca;
+    Face::LinAlg::Vector parameters;
+    Face::LinAlg::PCA pca;
     int imWidth;
 
     void testPCACreateFaceSpace()
     {
-        QVector<Vector> input;
+        QVector<Face::LinAlg::Vector> input;
         //QString path("/home/stepo/SVN/disp-stepan-mracek/databases/orl");
         QString path("/media/frgc/frgc-norm-iterative/big-index");
-        Loader::loadImages(path, input, 0, "*.png");
-        QVector<Vector> reduced = input.mid(0,196);
+        Face::LinAlg::Loader::loadImages(path, input, 0, "*.png");
+        QVector<Face::LinAlg::Vector> reduced = input.mid(0,196);
 
         pca.learn(reduced);
         pca.modesSelectionThreshold();
         qDebug() << "modes:" << pca.getModes();
 
         imWidth = 121;
-        parameters = Vector(pca.getModes());
-        Vector vec = pca.backProject(parameters);
-        Matrix image = MatrixConverter::columnVectorToMatrix(vec, imWidth);
+        parameters = Face::LinAlg::Vector(pca.getModes());
+        Face::LinAlg::Vector vec = pca.backProject(parameters);
+        Matrix image = Face::LinAlg::MatrixConverter::columnVectorToMatrix(vec, imWidth);
 
         winname = "PCA FaceSpace";
         cv::namedWindow(winname);
@@ -125,8 +125,8 @@ void onChange(int, void* userData)
         test->parameters(i) = value;
     }
 
-    Vector vec = test->pca.backProject(test->parameters);
-    Matrix image = MatrixConverter::columnVectorToMatrix(vec, test->imWidth);
+    Face::LinAlg::Vector vec = test->pca.backProject(test->parameters);
+    Matrix image = Face::LinAlg::MatrixConverter::columnVectorToMatrix(vec, test->imWidth);
     cv::imshow(test->winname, image);
 }
 

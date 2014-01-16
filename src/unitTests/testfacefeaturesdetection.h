@@ -15,7 +15,6 @@
 #include "facelib/facealigner.h"
 #include "linalg/vector.h"
 #include "linalg/procrustes.h"
-#include "linalg/pointcloud.h"
 #include "facelib/maskedvector.h"
 #include "facelib/facefeaturesanotation.h"
 #include "facelib/landmarks.h"
@@ -47,9 +46,9 @@ public:
         QFileInfoList list = dir.entryInfoList(filter, QDir::Files);
         foreach (const QFileInfo &info, list)
         {
-            Mesh m = Mesh::fromOBJ(info.absoluteFilePath());
-            LandmarkDetector detector(m);
-            Landmarks l = detector.detect();
+            Face::FaceData::Mesh m = Face::FaceData::Mesh::fromOBJ(info.absoluteFilePath());
+            Face::FaceData::LandmarkDetector detector(m);
+            Face::FaceData::Landmarks l = detector.detect();
             QString lPath = dirPath + QDir::separator() + info.baseName() + "_auto.xml";
             l.serialize(lPath);
         }
@@ -62,12 +61,13 @@ public:
         QFileInfoList list = dir.entryInfoList(filter, QDir::Files);
         foreach (const QFileInfo &info, list)
         {
-            Mesh m = Mesh::fromOBJ(info.absoluteFilePath());
+            Face::FaceData::Mesh m = Face::FaceData::Mesh::fromOBJ(info.absoluteFilePath());
             QString lPath = dirPath + QDir::separator() + info.baseName() + ".xml";
-            Landmarks l(lPath);
+            Face::FaceData::Landmarks l(lPath);
 
-            MapConverter converter;
-            Map depth = SurfaceProcessor::depthmap(m, converter, 1.0, SurfaceProcessor::ZCoord);
+            Face::FaceData::MapConverter converter;
+            Face::FaceData::Map depth = Face::FaceData::SurfaceProcessor::depthmap(m, converter, 1.0,
+                                                                                   Face::FaceData::SurfaceProcessor::ZCoord);
             Matrix img = depth.toMatrix() * 255;
 
             for (int i = 0; i < l.points.size(); i++)
@@ -95,12 +95,13 @@ public:
         QFileInfoList list = dir.entryInfoList(filter, QDir::Files);
         foreach (const QFileInfo &info, list)
         {
-            Mesh m = Mesh::fromOBJ(info.absoluteFilePath());
+            Face::FaceData::Mesh m = Face::FaceData::Mesh::fromOBJ(info.absoluteFilePath());
             QString lPath = dirPath + QDir::separator() + info.baseName() + "_auto.xml";
-            Landmarks l(lPath);
+            Face::FaceData::Landmarks l(lPath);
 
-            MapConverter converter;
-            Map depthmap = SurfaceProcessor::depthmap(m, converter, 1.0, SurfaceProcessor::ZCoord);
+            Face::FaceData::MapConverter converter;
+            Face::FaceData::Map depthmap =
+                    Face::FaceData::SurfaceProcessor::depthmap(m, converter, 1.0, Face::FaceData::SurfaceProcessor::ZCoord);
 
             QString ptsPath = dirPath + QDir::separator() + info.baseName() + ".pts";
             QFile ptsFile(ptsPath);
@@ -109,11 +110,11 @@ public:
             ptsStream << "version: 1\nn_points: 3\n{\n";
 
             cv::Point2d p2d;
-            p2d = converter.MeshToMapCoords(depthmap, l.points[Landmarks::LeftInnerEye]);
+            p2d = converter.MeshToMapCoords(depthmap, l.points[Face::FaceData::Landmarks::LeftInnerEye]);
             ptsStream << p2d.x << " " << p2d.y << "\n";
-            p2d = converter.MeshToMapCoords(depthmap, l.points[Landmarks::RightInnerEye]);
+            p2d = converter.MeshToMapCoords(depthmap, l.points[Face::FaceData::Landmarks::RightInnerEye]);
             ptsStream << p2d.x << " " << p2d.y << "\n";
-            p2d = converter.MeshToMapCoords(depthmap, l.points[Landmarks::Nosetip]);
+            p2d = converter.MeshToMapCoords(depthmap, l.points[Face::FaceData::Landmarks::Nosetip]);
             ptsStream << p2d.x << " " << p2d.y << "\n";
 
             ptsStream << "}\n";
@@ -122,9 +123,9 @@ public:
 
     static int  testLandmarkDetection(int argc, char *argv[], QString pathToXYZ)
     {
-        Mesh face = Mesh::fromXYZ(pathToXYZ);
-        LandmarkDetector detector(face);
-        Landmarks landmarks = detector.detect();
+        Face::FaceData::Mesh face = Face::FaceData::Mesh::fromXYZ(pathToXYZ);
+        Face::FaceData::LandmarkDetector detector(face);
+        Face::FaceData::Landmarks landmarks = detector.detect();
 
         QApplication app(argc, argv);
         GLWidget widget;
@@ -142,7 +143,7 @@ public:
         QFileInfoList entries = dir.entryInfoList();
         foreach (const QFileInfo &e, entries)
         {
-            Landmarks l(e.absoluteFilePath());
+            Face::FaceData::Landmarks l(e.absoluteFilePath());
             if (!l.check())
             {
                 qDebug() << e.fileName() << "didn't pass the landmark.check()";

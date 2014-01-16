@@ -14,10 +14,10 @@ public:
         int k1 = 3;
         int k2 = 35;
 
-        Matrix img = Common::loadMatrix("/media/data/frgc/spring2004/zbin-aligned2/textureI/02463d652.gz");
+        Matrix img = Face::LinAlg::Common::loadMatrix("/media/data/frgc/spring2004/zbin-aligned2/textureI/02463d652.gz");
 
-        Matrix diff = DifferenceOfGaussians::dog(img, k1, k2, false);
-        Matrix equalized = DifferenceOfGaussians::dog(img, k1, k2, true);
+        Matrix diff = Face::LinAlg::DifferenceOfGaussians::dog(img, k1, k2, false);
+        Matrix equalized = Face::LinAlg::DifferenceOfGaussians::dog(img, k1, k2, true);
 
         cv::imshow("img", img);
         cv::imshow("diff", diff);

@@ -21,40 +21,40 @@ public:
 
     static void testRotateAndScale()
     {
-        Vector v = Vector::fromTwoColsFile("vectorsToAlign/vec01");
-        Procrustes2D::centralize(v);
+        Face::LinAlg::Vector v = Face::LinAlg::Vector::fromTwoColsFile("vectorsToAlign/vec01");
+        Face::LinAlg::Procrustes2D::centralize(v);
         double sum = 0.0;
         for (int i = 0; i < v.rows; i++)
             sum += v(i, 0);
         qDebug() << sum;
         v.toFileTwoCols("original");
 
-        RotateAndScaleCoefs rs(1.2, 0.75);
-        Procrustes2D::rotateAndScale(v, rs);
+        Face::LinAlg::RotateAndScaleCoefs rs(1.2, 0.75);
+        Face::LinAlg::Procrustes2D::rotateAndScale(v, rs);
         v.toFileTwoCols("rotatedAndScaled");
     }
 
     static void testAlign()
     {
         // Load vectors
-        Vector from = Vector::fromTwoColsFile("vectorsToAlign/vec01");
-        Procrustes2D::centralize(from);
-        Vector to(from);
+        Face::LinAlg::Vector from = Face::LinAlg::Vector::fromTwoColsFile("vectorsToAlign/vec01");
+        Face::LinAlg::Procrustes2D::centralize(from);
+        Face::LinAlg::Vector to(from);
 
         // Rotate first one
-        RotateAndScaleCoefs testCoefs(1.2, -0.95);
-        Procrustes2D::rotateAndScale(to, testCoefs);
+        Face::LinAlg::RotateAndScaleCoefs testCoefs(1.2, -0.95);
+        Face::LinAlg::Procrustes2D::rotateAndScale(to, testCoefs);
 
-        Vector diff = from - to;
+        Face::LinAlg::Vector diff = from - to;
         qDebug() << "before:" << diff.sqrMagnitude();
         from.toFileTwoCols("before");
         to.toFileTwoCols("before", true);
 
         // Estimate needed rotation of second one
         //TransformationCoefs gainedCoefs = Procrustes::AlignAlt(from, to);
-        RotateAndScaleCoefs gainedCoefs = Procrustes2D::align(from, to);
+        Face::LinAlg::RotateAndScaleCoefs gainedCoefs = Face::LinAlg::Procrustes2D::align(from, to);
         //Procrustes::Transformate(from, gainedCoefs);
-        Procrustes2D::rotateAndScale(from, gainedCoefs);
+        Face::LinAlg::Procrustes2D::rotateAndScale(from, gainedCoefs);
         qDebug() << "coefs:" << gainedCoefs.s << gainedCoefs.theta;
         diff = from - to;
         qDebug() << "after:" << diff.sqrMagnitude();
@@ -66,18 +66,18 @@ public:
     static void testProcrustes()
     {
         // load vectors
-        QVector<Vector> vectors;
+        QVector<Face::LinAlg::Vector> vectors;
         QDir dir("vectorsToAlign");
         dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
         QStringList filenames = dir.entryList();
 
         for (int i = 0; i < filenames.count(); i++)
         {
-            Vector v = Vector::fromTwoColsFile("vectorsToAlign/" + filenames[i]);
-            RotateAndScaleCoefs c;
+            Face::LinAlg::Vector v = Face::LinAlg::Vector::fromTwoColsFile("vectorsToAlign/" + filenames[i]);
+            Face::LinAlg::RotateAndScaleCoefs c;
             c.s = 1;
             c.theta = ((double)qrand())/RAND_MAX - 0.5;
-            Procrustes2D::rotateAndScale(v, c);
+            Face::LinAlg::Procrustes2D::rotateAndScale(v, c);
             vectors.append(v);
         }
 
@@ -90,7 +90,7 @@ public:
         }
 
         // align them
-        Procrustes2D::procrustesAnalysis(vectors, 1e-100);
+        Face::LinAlg::Procrustes2D::procrustesAnalysis(vectors, 1e-100);
 
         // save all to one file
         if (QFile::exists("aligned"))

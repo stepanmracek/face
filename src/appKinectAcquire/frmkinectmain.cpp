@@ -16,7 +16,7 @@
 #include "linalg/loader.h"
 #include "biometrics/realtimeclassifier.h"
 
-FrmKinectMain::FrmKinectMain(KinectSensorPlugin &sensor, const FaceClassifier &classifier, const QString &databasePath,
+FrmKinectMain::FrmKinectMain(KinectSensorPlugin &sensor, const Face::Biometrics::FaceClassifier &classifier, const QString &databasePath,
                              QWidget *parent) :
     ui(new Ui::FrmKinectMain),
     sensor(sensor),
@@ -47,13 +47,13 @@ void FrmKinectMain::initDatabase(const QString &dirPath)
         mapNameToId[name] = id;
     }
 
-    QVector<QString> templateFiles = Loader::listFiles(dirPath, "*.yml", Loader::AbsoluteFull);
+    QVector<QString> templateFiles = Face::LinAlg::Loader::listFiles(dirPath, "*.yml", Face::LinAlg::Loader::AbsoluteFull);
     foreach(const QString &path, templateFiles)
     {
         int id = QFileInfo(path).baseName().split("-")[0].toInt();
 
         QString name = mapIdToName[id];
-        Face3DTemplate *t = new Face3DTemplate(id, path, classifier);
+        Face::Biometrics::Face3DTemplate *t = new Face::Biometrics::Face3DTemplate(id, path, classifier);
         database.insertMulti(id, t);
     }
 
@@ -101,12 +101,12 @@ void FrmKinectMain::on_btnIdentify_clicked()
 {
     sensor.scan();
     sensor.align();
-    Mesh m = sensor.mesh();
+    Face::FaceData::Mesh m = sensor.mesh();
 
-    Face3DTemplate *probe = new Face3DTemplate(0, m, classifier);
+    Face::Biometrics::Face3DTemplate *probe = new Face::Biometrics::Face3DTemplate(0, m, classifier);
     sensor.deleteMesh();
 
-    QMap<int, double> result = classifier.identify(database, probe, FaceClassifier::CompareMeanDistance);
+    QMap<int, double> result = classifier.identify(database, probe, Face::Biometrics::FaceClassifier::CompareMeanDistance);
     delete probe;
     DlgIdentifyResult dlg(result, mapIdToName, ui->sliderThreshold->value(), this);
     dlg.exec();
@@ -120,9 +120,9 @@ void FrmKinectMain::on_btnVerify_clicked()
 
     sensor.scan();
     sensor.align();
-    Mesh m = sensor.mesh();
+    Face::FaceData::Mesh m = sensor.mesh();
 
-    Face3DTemplate *probe = new Face3DTemplate(0, m, classifier);
+    Face::Biometrics::Face3DTemplate *probe = new Face::Biometrics::Face3DTemplate(0, m, classifier);
     sensor.deleteMesh();
 
     if (!mapNameToId.contains(name))
@@ -133,7 +133,7 @@ void FrmKinectMain::on_btnVerify_clicked()
     }
 
     int id = mapNameToId[name];
-    double score = classifier.compare(database.values(id), probe, FaceClassifier::CompareMeanDistance, true);
+    double score = classifier.compare(database.values(id), probe, Face::Biometrics::FaceClassifier::CompareMeanDistance, true);
     delete probe;
 
     bool accepted = (score < ui->sliderThreshold->value());
@@ -170,9 +170,9 @@ void FrmKinectMain::on_btnExport_clicked()
     QString path = QFileDialog::getExistingDirectory(this);
     if (path.isNull() || path.isEmpty()) return;
 
-    QList<Face3DTemplate*> templates = database.values(id);
+    QList<Face::Biometrics::Face3DTemplate*> templates = database.values(id);
     int index = 1;
-    foreach (const Face3DTemplate *t, templates)
+    foreach (const Face::Biometrics::Face3DTemplate *t, templates)
     {
         QString p = path + QDir::separator() + QString().sprintf("%02d", id) + "-" + QString().sprintf("%02d", index) + ".yml";
         qDebug() << p;

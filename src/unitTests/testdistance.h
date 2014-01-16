@@ -8,7 +8,7 @@ class TestDistance
 public:
     static void testCosine()
     {
-        CosineMetric cos;
+        Face::LinAlg::CosineMetric cos;
 
         Matrix first =  (Matrix(3,1) << 1.0, -2.0, 0.5 );
         Matrix second = -first;

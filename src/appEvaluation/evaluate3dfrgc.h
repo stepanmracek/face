@@ -53,20 +53,22 @@ public:
         QString srcDirPath = "/home/stepo/data/frgc/spring2004/bin/";
         QString outDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
 
-        FaceAligner aligner(Mesh::fromOBJ("../../test/meanForAlign.obj"));
-        MapConverter converter;
+        Face::FaceData::FaceAligner aligner(Face::FaceData::Mesh::fromOBJ("../../test/meanForAlign.obj"));
+        Face::FaceData::MapConverter converter;
 
         QDir srcDir(srcDirPath, "*.bin");
         QFileInfoList srcFiles = srcDir.entryInfoList();
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
-            Mesh mesh = Mesh::fromBIN(srcFileInfo.absoluteFilePath());
-            aligner.icpAlign(mesh, 15, FaceAligner::NoseTipDetection);
+            Face::FaceData::Mesh mesh = Face::FaceData::Mesh::fromBIN(srcFileInfo.absoluteFilePath());
+            aligner.icpAlign(mesh, 15, Face::FaceData::FaceAligner::NoseTipDetection);
 
             QString resultPath = outDirPath + srcFileInfo.baseName() + ".binz";
             mesh.writeBINZ(resultPath);
 
-            Map texture = SurfaceProcessor::depthmap(mesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, SurfaceProcessor::Texture_I);
+            Face::FaceData::Map texture =
+                    Face::FaceData::SurfaceProcessor::depthmap(mesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100),
+                                                               1, Face::FaceData::SurfaceProcessor::Texture_I);
             Matrix m = texture.toMatrix(0, 0, 255);
             cv::circle(m, cv::Point(100,100), 3, 255, -1);
             QString resultTexturePath = outDirPath + srcFileInfo.baseName() + ".png";
@@ -87,10 +89,10 @@ public:
             QString resultPath = outDirPath + srcFileInfo.baseName() + ".xml";
             if (QFile::exists(resultPath)) continue;
 
-            QVector<VectorOfPoints> isoCurves;
-            Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
-            isoCurves = Face3DTemplate::getIsoGeodesicCurves(mesh);
-            Serialization::serializeVectorOfPointclouds(isoCurves, resultPath);
+            QVector<Face::FaceData::VectorOfPoints> isoCurves;
+            Face::FaceData::Mesh mesh = Face::FaceData::Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
+            isoCurves = Face::Biometrics::Face3DTemplate::getIsoGeodesicCurves(mesh);
+            Face::LinAlg::Serialization::serializeVectorOfPointclouds(isoCurves, resultPath);
             //LandmarkDetector detector(mesh);
             //Landmarks lm = detector.detect();
             //cv::Point3d nosetip = lm.get(Landmarks::Nosetip);
@@ -114,44 +116,44 @@ public:
     {
         //int modulo = 1;
         QString dirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/isocurves/";
-        QVector<SubjectIsoCurves> data = IsoCurveProcessing::readDirectory(dirPath, "d", "*.xml");
-        IsoCurveProcessing::selectIsoCurves(data, 0, 5);
-        IsoCurveProcessing::stats(data);
+        QVector<Face::Biometrics::SubjectIsoCurves> data = Face::Biometrics::IsoCurveProcessing::readDirectory(dirPath, "d", "*.xml");
+        Face::Biometrics::IsoCurveProcessing::selectIsoCurves(data, 0, 5);
+        Face::Biometrics::IsoCurveProcessing::stats(data);
         //IsoCurveProcessing::sampleIsoCurvePoints(data, modulo);
-        QVector<Template> rawData = IsoCurveProcessing::generateTemplates(data, false);
+        QVector<Face::Biometrics::Template> rawData = Face::Biometrics::IsoCurveProcessing::generateTemplates(data, false);
 
         QVector<int> classes;
-        QVector<Vector> rawFeatureVectors;
-        Template::splitVectorsAndClasses(rawData, rawFeatureVectors, classes);
+        QVector<Face::LinAlg::Vector> rawFeatureVectors;
+        Face::Biometrics::Template::splitVectorsAndClasses(rawData, rawFeatureVectors, classes);
 
         int clusterCount = 5;
         QList<QVector<int> > classesInClusters;
-        QList<QVector<Vector> > rawVectorsInClusters;
-        BioDataProcessing::divideToNClusters(rawFeatureVectors, classes, clusterCount, rawVectorsInClusters, classesInClusters);
+        QList<QVector<Face::LinAlg::Vector> > rawVectorsInClusters;
+        Face::Biometrics::BioDataProcessing::divideToNClusters(rawFeatureVectors, classes, clusterCount,
+                                                               rawVectorsInClusters, classesInClusters);
 
         QList<QVector<int> > trainClassesInClusters;
-        QList<QVector<Vector> > trainVectorsInClusters;
-        BioDataProcessing::divideToNClusters(rawVectorsInClusters[0], classesInClusters[0], 2,
-                                             trainVectorsInClusters, trainClassesInClusters);
+        QList<QVector<Face::LinAlg::Vector> > trainVectorsInClusters;
+        Face::Biometrics::BioDataProcessing::divideToNClusters(rawVectorsInClusters[0], classesInClusters[0], 2,
+                trainVectorsInClusters, trainClassesInClusters);
 
-        PCA pca(trainVectorsInClusters[0]);
+        Face::LinAlg::PCA pca(trainVectorsInClusters[0]);
         //pca.modesSelectionThreshold(pcaThreshold);
         //PCAExtractor pcaExtractor(pca);
-        ZScorePCAExtractor zscorePcaExtractor(pca, trainVectorsInClusters[1]);
+        Face::Biometrics::ZScorePCAExtractor zscorePcaExtractor(pca, trainVectorsInClusters[1]);
         zscorePcaExtractor.serialize("isocurves-pca", "isocurves-normparams");
 
-        QVector<Template> trainTemplates = Template::createTemplates(trainVectorsInClusters[1],
-                                                                     trainClassesInClusters[1],
-                                                                     zscorePcaExtractor);
-        EERPotential eerPot(trainTemplates);
+        QVector<Face::Biometrics::Template> trainTemplates =
+                Face::Biometrics::Template::createTemplates(trainVectorsInClusters[1], trainClassesInClusters[1], zscorePcaExtractor);
+        Face::Biometrics::EERPotential eerPot(trainTemplates);
 
-        CorrelationWeightedMetric corW;
+        Face::LinAlg::CorrelationWeightedMetric corW;
         double bestThreshold;
         double bestEER = 1;
         for (double selThreshold = 0.0; selThreshold <= 0.3; selThreshold += 0.01)
         {
             corW.w = eerPot.createSelectionWeightsBasedOnRelativeThreshold(selThreshold);
-            Evaluation eCor(rawVectorsInClusters[1], classesInClusters[1], zscorePcaExtractor, corW);
+            Face::Biometrics::Evaluation eCor(rawVectorsInClusters[1], classesInClusters[1], zscorePcaExtractor, corW);
 
             if (eCor.eer < bestEER)
             {
@@ -164,11 +166,11 @@ public:
 
         corW.w = eerPot.createSelectionWeightsBasedOnRelativeThreshold(bestThreshold);
         corW.w.toFile("isocurves-selWeights");
-        BatchEvaluationResult batchResult = Evaluation::batch(rawVectorsInClusters, classesInClusters,
-                                                              zscorePcaExtractor, corW, 1);
+        Face::Biometrics::BatchEvaluationResult batchResult =
+                Face::Biometrics::Evaluation::batch(rawVectorsInClusters, classesInClusters, zscorePcaExtractor, corW, 1);
         qDebug() << batchResult.meanEER << batchResult.stdDevOfEER;
         int i = 0;
-        foreach(const Evaluation &e, batchResult.results)
+        foreach(const Face::Biometrics::Evaluation &e, batchResult.results)
         {
             qDebug() << e.eer;
             e.outputResults("isocurves-" + QString::number(i++), 50);
@@ -187,7 +189,7 @@ public:
         curvatureNames << "depth" << "mean" << "gauss" << "index" << "eigencur";
         foreach (const QFileInfo &srcFileInfo, srcFiles)
         {
-            Mesh mesh = Mesh::fromBINZ(srcFileInfo.absoluteFilePath(), false);
+            Face::FaceData::Mesh mesh = Face::FaceData::Mesh::fromBINZ(srcFileInfo.absoluteFilePath(), false);
             /*Matrix equalized = Face3DTemplate::getTexture(mesh, true);
 
             QString out = srcDirPath + "textureE/" + srcFileInfo.baseName() + ".gz";
@@ -206,11 +208,11 @@ public:
                 index++;
             }*/
 
-            Matrix texture = Face3DTemplate::getTexture(mesh, false);
+            Matrix texture = Face::Biometrics::Face3DTemplate::getTexture(mesh, false);
             QString out = srcDirPath + "textureI/" + srcFileInfo.baseName() + ".gz";
-            if (Common::matrixContainsNan(texture))
+            if (Face::LinAlg::Common::matrixContainsNan(texture))
                 nans << "textureI-" + srcFileInfo.baseName();
-            Common::saveMatrix(texture, out);
+            Face::LinAlg::Common::saveMatrix(texture, out);
         }
 
         qDebug() << nans;
@@ -236,7 +238,7 @@ public:
 
         QList<QVector<ImageGrayscale> > imagesInClusters;
         QList<QVector<int> > classesInClusters;
-        BioDataProcessing::divideToNClusters<ImageGrayscale>(allImages, allClasses, 10, imagesInClusters, classesInClusters);
+        Face::Biometrics::BioDataProcessing::divideToNClusters<ImageGrayscale>(allImages, allClasses, 10, imagesInClusters, classesInClusters);
 
         for (int i = 0; i < 3; i++)
         {
@@ -245,14 +247,15 @@ public:
             {
                 for (int bins = 3; bins <= 50; bins++)
                 {
-                    QVector<Vector> rawVectors;
+                    QVector<Face::LinAlg::Vector> rawVectors;
                     foreach(const ImageGrayscale &image, imagesInClusters[i])
                     {
-                        HistogramFeatures features(image, stripes, bins);
+                        Face::Biometrics::HistogramFeatures features(image, stripes, bins);
                         rawVectors << features.toVector();
                     }
 
-                    Evaluation e(rawVectors, classesInClusters[i], PassExtractor(), CityblockMetric());
+                    Face::Biometrics::Evaluation e(rawVectors, classesInClusters[i], Face::Biometrics::PassExtractor(),
+                                                   Face::LinAlg::CityblockMetric());
                     qDebug() << stripes << bins << e.eer; //  results.meanEER << "+-" << results.stdDevOfEER;
                 }
                 qDebug() << "";
@@ -340,21 +343,22 @@ public:
         double threshold = 0.995;
         cv::Rect roi(50, 40, 100, 90);
 
-        QVector<Vector> vectors;
+        QVector<Face::LinAlg::Vector> vectors;
         QVector<int> classes;
-        Loader::loadImages(srcDirPath, vectors, &classes, "*.png", "d", -1, roi);
+        Face::LinAlg::Loader::loadImages(srcDirPath, vectors, &classes, "*.png", "d", -1, roi);
 
         qDebug() << "dividing";
-        QList<QVector<Vector> > vectorsInClusters;
+        QList<QVector<Face::LinAlg::Vector> > vectorsInClusters;
         QList<QVector<int> > classesInClusters;
-        BioDataProcessing::divideToNClusters(vectors, classes, 5, vectorsInClusters, classesInClusters);
+        Face::Biometrics::BioDataProcessing::divideToNClusters(vectors, classes, 5, vectorsInClusters, classesInClusters);
 
         qDebug() << "extractor and metric";
-        ZPCACorrW extractorAndMetric(vectorsInClusters[0], threshold, vectorsInClusters[0]);//, classesInClusters[1], vectorsInClusters[1], 0.0, 0.5, 0.05);
+        Face::Biometrics::ZPCACorrW extractorAndMetric(vectorsInClusters[0], threshold, vectorsInClusters[0]);//, classesInClusters[1], vectorsInClusters[1], 0.0, 0.5, 0.05);
 
         qDebug() << "evaluation";
-        BatchEvaluationResult batchEval = Evaluation::batch(vectorsInClusters, classesInClusters, extractorAndMetric.extractor, extractorAndMetric.metric);
-        foreach(const Evaluation &eval, batchEval.results)
+        Face::Biometrics::BatchEvaluationResult batchEval = Face::Biometrics::Evaluation::batch(vectorsInClusters, classesInClusters,
+                                                                              extractorAndMetric.extractor, extractorAndMetric.metric);
+        foreach(const Face::Biometrics::Evaluation &eval, batchEval.results)
         {
             qDebug() << eval.eer;
         }
@@ -381,25 +385,23 @@ public:
         //QVector<int> testClasses;
         foreach (const QString &source, sources)
         {
-            QVector<Vector> vectors;
+            QVector<Face::LinAlg::Vector> vectors;
             QVector<int> classes;
-            Loader::loadImages(srcDirPath + source, vectors, &classes, "*.png", "d", -1, roi);
+            Face::LinAlg::Loader::loadImages(srcDirPath + source, vectors, &classes, "*.png", "d", -1, roi);
 
-            QList<QVector<Vector> > vectorsInClusters;
+            QList<QVector<Face::LinAlg::Vector> > vectorsInClusters;
             QList<QVector<int> > classesInClusters;
-            BioDataProcessing::divideToNClusters(vectors, classes, 5, vectorsInClusters, classesInClusters);
+            Face::Biometrics::BioDataProcessing::divideToNClusters(vectors, classes, 5, vectorsInClusters, classesInClusters);
 
-            PCA pca(vectorsInClusters[0]);
+            Face::LinAlg::PCA pca(vectorsInClusters[0]);
             pca.modesSelectionThreshold(threshold);
-            ZScorePCAExtractor *zPcaExtractor = new ZScorePCAExtractor(pca, vectorsInClusters[0]);
+            Face::Biometrics::ZScorePCAExtractor *zPcaExtractor = new Face::Biometrics::ZScorePCAExtractor(pca, vectorsInClusters[0]);
             zPcaExtractor->serialize("../../test/frgc/" + source + "/pca.yml",
                                      "../../test/frgc/" + source + "/normparams.yml");
 
-            Metrics *metrics = new CorrelationMetric();
+            Face::LinAlg::Metrics *metrics = new Face::LinAlg::CorrelationMetric();
 
-            Evaluation eval(vectorsInClusters[1],
-                            classesInClusters[1],
-                            *zPcaExtractor, *metrics);
+            Face::Biometrics::Evaluation eval(vectorsInClusters[1], classesInClusters[1], *zPcaExtractor, *metrics);
             qDebug() << source << "z-PCA" << eval.eer;
 
             //ScoreLevelFusionComponent component(vectorsInClusters[1], classesInClusters[1], zPcaExtractor, metrics);
@@ -431,29 +433,30 @@ public:
 
         QVector<Matrix> images;
         QVector<int> classes;
-        QVector<Vector> vectors;
-        Loader::loadImages(srcDirPath + source, images, &classes, "*.png", "d", 874);
+        QVector<Face::LinAlg::Vector> vectors;
+        Face::LinAlg::Loader::loadImages(srcDirPath + source, images, &classes, "*.png", "d", 874);
         int n = images.count();
 
         for (int i = 0; i < n; i++)
         {
             Matrix sub = images[i](roi);
             cv::resize(sub, sub, cv::Size(sub.cols/4, sub.rows/4));
-            vectors << MatrixConverter::matrixToColumnVector(sub);
+            vectors << Face::LinAlg::MatrixConverter::matrixToColumnVector(sub);
         }
 
-        QList<QVector<Vector> > vectorsInClusters;
+        QList<QVector<Face::LinAlg::Vector> > vectorsInClusters;
         QList<QVector<int> > classesInClusters;
-        BioDataProcessing::divideToNClusters(vectors, classes, 2, vectorsInClusters, classesInClusters);
+        Face::Biometrics::BioDataProcessing::divideToNClusters(vectors, classes, 2, vectorsInClusters, classesInClusters);
 
-        ZScorePassExtractor extractor(vectorsInClusters[0]);
-        QVector<Template> trainTemplates = Template::joinVectorsAndClasses(vectorsInClusters[0], classesInClusters[0]);
-        EERPotential potential(trainTemplates);
-        CorrelationWeightedMetric metric;
+        Face::Biometrics::ZScorePassExtractor extractor(vectorsInClusters[0]);
+        QVector<Face::Biometrics::Template> trainTemplates =
+                Face::Biometrics::Template::joinVectorsAndClasses(vectorsInClusters[0], classesInClusters[0]);
+        Face::Biometrics::EERPotential potential(trainTemplates);
+        Face::LinAlg::CorrelationWeightedMetric metric;
         for (double t = 0.05; t <= 0.95; t += 0.05) // 0.3 je nejlepsi
         {
             metric.w = potential.createSelectionWeightsBasedOnRelativeThreshold(t);
-            qDebug() << t << Evaluation(vectorsInClusters[1], classesInClusters[1], extractor, metric).eer;
+            qDebug() << t << Face::Biometrics::Evaluation(vectorsInClusters[1], classesInClusters[1], extractor, metric).eer;
         }
     }
 
@@ -536,47 +539,49 @@ public:
         // Create kernels
         QVector<Matrix> realWavelets;
         QVector<Matrix> imagWavelets;
-        FilterBankClassifier::addFilterKernels(realWavelets, imagWavelets, source, isGabor);
+        Face::Biometrics::FilterBankClassifier::addFilterKernels(realWavelets, imagWavelets, source, isGabor);
 
-        ScoreWeightedSumFusion fusion;
+        Face::Biometrics::ScoreWeightedSumFusion fusion;
 
-        QVector<QList<Evaluation> > testData(clusters); // [cluster][method]
+        QVector<QList<Face::Biometrics::Evaluation> > testData(clusters); // [cluster][method]
         // Load and process images
         {
             QVector<Matrix> images;
             QVector<int> classes;
-            Loader::loadMatrices(path, images, classes, "d", "*.gz");
+            Face::LinAlg::Loader::loadMatrices(path, images, classes, "d", "*.gz");
             for (int i = 0; i < realWavelets.count(); i++)
             {
                 qDebug() << source << i;
-                QVector<Vector> rawVectors;
+                QVector<Face::LinAlg::Vector> rawVectors;
                 foreach(const Matrix &img, images)
                 {
                     if (realWavelets[i].rows == 0)
                     {
-                        rawVectors << MatrixConverter::matrixToColumnVector(MatrixConverter::scale(img, 0.5));
+                        rawVectors << Face::LinAlg::MatrixConverter::matrixToColumnVector(
+                                          Face::LinAlg::MatrixConverter::scale(img, 0.5));
                     }
                     else
                     {
-                        rawVectors << MatrixConverter::matrixToColumnVector(
-                                          MatrixConverter::scale(
-                                              FilterBank::absResponse(img, realWavelets[i], imagWavelets[i]), 0.5));
+                        rawVectors << Face::LinAlg::MatrixConverter::matrixToColumnVector(
+                                          Face::LinAlg::MatrixConverter::scale(
+                                              Face::LinAlg::FilterBank::absResponse(
+                                                  img, realWavelets[i], imagWavelets[i]), 0.5));
                     }
                 }
 
-                QList<QVector<Vector> > vectorsInClusters;
+                QList<QVector<Face::LinAlg::Vector> > vectorsInClusters;
                 QList<QVector<int> > classesInClusters;
-                BioDataProcessing::divideToNClusters(rawVectors, classes, 5, vectorsInClusters, classesInClusters);
+                Face::Biometrics::BioDataProcessing::divideToNClusters(rawVectors, classes, 5, vectorsInClusters, classesInClusters);
 
-                ZPCACorrW pcaCor(vectorsInClusters[0], pcaThreshold, vectorsInClusters[0]);
+                Face::Biometrics::ZPCACorrW pcaCor(vectorsInClusters[0], pcaThreshold, vectorsInClusters[0]);
                 pcaCor.extractor.serialize(filterType + "-" + source + "-" + QString::number(i) + "-pca",
                                            filterType + "-" + source + "-" + QString::number(i) + "-normParams");
 
-                fusion.addComponent(Evaluation(vectorsInClusters[1], classesInClusters[1], pcaCor.extractor, pcaCor.metric));
+                fusion.addComponent(Face::Biometrics::Evaluation(vectorsInClusters[1], classesInClusters[1], pcaCor.extractor, pcaCor.metric));
 
                 for (int c = 1; c < clusters; c++)
                 {
-                    testData[c] << Evaluation(vectorsInClusters[c], classesInClusters[c], pcaCor.extractor, pcaCor.metric);
+                    testData[c] << Face::Biometrics::Evaluation(vectorsInClusters[c], classesInClusters[c], pcaCor.extractor, pcaCor.metric);
                 }
             }
         }
@@ -590,7 +595,7 @@ public:
         // evaluate
         for (int c = 1; c < clusters; c++)
         {
-            Evaluation result = fusion.evaluate(testData[c]);
+            Face::Biometrics::Evaluation result = fusion.evaluate(testData[c]);
             result.outputResults(filterType + "-" + source + "-" + QString::number(c-1), 50);
             qDebug() << result.eer;
         }
@@ -605,31 +610,31 @@ public:
         double pcaThreshold = 0.995;
         QVector<Matrix> srcImages;
         QVector<int> classes;
-        Loader::loadMatrices(srcDirPath, srcImages, classes, "d", "*.gz", 867);
+        Face::LinAlg::Loader::loadMatrices(srcDirPath, srcImages, classes, "d", "*.gz", 867);
 
         QList<QVector<Matrix> > srcImagesInClusters;
         QList<QVector<int> > classesInClusters;
-        BioDataProcessing::divideToNClusters(srcImages, classes, 2, srcImagesInClusters, classesInClusters);
+        Face::Biometrics::BioDataProcessing::divideToNClusters(srcImages, classes, 2, srcImagesInClusters, classesInClusters);
 
         for (int i = 0; i < srcImagesInClusters.count(); i++)
         {
             qDebug() << i << srcImagesInClusters[i].count();
         }
 
-        QList<Evaluation> components;
-        QVector<Vector> trainVectors;
+        QList<Face::Biometrics::Evaluation> components;
+        QVector<Face::LinAlg::Vector> trainVectors;
         foreach(const Matrix &srcImg, srcImagesInClusters[0])
         {
-            trainVectors << MatrixConverter::matrixToColumnVector(MatrixConverter::scale(srcImg, 0.5));
+            trainVectors << Face::LinAlg::MatrixConverter::matrixToColumnVector(Face::LinAlg::MatrixConverter::scale(srcImg, 0.5));
         }
-        QVector<Vector> testVectors;
+        QVector<Face::LinAlg::Vector> testVectors;
         foreach(const Matrix &srcImg, srcImagesInClusters[1])
         {
-            testVectors << MatrixConverter::matrixToColumnVector(MatrixConverter::scale(srcImg, 0.5));
+            testVectors << Face::LinAlg::MatrixConverter::matrixToColumnVector(Face::LinAlg::MatrixConverter::scale(srcImg, 0.5));
         }
 
-        ZPCACorrW pcaCor(trainVectors, pcaThreshold, trainVectors);
-        components << Evaluation(testVectors, classesInClusters[1], pcaCor.extractor, pcaCor.metric);
+        Face::Biometrics::ZPCACorrW pcaCor(trainVectors, pcaThreshold, trainVectors);
+        components << Face::Biometrics::Evaluation(testVectors, classesInClusters[1], pcaCor.extractor, pcaCor.metric);
         qDebug() << components.last().eer;
 
         Matrix realWavelet(kSize, kSize);
@@ -644,34 +649,36 @@ public:
             {
                 freqs[index] = freq;
                 ornts[index] = orientation;
-                Gabor::createWavelet(realWavelet, imagWavelet, freq, orientation);
+                Face::LinAlg::Gabor::createWavelet(realWavelet, imagWavelet, freq, orientation);
 
-                QVector<Vector> trainVectors;
+                QVector<Face::LinAlg::Vector> trainVectors;
                 foreach(const Matrix &srcImg, srcImagesInClusters[0])
                 {
-                    trainVectors << MatrixConverter::matrixToColumnVector(
-                                        MatrixConverter::scale(
-                                            Gabor::absResponse(srcImg, realWavelet, imagWavelet), 0.5));
+                    trainVectors << Face::LinAlg::MatrixConverter::matrixToColumnVector(
+                                        Face::LinAlg::MatrixConverter::scale(
+                                            Face::LinAlg::Gabor::absResponse(
+                                                srcImg, realWavelet, imagWavelet), 0.5));
                 }
 
-                ZPCACorrW pcaCor(trainVectors, pcaThreshold, trainVectors);
+                Face::Biometrics::ZPCACorrW pcaCor(trainVectors, pcaThreshold, trainVectors);
 
-                QVector<Vector> vectors;
+                QVector<Face::LinAlg::Vector> vectors;
                 foreach(const Matrix &srcImg, srcImagesInClusters[1])
                 {
-                    vectors << MatrixConverter::matrixToColumnVector(
-                                   MatrixConverter::scale(
-                                       Gabor::absResponse(srcImg, realWavelet, imagWavelet), 0.5));
+                    vectors << Face::LinAlg::MatrixConverter::matrixToColumnVector(
+                                   Face::LinAlg::MatrixConverter::scale(
+                                       Face::LinAlg::Gabor::absResponse(
+                                           srcImg, realWavelet, imagWavelet), 0.5));
                 }
 
-                components << Evaluation(vectors, classesInClusters[1], pcaCor.extractor, pcaCor.metric);
+                components << Face::Biometrics::Evaluation(vectors, classesInClusters[1], pcaCor.extractor, pcaCor.metric);
                 qDebug() << index << freq << orientation << components.last().eer;
                 index++;
             }
         }
 
-        ScoreWeightedSumFusion fusion;
-        QVector<int> keys = ScoreLevelFusionWrapper::trainClassifier(fusion, components, true);
+        Face::Biometrics::ScoreWeightedSumFusion fusion;
+        QVector<int> keys = Face::Biometrics::ScoreLevelFusionWrapper::trainClassifier(fusion, components, true);
         QString fString, oString;
         foreach (int k, keys)
         {
@@ -692,7 +699,7 @@ public:
         {
             QVector<Matrix> srcImages;
             QVector<int> classes;
-            Loader::loadImages(srcDirPath + source, srcImages, &classes, "*.png", "d", 866); //, roi);
+            Face::LinAlg::Loader::loadImages(srcDirPath + source, srcImages, &classes, "*.png", "d", 866); //, roi);
 
             for (int kSize = 200; kSize <= 200; kSize += 50)
             {
@@ -702,19 +709,20 @@ public:
                 {
                     for (int orientation = 1; orientation <= 8; orientation++)
                     {
-                        Gabor::createWavelet(realWavelet, imagWavelet, freq, orientation);
-                        QVector<Vector> vectors;
+                        Face::LinAlg::Gabor::createWavelet(realWavelet, imagWavelet, freq, orientation);
+                        QVector<Face::LinAlg::Vector> vectors;
                         foreach(const Matrix &srcImg, srcImages)
                         {
-                            vectors << MatrixConverter::matrixToColumnVector(Gabor::absResponse(srcImg, realWavelet, imagWavelet));
+                            vectors << Face::LinAlg::MatrixConverter::matrixToColumnVector(
+                                           Face::LinAlg::Gabor::absResponse(srcImg, realWavelet, imagWavelet));
                         }
 
                         QList<QVector<int> > classesInClusters;
-                        QList<QVector<Vector> > vectorsInClusters;
-                        BioDataProcessing::divideToNClusters(vectors, classes, 2, vectorsInClusters, classesInClusters);
-                        PCA pca(vectorsInClusters[0]);
-                        ZScorePCAExtractor extractor(pca, vectorsInClusters[0]);
-                        Evaluation eval(vectorsInClusters[1], classesInClusters[1], extractor, CorrelationMetric());
+                        QList<QVector<Face::LinAlg::Vector> > vectorsInClusters;
+                        Face::Biometrics::BioDataProcessing::divideToNClusters(vectors, classes, 2, vectorsInClusters, classesInClusters);
+                        Face::LinAlg::PCA pca(vectorsInClusters[0]);
+                        Face::Biometrics::ZScorePCAExtractor extractor(pca, vectorsInClusters[0]);
+                        Face::Biometrics::Evaluation eval(vectorsInClusters[1], classesInClusters[1], extractor, Face::LinAlg::CorrelationMetric());
                         qDebug() << freq << orientation << eval.eer;
                     }
                     qDebug() << "";
@@ -731,31 +739,31 @@ public:
         double pcaThreshold = 0.995;
         QVector<Matrix> srcImages;
         QVector<int> classes;
-        Loader::loadMatrices(srcDirPath, srcImages, classes, "d", "*.gz", 867);
+        Face::LinAlg::Loader::loadMatrices(srcDirPath, srcImages, classes, "d", "*.gz", 867);
 
         QList<QVector<Matrix> > srcImagesInClusters;
         QList<QVector<int> > classesInClusters;
-        BioDataProcessing::divideToNClusters(srcImages, classes, 2, srcImagesInClusters, classesInClusters);
+        Face::Biometrics::BioDataProcessing::divideToNClusters(srcImages, classes, 2, srcImagesInClusters, classesInClusters);
 
         for (int i = 0; i < srcImagesInClusters.count(); i++)
         {
             qDebug() << i << srcImagesInClusters[i].count();
         }
 
-        QList<Evaluation> components;
-        QVector<Vector> trainVectors;
+        QList<Face::Biometrics::Evaluation> components;
+        QVector<Face::LinAlg::Vector> trainVectors;
         foreach(const Matrix &srcImg, srcImagesInClusters[0])
         {
-            trainVectors << MatrixConverter::matrixToColumnVector(MatrixConverter::scale(srcImg, 0.5));
+            trainVectors << Face::LinAlg::MatrixConverter::matrixToColumnVector(Face::LinAlg::MatrixConverter::scale(srcImg, 0.5));
         }
-        QVector<Vector> testVectors;
+        QVector<Face::LinAlg::Vector> testVectors;
         foreach(const Matrix &srcImg, srcImagesInClusters[1])
         {
-            testVectors << MatrixConverter::matrixToColumnVector(MatrixConverter::scale(srcImg, 0.5));
+            testVectors << Face::LinAlg::MatrixConverter::matrixToColumnVector(Face::LinAlg::MatrixConverter::scale(srcImg, 0.5));
         }
 
-        ZPCACorrW pcaCor(trainVectors, pcaThreshold, trainVectors);
-        components << Evaluation(testVectors, classesInClusters[1], pcaCor.extractor, pcaCor.metric);
+        Face::Biometrics::ZPCACorrW pcaCor(trainVectors, pcaThreshold, trainVectors);
+        components << Face::Biometrics::Evaluation(testVectors, classesInClusters[1], pcaCor.extractor, pcaCor.metric);
         qDebug() << components.last().eer;
 
         QMap<int, int> sizes; sizes[0] = 0;
@@ -772,33 +780,35 @@ public:
 
                 Matrix realWavelet;
                 Matrix imagWavelet;
-                GaussLaguerre::createWavelet(realWavelet, imagWavelet, kSize, n, k);
+                Face::LinAlg::GaussLaguerre::createWavelet(realWavelet, imagWavelet, kSize, n, k);
 
-                QVector<Vector> trainVectors;
+                QVector<Face::LinAlg::Vector> trainVectors;
                 foreach(const Matrix &srcImg, srcImagesInClusters[0])
                 {
-                    trainVectors << MatrixConverter::matrixToColumnVector(
-                                        MatrixConverter::scale(
-                                            GaussLaguerre::absResponse(srcImg, realWavelet, imagWavelet), 0.5));
+                    trainVectors << Face::LinAlg::MatrixConverter::matrixToColumnVector(
+                                        Face::LinAlg::MatrixConverter::scale(
+                                            Face::LinAlg::GaussLaguerre::absResponse(
+                                                srcImg, realWavelet, imagWavelet), 0.5));
                 }
-                ZPCACorrW pcaCor(trainVectors, pcaThreshold, trainVectors);
+                Face::Biometrics::ZPCACorrW pcaCor(trainVectors, pcaThreshold, trainVectors);
 
-                QVector<Vector> testVectors;
+                QVector<Face::LinAlg::Vector> testVectors;
                 foreach(const Matrix &srcImg, srcImagesInClusters[1])
                 {
-                    testVectors << MatrixConverter::matrixToColumnVector(
-                                       MatrixConverter::scale(
-                                           GaussLaguerre::absResponse(srcImg, realWavelet, imagWavelet), 0.5));
+                    testVectors << Face::LinAlg::MatrixConverter::matrixToColumnVector(
+                                       Face::LinAlg::MatrixConverter::scale(
+                                           Face::LinAlg::GaussLaguerre::absResponse(
+                                               srcImg, realWavelet, imagWavelet), 0.5));
                 }
-                components << Evaluation(testVectors, classesInClusters[1], pcaCor.extractor, pcaCor.metric);
+                components << Face::Biometrics::Evaluation(testVectors, classesInClusters[1], pcaCor.extractor, pcaCor.metric);
 
                 qDebug() << index << kSize << n << components.last().eer;
                 index++;
             }
         }
 
-        ScoreWeightedSumFusion fusion;
-        QVector<int> keys = ScoreLevelFusionWrapper::trainClassifier(fusion, components, true);
+        Face::Biometrics::ScoreWeightedSumFusion fusion;
+        QVector<int> keys = Face::Biometrics::ScoreLevelFusionWrapper::trainClassifier(fusion, components, true);
         QString sString, nString;
         foreach (int k, keys)
         {
@@ -820,30 +830,30 @@ public:
         //units << "gabor-textureE" << "gabor-depth" << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur"
         //      << "gl-textureE" << "gl-depth" << "gl-index" << "gl-mean" << "gl-gauss" << "gl-eigencur";
 
-        ScoreWeightedSumFusion fusion;
-        QList<Evaluation> trainComponents;
+        Face::Biometrics::ScoreWeightedSumFusion fusion;
+        QList<Face::Biometrics::Evaluation> trainComponents;
         foreach (const QString &unit, units)
         {
-            QVector<double> trainGenScores = Vector::fromFile(dir + unit + "-0-gen-scores").toQVector();
-            QVector<double> trainImpScores = Vector::fromFile(dir + unit + "-0-imp-scores").toQVector();
-            trainComponents << Evaluation(trainGenScores, trainImpScores);
+            QVector<double> trainGenScores = Face::LinAlg::Vector::fromFile(dir + unit + "-0-gen-scores").toQVector();
+            QVector<double> trainImpScores = Face::LinAlg::Vector::fromFile(dir + unit + "-0-imp-scores").toQVector();
+            trainComponents << Face::Biometrics::Evaluation(trainGenScores, trainImpScores);
             //qDebug() << Evaluation(trainGenScores, trainImpScores).eer;
         }
 
-        QVector<int> selectedUnits = ScoreLevelFusionWrapper::trainClassifier(fusion, trainComponents, true);
+        QVector<int> selectedUnits = Face::Biometrics::ScoreLevelFusionWrapper::trainClassifier(fusion, trainComponents, true);
 
         for (int i = 0; i <= 3; i++)
         {
-            QList<Evaluation> testEvals;
+            QList<Face::Biometrics::Evaluation> testEvals;
 
             foreach (int unitIndex, selectedUnits)
             {
-                QVector<double> testGenScores = Vector::fromFile(dir + units[unitIndex] + "-" + QString::number(i) + "-gen-scores").toQVector();
-                QVector<double> testImpScores = Vector::fromFile(dir + units[unitIndex] + "-" + QString::number(i) + "-imp-scores").toQVector();
-                testEvals << Evaluation(testGenScores, testImpScores);
+                QVector<double> testGenScores = Face::LinAlg::Vector::fromFile(dir + units[unitIndex] + "-" + QString::number(i) + "-gen-scores").toQVector();
+                QVector<double> testImpScores = Face::LinAlg::Vector::fromFile(dir + units[unitIndex] + "-" + QString::number(i) + "-imp-scores").toQVector();
+                testEvals << Face::Biometrics::Evaluation(testGenScores, testImpScores);
             }
 
-            Evaluation eval = fusion.evaluate(testEvals);
+            Face::Biometrics::Evaluation eval = fusion.evaluate(testEvals);
             qDebug() << eval.eer << eval.fnmrAtFmr(0.01) << eval.fnmrAtFmr(0.001) << eval.fnmrAtFmr(0.0001);
 
             eval.outputResultsDET(QString::number(i));
@@ -859,31 +869,31 @@ public:
               << "gabor-index" << "gabor-mean" << "gabor-gauss" << "gabor-eigencur" << "gabor-depth" << "gabor-textureE";
 
         {
-            ScoreSVMFusion fusion;
+            Face::Biometrics::ScoreSVMFusion fusion;
             foreach (const QString &unit, units)
             {
-                QVector<double> trainGenScores = Vector::fromFile(dir + unit + "-0-gen-scores").toQVector();
-                QVector<double> trainImpScores = Vector::fromFile(dir + unit + "-0-imp-scores").toQVector();
-                fusion.addComponent(Evaluation(trainGenScores, trainImpScores));
+                QVector<double> trainGenScores = Face::LinAlg::Vector::fromFile(dir + unit + "-0-gen-scores").toQVector();
+                QVector<double> trainImpScores = Face::LinAlg::Vector::fromFile(dir + unit + "-0-imp-scores").toQVector();
+                fusion.addComponent(Face::Biometrics::Evaluation(trainGenScores, trainImpScores));
             }
             fusion.learn();
             fusion.serialize("final");
         }
 
         {
-            ScoreSVMFusion fusion2("final");
+            Face::Biometrics::ScoreSVMFusion fusion2("final");
             for (int i = 0; i <= 3; i++)
             {
-                QList<Evaluation> testEvals;
+                QList<Face::Biometrics::Evaluation> testEvals;
 
                 foreach (const QString &unit, units)
                 {
-                    QVector<double> testGenScores = Vector::fromFile(dir + unit + "-" + QString::number(i) + "-gen-scores").toQVector();
-                    QVector<double> testImpScores = Vector::fromFile(dir + unit + "-" + QString::number(i) + "-imp-scores").toQVector();
-                    testEvals << Evaluation(testGenScores, testImpScores);
+                    QVector<double> testGenScores = Face::LinAlg::Vector::fromFile(dir + unit + "-" + QString::number(i) + "-gen-scores").toQVector();
+                    QVector<double> testImpScores = Face::LinAlg::Vector::fromFile(dir + unit + "-" + QString::number(i) + "-imp-scores").toQVector();
+                    testEvals << Face::Biometrics::Evaluation(testGenScores, testImpScores);
                 }
 
-                Evaluation eval = fusion2.evaluate(testEvals);
+                Face::Biometrics::Evaluation eval = fusion2.evaluate(testEvals);
                 qDebug() << eval.eer << eval.fnmrAtFmr(0.01) << eval.fnmrAtFmr(0.001) << eval.fnmrAtFmr(0.0001) << eval.fnmrAtFmr(0.00001);
 
                 eval.outputResultsDET(QString::number(i));
@@ -894,11 +904,11 @@ public:
     static void testFilterBankKernelSizes()
     {
         QString classifiersDir = "/home/stepo/git/face/test/frgc/classifiers/";
-        FaceClassifier faceClassifier(classifiersDir);
+        Face::Biometrics::FaceClassifier faceClassifier(classifiersDir);
 
         foreach (QString bankName, faceClassifier.bankClassifiers.keys())
         {
-            FilterBanksClassifiers &bankClassifiers = faceClassifier.bankClassifiers[bankName];
+            Face::Biometrics::FilterBanksClassifiers &bankClassifiers = faceClassifier.bankClassifiers[bankName];
 
             foreach (QString imgTypeName, bankClassifiers.dict.keys())
             {
@@ -924,10 +934,10 @@ public:
     static void testSerializedClassifiers()
     {
         QString classifiersDir = "/home/stepo/git/face/test/frgc/classifiers/";
-        FaceClassifier faceClassifier(classifiersDir);
+        Face::Biometrics::FaceClassifier faceClassifier(classifiersDir);
 
         QString dataDirPath = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
-        QVector<QString> filenames = Loader::listFiles(dataDirPath, "*.binz", Loader::BaseFilename);
+        QVector<QString> filenames = Face::LinAlg::Loader::listFiles(dataDirPath, "*.binz", Face::LinAlg::Loader::BaseFilename);
         QVector<int> classes;
         foreach (const QString &f, filenames)
         {
@@ -936,66 +946,67 @@ public:
 
         QList<QVector<QString> > filenamesInClusters;
         QList<QVector<int> > classesInClusters;
-        BioDataProcessing::divideToNClusters(filenames, classes, 5, filenamesInClusters, classesInClusters);
+        Face::Biometrics::BioDataProcessing::divideToNClusters(filenames, classes, 5, filenamesInClusters, classesInClusters);
 
         for (int cluster = 1; cluster <= filenamesInClusters.count(); cluster++)
         {
-            QVector<Face3DTemplate *> templates;
+            QVector<Face::Biometrics::Face3DTemplate *> templates;
             for (int i = 0; i < filenamesInClusters[cluster].count(); i++)
             {
                 int id = classesInClusters[cluster][i];
                 QString fileName = filenamesInClusters[cluster][i] + ".binz";
                 QString path = dataDirPath + fileName;
-                Mesh faceMesh = Mesh::fromBINZ(path, false);
-                templates << new Face3DTemplate(id, faceMesh, faceClassifier);
+                Face::FaceData::Mesh faceMesh = Face::FaceData::Mesh::fromBINZ(path, false);
+                templates << new Face::Biometrics::Face3DTemplate(id, faceMesh, faceClassifier);
                 qDebug() << cluster << fileName << id << (i+1) << "/" << filenamesInClusters[cluster].count();
 
                 //templates.last()->serialize(dataDirPath + "templates/" + filenamesInClusters[cluster][i], faceClassifier);
             }
 
-            Evaluation eval = faceClassifier.evaluate(templates);
+            Face::Biometrics::Evaluation eval = faceClassifier.evaluate(templates);
             qDebug() << cluster << eval.eer;
         }
     }
 
     static void createTemplates()
     {
-        FaceClassifier classifier("../../test/frgc/classifiers");
+        Face::Biometrics::FaceClassifier classifier("../../test/frgc/classifiers");
         QString dir = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
-        QVector<QString> files = Loader::listFiles(dir, "*.binz", Loader::BaseFilename);
+        QVector<QString> files = Face::LinAlg::Loader::listFiles(dir, "*.binz", Face::LinAlg::Loader::BaseFilename);
         foreach (const QString &file, files)
         {
-            Mesh face = Mesh::fromBINZ(dir + file + ".binz");
-            Face3DTemplate t(0, face, classifier);
+            Face::FaceData::Mesh face = Face::FaceData::Mesh::fromBINZ(dir + file + ".binz");
+            Face::Biometrics::Face3DTemplate t(0, face, classifier);
             t.serialize(dir + "templates/" + file + ".xml.gz", classifier);
         }
     }
 
     static void evaluateSerializedTemplates()
     {
-        FaceClassifier classifier("../../test/frgc/classifiers");
+        Face::Biometrics::FaceClassifier classifier("../../test/frgc/classifiers");
         QString dir = "/home/stepo/data/frgc/spring2004/zbin-aligned2/templates";
-        QVector<QString> files = Loader::listFiles(dir, "*.xml.gz", Loader::AbsoluteFull);
-        QVector<Face3DTemplate *> allTemplates;
+        QVector<QString> files = Face::LinAlg::Loader::listFiles(dir, "*.xml.gz", Face::LinAlg::Loader::AbsoluteFull);
+        QVector<Face::Biometrics::Face3DTemplate *> allTemplates;
         QVector<int> allClasses;
         qDebug() << "loading...";
         foreach (const QString &file, files)
         {
             int id = file.split('/').last().split('d').at(0).toInt();
-            allTemplates << new Face3DTemplate(id, file, classifier);
+            allTemplates << new Face::Biometrics::Face3DTemplate(id, file, classifier);
             allClasses << id;
         }
 
         qDebug() << "dividing...";
         int clustersCount = 5;
-        QList<QVector<Face3DTemplate *> > templatesInClusters;
+        QList<QVector<Face::Biometrics::Face3DTemplate *> > templatesInClusters;
         QList<QVector<int> > classesInClusters;
-        BioDataProcessing::divideToNClusters(allTemplates, allClasses, clustersCount, templatesInClusters, classesInClusters);
+        Face::Biometrics::BioDataProcessing::divideToNClusters(allTemplates, allClasses, clustersCount,
+                                                               templatesInClusters, classesInClusters);
 
         qDebug() << "evaluating...";
         for (int i = 0; i < clustersCount; i++)
         {
-            Evaluation e = classifier.evaluate(templatesInClusters[i]);
+            Face::Biometrics::Evaluation e = classifier.evaluate(templatesInClusters[i]);
             qDebug() << e.eer;
         }
     }

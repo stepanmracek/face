@@ -12,21 +12,21 @@ class TestMetrics
 public:
     static void testMahalanobisDistance()
     {
-        QVector<Vector> samples;
+        QVector<Face::LinAlg::Vector> samples;
 
-        Vector s1(4);
+        Face::LinAlg::Vector s1(4);
         s1(0) = 3;
         s1(1) = 2;
         s1(2) = 4;
         s1(3) = 5;
 
-        Vector s2(4);
+        Face::LinAlg::Vector s2(4);
         s2(0) = 3.1;
         s2(1) = 2;
         s2(2) = 4.1;
         s2(3) = 7.2;
 
-        Vector s3(4);
+        Face::LinAlg::Vector s3(4);
         s3(0) = 2.3;
         s3(1) = 2;
         s3(2) = 4.2;
@@ -34,7 +34,7 @@ public:
 
         samples << s1 << s2 << s3;
 
-        MahalanobisMetric m(samples);
+        Face::LinAlg::MahalanobisMetric m(samples);
 
         qDebug() << "mean:";
         for (int i = 0; i < m.mean.rows; i++)

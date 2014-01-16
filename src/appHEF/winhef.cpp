@@ -18,8 +18,8 @@ WinHef::~WinHef()
 void WinHef::loadFace(GLWidget *widget, const QString &path)
 {
     widget->deleteAll();
-    Mesh m = Mesh::fromBINZ(path);
-    Mesh *m2 = new Mesh(m.radiusSelect(80, cv::Point3d(0, 10, 0)));
+    Face::FaceData::Mesh m = Face::FaceData::Mesh::fromBINZ(path);
+    Face::FaceData::Mesh *m2 = new Face::FaceData::Mesh(m.radiusSelect(80, cv::Point3d(0, 10, 0)));
     m2->centralize();
     widget->addFace(m2);
     widget->repaint();
@@ -102,10 +102,10 @@ void WinHef::on_btnEval_clicked()
 {
     if (sameScores.count() == 0 || diffScores.count() == 0) return;
 
-    Histogram genuineDistribution(sameScores, 5, true, 0, 5);
+    Face::LinAlg::Histogram genuineDistribution(sameScores, 5, true, 0, 5);
     genuineDistribution.savePlot("genuine");
 
-    Histogram impostorDistribution(diffScores, 5, true, 0, 5);
+    Face::LinAlg::Histogram impostorDistribution(diffScores, 5, true, 0, 5);
     impostorDistribution.savePlot("impostor");
 
     QVector<double> fmr(4);
@@ -114,5 +114,5 @@ void WinHef::on_btnEval_clicked()
     {
         calculateDet(i, fmr[i], fnmr[i]);
     }
-    Common::savePlot(fmr, fnmr, "det");
+    Face::LinAlg::Common::savePlot(fmr, fnmr, "det");
 }

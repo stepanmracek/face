@@ -5,7 +5,8 @@
 #include "dlgscanface.h"
 
 DlgEnroll::DlgEnroll(QMap<int, QString> &mapIdToName, QMap<QString, int> mapNameToId,
-                     QHash<int, Face3DTemplate *> database, const FaceClassifier &classifier,
+                     QHash<int, Face::Biometrics::Face3DTemplate *> database,
+                     const Face::Biometrics::FaceClassifier &classifier,
                      KinectSensorPlugin &sensor, QWidget *parent) :
     mapIdToName(mapIdToName), mapNameToId(mapNameToId), database(database), classifier(classifier),
     sensor(sensor),
@@ -24,7 +25,7 @@ void DlgEnroll::on_btnAdd_clicked()
     sensor.scan();
     sensor.align();
 
-    scans << new Mesh(sensor.mesh());
+    scans << new Face::FaceData::Mesh(sensor.mesh());
     sensor.deleteMesh();
 
     ui->listScans->addItem(QString::number(ui->listScans->count()+1));
@@ -94,21 +95,21 @@ void DlgEnroll::on_buttonBox_accepted()
     QProgressDialog progDlg("Extracting templates", QString(), 0, scans.count(), this);
     progDlg.setWindowModality(Qt::WindowModal);
     progDlg.setMinimumDuration(100);
-    QList<Face3DTemplate*> templates;
+    QList<Face::Biometrics::Face3DTemplate*> templates;
     int index = 0;
-    foreach (const Mesh *m, scans)
+    foreach (const Face::FaceData::Mesh *m, scans)
     {
         progDlg.setValue(index);
-        templates << new Face3DTemplate(id, *m, classifier);
+        templates << new Face::Biometrics::Face3DTemplate(id, *m, classifier);
         index++;
     }
     progDlg.setValue(scans.count());
 
     // check quality
     int templateNum = 1;
-    foreach (const Face3DTemplate *t, templates)
+    foreach (const Face::Biometrics::Face3DTemplate *t, templates)
     {
-        double d = classifier.compare(templates, t, FaceClassifier::CompareMeanDistance);
+        double d = classifier.compare(templates, t, Face::Biometrics::FaceClassifier::CompareMeanDistance);
         qDebug() << "template:" << templateNum << "distance:" << d;
 
         if (d >= -1.0)
@@ -130,7 +131,7 @@ void DlgEnroll::on_buttonBox_accepted()
     mapIdToName[id] = name;
     mapNameToId[name] = id;
 
-    foreach (Face3DTemplate *t, templates)
+    foreach (Face::Biometrics::Face3DTemplate *t, templates)
     {
         database.insertMulti(id, t);
     }

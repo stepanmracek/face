@@ -30,7 +30,7 @@ void Morphable3DFaceModelWidget::recalculateModel()
         return;
     }
 
-    Vector params(model->pca.getModes());
+    Face::LinAlg::Vector params(model->pca.getModes());
     for (int i = 0; i < model->pca.getModes(); i++)
     {
         QSlider *slider = sliders[i];

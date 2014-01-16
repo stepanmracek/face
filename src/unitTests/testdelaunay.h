@@ -27,7 +27,7 @@ public:
             points.append(p);
         }
 
-        QVector<cv::Vec3i> subdiv = Delaunay::process(points);
+        QVector<cv::Vec3i> subdiv = Face::LinAlg::Delaunay::process(points);
 
         cv::Mat img = cv::Mat::zeros(700, 700, CV_8UC3);
         cv::Scalar white; white[0] = white[1] = white[2] = 255;

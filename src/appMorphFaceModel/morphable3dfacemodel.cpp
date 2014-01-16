@@ -8,15 +8,15 @@
 Morphable3DFaceModel::Morphable3DFaceModel(const QString &pcaPathForZcoord, const QString &pcaPathForTexture, const QString &pcaFile, const QString &maskPath,
                                            const QString &landmarksPath, int width)
 {
-    pcaForZcoord = PCA(pcaPathForZcoord);
-    pcaForTexture = PCA(pcaPathForTexture);
-    pca = PCA(pcaFile);
-    landmarks = Landmarks(landmarksPath);
+    pcaForZcoord = Face::LinAlg::PCA(pcaPathForZcoord);
+    pcaForTexture = Face::LinAlg::PCA(pcaPathForTexture);
+    pca = Face::LinAlg::PCA(pcaFile);
+    landmarks = Face::FaceData::Landmarks(landmarksPath);
 
-    mask = Vector::fromFile(maskPath);
+    mask = Face::LinAlg::Vector::fromFile(maskPath);
     int maskRows = mask.rows;
-    Map faceDepth(width, maskRows/width);
-    Map faceTexture(width, maskRows/width);
+    Face::FaceData::Map faceDepth(width, maskRows/width);
+    Face::FaceData::Map faceTexture(width, maskRows/width);
     for (int i = 0; i < maskRows; i++)
     {
         faceDepth.flags(i/faceDepth.w, i%faceDepth.w) = mask(i) ? true : false;
@@ -37,15 +37,15 @@ Morphable3DFaceModel::Morphable3DFaceModel(const QString &pcaPathForZcoord, cons
         }
     }
 
-    mesh = Mesh::fromMap(faceDepth, faceTexture, false);
+    mesh = Face::FaceData::Mesh::fromMap(faceDepth, faceTexture, false);
     mesh.translate(cv::Point3d(-width/2, -width/2, 0));
 }
 
-void Morphable3DFaceModel::setModelParams(Vector &commonParams)
+void Morphable3DFaceModel::setModelParams(Face::LinAlg::Vector &commonParams)
 {
-    Vector backProjectedCommonParams = pca.backProject(commonParams);
-    Vector zcoordParams(pcaForZcoord.getModes());
-    Vector textureParams(pcaForTexture.getModes());
+    Face::LinAlg::Vector backProjectedCommonParams = pca.backProject(commonParams);
+    Face::LinAlg::Vector zcoordParams(pcaForZcoord.getModes());
+    Face::LinAlg::Vector textureParams(pcaForTexture.getModes());
 
     for (int i = 0; i < pcaForZcoord.getModes(); i++)
     {
@@ -58,10 +58,10 @@ void Morphable3DFaceModel::setModelParams(Vector &commonParams)
     setModelParams(zcoordParams, textureParams);
 }
 
-void Morphable3DFaceModel::setModelParams(Vector &zcoordParams, Vector &textureParams)
+void Morphable3DFaceModel::setModelParams(Face::LinAlg::Vector &zcoordParams, Face::LinAlg::Vector &textureParams)
 {
-    Vector newZcoords = pcaForZcoord.backProject(zcoordParams);
-    Vector newIntensities = pcaForTexture.backProject(textureParams);
+    Face::LinAlg::Vector newZcoords = pcaForZcoord.backProject(zcoordParams);
+    Face::LinAlg::Vector newIntensities = pcaForTexture.backProject(textureParams);
     int n = newZcoords.rows;
     assert(n == mesh.pointsMat.rows);
     assert(n == newIntensities.rows);
@@ -70,32 +70,34 @@ void Morphable3DFaceModel::setModelParams(Vector &zcoordParams, Vector &textureP
     {
         mesh.pointsMat(i, 2) = newZcoords(i);
         uchar intensity = newIntensities(i);
-        mesh.colors[i] = Color(intensity, intensity, intensity);
+        mesh.colors[i] = Face::FaceData::Mesh::Color(intensity, intensity, intensity);
     }
 }
 
-Procrustes3DResult Morphable3DFaceModel::align(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations, bool scale)
+Face::LinAlg::Procrustes3DResult Morphable3DFaceModel::align(Face::FaceData::Mesh &inputMesh,
+                                                             Face::FaceData::Landmarks &inputLandmarks,
+                                                             int iterations, bool scale)
 {
-    Procrustes3DResult result;
+    Face::LinAlg::Procrustes3DResult result;
 
     // centralize
-    cv::Point3d shift = Procrustes3D::centralizedTranslation(inputLandmarks.points);
-    Procrustes3D::translate(inputLandmarks.points, shift);
+    cv::Point3d shift = Face::LinAlg::Procrustes3D::centralizedTranslation(inputLandmarks.points);
+    Face::LinAlg::Procrustes3D::translate(inputLandmarks.points, shift);
     inputMesh.translate(shift);
 
     for (int iteration = 0; iteration < iterations; iteration++)
     {
         // rotate
-        Matrix rotation = Procrustes3D::getOptimalRotation(inputLandmarks.points, this->landmarks.points);
-        Procrustes3D::transform(inputLandmarks.points, rotation);
+        Matrix rotation = Face::LinAlg::Procrustes3D::getOptimalRotation(inputLandmarks.points, this->landmarks.points);
+        Face::LinAlg::Procrustes3D::transform(inputLandmarks.points, rotation);
         inputMesh.transform(rotation);
         result.rotations << rotation;
 
         // scale
         if (scale)
         {
-            cv::Point3d scaleParams = Procrustes3D::getOptimalScale(inputLandmarks.points, this->landmarks.points);
-            Procrustes3D::scale(inputLandmarks.points, scaleParams);
+            cv::Point3d scaleParams = Face::LinAlg::Procrustes3D::getOptimalScale(inputLandmarks.points, this->landmarks.points);
+            Face::LinAlg::Procrustes3D::scale(inputLandmarks.points, scaleParams);
             inputMesh.scale(scaleParams);
             result.scaleParams << scaleParams;
         }
@@ -108,15 +110,19 @@ Procrustes3DResult Morphable3DFaceModel::align(Mesh &inputMesh, Landmarks &input
     return result;
 }
 
-void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
+void Morphable3DFaceModel::morphModel(Face::FaceData::Mesh &alignedMesh)
 {
     // coord to index: y*w + x;
     /*int x = i % w;
     int y = i / w;*/
 
-    MapConverter converter;
-    Map depthmap = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, SurfaceProcessor::ZCoord);
-    Map intensities = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, SurfaceProcessor::Texture_I);
+    Face::FaceData::MapConverter converter;
+    Face::FaceData::Map depthmap =
+            Face::FaceData::SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100),
+                                                       1, Face::FaceData::SurfaceProcessor::ZCoord);
+    Face::FaceData::Map intensities =
+            Face::FaceData::SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100),
+                                                       1, Face::FaceData::SurfaceProcessor::Texture_I);
     for (int i = 0; i < mask.rows; i++)
     {
         if (mask(i) == 0)
@@ -134,22 +140,25 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     }
 
     QVector<double> usedZValues = depthmap.getUsedValues();
-    Vector inputZValues(usedZValues);
-    Vector zcoordParams = pcaForZcoord.project(inputZValues);
-    Vector normalizedZcoordParams = pcaForZcoord.normalizeParams(zcoordParams, 1);
+    Face::LinAlg::Vector inputZValues(usedZValues);
+    Face::LinAlg::Vector zcoordParams = pcaForZcoord.project(inputZValues);
+    Face::LinAlg::Vector normalizedZcoordParams = pcaForZcoord.normalizeParams(zcoordParams, 1);
 
     /*QVector<double> usedIValues = intensities.getUsedValues();
     Vector inputIValues(usedIValues);
     Vector textureParams = pcaForTexture.project(inputIValues);
     Vector normalizedTextureParams = pcaForTexture.normalizeParams(textureParams);*/
-    Vector textureParams(pcaForTexture.getModes()); // no texture generation => texture params are just zeros
+    Face::LinAlg::Vector textureParams(pcaForTexture.getModes()); // no texture generation => texture params are just zeros
 
     setModelParams(normalizedZcoordParams, textureParams);
 
     // direct copy of input mesh texture to the model
-    Map textureR = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, SurfaceProcessor::Texture_R);
-    Map textureG = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, SurfaceProcessor::Texture_G);
-    Map textureB = SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100), cv::Point2d(100,100), 1, SurfaceProcessor::Texture_B);
+    Face::FaceData::Map textureR = Face::FaceData::SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100),
+                                                              cv::Point2d(100,100), 1, Face::FaceData::SurfaceProcessor::Texture_R);
+    Face::FaceData::Map textureG = Face::FaceData::SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100),
+                                                              cv::Point2d(100,100), 1, Face::FaceData::SurfaceProcessor::Texture_G);
+    Face::FaceData::Map textureB = Face::FaceData::SurfaceProcessor::depthmap(alignedMesh, converter, cv::Point2d(-100,-100),
+                                                              cv::Point2d(100,100), 1, Face::FaceData::SurfaceProcessor::Texture_B);
     int n = textureR.w * textureR.h;
     assert(n == mask.rows);
     mesh.colors.clear();
@@ -157,16 +166,16 @@ void Morphable3DFaceModel::morphModel(Mesh &alignedMesh)
     {
         if (textureR.flags[i] && mask(i))
         {
-            mesh.colors << Color(textureB.values(i/textureB.w, i%textureB.w),
+            mesh.colors << Face::FaceData::Mesh::Color(textureB.values(i/textureB.w, i%textureB.w),
                                  textureG.values(i/textureG.w, i%textureG.w),
                                  textureR.values(i/textureR.w, i%textureR.w));
         }
     }
 }
 
-Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, int iterations)
+Face::FaceData::Mesh Morphable3DFaceModel::morph(Face::FaceData::Mesh &inputMesh, int iterations)
 {
-    Mesh result(inputMesh);
+    Face::FaceData::Mesh result(inputMesh);
     return result;
 
     /*// reset model
@@ -194,22 +203,22 @@ Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, int iterations)
     return result;*/
 }
 
-Mesh Morphable3DFaceModel::morph(Mesh &inputMesh, Landmarks &inputLandmarks, int iterations)
+Face::FaceData::Mesh Morphable3DFaceModel::morph(Face::FaceData::Mesh &inputMesh, Face::FaceData::Landmarks &inputLandmarks, int iterations)
 {
-    Procrustes3DResult procrustesResult = align(inputMesh, inputLandmarks, iterations, false);
+    Face::LinAlg::Procrustes3DResult procrustesResult = align(inputMesh, inputLandmarks, iterations, false);
     morphModel(inputMesh);
-    Mesh result(mesh);
-    Procrustes3D::applyInversedProcrustesResult(inputLandmarks.points, procrustesResult);
-    Procrustes3D::applyInversedProcrustesResult(inputMesh.pointsMat, procrustesResult);
-    Procrustes3D::applyInversedProcrustesResult(result.pointsMat, procrustesResult);
+    Face::FaceData::Mesh result(mesh);
+    Face::LinAlg::Procrustes3D::applyInversedProcrustesResult(inputLandmarks.points, procrustesResult);
+    Face::LinAlg::Procrustes3D::applyInversedProcrustesResult(inputMesh.pointsMat, procrustesResult);
+    Face::LinAlg::Procrustes3D::applyInversedProcrustesResult(result.pointsMat, procrustesResult);
     result.recalculateMinMax();
     inputMesh.recalculateMinMax();
 
     return result;
 }
 
-void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
-                                 QVector<VectorOfPoints> &controlPoints,
+void Morphable3DFaceModel::align(QVector<Face::FaceData::Mesh> &meshes,
+                                 QVector<Face::FaceData::VectorOfPoints> &controlPoints,
                                  int iterations, bool scale, bool centralize)
 {
     int meshCount = meshes.count();
@@ -219,40 +228,40 @@ void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
     {
         for (int i = 0; i < meshCount; i++)
         {
-            VectorOfPoints &landmarks = controlPoints[i];
-            cv::Point3d shift = Procrustes3D::centralizedTranslation(landmarks);
+            Face::FaceData::VectorOfPoints &landmarks = controlPoints[i];
+            cv::Point3d shift = Face::LinAlg::Procrustes3D::centralizedTranslation(landmarks);
 
-            Procrustes3D::translate(landmarks, shift);
+            Face::LinAlg::Procrustes3D::translate(landmarks, shift);
             meshes[i].translate(shift);
         }
     }
 
-    VectorOfPoints meanShape = Procrustes3D::getMeanShape(controlPoints);
-    qDebug() << "Initial variation:" << Procrustes3D::getShapeVariation(controlPoints, meanShape);
+    Face::FaceData::VectorOfPoints meanShape = Face::LinAlg::Procrustes3D::getMeanShape(controlPoints);
+    qDebug() << "Initial variation:" << Face::LinAlg::Procrustes3D::getShapeVariation(controlPoints, meanShape);
 
     for (int iteration = 0; iteration < iterations; iteration++)
     {
         // rotate
-        Procrustes3DResult rotResult = Procrustes3D::SVDAlign(controlPoints);
+        Face::LinAlg::Procrustes3DResult rotResult = Face::LinAlg::Procrustes3D::SVDAlign(controlPoints);
         for (int i = 0; i < meshCount; i++)
         {
             meshes[i].transform(rotResult.rotations[i]);
         }
-        meanShape = Procrustes3D::getMeanShape(controlPoints);
-        qDebug() << "Iteration:" << iteration << "after SVD:" << Procrustes3D::getShapeVariation(controlPoints, meanShape);
+        meanShape = Face::LinAlg::Procrustes3D::getMeanShape(controlPoints);
+        qDebug() << "Iteration:" << iteration << "after SVD:" << Face::LinAlg::Procrustes3D::getShapeVariation(controlPoints, meanShape);
 
         // scale
         if (scale)
         {
             for (int meshIndex = 0; meshIndex < meshCount; meshIndex++)
             {
-                cv::Point3d scaleParams = Procrustes3D::getOptimalScale(controlPoints[meshIndex], meanShape);
-                Procrustes3D::scale(controlPoints[meshIndex], scaleParams);
+                cv::Point3d scaleParams = Face::LinAlg::Procrustes3D::getOptimalScale(controlPoints[meshIndex], meanShape);
+                Face::LinAlg::Procrustes3D::scale(controlPoints[meshIndex], scaleParams);
                 meshes[meshIndex].scale(scaleParams);
             }
 
-            meanShape = Procrustes3D::getMeanShape(controlPoints);
-            qDebug() << "Iteration:" << iteration << "after scaling:" << Procrustes3D::getShapeVariation(controlPoints, meanShape);
+            meanShape = Face::LinAlg::Procrustes3D::getMeanShape(controlPoints);
+            qDebug() << "Iteration:" << iteration << "after scaling:" << Face::LinAlg::Procrustes3D::getShapeVariation(controlPoints, meanShape);
         }
 
         /*MapConverter c;
@@ -262,43 +271,43 @@ void Morphable3DFaceModel::align(QVector<Mesh> &meshes,
     }
 }
 
-void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints> &controlPoints, int iterations,
-                                  const QString &pcaForZcoordFile, const QString &pcaForTextureFile, const QString &pcaFile,
-                                  const QString &flagsFile, const QString &meanControlPointsFile,
-                                  Map &mapMask, bool scale, bool centralize)
+void Morphable3DFaceModel::create(QVector<Face::FaceData::Mesh> &meshes, QVector<Face::FaceData::VectorOfPoints> &controlPoints,
+                                  int iterations, const QString &pcaForZcoordFile, const QString &pcaForTextureFile,
+                                  const QString &pcaFile, const QString &flagsFile, const QString &meanControlPointsFile,
+                                  Face::FaceData::Map &mapMask, bool scale, bool centralize)
 {
     align(meshes, controlPoints, iterations, scale, centralize);
-    VectorOfPoints meanControlPoints = Procrustes3D::getMeanShape(controlPoints);
-    Landmarks l(meanControlPoints);
+    Face::FaceData::VectorOfPoints meanControlPoints = Face::LinAlg::Procrustes3D::getMeanShape(controlPoints);
+    Face::FaceData::Landmarks l(meanControlPoints);
     l.serialize(meanControlPointsFile);
 
-    QVector<Map> depthMaps;
-    QVector<Map> textureMaps;
+    QVector<Face::FaceData::Map> depthMaps;
+    QVector<Face::FaceData::Map> textureMaps;
 
-    Map resultZcoordMap(mapMask.w, mapMask.h);
+    Face::FaceData::Map resultZcoordMap(mapMask.w, mapMask.h);
     resultZcoordMap.setAll(0);
     resultZcoordMap.add(mapMask);
 
-    Map resultTextureMap(mapMask.w, mapMask.h);
+    Face::FaceData::Map resultTextureMap(mapMask.w, mapMask.h);
     resultTextureMap.setAll(0);
     resultTextureMap.add(mapMask);
 
     qDebug() << "Creating depthmaps and textures";
     for (int index = 0; index < meshes.count(); index++)
     {
-        Mesh &mesh = meshes[index];
-        MapConverter converter;
-        Map depth = SurfaceProcessor::depthmap(mesh, converter,
+        Face::FaceData::Mesh &mesh = meshes[index];
+        Face::FaceData::MapConverter converter;
+        Face::FaceData::Map depth = Face::FaceData::SurfaceProcessor::depthmap(mesh, converter,
                                                cv::Point2d(-mapMask.w/2, -mapMask.h/2),
                                                cv::Point2d(mapMask.w/2, mapMask.h/2),
-                                               1.0, SurfaceProcessor::ZCoord);
+                                               1.0, Face::FaceData::SurfaceProcessor::ZCoord);
         resultZcoordMap.add(depth);
         depthMaps.append(depth);
 
-        Map texture = SurfaceProcessor::depthmap(mesh, converter,
+        Face::FaceData::Map texture = Face::FaceData::SurfaceProcessor::depthmap(mesh, converter,
                                                cv::Point2d(-mapMask.w/2, -mapMask.h/2),
                                                cv::Point2d(mapMask.w/2, mapMask.h/2),
-                                               1.0, SurfaceProcessor::Texture_I);
+                                               1.0, Face::FaceData::SurfaceProcessor::Texture_I);
         resultTextureMap.add(texture);
         textureMaps.append(texture);
 
@@ -312,48 +321,48 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
     //cv::imwrite(meanImageFile.toStdString(), resultMatrix);
 
     qDebug() << "Creating input projection vectors for depthmaps and textures";
-    QVector<Vector> zcoordVectors;
-    QVector<Vector> textureVectors;
+    QVector<Face::LinAlg::Vector> zcoordVectors;
+    QVector<Face::LinAlg::Vector> textureVectors;
     for (int index = 0; index < meshes.count(); index++)
     {
-        Map &depth = depthMaps[index];
+        Face::FaceData::Map &depth = depthMaps[index];
         //SurfaceProcessor::smooth(depth, 1, 2);
         depth.flags = resultZcoordMap.flags;
         QVector<double> zcoords = depth.getUsedValues();
-        Vector zcoordsVec(zcoords);
+        Face::LinAlg::Vector zcoordsVec(zcoords);
         zcoordVectors << zcoordsVec;
 
-        Map &texture = textureMaps[index];
+        Face::FaceData::Map &texture = textureMaps[index];
         texture.flags = resultTextureMap.flags;
         QVector<double> intensities = texture.getUsedValues();
-        Vector intensitiesVec(intensities);
+        Face::LinAlg::Vector intensitiesVec(intensities);
         textureVectors << intensitiesVec;
 
         assert(zcoords.count() == intensities.count());
     }
 
     qDebug() << "PCA learning";
-    PCA pcaForZcoord(zcoordVectors);
+    Face::LinAlg::PCA pcaForZcoord(zcoordVectors);
     pcaForZcoord.modesSelectionThreshold(0.95);
     pcaForZcoord.serialize(pcaForZcoordFile);
 
-    PCA pcaForTexture(textureVectors);
+    Face::LinAlg::PCA pcaForTexture(textureVectors);
     pcaForTexture.modesSelectionThreshold(0.95);
     pcaForTexture.serialize(pcaForTextureFile);
 
-    QVector<Vector> projectedZcoords = pcaForZcoord.batchProject(zcoordVectors);
-    QVector<Vector> projectedTextures = pcaForTexture.batchProject(textureVectors);
-    QVector<Vector> commonParams;
+    QVector<Face::LinAlg::Vector> projectedZcoords = pcaForZcoord.batchProject(zcoordVectors);
+    QVector<Face::LinAlg::Vector> projectedTextures = pcaForTexture.batchProject(textureVectors);
+    QVector<Face::LinAlg::Vector> commonParams;
     for (int i = 0; i < meshes.count(); i++)
     {
         QVector<double> common;
         common << projectedZcoords[i].toQVector();
         common << projectedTextures[i].toQVector();
 
-        Vector commonVec(common);
+        Face::LinAlg::Vector commonVec(common);
         commonParams << commonVec;
     }
-    PCA pca(commonParams);
+    Face::LinAlg::PCA pca(commonParams);
     pca.modesSelectionThreshold(0.95);
     pca.serialize(pcaFile);
 
@@ -366,6 +375,6 @@ void Morphable3DFaceModel::create(QVector<Mesh> &meshes, QVector<VectorOfPoints>
             flags[i] = 1.0;
         }
     }
-    Vector flagsVec(flags);
+    Face::LinAlg::Vector flagsVec(flags);
     flagsVec.toFile(flagsFile);
 }

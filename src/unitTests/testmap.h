@@ -15,12 +15,13 @@ class TestMap
 public:
     static void testSerialization(const QString &pathToXYZ)
     {
-        Mesh mesh = Mesh::fromXYZ(pathToXYZ);
-        MapConverter c;
-        Map map = SurfaceProcessor::depthmap(mesh, c, 1.0, SurfaceProcessor::ZCoord);
+        Face::FaceData::Mesh mesh = Face::FaceData::Mesh::fromXYZ(pathToXYZ);
+        Face::FaceData::MapConverter c;
+        Face::FaceData::Map map = Face::FaceData::SurfaceProcessor::depthmap(mesh, c, 1.0,
+                                                                             Face::FaceData::SurfaceProcessor::ZCoord);
         map.serialize("serializedMap.map");
 
-        Map deserialized("serializedMap.map");
+        Face::FaceData::Map deserialized("serializedMap.map");
         Matrix mat = deserialized.toMatrix(0.5);
         cv::imshow("deserialized", mat);
         double min, max;
@@ -31,12 +32,12 @@ public:
 
     static void testSmoothing()
     {
-        Mesh mean = Mesh::fromOBJ("../../test/meanForAlign.obj");
-        FaceAligner aligner(mean);
+        Face::FaceData::Mesh mean = Face::FaceData::Mesh::fromOBJ("../../test/meanForAlign.obj");
+        Face::FaceData::FaceAligner aligner(mean);
 
-        Mesh mesh = Mesh::fromBIN("/media/data/frgc/spring2004/bin/02463d652.bin");
+        Face::FaceData::Mesh mesh = Face::FaceData::Mesh::fromBIN("/media/data/frgc/spring2004/bin/02463d652.bin");
         QDateTime dt = QDateTime::currentDateTime();
-        aligner.icpAlign(mesh, 10, FaceAligner::NoseTipDetection);
+        aligner.icpAlign(mesh, 10, Face::FaceData::FaceAligner::NoseTipDetection);
         qDebug() << dt.msecsTo(QDateTime::currentDateTime());
     }
 };

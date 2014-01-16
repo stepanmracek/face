@@ -36,7 +36,7 @@ void gaborRedraw(GaborParams *gParams)
 {
     realKernel = Matrix(gParams->size, gParams->size);
     imagKernel = Matrix(gParams->size, gParams->size);
-    Gabor::createWavelet(realKernel, imagKernel, gParams->frequency, gParams->orientation);
+    Face::LinAlg::Gabor::createWavelet(realKernel, imagKernel, gParams->frequency, gParams->orientation);
 
     cv::filter2D(inputImage, responseReal, -1, realKernel);
     cv::filter2D(inputImage, responseImag, -1, imagKernel);
@@ -133,7 +133,7 @@ public:
         cv::createTrackbar("frequency", "input image", &gParams.frequency, 10, gaborOnFrequencyChange, &gParams);
         cv::createTrackbar("orientation", "input image", &gParams.orientation, 8, gaborOnOrientationChange, &gParams);
 
-        inputImage = MatrixConverter::imageToMatrix("/mnt/data/frgc/spring2004/zbin-aligned/index/02463d652.png");
+        inputImage = Face::LinAlg::MatrixConverter::imageToMatrix("/mnt/data/frgc/spring2004/zbin-aligned/index/02463d652.png");
         cv::imshow("input image", inputImage);
         gaborRedraw(&gParams);
 

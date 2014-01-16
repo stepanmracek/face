@@ -2,7 +2,8 @@
 #include "ui_dlgreferenceproperties.h"
 
 DlgReferenceProperties::DlgReferenceProperties(const QString &name, const QMap<int, QString> &mapIdToName,
-                                               const QMap<QString, int> &mapNameToId, const QHash<int, Face3DTemplate *> &database,
+                                               const QMap<QString, int> &mapNameToId,
+                                               const QHash<int, Face::Biometrics::Face3DTemplate *> &database,
                                                QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DlgReferenceProperties)

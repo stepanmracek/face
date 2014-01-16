@@ -8,7 +8,7 @@ class TestLogisticRegression
 public:
     static void test()
     {
-        QVector<Vector> data;
+        QVector<Face::LinAlg::Vector> data;
         QVector<int> labels;
         for (int x = 0; x <= 10; x++)
         {
@@ -18,13 +18,13 @@ public:
 
                 QVector<double> values;
                 values << x << y;
-                data << Vector(values);
+                data << Face::LinAlg::Vector(values);
 
                 labels << ((x < y) ? 1 : 0);
             }
         }
 
-        LogisticRegression logR;
+        Face::LinAlg::LogisticRegression logR;
         logR.learn(data, labels);
 
         for (double x = 0; x <= 10; x += 0.5)
@@ -33,7 +33,7 @@ public:
             {
                 QVector<double> values;
                 values << x << y;
-                Vector probe(values);
+                Face::LinAlg::Vector probe(values);
 
                 qDebug() << x << y << logR.classify(probe);
             }

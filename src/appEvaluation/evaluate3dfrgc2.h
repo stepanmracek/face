@@ -21,15 +21,15 @@ class Evaluate3dFrgc2
 private:
     static void autoTuner()
     {
-        MultiBiomertricsAutoTuner::Input frgcData =
-                MultiBiomertricsAutoTuner::Input::fromDirectoryWithExportedCurvatureImages("/home/stepo/data/frgc/spring2004/zbin-aligned2/", "d", 300);
+        Face::Biometrics::MultiBiomertricsAutoTuner::Input frgcData =
+                Face::Biometrics::MultiBiomertricsAutoTuner::Input::fromDirectoryWithExportedCurvatureImages("/home/stepo/data/frgc/spring2004/zbin-aligned2/", "d", 300);
 
-        MultiBiomertricsAutoTuner::Input kinectData =
-                MultiBiomertricsAutoTuner::Input::fromDirectoryWithAlignedBinMeshes("../../test/kinect/", "-");
+        Face::Biometrics::MultiBiomertricsAutoTuner::Input kinectData =
+                Face::Biometrics::MultiBiomertricsAutoTuner::Input::fromDirectoryWithAlignedBinMeshes("../../test/kinect/", "-");
 
-        MultiBiomertricsAutoTuner::Settings settings(MultiBiomertricsAutoTuner::Settings::FCT_SVM, "allUnits");
+        Face::Biometrics::MultiBiomertricsAutoTuner::Settings settings(Face::Biometrics::MultiBiomertricsAutoTuner::Settings::FCT_SVM, "allUnits");
 
-        MultiExtractor extractor = MultiBiomertricsAutoTuner::train(frgcData, kinectData, settings);
+        Face::Biometrics::MultiExtractor extractor = Face::Biometrics::MultiBiomertricsAutoTuner::train(frgcData, kinectData, settings);
         extractor.serialize("kinect");
     }
 
@@ -39,28 +39,28 @@ private:
 
 private:
 
-    static Vector dog(const Matrix &in)
+    static Face::LinAlg::Vector dog(const Matrix &in)
     {
-        return MatrixConverter::matrixToColumnVector(
-                    MatrixConverter::scale(
-                        DifferenceOfGaussians::dog(in, ksize1, ksize2, equalizeDoG), 0.5));
+        return Face::LinAlg::MatrixConverter::matrixToColumnVector(
+                    Face::LinAlg::MatrixConverter::scale(
+                        Face::LinAlg::DifferenceOfGaussians::dog(in, ksize1, ksize2, equalizeDoG), 0.5));
     }
 
-    static Vector equalize(const Matrix &in)
+    static Face::LinAlg::Vector equalize(const Matrix &in)
     {
-        return MatrixConverter::matrixToColumnVector(
-                    MatrixConverter::scale(
-                        MatrixConverter::equalize(in), 0.5));
+        return Face::LinAlg::MatrixConverter::matrixToColumnVector(
+                    Face::LinAlg::MatrixConverter::scale(
+                        Face::LinAlg::MatrixConverter::equalize(in), 0.5));
     }
 
-    static Vector plain(const Matrix &in)
+    static Face::LinAlg::Vector plain(const Matrix &in)
     {
-        return MatrixConverter::matrixToColumnVector(MatrixConverter::scale(in, 0.5));
+        return Face::LinAlg::MatrixConverter::matrixToColumnVector(Face::LinAlg::MatrixConverter::scale(in, 0.5));
     }
 
-    static QVector<Vector> process(const QVector<Matrix> &in, Vector f(const Matrix &))
+    static QVector<Face::LinAlg::Vector> process(const QVector<Matrix> &in, Face::LinAlg::Vector f(const Matrix &))
     {
-        QVector<Vector> result;
+        QVector<Face::LinAlg::Vector> result;
         foreach (const Matrix &m, in)
         {
             result << f(m);
@@ -68,24 +68,26 @@ private:
         return result;
     }
 
-    static double evaluate(const QList<QVector<Matrix> > &imagesInClusters, const QList<QVector<int> > &classesInClusters, Vector f(const Matrix &))
+    static double evaluate(const QList<QVector<Matrix> > &imagesInClusters,
+                           const QList<QVector<int> > &classesInClusters,
+                           Face::LinAlg::Vector f(const Matrix &))
     {
         int N = imagesInClusters.count();
 
         // train
-        QVector<Vector> trainVectors = process(imagesInClusters[0], f);
-        ZPCACorrW pca(trainVectors, 0.995, trainVectors);
+        QVector<Face::LinAlg::Vector> trainVectors = process(imagesInClusters[0], f);
+        Face::Biometrics::ZPCACorrW pca(trainVectors, 0.995, trainVectors);
 
         QVector<double> eers;
         // evaluate
         for (int i = 1; i < N; i++)
         {
-            QVector<Vector> testVectors = process(imagesInClusters[i], f);
-            Evaluation e(testVectors, classesInClusters[i], pca.extractor, pca.metric);
+            QVector<Face::LinAlg::Vector> testVectors = process(imagesInClusters[i], f);
+            Face::Biometrics::Evaluation e(testVectors, classesInClusters[i], pca.extractor, pca.metric);
             eers << e.eer;
         }
 
-        return Vector(eers).meanValue();
+        return Face::LinAlg::Vector(eers).meanValue();
     }
 
 public:
@@ -97,12 +99,12 @@ public:
         qDebug() << "loading textureImages";
         QVector<Matrix> textureImages;
         QVector<int> ids;
-        Loader::loadMatrices(dir + "textureI", textureImages, ids, "d", "*.gz");
+        Face::LinAlg::Loader::loadMatrices(dir + "textureI", textureImages, ids, "d", "*.gz");
 
         qDebug() << "dividing";
         QList<QVector<Matrix> > imagesInClusters;
         QList<QVector<int> > classesInClusters;
-        BioDataProcessing::divideToNClusters(textureImages, ids, 5, imagesInClusters, classesInClusters);
+        Face::Biometrics::BioDataProcessing::divideToNClusters(textureImages, ids, 5, imagesInClusters, classesInClusters);
 
         //qDebug() << "plain" << evaluate(imagesInClusters, classesInClusters, plain);
 

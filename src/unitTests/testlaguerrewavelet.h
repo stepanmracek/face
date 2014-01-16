@@ -34,7 +34,7 @@ void laguerreRedraw(LaguerreParams *params)
 {
     lagKernelReal = Matrix();
     lagKernelImag = Matrix();
-    GaussLaguerre::createWavelet(lagKernelReal, lagKernelImag, params->size, params->n, params->k);
+    Face::LinAlg::GaussLaguerre::createWavelet(lagKernelReal, lagKernelImag, params->size, params->n, params->k);
 
     cv::filter2D(lagInputImage, lagResponseReal, -1, lagKernelReal);
     cv::filter2D(lagInputImage, lagResponseImag, -1, lagKernelImag);
@@ -100,7 +100,7 @@ public:
         cv::createTrackbar("n", "input image", &params.n, 5, laguerreOnNChange, &params);
         cv::createTrackbar("k", "input image", &params.k, 5, laguerreOnKChange, &params);
 
-        lagInputImage = MatrixConverter::imageToMatrix("/mnt/data/frgc/spring2004/zbin-aligned/textureE/02463d652.png");
+        lagInputImage = Face::LinAlg::MatrixConverter::imageToMatrix("/mnt/data/frgc/spring2004/zbin-aligned/textureE/02463d652.png");
         cv::imshow("input image", lagInputImage);
         laguerreRedraw(&params);
 

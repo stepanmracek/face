@@ -12,7 +12,7 @@ class TestLandmarks
 public:
     static void testReadWrite()
     {
-        VectorOfPoints points;
+        Face::FaceData::VectorOfPoints points;
         points << cv::Point3d(1,2,3);
         points << cv::Point3d(4,5,6);
         points << cv::Point3d(7,8,9);

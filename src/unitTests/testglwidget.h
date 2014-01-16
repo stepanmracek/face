@@ -18,11 +18,11 @@ public:
 
     static int test(int argc, char *argv[])
     {
-        Mesh mesh = Mesh::fromBINZ("../../test/softKinetic/01/03-02.binz", false);
+        Face::FaceData::Mesh mesh = Face::FaceData::Mesh::fromBINZ("../../test/softKinetic/01/03-02.binz", false);
 
         //for (int i = 0; i < 10; i++)
         //    SurfaceProcessor::zsmoothFlann(mesh, 50.0, 1, 1);
-        SurfaceProcessor::zsmooth(mesh, 0.5, 10);
+        Face::FaceData::SurfaceProcessor::zsmooth(mesh, 0.5, 10);
 
         mesh.printStats();
         //mesh.colors.clear();

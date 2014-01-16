@@ -31,16 +31,16 @@ public:
         QVector<double> mean1; mean1 << -3 << 0;
         QVector<double> mean2; mean2 << 3 << 0;
         QVector<double> sigma; sigma << 1 << 10;
-        QVector<Vector> class1 = Random::gauss(mean1, sigma, 500);
-        QVector<Vector> class2 = Random::gauss(mean2, sigma, 500);
+        QVector<Face::LinAlg::Vector> class1 = Face::LinAlg::Random::gauss(mean1, sigma, 500);
+        QVector<Face::LinAlg::Vector> class2 = Face::LinAlg::Random::gauss(mean2, sigma, 500);
 
         class1 << class2; // copy second class to first one
-        ICA ica(class1, 2);
+        Face::LinAlg::ICA ica(class1, 2);
         ica.setModes(1);
 
-        Vector test(2);
+        Face::LinAlg::Vector test(2);
         test(0) = -3; test(1) = 0;
-        Vector projected = ica.project(test);
+        Face::LinAlg::Vector projected = ica.project(test);
         qDebug() << test.toQVector() << projected.toQVector();
 
         test(0) = -3; test(1) = 5;
@@ -64,7 +64,7 @@ public:
         qDebug() << test.toQVector() << projected.toQVector();
     }
 
-    static void saveVec(Vector &vec, int id, int scan, const QString& suffix)
+    static void saveVec(Face::LinAlg::Vector &vec, int id, int scan, const QString& suffix)
     {
         QString idS = ((id < 10)?"0":"")+QString::number(id);
         QString scanS = ((scan < 10)?"0":"")+QString::number(scan);
@@ -73,24 +73,24 @@ public:
         vec.toFile(path);
     }
 
-    ICAofPCA ica;
+    Face::LinAlg::ICAofPCA ica;
     int imgWidth;
     Matrix parameters;
     char *winname;
     int trackbarValues[10];
     void DeprojectGermanyThermoImages()
     {
-        QVector<Vector> allImages;
+        QVector<Face::LinAlg::Vector> allImages;
         QVector<int> allClasses;
-        Loader::loadImages("/home/stepo/SVN/disp-stepan-mracek/databases/thermo/germany", allImages, &allClasses, "*.png", "-", false);
+        Face::LinAlg::Loader::loadImages("/home/stepo/SVN/disp-stepan-mracek/databases/thermo/germany", allImages, &allClasses, "*.png", "-", false);
         imgWidth = 50;
         winname = "ICA Facespace";
         cv::namedWindow(winname);
 
         // Divide data
-        QList<QVector<Vector> > images;
+        QList<QVector<Face::LinAlg::Vector> > images;
         QList<QVector<int> > classes;
-        BioDataProcessing::divideVectorsToClusters(allImages, allClasses, 15, images, classes);
+        Face::Biometrics::BioDataProcessing::divideVectorsToClusters(allImages, allClasses, 15, images, classes);
 
         ica.learn(images[0], 0.99, 20);
 
@@ -99,11 +99,11 @@ public:
         {
             Matrix in = ica.ica.W.row(i);
             in = in.t();
-            Vector out = ica.pca.backProject(in);
+            Face::LinAlg::Vector out = ica.pca.backProject(in);
             Matrix diff = out - ica.pca.cvPca.mean;
             out = diff;
             out.normalizeComponents();
-            Matrix img = MatrixConverter::columnVectorToMatrix(out, imgWidth);
+            Matrix img = Face::LinAlg::MatrixConverter::columnVectorToMatrix(out, imgWidth);
             img = img*255;
 
             cv::resize(img, img, size);
@@ -119,8 +119,8 @@ public:
         }
 
         parameters = Matrix::zeros(20, 1);
-        Vector backProjected = ica.backProject(parameters);
-        Matrix image = MatrixConverter::columnVectorToMatrix(backProjected, imgWidth);
+        Face::LinAlg::Vector backProjected = ica.backProject(parameters);
+        Matrix image = Face::LinAlg::MatrixConverter::columnVectorToMatrix(backProjected, imgWidth);
         cv::resize(image, image, size);
 
         cv::imshow(winname, image);
@@ -129,16 +129,16 @@ public:
 
     static void ConvertGermanyThermoImages()
     {
-        QVector<Vector> allImages;
+        QVector<Face::LinAlg::Vector> allImages;
         QVector<int> allClasses;
-        Loader::loadImages("/home/stepo/SVN/disp-stepan-mracek/databases/thermo/germany", allImages, &allClasses, "*.png", "-", true);
+        Face::LinAlg::Loader::loadImages("/home/stepo/SVN/disp-stepan-mracek/databases/thermo/germany", allImages, &allClasses, "*.png", "-", true);
 
         // Divide data
-        QList<QVector<Vector> > images;
+        QList<QVector<Face::LinAlg::Vector> > images;
         QList<QVector<int> > classes;
-        BioDataProcessing::divideVectorsToClusters(allImages, allClasses, 15, images, classes);
+        Face::Biometrics::BioDataProcessing::divideVectorsToClusters(allImages, allClasses, 15, images, classes);
 
-        ICAofPCA ica(images[0], 0.99, 20);
+        Face::LinAlg::ICAofPCA ica(images[0], 0.99, 20);
 
         // Create templates
         int scan = 1;
@@ -147,8 +147,8 @@ public:
             for (int i = 0; i < images[c].count(); i++)
             {
                 int id = classes[c][i];
-                Vector in = ica.pca.project(images[c][i]);
-                Vector out = ica.ica.project(in);
+                Face::LinAlg::Vector in = ica.pca.project(images[c][i]);
+                Face::LinAlg::Vector out = ica.ica.project(in);
 
                 saveVec(in, id, scan, "-in");
                 saveVec(out, id, scan, "-out");
@@ -159,7 +159,7 @@ public:
             }
         }
 
-        Common::printMatrix(ica.ica.EDET);
+        Face::LinAlg::Common::printMatrix(ica.ica.EDET);
     }
 };
 
@@ -174,8 +174,8 @@ void onTestICAChange(int, void* userData)
         test->parameters(i) = value;
     }
 
-    Vector vec = test->ica.backProject(test->parameters);
-    Matrix image = MatrixConverter::columnVectorToMatrix(vec, test->imgWidth);
+    Face::LinAlg::Vector vec = test->ica.backProject(test->parameters);
+    Matrix image = Face::LinAlg::MatrixConverter::columnVectorToMatrix(vec, test->imgWidth);
     cv::Size size(image.rows*4, image.cols*4);
     cv::resize(image, image, size);
     cv::imshow(test->winname, image);
