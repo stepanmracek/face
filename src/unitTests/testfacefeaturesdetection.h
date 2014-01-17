@@ -7,7 +7,7 @@
 #include <QDir>
 #include <QFileInfoList>
 
-#include "facedata/glwidget.h"
+#include "gui/glwidget.h"
 #include "facedata/mesh.h"
 #include "facedata/map.h"
 #include "facedata/surfaceprocessor.h"
@@ -19,7 +19,7 @@
 #include "facedata/facefeaturesanotation.h"
 #include "facedata/landmarks.h"
 #include "linalg/pca.h"
-#include "facedata/widgetmeshselect.h"
+#include "gui/widgetmeshselect.h"
 #include "linalg/kernelgenerator.h"
 #include "linalg/gabor.h"
 #include "linalg/gausslaguerre.h"
@@ -128,7 +128,7 @@ public:
         Face::FaceData::Landmarks landmarks = detector.detect();
 
         QApplication app(argc, argv);
-        GLWidget widget;
+        Face::GUI::GLWidget widget;
         widget.setWindowTitle("GL Widget");
         widget.addFace(&face);
         widget.addLandmarks(&landmarks);

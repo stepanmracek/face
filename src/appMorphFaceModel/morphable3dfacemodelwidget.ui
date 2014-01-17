@@ -86,7 +86,7 @@
     </layout>
    </item>
    <item>
-    <widget class="GLWidget" name="glWidget" native="true">
+    <widget class="Face::GUI::GLWidget" name="glWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -99,9 +99,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>GLWidget</class>
+   <class>Face::GUI::GLWidget</class>
    <extends>QWidget</extends>
-   <header>facedata/glwidget.h</header>
+   <header>gui/glwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="GLWidget" name="widget" native="true"/>
+    <widget class="Face::GUI::GLWidget" name="widget" native="true"/>
    </item>
    <item>
     <widget class="QLabel" name="label">
@@ -49,9 +49,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>GLWidget</class>
+   <class>Face::GUI::GLWidget</class>
    <extends>QWidget</extends>
-   <header>facedata/glwidget.h</header>
+   <header>gui/glwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

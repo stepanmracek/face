@@ -15,7 +15,7 @@ WinHef::~WinHef()
     delete ui;
 }
 
-void WinHef::loadFace(GLWidget *widget, const QString &path)
+void WinHef::loadFace(Face::GUI::GLWidget *widget, const QString &path)
 {
     widget->deleteAll();
     Face::FaceData::Mesh m = Face::FaceData::Mesh::fromBINZ(path);

@@ -4,7 +4,7 @@
 #include <QApplication>
 #include <QDir>
 
-#include "facedata/glwidget.h"
+#include "gui/glwidget.h"
 #include "facedata/mesh.h"
 #include "facedata/landmarks.h"
 #include "facedata/surfaceprocessor.h"
@@ -28,7 +28,7 @@ public:
         //mesh.colors.clear();
 
         QApplication app(argc, argv);
-        GLWidget widget;
+        Face::GUI::GLWidget widget;
         widget.setWindowTitle("GL Widget");
         widget.addFace(&mesh);
         widget.show();

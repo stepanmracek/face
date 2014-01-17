@@ -5,7 +5,7 @@
 #include <QDir>
 #include <QFileInfoList>
 
-#include "facedata/glwidget.h"
+#include "gui/glwidget.h"
 #include "facedata/mesh.h"
 #include "facedata/landmarks.h"
 #include "facedata/surfaceprocessor.h"
@@ -46,7 +46,7 @@ public:
         Face::FaceData::Mesh mesh2 = Face::FaceData::Mesh::fromBIN("face.bin");
 
         QApplication app(argc, argv);
-        GLWidget widget;
+        Face::GUI::GLWidget widget;
         widget.setWindowTitle("GL Widget");
         widget.addFace(&mesh2);
         widget.show();
@@ -61,7 +61,7 @@ public:
         mesh.printStats();
 
         QApplication app(argc, argv);
-        GLWidget widget;
+        Face::GUI::GLWidget widget;
         widget.setWindowTitle("GL Widget");
         widget.addFace(&mesh);
         widget.show();
@@ -74,7 +74,7 @@ public:
                                                                   "/run/media/stepo/My Book/3D-FRGC-data/nd1/Spring2004range/02463d653.ppm", true);
 
         QApplication app(argc, argv);
-        GLWidget widget;
+        Face::GUI::GLWidget widget;
         widget.setWindowTitle("GL Widget");
         widget.addFace(&mesh);
         widget.show();

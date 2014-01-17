@@ -3,7 +3,7 @@
 #include <QInputDialog>
 
 #include "kinect.h"
-#include "facedata/glwidget.h"
+#include "gui/glwidget.h"
 #include "facedata/facefeaturesanotation.h"
 #include "facedata/facealigner.h"
 #include "facedata/surfaceprocessor.h"
@@ -96,7 +96,7 @@ int mainKinect(int argc, char *argv[])
     Face::FaceData::SurfaceProcessor::smooth(mesh, 0.7, 5);
 
     QApplication app(argc, argv);
-    GLWidget widget;
+    Face::GUI::GLWidget widget;
     widget.addFace(&mesh);
     widget.show();
     return app.exec();

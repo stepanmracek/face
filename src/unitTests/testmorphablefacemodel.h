@@ -8,7 +8,7 @@
 #include <QSet>
 
 #include "facedata/surfaceprocessor.h"
-#include "facedata/glwidget.h"
+#include "gui/glwidget.h"
 #include "facedata/facefeaturesanotation.h"
 //#include "kinect/kinnect.h"
 

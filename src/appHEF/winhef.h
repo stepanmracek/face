@@ -4,7 +4,7 @@
 #include <QMainWindow>
 
 #include "filedata.h"
-#include "facedata/glwidget.h"
+#include "gui/glwidget.h"
 
 namespace Ui {
 class WinHef;
@@ -34,7 +34,7 @@ private:
     bool isCurrentPairSame;
     void loadNewPair();
     void handleEvalButton();
-    void loadFace(GLWidget *widget, const QString &path);
+    void loadFace(Face::GUI::GLWidget *widget, const QString &path);
     void score(double s);
     void calculateDet(double s, double &fmr, double &fnmr);
 

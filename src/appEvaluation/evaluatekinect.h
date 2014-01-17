@@ -6,7 +6,7 @@
 #include <QFileInfo>
 #include <QApplication>
 
-#include "facedata/glwidget.h"
+#include "gui/glwidget.h"
 #include "facedata/mesh.h"
 #include "facedata/surfaceprocessor.h"
 #include "linalg/common.h"

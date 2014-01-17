@@ -22,7 +22,7 @@
 #include "facedata/landmarkdetector.h"
 #include "facedata/landmarks.h"
 #include "facedata/facealigner.h"
-#include "facedata/glwidget.h"
+#include "gui/glwidget.h"
 #include "linalg/kernelgenerator.h"
 #include "linalg/serialization.h"
 #include "biometrics/isocurveprocessing.h"

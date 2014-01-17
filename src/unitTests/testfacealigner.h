@@ -2,7 +2,7 @@
 #define TESTFACEALIGNER_H
 
 #include "facedata/facealigner.h"
-#include "facedata/glwidget.h"
+#include "gui/glwidget.h"
 
 #include <QList>
 
