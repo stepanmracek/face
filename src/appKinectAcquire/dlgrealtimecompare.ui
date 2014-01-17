@@ -51,7 +51,7 @@
   <customwidget>
    <class>GLWidget</class>
    <extends>QWidget</extends>
-   <header>facelib/glwidget.h</header>
+   <header>facedata/glwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

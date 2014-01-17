@@ -4,7 +4,7 @@
 #include <QMainWindow>
 
 #include "filedata.h"
-#include "facelib/glwidget.h"
+#include "facedata/glwidget.h"
 
 namespace Ui {
 class WinHef;

@@ -6,17 +6,17 @@
 #include <QFileInfo>
 #include <QApplication>
 
-#include "facelib/glwidget.h"
-#include "facelib/mesh.h"
-#include "facelib/surfaceprocessor.h"
+#include "facedata/glwidget.h"
+#include "facedata/mesh.h"
+#include "facedata/surfaceprocessor.h"
 #include "linalg/common.h"
 #include "biometrics/featureextractor.h"
 #include "biometrics/isocurveprocessing.h"
 #include "biometrics/evaluation.h"
 #include "biometrics/scorelevefusion.h"
 #include "biometrics/histogramfeatures.h"
-#include "facelib/landmarkdetector.h"
-#include "facelib/facealigner.h"
+#include "facedata/landmarkdetector.h"
+#include "facedata/facealigner.h"
 #include "linalg/kernelgenerator.h"
 #include "linalg/serialization.h"
 #include "linalg/loader.h"

@@ -1,9 +1,9 @@
 #include "morphable3dfacemodel.h"
 
 #include "linalg/procrustes.h"
-#include "facelib/surfaceprocessor.h"
-#include "facelib/facealigner.h"
-#include "facelib/landmarks.h"
+#include "facedata/surfaceprocessor.h"
+#include "facedata/facealigner.h"
+#include "facedata/landmarks.h"
 
 Morphable3DFaceModel::Morphable3DFaceModel(const QString &pcaPathForZcoord, const QString &pcaPathForTexture, const QString &pcaFile, const QString &maskPath,
                                            const QString &landmarksPath, int width)

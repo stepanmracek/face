@@ -4,11 +4,11 @@
 #include <QString>
 #include <QDateTime>
 
-#include "facelib/mesh.h"
-#include "facelib/map.h"
-#include "facelib/surfaceprocessor.h"
-#include "facelib/facealigner.h"
-#include "facelib/landmarkdetector.h"
+#include "facedata/mesh.h"
+#include "facedata/map.h"
+#include "facedata/surfaceprocessor.h"
+#include "facedata/facealigner.h"
+#include "facedata/landmarkdetector.h"
 
 class TestMap
 {

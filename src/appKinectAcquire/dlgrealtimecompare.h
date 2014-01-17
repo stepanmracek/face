@@ -4,9 +4,9 @@
 #include <QDialog>
 
 #include "facetrack/realtimetrack.h"
-#include "facelib/mesh.h"
+#include "facedata/mesh.h"
 #include "biometrics/facetemplate.h"
-#include "facelib/facealigner.h"
+#include "facedata/facealigner.h"
 #include "biometrics/realtimeclassifier.h"
 
 namespace Ui {

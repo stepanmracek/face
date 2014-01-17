@@ -4,8 +4,8 @@
 #include <QDir>
 #include <opencv2/core/core.hpp>
 
-#include "facelib/mesh.h"
-#include "facelib/landmarks.h"
+#include "facedata/mesh.h"
+#include "facedata/landmarks.h"
 
 class TestLandmarks
 {

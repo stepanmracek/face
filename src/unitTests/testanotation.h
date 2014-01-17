@@ -3,7 +3,7 @@
 
 #include <QString>
 
-#include "facelib/facefeaturesanotation.h"
+#include "facedata/facefeaturesanotation.h"
 
 class TestAnotation
 {

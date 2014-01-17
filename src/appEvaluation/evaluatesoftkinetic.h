@@ -1,9 +1,9 @@
 #ifndef EVALUATESOFTKINETIC_H
 #define EVALUATESOFTKINETIC_H
 
-#include "facelib/facealigner.h"
+#include "facedata/facealigner.h"
 #include "biometrics/facetemplate.h"
-#include "facelib/surfaceprocessor.h"
+#include "facedata/surfaceprocessor.h"
 #include "biometrics/multibiomertricsautotuner.h"
 
 class EvaluateSoftKinetic

@@ -5,10 +5,10 @@
 #include <QDir>
 #include <QFileInfoList>
 
-#include "facelib/glwidget.h"
-#include "facelib/mesh.h"
-#include "facelib/landmarks.h"
-#include "facelib/surfaceprocessor.h"
+#include "facedata/glwidget.h"
+#include "facedata/mesh.h"
+#include "facedata/landmarks.h"
+#include "facedata/surfaceprocessor.h"
 
 class TestMesh
 {

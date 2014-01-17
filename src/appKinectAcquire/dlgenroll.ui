@@ -108,7 +108,9 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset theme="gtk-save"/>
+             <iconset theme="gtk-save">
+              <normaloff/>
+             </iconset>
             </property>
            </widget>
           </item>
@@ -149,7 +151,7 @@
   <customwidget>
    <class>GLWidget</class>
    <extends>QWidget</extends>
-   <header>facelib/glwidget.h</header>
+   <header>facedata/glwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

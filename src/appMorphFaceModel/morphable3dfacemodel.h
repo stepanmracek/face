@@ -4,11 +4,11 @@
 #include <QVector>
 
 #include "linalg/pca.h"
-#include "facelib/mesh.h"
+#include "facedata/mesh.h"
 #include "linalg/vector.h"
-#include "facelib/map.h"
-#include "facelib/maskedvector.h"
-#include "facelib/landmarks.h"
+#include "facedata/map.h"
+#include "facedata/maskedvector.h"
+#include "facedata/landmarks.h"
 #include "linalg/procrustes.h"
 
 class Morphable3DFaceModel

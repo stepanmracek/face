@@ -1,8 +1,8 @@
 #ifndef TESTFACEALIGNER_H
 #define TESTFACEALIGNER_H
 
-#include "facelib/facealigner.h"
-#include "facelib/glwidget.h"
+#include "facedata/facealigner.h"
+#include "facedata/glwidget.h"
 
 #include <QList>
 

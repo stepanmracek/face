@@ -4,13 +4,13 @@
 #include <QApplication>
 #include <QDir>
 
-#include "facelib/glwidget.h"
-#include "facelib/mesh.h"
-#include "facelib/landmarks.h"
-#include "facelib/surfaceprocessor.h"
+#include "facedata/glwidget.h"
+#include "facedata/mesh.h"
+#include "facedata/landmarks.h"
+#include "facedata/surfaceprocessor.h"
 #include "linalg/serialization.h"
 #include "linalg/loader.h"
-#include "facelib/facealigner.h"
+#include "facedata/facealigner.h"
 
 class TestGlWidget
 {

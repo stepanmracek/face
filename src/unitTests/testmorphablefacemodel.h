@@ -7,9 +7,9 @@
 #include <QDir>
 #include <QSet>
 
-#include "facelib/surfaceprocessor.h"
-#include "facelib/glwidget.h"
-#include "facelib/facefeaturesanotation.h"
+#include "facedata/surfaceprocessor.h"
+#include "facedata/glwidget.h"
+#include "facedata/facefeaturesanotation.h"
 //#include "kinect/kinnect.h"
 
 class TestMorphableFaceModel

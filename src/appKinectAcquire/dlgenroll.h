@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QMap>
 
-#include "facelib/mesh.h"
+#include "facedata/mesh.h"
 #include "biometrics/facetemplate.h"
 #include "kinectsensorplugin.h"
 

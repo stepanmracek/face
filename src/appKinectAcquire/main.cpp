@@ -3,10 +3,10 @@
 #include <QInputDialog>
 
 #include "kinect.h"
-#include "facelib/glwidget.h"
-#include "facelib/facefeaturesanotation.h"
-#include "facelib/facealigner.h"
-#include "facelib/surfaceprocessor.h"
+#include "facedata/glwidget.h"
+#include "facedata/facefeaturesanotation.h"
+#include "facedata/facealigner.h"
+#include "facedata/surfaceprocessor.h"
 #include "dlgscanface.h"
 #include "frmkinectmain.h"
 #include "kinectsensorplugin.h"
