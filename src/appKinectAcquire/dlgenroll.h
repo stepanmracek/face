@@ -19,7 +19,7 @@ class DlgEnroll : public QDialog
 public:
     explicit DlgEnroll(QMap<int, QString> &mapIdToName, QMap<QString, int> mapNameToId,
                        QHash<int, Face::Biometrics::Face3DTemplate*> database, const Face::Biometrics::FaceClassifier &classifier,
-                       KinectSensorPlugin &sensor,
+                       Face::Sensors::Kinect::KinectSensorPlugin &sensor,
                        QWidget *parent);
 
     ~DlgEnroll();
@@ -33,7 +33,7 @@ private slots:
     void on_btnExport_clicked();
 
 private:
-    KinectSensorPlugin &sensor;
+    Face::Sensors::Kinect::KinectSensorPlugin &sensor;
     Ui::DlgEnroll *ui;
     QMap<int, QString> &mapIdToName;
     QMap<QString, int> &mapNameToId;

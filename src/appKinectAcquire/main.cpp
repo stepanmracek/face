@@ -65,7 +65,7 @@ int mainMSV(int argc, char *argv[])
         exit(0);
     }
 
-    KinectSensorPlugin plugin(p.haarFaceDetectPath, p.alignReferencePath);
+    Face::Sensors::Kinect::KinectSensorPlugin plugin(p.haarFaceDetectPath, p.alignReferencePath);
     Face::Biometrics::FaceClassifier classifier(p.classifierDirPath);
     FrmKinectMain frmMain(plugin, classifier, p.databasePath);
     frmMain.show();
@@ -75,7 +75,7 @@ int mainMSV(int argc, char *argv[])
 
 int mainKinect(int argc, char *argv[])
 {
-    KinectSensorPlugin plugin("../../test/haar-face.xml", "../../test/meanForAlign.obj");
+    Face::Sensors::Kinect::KinectSensorPlugin plugin("../../test/haar-face.xml", "../../test/meanForAlign.obj");
 
     if (!plugin.isKinectPluggedIn())
     {

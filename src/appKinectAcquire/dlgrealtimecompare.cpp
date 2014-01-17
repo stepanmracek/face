@@ -36,8 +36,8 @@ void DlgRealTimeCompare::showFace()
         ui->label->setText(mapIdToName[classifier->minDistanceId] + ": " + QString::number(classifier->minDistance));
     }
 
-    Kinect::getRGB(rgbBuffer);
-    frame = Kinect::RGBToGrayscale(rgbBuffer);
+    Face::Sensors::Kinect::Kinect::getRGB(rgbBuffer);
+    frame = Face::Sensors::Kinect::Kinect::RGBToGrayscale(rgbBuffer);
     std::vector<cv::Rect> faces = tracker.detect(frame);
 
     int faceCount = faces.size();
@@ -59,8 +59,8 @@ void DlgRealTimeCompare::showFace()
         memset(mask, 0, 307200); //640*480
     }
 
-    Kinect::getDepth(depthBuffer, mask, 200, 1000);
-    Face::FaceData::Mesh *m = Kinect::createMesh(depthBuffer, rgbBuffer);
+    Face::Sensors::Kinect::Kinect::getDepth(depthBuffer, mask, 200, 1000);
+    Face::FaceData::Mesh *m = Face::Sensors::Kinect::Kinect::createMesh(depthBuffer, rgbBuffer);
     m->centralize();
 
     ui->widget->deleteAll();

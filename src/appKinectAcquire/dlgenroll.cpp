@@ -7,7 +7,7 @@
 DlgEnroll::DlgEnroll(QMap<int, QString> &mapIdToName, QMap<QString, int> mapNameToId,
                      QHash<int, Face::Biometrics::Face3DTemplate *> database,
                      const Face::Biometrics::FaceClassifier &classifier,
-                     KinectSensorPlugin &sensor, QWidget *parent) :
+                     Face::Sensors::Kinect::KinectSensorPlugin &sensor, QWidget *parent) :
     mapIdToName(mapIdToName), mapNameToId(mapNameToId), database(database), classifier(classifier),
     sensor(sensor),
     QDialog(parent), ui(new Ui::DlgEnroll)

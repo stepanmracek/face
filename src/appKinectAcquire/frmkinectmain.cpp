@@ -16,7 +16,8 @@
 #include "linalg/loader.h"
 #include "biometrics/realtimeclassifier.h"
 
-FrmKinectMain::FrmKinectMain(KinectSensorPlugin &sensor, const Face::Biometrics::FaceClassifier &classifier, const QString &databasePath,
+FrmKinectMain::FrmKinectMain(Face::Sensors::Kinect::KinectSensorPlugin &sensor,
+                             const Face::Biometrics::FaceClassifier &classifier, const QString &databasePath,
                              QWidget *parent) :
     ui(new Ui::FrmKinectMain),
     sensor(sensor),
