@@ -1,6 +1,10 @@
 #include "dlgenroll.h"
 #include "ui_dlgenroll.h"
 
+#include <QMessageBox>
+#include <QProgressDialog>
+#include <QFileDialog>
+
 #include "kinect.h"
 #include "dlgscanface.h"
 

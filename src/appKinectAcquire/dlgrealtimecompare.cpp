@@ -6,6 +6,7 @@
 #else
     #include <QtConcurrentRun>
 #endif
+#include <QTimer>
 
 #include "kinect.h"
 
