@@ -1,0 +1,14 @@
+gabor depth 0.5 7 2
+gabor eigencur 0.5 4 5
+gl gauss 0.5 96 3
+gabor depth 0.5 6 1
+gabor depth 0.5 6 5
+gabor index 0.5 1 2
+gabor eigencur 0.5 6 4
+gl depth 0.5 72 3
+gabor eigencur 0.5 4 3
+gabor gauss 0.5 1 0
+gabor depth 0.5 2 7
+gabor mean 0.5 7 7
+gabor mean 0.5 4 7
+gl gauss 0.5 16 1
