@@ -39,7 +39,7 @@ private:
     const Face::Biometrics::FaceClassifier &classifier;
     QMap<int, QString> mapIdToName;
     QMap<QString, int> mapNameToId;
-    QHash<int, Face::Biometrics::Face3DTemplate*> database;
+    QHash<int, Face::Biometrics::FaceTemplate*> database;
 
     void initDatabase(const QString &dirPath);
     void refreshList();

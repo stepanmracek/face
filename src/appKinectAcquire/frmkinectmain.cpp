@@ -54,7 +54,7 @@ void FrmKinectMain::initDatabase(const QString &dirPath)
         int id = QFileInfo(path).baseName().split("-")[0].toInt();
 
         QString name = mapIdToName[id];
-        Face::Biometrics::Face3DTemplate *t = new Face::Biometrics::Face3DTemplate(id, path, classifier);
+        Face::Biometrics::FaceTemplate *t = new Face::Biometrics::FaceTemplate(id, path, classifier);
         database.insertMulti(id, t);
     }
 
@@ -104,7 +104,7 @@ void FrmKinectMain::on_btnIdentify_clicked()
     sensor.align();
     Face::FaceData::Mesh m = sensor.mesh();
 
-    Face::Biometrics::Face3DTemplate *probe = new Face::Biometrics::Face3DTemplate(0, m, classifier);
+    Face::Biometrics::FaceTemplate *probe = new Face::Biometrics::FaceTemplate(0, m, classifier);
     sensor.deleteMesh();
 
     QMap<int, double> result = classifier.identify(database, probe, Face::Biometrics::FaceClassifier::CompareMeanDistance);
@@ -123,7 +123,7 @@ void FrmKinectMain::on_btnVerify_clicked()
     sensor.align();
     Face::FaceData::Mesh m = sensor.mesh();
 
-    Face::Biometrics::Face3DTemplate *probe = new Face::Biometrics::Face3DTemplate(0, m, classifier);
+    Face::Biometrics::FaceTemplate *probe = new Face::Biometrics::FaceTemplate(0, m, classifier);
     sensor.deleteMesh();
 
     if (!mapNameToId.contains(name))
@@ -171,9 +171,9 @@ void FrmKinectMain::on_btnExport_clicked()
     QString path = QFileDialog::getExistingDirectory(this);
     if (path.isNull() || path.isEmpty()) return;
 
-    QList<Face::Biometrics::Face3DTemplate*> templates = database.values(id);
+    QList<Face::Biometrics::FaceTemplate*> templates = database.values(id);
     int index = 1;
-    foreach (const Face::Biometrics::Face3DTemplate *t, templates)
+    foreach (const Face::Biometrics::FaceTemplate *t, templates)
     {
         QString p = path + QDir::separator() + QString().sprintf("%02d", id) + "-" + QString().sprintf("%02d", index) + ".yml";
         qDebug() << p;

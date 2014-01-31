@@ -1,6 +1,8 @@
 #ifndef EVALUATESOFTKINETIC_H
 #define EVALUATESOFTKINETIC_H
 
+#include <QDir>
+
 #include "facedata/facealigner.h"
 #include "biometrics/facetemplate.h"
 #include "facedata/surfaceprocessor.h"
@@ -94,13 +96,13 @@ public:
 
         foreach(MeshProcessor *p, processors)
         {
-            QVector<Face::Biometrics::Face3DTemplate *> templates;
+            QVector<Face::Biometrics::FaceTemplate *> templates;
 
             for (int i = 0; i < meshes.count(); i++)
             {
                 Face::FaceData::Mesh in(meshes[i]);
                 p->process(in);
-                templates << new Face::Biometrics::Face3DTemplate(ids[i], in, faceClassifier);
+                templates << new Face::Biometrics::FaceTemplate(ids[i], in, faceClassifier);
             }
 
             Face::Biometrics::FaceClassifier c;
@@ -113,7 +115,7 @@ public:
             {
                 Face::FaceData::Mesh in(meshes[i]);
                 p->process(in);
-                templates << new Face::Biometrics::Face3DTemplate(ids[i], in, c);
+                templates << new Face::Biometrics::FaceTemplate(ids[i], in, c);
             }
             Face::Biometrics::Evaluation e = c.evaluate(templates);
             qDebug() << e.eer << e.fnmrAtFmr(0.01) << e.fnmrAtFmr(0.001);
@@ -145,8 +147,8 @@ public:
         return 0;
     }
 
-    static void loadBinZMeshes(const QString &dir, const Face::FaceData::FaceAligner &aligner, QVector<int> &ids,
-                               QVector<Face::FaceData::Mesh> &meshes, int icpIterations, int smoothIterations, float smoothCoef)
+    static void loadMeshes(const QString &dir, const Face::FaceData::FaceAligner &aligner, QVector<int> &ids,
+                           QVector<Face::FaceData::Mesh> &meshes, int icpIterations, int smoothIterations, float smoothCoef)
     {
         const QVector<QString> fileNames = Face::LinAlg::Loader::listFiles(dir, "*.binz", Face::LinAlg::Loader::Filename);
         int n = fileNames.count();
@@ -157,7 +159,7 @@ public:
         //#pragma omp parallel for
         for (int i = 0; i < n; i++)
         {
-            Face::FaceData::Mesh m = Face::FaceData::Mesh::fromBINZ(dir + fileNames[i]);
+            Face::FaceData::Mesh m = Face::FaceData::Mesh::fromFile(dir + fileNames[i]);
             Face::FaceData::SurfaceProcessor::mdenoising(m, smoothCoef, smoothIterations, smoothIterations); // 0.02f, 10, 10);
             aligner.icpAlign(m, icpIterations, Face::FaceData::FaceAligner::TemplateMatching); // 20
 
@@ -172,7 +174,7 @@ public:
     {
         QVector<int> ids;
         QVector<Face::FaceData::Mesh> meshes;
-        loadBinZMeshes(evalPath, aligner, ids, meshes, icpIterations, smoothIterations, smoothCoef);
+        loadMeshes(evalPath, aligner, ids, meshes, icpIterations, smoothIterations, smoothCoef);
         int n = ids.count();
         QVector<Face::Biometrics::MultiTemplate> templates;
         for (int i = 0; i < n; i++)
@@ -209,7 +211,7 @@ public:
         Face::FaceData::FaceAligner aligner(Face::FaceData::Mesh::fromOBJ(meanFaceForAlign, false));
         QVector<int> ids;
         QVector<Face::FaceData::Mesh> meshes;
-        loadBinZMeshes(targetSoftKineticDir, aligner, ids, meshes, trainICPiters, trainSmoothIters, trainSmoothCoef);
+        loadMeshes(targetSoftKineticDir, aligner, ids, meshes, trainICPiters, trainSmoothIters, trainSmoothCoef);
 
         qDebug() << "loading FRGC";
         Face::Biometrics::MultiBiomertricsAutoTuner::Input frgcData =
@@ -230,15 +232,84 @@ public:
         eval.outputResults(outputDir + "/eval", 10);
     }
 
+    static void createMultiExtractor()
+    {
+        QString meanFaceForAlign = "../../test/meanForAlign.obj";
+        QString unitsFile = "../../test/allUnits";
+        QString frgcDirectory = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
+        QString targetSoftKineticDir = "../../test/softKinetic/03/stepan/";
+        QString evaluationSoftKineticDir = "../../test/softKinetic/03/radim/";
+        int trainICPiters = 20;
+        int testICPiters = 100;
+        float trainSmoothCoef = 0.02;
+        float testSmoothCoef = 0.02;
+        int trainSmoothIters = 10;
+        int testSmoothIters = 10;
+
+        Face::FaceData::FaceAligner aligner(Face::FaceData::Mesh::fromOBJ(meanFaceForAlign, false));
+        QVector<int> ids;
+        QVector<Face::FaceData::Mesh> meshes;
+        loadMeshes(targetSoftKineticDir, aligner, ids, meshes, trainICPiters, trainSmoothIters, trainSmoothCoef);
+
+        qDebug() << "loading FRGC";
+        Face::Biometrics::MultiBiomertricsAutoTuner::Input frgcData =
+                Face::Biometrics::MultiBiomertricsAutoTuner::Input::fromDirectoryWithExportedCurvatureImages(frgcDirectory, "d", 200);
+
+        qDebug() << "SoftKinetic data";
+        Face::Biometrics::MultiBiomertricsAutoTuner::Input softKineticData =
+                Face::Biometrics::MultiBiomertricsAutoTuner::Input::fromAlignedMeshes(ids, meshes);
+
+        Face::Biometrics::MultiBiomertricsAutoTuner::Settings settings(Face::Biometrics::MultiBiomertricsAutoTuner::Settings::FCT_GMM, unitsFile);
+        Face::Biometrics::MultiExtractor extractor = Face::Biometrics::MultiBiomertricsAutoTuner::train(frgcData, softKineticData, settings);
+
+
+        Face::Biometrics::Evaluation eval = evaluateMultiExtractor(extractor, aligner, evaluationSoftKineticDir,
+                                                                   testICPiters, testSmoothIters, testSmoothCoef);
+        qDebug() << "Validation set:" << eval.eer;
+
+        //extractor.serialize("out");
+    }
+
     static void evaluateMultiExtractor()
     {
-        Face::Biometrics::MultiExtractor extractor("../../test/softKinetic/out1");
+        Face::Biometrics::MultiExtractor extractor("../../test/softKinetic/out5");
         Face::FaceData::FaceAligner aligner(Face::FaceData::Mesh::fromOBJ("../../test/meanForAlign.obj", false));
-        QString dir("../../test/softKinetic/03/stepan/");
-        //QString dir("../../test/softKinetic/03/radim/");
+        //QString dir("../../test/softKinetic/03/stepan/");
+        QString dir("../../test/softKinetic/03/radim/");
         //QString dir("../../test/softKinetic/03/honza/");
 
-        qDebug() << evaluateMultiExtractor(extractor, aligner, dir, 100, 10, 0.02).eer;
+        Face::Biometrics::Evaluation evaluation = evaluateMultiExtractor(extractor, aligner, dir, 100, 10, 0.02);
+        qDebug() << evaluation.eer;
+        evaluation.outputResults("softKinetic-SVM", 50);
+    }
+
+    static void createSeparatedVectors()
+    {
+        Face::Biometrics::MultiExtractor extractor("../../test/softKinetic/out3");
+        Face::FaceData::FaceAligner aligner(Face::FaceData::Mesh::fromOBJ("../../test/meanForAlign.obj", false));
+        QString dir("../../test/softKinetic/03/radim/");
+
+        QVector<int> ids;
+        QVector<Face::FaceData::Mesh> meshes;
+        loadMeshes(dir, aligner, ids, meshes, 100, 10, 0.02);
+        int n = ids.count();
+        QVector<Face::Biometrics::MultiTemplate> templates;
+        for (int i = 0; i < n; i++)
+        {
+            templates << extractor.extract(meshes[i], 1, ids[i]);
+        }
+
+        int modalities = templates[0].featureVectors.count();
+        for (int m = 0; m < modalities; m++)
+        {
+            QDir().mkpath(QString::number(m));
+
+            for (int i = 0; i < n; i++)
+            {
+                const Face::LinAlg::Vector &vec = templates[i].featureVectors[m];
+                vec.toFile(QString::number(m) + QDir::separator() + QString::number(templates[i].id) + "-" + QString::number(i));
+            }
+        }
     }
 
     static void evaluateAging()

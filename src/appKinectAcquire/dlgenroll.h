@@ -18,7 +18,7 @@ class DlgEnroll : public QDialog
 
 public:
     explicit DlgEnroll(QMap<int, QString> &mapIdToName, QMap<QString, int> mapNameToId,
-                       QHash<int, Face::Biometrics::Face3DTemplate*> database, const Face::Biometrics::FaceClassifier &classifier,
+                       QHash<int, Face::Biometrics::FaceTemplate*> database, const Face::Biometrics::FaceClassifier &classifier,
                        Face::Sensors::Kinect::KinectSensorPlugin &sensor,
                        QWidget *parent);
 
@@ -37,7 +37,7 @@ private:
     Ui::DlgEnroll *ui;
     QMap<int, QString> &mapIdToName;
     QMap<QString, int> &mapNameToId;
-    QHash<int, Face::Biometrics::Face3DTemplate*> &database;
+    QHash<int, Face::Biometrics::FaceTemplate*> &database;
     const Face::Biometrics::FaceClassifier &classifier;
 
     QList<Face::FaceData::Mesh*> scans;

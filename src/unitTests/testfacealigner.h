@@ -29,15 +29,12 @@ public:
     static void test(const QString &frgcPath, int argc, char *argv[])
     {
         Face::FaceData::FaceAligner aligner(Face::FaceData::Mesh::fromOBJ("../../test/meanForAlign.obj"));
-        Face::FaceData::Mesh probe = Face::FaceData::Mesh::fromBINZ("../../test/softKinetic/03/DS32528233700098_radim/3000-20131224112242.binz");
+        Face::FaceData::Mesh probe = Face::FaceData::Mesh::fromBINZ("../../test/softKinetic/03/radim/3000-20131224112242.binz");
 
-        for (int iterations = 10; iterations <= 100; iterations++)
-        {
-            Face::FaceData::Mesh m(probe);
-            QDateTime now = QDateTime::currentDateTime();
-            aligner.icpAlign(m, iterations, Face::FaceData::FaceAligner::TemplateMatching);
-            qDebug() << iterations << now.msecsTo(QDateTime::currentDateTime());
-        }
+        Face::FaceData::Mesh m(probe);
+        QDateTime now = QDateTime::currentDateTime();
+        aligner.icpAlign(m, 100, Face::FaceData::FaceAligner::None);
+        qDebug() << now.msecsTo(QDateTime::currentDateTime());
 
         /*QApplication app(argc, argv);
         GLWidget w;

@@ -25,7 +25,7 @@ private:
                 Face::Biometrics::MultiBiomertricsAutoTuner::Input::fromDirectoryWithExportedCurvatureImages("/home/stepo/data/frgc/spring2004/zbin-aligned2/", "d", 300);
 
         Face::Biometrics::MultiBiomertricsAutoTuner::Input kinectData =
-                Face::Biometrics::MultiBiomertricsAutoTuner::Input::fromDirectoryWithAlignedBinMeshes("../../test/kinect/", "-");
+                Face::Biometrics::MultiBiomertricsAutoTuner::Input::fromDirectoryWithAlignedMeshes("../../test/kinect/", "-");
 
         Face::Biometrics::MultiBiomertricsAutoTuner::Settings settings(Face::Biometrics::MultiBiomertricsAutoTuner::Settings::FCT_SVM, "allUnits");
 

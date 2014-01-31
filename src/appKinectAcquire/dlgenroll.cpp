@@ -9,7 +9,7 @@
 #include "dlgscanface.h"
 
 DlgEnroll::DlgEnroll(QMap<int, QString> &mapIdToName, QMap<QString, int> mapNameToId,
-                     QHash<int, Face::Biometrics::Face3DTemplate *> database,
+                     QHash<int, Face::Biometrics::FaceTemplate *> database,
                      const Face::Biometrics::FaceClassifier &classifier,
                      Face::Sensors::Kinect::KinectSensorPlugin &sensor, QWidget *parent) :
     mapIdToName(mapIdToName), mapNameToId(mapNameToId), database(database), classifier(classifier),
@@ -99,19 +99,19 @@ void DlgEnroll::on_buttonBox_accepted()
     QProgressDialog progDlg("Extracting templates", QString(), 0, scans.count(), this);
     progDlg.setWindowModality(Qt::WindowModal);
     progDlg.setMinimumDuration(100);
-    QList<Face::Biometrics::Face3DTemplate*> templates;
+    QList<Face::Biometrics::FaceTemplate*> templates;
     int index = 0;
     foreach (const Face::FaceData::Mesh *m, scans)
     {
         progDlg.setValue(index);
-        templates << new Face::Biometrics::Face3DTemplate(id, *m, classifier);
+        templates << new Face::Biometrics::FaceTemplate(id, *m, classifier);
         index++;
     }
     progDlg.setValue(scans.count());
 
     // check quality
     int templateNum = 1;
-    foreach (const Face::Biometrics::Face3DTemplate *t, templates)
+    foreach (const Face::Biometrics::FaceTemplate *t, templates)
     {
         double d = classifier.compare(templates, t, Face::Biometrics::FaceClassifier::CompareMeanDistance);
         qDebug() << "template:" << templateNum << "distance:" << d;
@@ -135,7 +135,7 @@ void DlgEnroll::on_buttonBox_accepted()
     mapIdToName[id] = name;
     mapNameToId[name] = id;
 
-    foreach (Face::Biometrics::Face3DTemplate *t, templates)
+    foreach (Face::Biometrics::FaceTemplate *t, templates)
     {
         database.insertMulti(id, t);
     }

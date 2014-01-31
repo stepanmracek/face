@@ -91,7 +91,7 @@ public:
 
             QVector<Face::FaceData::VectorOfPoints> isoCurves;
             Face::FaceData::Mesh mesh = Face::FaceData::Mesh::fromBINZ(srcFileInfo.absoluteFilePath());
-            isoCurves = Face::Biometrics::Face3DTemplate::getIsoGeodesicCurves(mesh);
+            isoCurves = Face::Biometrics::FaceTemplate::getIsoGeodesicCurves(mesh);
             Face::LinAlg::Serialization::serializeVectorOfPointclouds(isoCurves, resultPath);
             //LandmarkDetector detector(mesh);
             //Landmarks lm = detector.detect();
@@ -208,7 +208,7 @@ public:
                 index++;
             }*/
 
-            Matrix texture = Face::Biometrics::Face3DTemplate::getTexture(mesh, false);
+            Matrix texture = Face::Biometrics::FaceTemplate::getTexture(mesh, false);
             QString out = srcDirPath + "textureI/" + srcFileInfo.baseName() + ".gz";
             if (Face::LinAlg::Common::matrixContainsNan(texture))
                 nans << "textureI-" + srcFileInfo.baseName();
@@ -950,14 +950,14 @@ public:
 
         for (int cluster = 1; cluster <= filenamesInClusters.count(); cluster++)
         {
-            QVector<Face::Biometrics::Face3DTemplate *> templates;
+            QVector<Face::Biometrics::FaceTemplate *> templates;
             for (int i = 0; i < filenamesInClusters[cluster].count(); i++)
             {
                 int id = classesInClusters[cluster][i];
                 QString fileName = filenamesInClusters[cluster][i] + ".binz";
                 QString path = dataDirPath + fileName;
                 Face::FaceData::Mesh faceMesh = Face::FaceData::Mesh::fromBINZ(path, false);
-                templates << new Face::Biometrics::Face3DTemplate(id, faceMesh, faceClassifier);
+                templates << new Face::Biometrics::FaceTemplate(id, faceMesh, faceClassifier);
                 qDebug() << cluster << fileName << id << (i+1) << "/" << filenamesInClusters[cluster].count();
 
                 //templates.last()->serialize(dataDirPath + "templates/" + filenamesInClusters[cluster][i], faceClassifier);
@@ -976,7 +976,7 @@ public:
         foreach (const QString &file, files)
         {
             Face::FaceData::Mesh face = Face::FaceData::Mesh::fromBINZ(dir + file + ".binz");
-            Face::Biometrics::Face3DTemplate t(0, face, classifier);
+            Face::Biometrics::FaceTemplate t(0, face, classifier);
             t.serialize(dir + "templates/" + file + ".xml.gz", classifier);
         }
     }
@@ -986,19 +986,19 @@ public:
         Face::Biometrics::FaceClassifier classifier("../../test/frgc/classifiers");
         QString dir = "/home/stepo/data/frgc/spring2004/zbin-aligned2/templates";
         QVector<QString> files = Face::LinAlg::Loader::listFiles(dir, "*.xml.gz", Face::LinAlg::Loader::AbsoluteFull);
-        QVector<Face::Biometrics::Face3DTemplate *> allTemplates;
+        QVector<Face::Biometrics::FaceTemplate *> allTemplates;
         QVector<int> allClasses;
         qDebug() << "loading...";
         foreach (const QString &file, files)
         {
             int id = file.split('/').last().split('d').at(0).toInt();
-            allTemplates << new Face::Biometrics::Face3DTemplate(id, file, classifier);
+            allTemplates << new Face::Biometrics::FaceTemplate(id, file, classifier);
             allClasses << id;
         }
 
         qDebug() << "dividing...";
         int clustersCount = 5;
-        QList<QVector<Face::Biometrics::Face3DTemplate *> > templatesInClusters;
+        QList<QVector<Face::Biometrics::FaceTemplate *> > templatesInClusters;
         QList<QVector<int> > classesInClusters;
         Face::Biometrics::BioDataProcessing::divideToNClusters(allTemplates, allClasses, clustersCount,
                                                                templatesInClusters, classesInClusters);

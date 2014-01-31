@@ -52,12 +52,16 @@ int main(int argc, char *argv[])
     //EvaluateKinect::evaluateSimple();
     //EvaluateKinect::evaluateRefeference();
     //EvaluateKinect::evaluateReferenceDistances();
+    //EvaluateKinect::evaluateMultiExtractor();
 
     // SoftKinetic
     //EvaluateSoftKinetic::checkAligning(argc, argv);
     //EvaluateSoftKinetic::createMultiExtractor(argc, argv);
+    EvaluateSoftKinetic::createMultiExtractor();
     //EvaluateSoftKinetic::evaluateMultiExtractor();
-    EvaluateSoftKinetic::evaluateAging();
+    //EvaluateSoftKinetic::evaluateAging();
+
+    //EvaluateSoftKinetic::createSeparatedVectors();
 
     return 0;
 }

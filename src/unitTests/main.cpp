@@ -25,6 +25,7 @@
 #include "testlaguerrewavelet.h"
 #include "testfacealigner.h"
 #include "testtextureprocessing.h"
+#include "testgmm.h"
 
 #include <QString>
 
@@ -111,7 +112,7 @@ int main(int argc, char *argv[])
     //TestMesh::readAbsWithTexture(argc, argv);
     //TestMesh::testReadWriteCharArray(frgcPath());
 
-    TestFaceAligner::test(frgcPath(), argc, argv);
+    //TestFaceAligner::test(frgcPath(), argc, argv);
     //TestFaceAligner::testOpenMP();
 
     //TestLandmarks::testReadWrite();
@@ -129,6 +130,10 @@ int main(int argc, char *argv[])
     //TestLogisticRegression::test();
 
     //TestTextureProcessing::testClahe();
+
+    //TestGMM::TestSerialization();
+    //TestGMM::TestLearnScoreGMMFusion();
+    TestGMM::Bug();
 
 	return 0;
 }

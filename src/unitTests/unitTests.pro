@@ -46,4 +46,5 @@ HEADERS += \
     testlaguerrewavelet.h \
     testfacealigner.h \
     testtextureprocessing.h \
-    test.h
+    test.h \
+    testgmm.h
