@@ -111,6 +111,7 @@ int main(int argc, char *argv[])
     //TestMesh::testReadBinWriteBinzReadBinz(argc, argv, frgcPath());
     //TestMesh::readAbsWithTexture(argc, argv);
     //TestMesh::testReadWriteCharArray(frgcPath());
+    TestMesh::testDepthmap();
 
     //TestFaceAligner::test(frgcPath(), argc, argv);
     //TestFaceAligner::testOpenMP();
@@ -133,7 +134,7 @@ int main(int argc, char *argv[])
 
     //TestGMM::TestSerialization();
     //TestGMM::TestLearnScoreGMMFusion();
-    TestGMM::Bug();
+    //TestGMM::Bug();
 
 	return 0;
 }

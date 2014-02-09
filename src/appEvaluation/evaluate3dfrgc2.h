@@ -5,6 +5,7 @@
 #include "linalg/gabor.h"
 #include "linalg/gausslaguerre.h"
 #include "linalg/loader.h"
+#include "linalg/differenceofgaussians.h"
 #include "biometrics/filterfeatureextractor.h"
 #include "biometrics/evaluation.h"
 #include "biometrics/scorelevelfusionwrapper.h"
@@ -14,7 +15,7 @@
 #include "biometrics/multiextractor.h"
 #include "biometrics/multitemplate.h"
 #include "biometrics/multibiomertricsautotuner.h"
-#include "linalg/differenceofgaussians.h"
+
 
 class Evaluate3dFrgc2
 {
@@ -36,8 +37,6 @@ private:
     static int ksize1;
     static int ksize2;
     static bool equalizeDoG;
-
-private:
 
     static Face::LinAlg::Vector dog(const Matrix &in)
     {
@@ -126,6 +125,64 @@ public:
                 }
             }
         }
+    }
+
+    static void createMultiExtractor()
+    {
+        QString unitsFile = "../../test/allUnits";
+        QString frgcDirectory = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
+
+        qDebug() << "loading training set";
+        Face::Biometrics::MultiBiomertricsAutoTuner::Input trainData =
+                Face::Biometrics::MultiBiomertricsAutoTuner::Input::fromDirectoryWithAlignedMeshes(frgcDirectory, "d", 416, 0);
+
+        qDebug() << "loading validation set";
+        Face::Biometrics::MultiBiomertricsAutoTuner::Input validationData =
+                Face::Biometrics::MultiBiomertricsAutoTuner::Input::fromDirectoryWithAlignedMeshes(frgcDirectory, "d", 451, 416);
+
+        Face::Biometrics::MultiBiomertricsAutoTuner::Settings settings(Face::Biometrics::MultiBiomertricsAutoTuner::Settings::FCT_SVM, unitsFile);
+        Face::Biometrics::MultiExtractor extractor = Face::Biometrics::MultiBiomertricsAutoTuner::train(trainData, validationData, settings);
+
+        //eval.outputResults("frgc-SVM", 50);
+        extractor.serialize("out");
+    }
+
+    static void evaluate()
+    {
+        QString multiextractorPath = "../../test/frgc/multiextractor-images";
+        QString frgcDirectory = "/home/stepo/data/frgc/spring2004/zbin-aligned2/";
+        Face::Biometrics::MultiExtractor extractor(multiextractorPath);
+
+        QVector<QString> files = Face::LinAlg::Loader::listFiles(frgcDirectory + "depth", "*.gz", Face::LinAlg::Loader::Filename);
+        //QVector<QString> files = Face::LinAlg::Loader::listFiles(frgcDirectory, "*.binz", Face::LinAlg::Loader::Filename);
+        QVector<int> classes = Face::LinAlg::Loader::getClasses(files, "d");
+
+        int clusters = 5;
+        QList<QVector<QString> > filesInClusters;
+        QList<QVector<int> > classesInClusters;
+        Face::Biometrics::BioDataProcessing::divideToNClusters(files, classes, clusters, filesInClusters, classesInClusters);
+
+        QVector<Face::Biometrics::MultiTemplate> templates;
+        for (int i = 2; i < clusters; i++)
+        {
+            const QVector<QString> &files = filesInClusters[i];
+            const QVector<int> &classes = classesInClusters[i];
+            int n = files.count();
+
+            //QVector<Face::Biometrics::MultiTemplate> templates;
+            for (int j = 0; j < n; j++)
+            {
+                templates << extractor.extract(
+                                 //Face::FaceData::Mesh::fromFile(frgcDirectory + files[j]),
+                                 Face::Biometrics::MultiExtractor::ImageData(frgcDirectory, files[j]),
+                                 1, classes[j]);
+            }
+
+            /*Face::Biometrics::Evaluation e = extractor.evaluate(templates);
+            qDebug() << e.eer;
+            e.outputResults("frgc-meshes-SVM-" + QString::number(i), 50);*/
+        }
+        qDebug() << extractor.rankOneIdentification(templates);
     }
 };
 

@@ -190,7 +190,7 @@ public:
 
         qDebug() << "loading frgc";
         MultiBiomertricsAutoTuner::Input frgc =
-                MultiBiomertricsAutoTuner::Input::fromDirectoryWithExportedCurvatureImages("/media/data/frgc/spring2004/zbin-aligned2/", "d", 300);
+                MultiBiomertricsAutoTuner::Input::fromDirectoryWithExportedCurvatureImages("/media/data/frgc/spring2004/zbin-aligned2/", "d", 200);
 
         qDebug() << "loading kinect";
         MultiBiomertricsAutoTuner::Input kinect =
@@ -198,7 +198,7 @@ public:
 
         qDebug() << "training";
         MultiExtractor extractor = MultiBiomertricsAutoTuner::train(frgc, kinect, settings);
-        extractor.serialize("../../test/kinect/multiextractor");
+        extractor.serialize("out");
     }
 };
 #endif // EVALUATEKINECT_H

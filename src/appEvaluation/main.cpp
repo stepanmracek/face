@@ -40,9 +40,11 @@ int main(int argc, char *argv[])
     //Evaluate3dFrgc::createTemplates();
     //Evaluate3dFrgc::evaluateSerializedTemplates();
 
-    // sandbox
+    // FRGC - multiextractor
     //Evaluate3dFrgc2::autoTuner();
     //Evaluate3dFrgc2::evaluateDoGTexture();
+    //Evaluate3dFrgc2::createMultiExtractor();
+    Evaluate3dFrgc2::evaluate();
 
     // Kinect
     //EvaluateKinect::learnFromFrgc();
@@ -57,8 +59,9 @@ int main(int argc, char *argv[])
     // SoftKinetic
     //EvaluateSoftKinetic::checkAligning(argc, argv);
     //EvaluateSoftKinetic::createMultiExtractor(argc, argv);
-    EvaluateSoftKinetic::createMultiExtractor();
+    //EvaluateSoftKinetic::createMultiExtractor();
     //EvaluateSoftKinetic::evaluateMultiExtractor();
+    //EvaluateSoftKinetic::evaluateRankOneIdentification();
     //EvaluateSoftKinetic::evaluateAging();
 
     //EvaluateSoftKinetic::createSeparatedVectors();

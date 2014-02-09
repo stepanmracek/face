@@ -14,6 +14,14 @@ class TestMesh
 {
 public:
 
+    static void testDepthmap()
+    {
+        Face::FaceData::Mesh m = Face::FaceData::Mesh::fromFile("/home/stepo/danko/100-20140127173545.obj", true);
+        Face::FaceData::MapConverter c;
+        Face::FaceData::Map dm = Face::FaceData::SurfaceProcessor::depthmap(m, c, 1.0, Face::FaceData::SurfaceProcessor::ZCoord);
+        cv::imwrite("depth.png", dm.toMatrix()*255);
+    }
+
     static void testReadWriteCharArray(const QString &frgcPath)
     {
         QString path = frgcPath + "zbin-aligned/02463d652.binz";
