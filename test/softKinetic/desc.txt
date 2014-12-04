@@ -1,5 +1,0 @@
-pozor - mezi jednotlivymi podslozkami nesedi ID subjektu
-
-01 - ruzne svetelne podminky
-02 - konstantni svetelne podminky
-

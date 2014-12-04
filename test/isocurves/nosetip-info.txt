@@ -1,5 +1,0 @@
-Center of isocurves: nosetip (0,0,0)
-Distances: 10,20,30,40,50,60
-Samples: 100, sampled with modulo 5 => 20
-PCA mean: 6*20*3 = 360
-PCA eigenvalues: 230

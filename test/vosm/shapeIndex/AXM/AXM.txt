@@ -1,2 +1,0 @@
-m_iNbOfPyramidLevels
-4
