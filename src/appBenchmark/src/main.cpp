@@ -7,7 +7,7 @@
 
 void printHelpAndExit()
 {
-    std::cout << "usage: tbs-face3d-benchmark" << std::endl;
+    std::cout << "usage: appBenchmark" << std::endl;
     std::cout << "  --extractor path/to/extractor" << std::endl;
     std::cout << "  --meanFaceForAlign path/to/meanFace/For/Align" << std::endl;
     std::cout << "  --preAlignTemplate path/to/template.yml" << std::endl;
