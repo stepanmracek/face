@@ -37,7 +37,7 @@ TemplateExtractor::Settings::Settings(int argc, char *argv[], bool &ok)
 
 void TemplateExtractor::Settings::printHelp()
 {
-    std::cout << "usage: tbs-face3d --extract" << std::endl;
+    std::cout << "usage: appAutoTrainer --extract" << std::endl;
     std::cout << " mandatory parameters:" << std::endl;
     std::cout << "  --extractor path/to/extractor" << std::endl;
     std::cout << "  --inputPath path/to/input/meshes" << std::endl;

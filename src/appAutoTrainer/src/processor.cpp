@@ -33,7 +33,7 @@ Processor::Settings::Settings(int argc, char *argv[], bool &ok)
 
 void Processor::Settings::printHelp()
 {
-    std::cout << "usage: tbs-face3d --process" << std::endl;
+    std::cout << "usage: appAutoTrainer --process" << std::endl;
     std::cout << " mandatory parameters:" << std::endl;
     std::cout << "  --meanFaceForAlign model.obj" << std::endl;
     std::cout << "  --preAlignTemplate template.yml" << std::endl;

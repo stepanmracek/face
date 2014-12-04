@@ -29,7 +29,6 @@ endif()
 
 if (3DFACE_EXTRAS)
 	add_subdirectory(faceExtras)
-	add_subdirectory(appEvaluation)
 endif()
 
 if (3DFACE_EXTRAS AND 3DFACE_SOFTKINETIC AND 3DFACE_KINECT AND 3DFACE_OCCIPITAL)

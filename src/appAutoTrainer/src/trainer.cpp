@@ -37,7 +37,7 @@ Trainer::Settings::Settings(int argc, char *argv[], bool &ok)
 
 void Trainer::Settings::printHelp()
 {
-    std::cout << "usage: tbs-face3d --trainUnits outputDir" << std::endl;
+    std::cout << "usage: appAutoTrainer --trainUnits outputDir" << std::endl;
     std::cout << " mandatory parameters:" << std::endl;
     std::cout << "  --meanFaceForAlign model.obj" << std::endl;
     std::cout << "  --preAlignTemplate template.yml" << std::endl;

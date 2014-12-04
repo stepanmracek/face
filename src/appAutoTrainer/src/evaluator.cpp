@@ -32,7 +32,7 @@ Evaluator::Settings::Settings(int argc, char *argv[], bool &ok)
 
 void Evaluator::Settings::printHelp()
 {
-    std::cout << "usage: tbs-face3d --evaluate output" << std::endl;
+    std::cout << "usage: appAutoTrainer --evaluate output" << std::endl;
     std::cout << " mandatory parameters:" << std::endl;
     std::cout << "  --extractor /path/to/extractor/" << std::endl;
     std::cout << "  --meanFaceForAlign model.obj" << std::endl;
