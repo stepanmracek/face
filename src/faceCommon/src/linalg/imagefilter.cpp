@@ -208,7 +208,7 @@ Matrix LBPFilter::process(const Matrix &input) const
     Matrix result(input.rows-2, input.cols-2);
     for (int r = 1; r < input.rows-1; r++)
     {
-        for (int c = 1; c < input.cols; c++)
+        for (int c = 1; c < input.cols-1; c++)
         {
             result (r-1,c-1) = getValue(input, r, c);
         }
@@ -302,7 +302,7 @@ Matrix HistogramFilter::process(const Matrix &input) const
     return Vector(resultVec);
 }
 
-std::vector<double> HistogramFilter::histogram(const Matrix &cell) const
+/*std::vector<double> HistogramFilter::histogram(const Matrix &cell) const
 {
     std::vector<double> h(256);
     double increment = 1.0/(cell.rows*cell.cols);
@@ -317,6 +317,50 @@ std::vector<double> HistogramFilter::histogram(const Matrix &cell) const
     }
 
     return h;
+}*/
+
+HistogramBinsFilter::HistogramBinsFilter(int gridSizeX, int gridSizeY, int binsCount) :
+    HistogramFilter(gridSizeX, gridSizeY), binsCount(binsCount) { }
+
+std::string HistogramBinsFilter::writeParams() const
+{
+    return Poco::format("%s-%d-%d-%d", name(), gridSizeX, gridSizeY, binsCount);
+}
+
+Matrix HistogramBinsFilter::process(const Matrix &input) const
+{
+    int width = input.cols/gridSizeX;
+    int height = input.rows/gridSizeY;
+
+    std::vector<double> resultVec;
+    for(int i = 0; i < gridSizeY; i++)
+    {
+        for(int j = 0; j < gridSizeX; j++)
+        {
+            std::vector<double> h(binsCount);
+            double increment = 1.0/(width*height);
+            for (int r = i*height; r < (i+1)*height; r++)
+            {
+                for (int c = j*width; c < (j+1)*width; c++)
+                {
+                    int bin = (int)round(input(r,c)*(binsCount-1));
+                    if (bin < 0 || bin >= binsCount)
+                    {
+                        throw FACELIB_EXCEPTION("bin out of range: " + std::to_string(bin) + " (from value " + std::to_string(input(r,c)) + ")");
+                    }
+                    h[bin] += increment;
+                }
+            }
+            resultVec.insert(resultVec.end(), h.begin(), h.end());
+
+            /*if (i == 0 && j == 0) {
+                for (auto v : h)
+                    std::cout << v << " ";
+                std::cout << std::endl;
+            }*/
+        }
+    }
+    return Vector(resultVec);
 }
 
 Matrix ContrastEqualizationFilter::process(const Matrix &input) const
@@ -342,4 +386,35 @@ Matrix ContrastEqualizationFilter::process(const Matrix &input) const
     tmp = (tau * tmp)+tau;
     cv::normalize(tmp, tmp, 0.0, 1.0, CV_MINMAX);
     return tmp;
+}
+
+OrientedGradientsFilter::OrientedGradientsFilter()
+{
+    horizontalKernel = Matrix::zeros(1, 3);
+    horizontalKernel(0) = -1.0;
+    horizontalKernel(1) = 0;
+    horizontalKernel(2) = 1.0;
+
+    verticalKernel = horizontalKernel.t();
+}
+
+Matrix OrientedGradientsFilter::process(const Matrix &input) const
+{
+    Matrix horizontalResult;
+    Matrix verticalResult;
+    cv::filter2D(input, horizontalResult, CV_64F, horizontalKernel, cv::Point(1, 0));
+    cv::filter2D(input, verticalResult, CV_64F, verticalKernel, cv::Point(0, 1));
+
+    Matrix result = Matrix(input.rows, input.cols);
+    for (int r = 0; r < input.rows; r++)
+    {
+        for (int c = 0; c < input.cols; c++)
+        {
+            double x = horizontalResult(r, c);
+            double y = verticalResult(r, c);
+            result(r, c) = (atan2(y, x) + M_PI) / (2 * M_PI);
+        }
+    }
+
+    return result;
 }

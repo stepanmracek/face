@@ -1,5 +1,4 @@
-#ifndef ISERIALIZABLE_H
-#define ISERIALIZABLE_H
+#pragma once
 
 #include <opencv2/opencv.hpp>
 
@@ -18,5 +17,3 @@ public:
 
 }
 }
-
-#endif // ISERIALIZABLE_H

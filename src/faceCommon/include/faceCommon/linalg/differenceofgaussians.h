@@ -1,5 +1,4 @@
-#ifndef DIFFERENCEOFGAUSSIANS_H
-#define DIFFERENCEOFGAUSSIANS_H
+#pragma once
 
 #include "common.h"
 
@@ -14,5 +13,3 @@ public:
 
 }
 }
-
-#endif // DIFFERENCEOFGAUSSIANS_H

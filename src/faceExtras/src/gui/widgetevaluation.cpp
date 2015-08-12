@@ -226,7 +226,7 @@ void WidgetEvaluation::on_btnAdd_clicked()
     addEvaluation(eval.first, eval.second);
 }
 
-void WidgetEvaluation::addEvaluation(const QString &key, const Biometrics::Evaluation &newEvaluation)
+void WidgetEvaluation::addEvaluation(const QString &key, const Face::Biometrics::Evaluation &newEvaluation)
 {
     evaluations.insert(key, newEvaluation);
     replotAll();

@@ -4,10 +4,12 @@
 #include <string>
 #include <vector>
 
+#include "faceCommon/faceCommon.h"
+
 namespace Face {
 namespace Helpers {
 
-class CmdLineArgsParser
+class FACECOMMON_EXPORTS CmdLineArgsParser
 {
     std::vector<std::string> params;
 

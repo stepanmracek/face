@@ -1,5 +1,4 @@
-#ifndef HAARDETECT_H
-#define HAARDETECT_H
+#pragma once
 
 #include <opencv/cv.h>
 
@@ -24,5 +23,3 @@ public:
 
 }
 }
-
-#endif // HAARDETECT_H

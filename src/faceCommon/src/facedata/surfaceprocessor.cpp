@@ -145,6 +145,7 @@ void SurfaceProcessor::mdenoising(Mesh &mesh, float sigma, int normalIterations,
     mdenoise.exportVertices(mesh);
 }
 
+namespace {
 
 inline double min(double a, double b, double c)
 {
@@ -185,6 +186,8 @@ inline double linearInterpolation(double x1, double y1, double z1,
         return (z1+z2+z3)/3;
     }
     return result;
+}
+
 }
 
 void SurfaceProcessor::depthmap(const Mesh &mesh, Map &map, cv::Point2d meshStart, cv::Point2d meshEnd, SurfaceDataToProcess dataToProcess)

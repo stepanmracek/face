@@ -3,14 +3,15 @@
 
 #include "faceCommon/biometrics/multiextractor.h"
 #include "faceCommon/biometrics/multitemplate.h"
+#include "faceCommon/faceCommon.h"
 
 namespace Face {
 namespace Biometrics {
 
-class MultiBiomertricsAutoTuner
+class FACECOMMON_EXPORTS MultiBiomertricsAutoTuner
 {
 public:
-    class Input
+    class FACECOMMON_EXPORTS Input
     {
     private:
         Input();
@@ -35,7 +36,7 @@ public:
                                                     int maxCount = -1, int startIndex = 0);
     };
 
-    struct Settings
+    struct FACECOMMON_EXPORTS Settings
     {
         std::string fusionType;
         std::vector<std::string> params;
@@ -54,8 +55,6 @@ public:
     static MultiExtractor::Ptr trainAllUnits(const Input &sourceDatabaseTrainData,
                                              const Input &targetDatabaseTrainData,
                                              const Settings &settings);
-
-//private:
 
     static MultiExtractor::Unit::Ptr trainUnit(const std::string &lineParams, const Input &sourceDatabaseTrainData,
                                                const Input &targetDatabaseTrainData, std::vector<Evaluation> &evaluations,

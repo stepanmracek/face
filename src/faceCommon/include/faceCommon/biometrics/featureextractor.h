@@ -73,7 +73,7 @@ public:
     std::string writeParams() const { return name(); }
 };
 
-class ZScorePCAExtractor : public ZScoreFeatureExtractor
+class FACECOMMON_EXPORTS ZScorePCAExtractor : public ZScoreFeatureExtractor
 {
 public:
     Face::LinAlg::PCA pca;

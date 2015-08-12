@@ -1,0 +1,14 @@
+<RCC>
+  <qresource prefix="images">
+    <file>logo.png</file>
+    <file>delete.png</file>
+    <file>export.png</file>
+    <file>import.png</file>
+    <file>properties.png</file>
+    <file>add.png</file>
+    <file>import.png</file>
+    <file>export.png</file>
+    <file>scan.png</file>
+    <file>save.png</file>
+  </qresource>
+</RCC>

@@ -1,5 +1,4 @@
-#ifndef SERIALIZATION_H
-#define SERIALIZATION_H
+#pragma once
 
 #include "common.h"
 #include "faceCommon/facedata/mesh.h"
@@ -16,5 +15,3 @@ public:
 
 }
 }
-
-#endif // SERIALIZATION_H

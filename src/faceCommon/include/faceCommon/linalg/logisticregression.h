@@ -1,5 +1,4 @@
-#ifndef LOGISTICREGRESSION_H
-#define LOGISTICREGRESSION_H
+#pragma once
 
 #include "common.h"
 #include "vector.h"
@@ -32,5 +31,3 @@ public:
 
 }
 }
-
-#endif // LOGISTICREGRESSION_H

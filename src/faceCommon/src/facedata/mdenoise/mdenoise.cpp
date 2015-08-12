@@ -4,6 +4,9 @@
 #include <cstdio>
 #include <iostream>
 
+#include "faceCommon/facedata/mesh.h"
+#include "faceCommon/linalg/common.h"
+
 using namespace Face::FaceData::MDenoise;
 
 //functions deal with memory allocation errors.
@@ -162,6 +165,7 @@ void MDenoise::loadModel(const std::string& fname) {
                     m_nNumVertex = m_nNumFace = 0;
                     free(vVertex);
                     free(tTriangle);
+                    fclose(fp);
                     return;
                 }
                 else
@@ -226,7 +230,7 @@ void MDenoise::loadModel(const std::string& fname) {
     }
 
     ScalingBox(); // scale to a box
-    ComputeNormal(FALSE);
+    ComputeNormal(false);
 
     m_nNumVertexP = m_nNumVertex;
     m_nNumFaceP = m_nNumFace;
@@ -265,7 +269,7 @@ void MDenoise::importModel(const Face::FaceData::Mesh& mesh) {
     }
 
     ScalingBox(); // scale to a box
-    ComputeNormal(FALSE);
+    ComputeNormal(false);
 
     m_pf3VertexP = new FVECTOR3[m_nNumVertexP];
     m_pn3FaceP = new NVECTOR3[m_nNumFaceP];
@@ -304,6 +308,8 @@ void MDenoise::saveModel(const std::string& ofname) {
     {
         fprintf(fp,"f %d %d %d\n", m_pn3FaceP[i][0]+1, m_pn3FaceP[i][1]+1, m_pn3FaceP[i][2]+1);
     }
+
+    fclose(fp);
 }
 
 void MDenoise::exportVertices(Face::FaceData::Mesh& mesh) {
@@ -799,6 +805,6 @@ void MDenoise::VertexUpdate(int** tRing, int nVIterations) {
             }
         }
     }
-    ComputeNormal(TRUE);
+    ComputeNormal(true);
 }
 

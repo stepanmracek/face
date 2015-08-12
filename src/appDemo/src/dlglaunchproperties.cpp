@@ -4,9 +4,7 @@
 #include <QFileDialog>
 #include <QDebug>
 
-#include "kinect/kinectsensorplugin.h"
-#include "occipital/occipitalsensor.h"
-#include "softkinetic/ds325sensorfactory.h"
+#include "faceCommon/settings/settings.h"
 
 DlgLaunchProperties::DlgLaunchProperties(QWidget *parent) :
     QDialog(parent),
@@ -14,14 +12,16 @@ DlgLaunchProperties::DlgLaunchProperties(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->cmbSensor->addItem(kinect);
-    ui->cmbSensor->addItem(softKinetic);
-    ui->cmbSensor->addItem(occipital);
+	auto sensorNames = loader.getSensorNames();
+	for (const std::string &sn : sensorNames)
+		ui->cmbSensor->addItem(QString::fromStdString(sn));
 
-    ui->leHaarPath->setText("haar-face.xml");
-    ui->leMeanFacePath->setText("meanForAlign.obj");
-    ui->lePreAlignTemplatePath->setText("preAlignTemplate.yml");
-    ui->leMultiExtractorPath->setText("classifiers");
+	auto &s = Face::Settings::instance();
+	ui->leHaarPath->setText(QString::fromStdString(s.settingsMap[Face::Settings::CascadeFaceDetectorPathKey]));
+	ui->leMeanFacePath->setText(QString::fromStdString(s.settingsMap[Face::Settings::MeanFaceModelPathKey]));
+	ui->lePreAlignTemplatePath->setText(QString::fromStdString(s.settingsMap[Face::Settings::PreAlignTemplatePathKey]));
+	ui->leLandmarkPath->setText(QString::fromStdString(s.settingsMap[Face::Settings::MeanFaceModelLandmarksPathKey]));
+	ui->leMultiExtractorPath->setText(QString::fromStdString(s.settingsMap[Face::Settings::MultiExtractorPathKey]));
 }
 
 DlgLaunchProperties::~DlgLaunchProperties()
@@ -65,45 +65,27 @@ void DlgLaunchProperties::on_pbMultiExtractorPath_clicked()
     }
 }
 
+void DlgLaunchProperties::on_pbLandmarksPath_clicked()
+{
+	QString lmPath = QFileDialog::getOpenFileName(this, "Open landmarks file");
+	if (!lmPath.isNull())
+	{
+		ui->leLandmarkPath->setText(lmPath);
+	}
+}
+
 void DlgLaunchProperties::on_buttonBox_accepted()
 {
-
-}
-
-QString DlgLaunchProperties::getHaarPath()
-{
-    return ui->leHaarPath->text();
-}
-
-QString DlgLaunchProperties::getMultiExtractorPath()
-{
-    return ui->leMultiExtractorPath->text();
-}
-
-QString DlgLaunchProperties::getAlignerPath()
-{
-    return ui->leMeanFacePath->text();
-}
-
-QString DlgLaunchProperties::getPreAlignTemplatePath()
-{
-    return ui->lePreAlignTemplatePath->text();
+	auto &s = Face::Settings::instance();
+	s.settingsMap[Face::Settings::CascadeFaceDetectorPathKey] = ui->leHaarPath->text().toStdString();
+	s.settingsMap[Face::Settings::MeanFaceModelPathKey] = ui->leMeanFacePath->text().toStdString();
+	s.settingsMap[Face::Settings::PreAlignTemplatePathKey] = ui->lePreAlignTemplatePath->text().toStdString();
+	s.settingsMap[Face::Settings::MeanFaceModelLandmarksPathKey] = ui->leLandmarkPath->text().toStdString();
+	s.settingsMap[Face::Settings::MultiExtractorPathKey] = ui->leMultiExtractorPath->text().toStdString();
 }
 
 Face::Sensors::ISensor::Ptr DlgLaunchProperties::getSensor()
 {
-    qDebug() << ui->cmbSensor->currentText() << kinect << ui->cmbSensor->currentText().compare(kinect);
-    if (ui->cmbSensor->currentText().compare(kinect) == 0)
-    {
-        return new Face::Sensors::Kinect::KinectSensorPlugin(getHaarPath().toStdString());
-    }
-    else if (ui->cmbSensor->currentText().compare(occipital) == 0)
-    {
-        return new Face::Sensors::Occipital::OccipitalSensor();
-    }
-    else
-    {
-        Face::Sensors::SoftKinetic::DS325SensorFactory factory;
-        return factory.create(getHaarPath().toStdString());
-    }
+	return loader.getSensor(ui->cmbSensor->currentText().toStdString());
+    return 0;
 }

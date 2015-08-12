@@ -1,5 +1,4 @@
-#ifndef UTIL_H
-#define UTIL_H
+#pragma once
 
 #include "faceCommon/linalg/common.h"
 
@@ -20,5 +19,3 @@ public:
 
 }
 }
-
-#endif // UTIL_H

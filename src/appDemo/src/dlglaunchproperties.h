@@ -16,10 +16,6 @@ public:
     explicit DlgLaunchProperties(QWidget *parent = 0);
     ~DlgLaunchProperties();
 
-    QString getHaarPath();
-    QString getMultiExtractorPath();
-    QString getAlignerPath();
-    QString getPreAlignTemplatePath();
     Face::Sensors::ISensor::Ptr getSensor();
 
 private slots:
@@ -31,14 +27,13 @@ private slots:
 
     void on_pbMultiExtractorPath_clicked();
 
+	void on_pbLandmarksPath_clicked();
+
     void on_buttonBox_accepted();
 
 private:
+	Face::Sensors::SensorLoader loader;
     Ui::DlgLaunchProperties *ui;
-
-    static constexpr char *kinect = "Kinect";
-    static constexpr char *occipital = "Occipital";
-    static constexpr char *softKinetic = "SoftKinetic";
 };
 
 #endif // DLGLAUNCHPROPERTIES_H

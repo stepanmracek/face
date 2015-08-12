@@ -1,12 +1,11 @@
-#ifndef IMAGEFILTERFACTORY_H
-#define IMAGEFILTERFACTORY_H
+#pragma once
 
 #include "imagefilter.h"
 
 namespace Face {
 namespace LinAlg {
 
-class ImageFilterFactory
+class FACECOMMON_EXPORTS ImageFilterFactory
 {
 public:
     static ImageFilter::Ptr create(const std::string &params);
@@ -15,5 +14,3 @@ public:
 
 }
 }
-
-#endif // IMAGEFILTERFACTORY_H

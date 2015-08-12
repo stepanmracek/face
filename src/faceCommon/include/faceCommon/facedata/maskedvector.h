@@ -1,5 +1,4 @@
-#ifndef VECTOR_H
-#define VECTOR_H
+#pragma once
 
 #include "faceCommon/linalg/common.h"
 
@@ -54,5 +53,3 @@ public:
 
 }
 }
-
-#endif // VECTOR_H

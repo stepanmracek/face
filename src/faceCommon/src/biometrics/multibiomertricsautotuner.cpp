@@ -71,7 +71,10 @@ MultiBiomertricsAutoTuner::Input MultiBiomertricsAutoTuner::Input::fromDirectory
     if (dir.back() != Poco::Path::separator()) dir.push_back(Poco::Path::separator());
 
     Input result;
-    std::vector<std::string> files = Face::LinAlg::Loader::listFiles(dir, "*.png", Face::LinAlg::Loader::Filename);
+    std::vector<std::string> filters;
+    filters.push_back("*.png");
+    filters.push_back("*.ppm");
+    std::vector<std::string> files = Face::LinAlg::Loader::listFiles(dir, filters, Face::LinAlg::Loader::Filename);
 
     if (maxCount == -1)
     {
@@ -125,7 +128,7 @@ void MultiBiomertricsAutoTuner::fillEvaluations(const Input &sourceDatabaseTrain
     {
         trainUnit(settings.params[i], sourceDatabaseTrainData, targetDatabaseTrainData, evaluations, i);
     }
-    std::cout << "Training individual classifiers took " << (stamp.elapsed()/1000) << "ms";
+    std::cout << "Training individual classifiers took " << (stamp.elapsed()/1000) << "ms" << std::endl;
 }
 
 MultiExtractor::Ptr MultiBiomertricsAutoTuner::trainWithWrapper(const Input &sourceDatabaseTrainData,
@@ -183,7 +186,7 @@ MultiExtractor::Unit::Ptr MultiBiomertricsAutoTuner::trainUnit(const std::string
     }
     Evaluation eval(templates, *(unit->metrics));
     evaluations[index] = eval;
-    std::cout << "  " << index << " " << unit->writeParams() << ": " << eval.eer;
+    //std::cout << "  " << index << " " << unit->writeParams() << ": " << eval.eer << std::endl;
 
     return unit;
 }

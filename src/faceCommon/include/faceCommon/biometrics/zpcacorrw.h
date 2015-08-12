@@ -10,7 +10,7 @@ namespace Biometrics {
 
 class ZScorePCAExtractor;
 
-class ZPCACorrW
+class FACECOMMON_EXPORTS ZPCACorrW
 {
 public:
     ZScorePCAExtractor extractor;

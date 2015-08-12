@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(F3D.kinect)
+project(F3D.sensor.kinect)
 
 file(GLOB_RECURSE ${PROJECT_NAME}.Sources "src/*.cpp")
 add_library (${PROJECT_NAME} SHARED ${${PROJECT_NAME}.Sources})

@@ -1,5 +1,4 @@
-#ifndef MATRIXCONVERTER_H
-#define MATRIXCONVERTER_H
+#pragma once
 
 #include "common.h"
 #include "vector.h"
@@ -126,5 +125,3 @@ public:
 
 }
 }
-
-#endif // MATRIXCONVERTER_H

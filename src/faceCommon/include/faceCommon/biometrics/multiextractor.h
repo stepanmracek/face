@@ -20,7 +20,7 @@ class ImageDataThreadPool;
 /**
  * MultiExtractor
  */
-class MultiExtractor
+class FACECOMMON_EXPORTS MultiExtractor
 {
 private:
     ExtractorThreadPool *extractorThreadPool;
@@ -29,7 +29,7 @@ private:
 public:
     typedef cv::Ptr<MultiExtractor> Ptr;
 
-    class ImageData
+	class FACECOMMON_EXPORTS ImageData
     {
     public:
         std::map<std::string, Matrix> typeDict;
@@ -43,7 +43,7 @@ public:
         static std::vector<std::string> getTypes();
     };
 
-    class Unit
+	class FACECOMMON_EXPORTS Unit
     {
     public:
         typedef cv::Ptr<Unit> Ptr;
@@ -105,6 +105,7 @@ public:
 
     MultiTemplate extract(const ImageData &data, int version, int id) const;
     MultiTemplate extract(const FaceData::Mesh &mesh, int version, int id) const;
+    std::vector<MultiTemplate> extract(const std::vector<FaceData::Mesh> &meshes, const std::vector<int> &ids, int version) const;
 
     bool checkTemplate(const MultiTemplate &t);
     ScoreLevelFusionBase::Result compare(const MultiTemplate &first, const MultiTemplate &second) const;

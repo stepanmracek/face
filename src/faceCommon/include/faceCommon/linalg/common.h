@@ -1,11 +1,11 @@
-#ifndef COMMON_H
-#define COMMON_H
+#pragma once
 
 #include <limits>
 #include <opencv2/opencv.hpp>
 #include <stdexcept>
 #include <string>
-#include <execinfo.h>
+
+#include "faceCommon/faceCommon.h"
 
 #ifndef NAN
     #define NAN (std::numeric_limits<double>::quiet_NaN());
@@ -14,6 +14,7 @@
 #ifndef M_PI
     #define M_PI       3.14159265358979323846
     #define M_PI_2     1.57079632679489661923
+    #define M_PI_4     0.78539816339744830962
     #define M_1_PI     0.318309886183790671538
     #define M_SQRT2    1.41421356237309504880
 #endif
@@ -27,7 +28,7 @@ typedef cv::Mat_<unsigned char> ImageGrayscale;
 namespace Face {
 namespace LinAlg {
 
-class Common
+class FACECOMMON_EXPORTS Common
 {
 public:
     static double absSum(Matrix &m);
@@ -93,5 +94,3 @@ double euclideanDistance(const cv::Point &p1, const cv::Point &p2);
 
 }
 }
-
-#endif // COMMON_H

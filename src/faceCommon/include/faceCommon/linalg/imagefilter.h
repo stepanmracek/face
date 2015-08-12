@@ -1,5 +1,4 @@
-#ifndef IMAGEFILTER_H
-#define IMAGEFILTER_H
+#pragma once
 
 #include <string>
 
@@ -8,7 +7,7 @@
 namespace Face {
 namespace LinAlg {
 
-class ImageFilter
+class FACECOMMON_EXPORTS ImageFilter
 {
 public:
     typedef cv::Ptr<ImageFilter> Ptr;
@@ -22,7 +21,7 @@ public:
 
 // ---------- Gabor filters ----------
 
-class GaborFilter : public ImageFilter
+class FACECOMMON_EXPORTS GaborFilter : public ImageFilter
 {
 protected:
     Matrix realKernel;
@@ -34,7 +33,7 @@ public:
     GaborFilter(int frequency, int orientation);
 };
 
-class GaborFilterReal : public GaborFilter
+class FACECOMMON_EXPORTS GaborFilterReal : public GaborFilter
 {
 public:
     GaborFilterReal(int frequency, int orientation);
@@ -44,7 +43,7 @@ public:
     static std::string name() { return "gaborReal"; }
 };
 
-class GaborFilterImag : public GaborFilter
+class FACECOMMON_EXPORTS GaborFilterImag : public GaborFilter
 {
 public:
     GaborFilterImag(int frequency, int orientation);
@@ -54,7 +53,7 @@ public:
     static std::string name() { return "gaborImag"; }
 };
 
-class GaborFilterAbs : public GaborFilter
+class FACECOMMON_EXPORTS GaborFilterAbs : public GaborFilter
 {
 public:
     GaborFilterAbs(int frequency, int orientation);
@@ -66,7 +65,7 @@ public:
 
 // ---------- G-L filters ----------
 
-class GaussLaguerreFilter : public ImageFilter
+class FACECOMMON_EXPORTS GaussLaguerreFilter : public ImageFilter
 {
 protected:
     Matrix realKernel;
@@ -79,7 +78,7 @@ public:
     GaussLaguerreFilter(int kernelSize, int n, int k);
 };
 
-class GaussLaguerreFilterReal : public GaussLaguerreFilter
+class FACECOMMON_EXPORTS GaussLaguerreFilterReal : public GaussLaguerreFilter
 {
 public:
     GaussLaguerreFilterReal(int kernelSize, int n, int k);
@@ -89,7 +88,7 @@ public:
     static std::string name() { return "gaussLaguerreReal"; }
 };
 
-class GaussLaguerreFilterImag : public GaussLaguerreFilter
+class FACECOMMON_EXPORTS GaussLaguerreFilterImag : public GaussLaguerreFilter
 {
 public:
     GaussLaguerreFilterImag(int kernelSize, int n, int k);
@@ -99,7 +98,7 @@ public:
     static std::string name() { return "gaussLaguerreImag"; }
 };
 
-class GaussLaguerreFilterAbs : public GaussLaguerreFilter
+class FACECOMMON_EXPORTS GaussLaguerreFilterAbs : public GaussLaguerreFilter
 {
 public:
     GaussLaguerreFilterAbs(int kernelSize, int n, int k);
@@ -111,7 +110,7 @@ public:
 
 // ---------- other filters ----------
 
-class DifferenceOfGaussiansFilter : public ImageFilter
+class FACECOMMON_EXPORTS DifferenceOfGaussiansFilter : public ImageFilter
 {
     int kernel1size;
     int kernel2size;
@@ -124,7 +123,7 @@ public:
     static std::string name() { return "dog"; }
 };
 
-class EqualizeFilter : public ImageFilter
+class FACECOMMON_EXPORTS EqualizeFilter : public ImageFilter
 {
 public:
     Matrix process(const Matrix &input) const;
@@ -133,7 +132,7 @@ public:
     static std::string name() { return "equalize"; }
 };
 
-class GaussianBlurFilter : public ImageFilter
+class FACECOMMON_EXPORTS GaussianBlurFilter : public ImageFilter
 {
     int kernelSize;
 
@@ -145,7 +144,7 @@ public:
     static std::string name() { return "gaussBlur"; }
 };
 
-class ScaleFilter : public ImageFilter
+class FACECOMMON_EXPORTS ScaleFilter : public ImageFilter
 {
 protected:
     double scale;
@@ -158,7 +157,7 @@ public:
     static std::string name() { return "scale"; }
 };
 
-class LBPFilter : public ImageFilter
+class FACECOMMON_EXPORTS LBPFilter : public ImageFilter
 {
 protected:
     inline double getValue(const Matrix &in, int row, int col) const;
@@ -169,7 +168,7 @@ public:
     static std::string name() { return "lbp"; }
 };
 
-class GammaFilter : public ImageFilter
+class FACECOMMON_EXPORTS GammaFilter : public ImageFilter
 {
 protected:
     double gamma;
@@ -181,7 +180,7 @@ public:
     static std::string name() { return "gamma"; }
 };
 
-class HistogramFilter : public ImageFilter
+class FACECOMMON_EXPORTS HistogramFilter : public ImageFilter
 {
 protected:
     int gridSizeX;
@@ -193,10 +192,22 @@ public:
     std::string writeParams() const;
     static std::string name() { return "histogram"; }
 
-    std::vector<double> histogram(const Matrix &cell) const;
+    //std::vector<double> histogram(const Matrix &cell) const;
 };
 
-class ContrastEqualizationFilter : public ImageFilter
+class FACECOMMON_EXPORTS HistogramBinsFilter : public HistogramFilter
+{
+protected:
+    int binsCount;
+
+public:
+    HistogramBinsFilter(int gridSizeX, int gridSizeY, int binsCount);
+    Matrix process(const Matrix &input) const;
+    std::string writeParams() const;
+    static std::string name() { return "histogramBins"; }
+};
+
+class FACECOMMON_EXPORTS ContrastEqualizationFilter : public ImageFilter
 {
 protected:
     double alpha;
@@ -210,7 +221,19 @@ public:
     static std::string name() { return "contrast"; }
 };
 
-}
-}
+class FACECOMMON_EXPORTS OrientedGradientsFilter : public ImageFilter
+{
+protected:
+    Matrix horizontalKernel;
+    Matrix verticalKernel;
 
-#endif // IMAGEFILTER_H
+public:
+    OrientedGradientsFilter();
+
+    Matrix process(const Matrix &input) const;
+    std::string writeParams() const { return name(); }
+    static std::string name() { return "orientedGradients"; }
+};
+
+}
+}

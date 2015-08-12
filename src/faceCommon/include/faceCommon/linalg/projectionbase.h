@@ -1,5 +1,4 @@
-#ifndef PROJECTIONBASE_H_
-#define PROJECTIONBASE_H_
+#pragma once
 
 #include "common.h"
 #include "vector.h"
@@ -29,5 +28,3 @@ public:
 
 }
 }
-
-#endif /* PROJECTIONBASE_H_ */

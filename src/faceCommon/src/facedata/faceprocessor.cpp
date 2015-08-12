@@ -4,18 +4,17 @@
 
 using namespace Face::FaceData;
 
-FaceProcessor::FaceProcessor(FaceAligner::Ptr aligner, float smoothCoef, int smoothIters) :
+FaceProcessor::FaceProcessor(FaceAlignerLandmark::Ptr aligner, float smoothCoef, int smoothIters) :
     aligner(aligner),
-    icpIterations(100),
     smoothCoef(smoothCoef),
     smoothIters(smoothIters)
 {
 
 }
 
-void FaceProcessor::process(Mesh &mesh)
+void FaceProcessor::process(Mesh &mesh, Landmarks &landmarks)
 {
     if (smoothIters > 0)
         SurfaceProcessor::mdenoising(mesh, smoothCoef, smoothIters, smoothIters);
-    aligner->icpAlign(mesh, icpIterations, FaceAligner::CVTemplateMatching);
+	aligner->align(mesh, landmarks);
 }

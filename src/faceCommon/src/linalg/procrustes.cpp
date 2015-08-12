@@ -82,7 +82,7 @@ void Procrustes2D::translate(Vector &vector, TranslationCoefs &coefs)
     }
 }
 
-TranslationCoefs Procrustes2D::centralizedTranslation(Vector &vector)
+TranslationCoefs Procrustes2D::centralizedTranslation(const Vector &vector)
 {
     double meanx = 0.0;
     double meany = 0.0;
@@ -170,22 +170,9 @@ RotateAndScaleCoefs Procrustes2D::align(const Vector &from, const Vector &to)
     double vectorScale = 1.0/from.magnitude();
     Vector vector = from.mul(vectorScale);
 
-    /*int n = vector.rows/2;
-    double numerator = 0.0;
-    double denumerator = 0.0;
-    for (int i = 0; i < n; i++)
-    {
-        numerator += (vector(i, 0) * reference(n+i, 0) - vector(n+i, 0) * reference(i, 0));
-        denumerator += (vector(i, 0) * reference(i, 0) + vector(n+i, 0) * reference(n+i, 0));
-    }*/
-
     double s = vectorScale/referenceScale;
-    //double theta = atan(numerator/denumerator);
     double theta = getOptimalRotation(vector, reference);
     RotateAndScaleCoefs c(s, theta);
-
-    //reference.mult(1.0/referenceScale);
-    //vector.mult(1.0/vectorScale);
 
     return c;
 }

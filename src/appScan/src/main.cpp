@@ -1,45 +1,39 @@
 #include <QApplication>
 #include <QInputDialog>
+#include <Poco/ClassLoader.h>
+#include <Poco/Manifest.h>
+#include <Poco/Glob.h>
 
-
-#include "kinect/kinectsensorplugin.h"
-#include "softkinetic/ds325sensorfactory.h"
-#include "softkinetic/ds325sensor.h"
-#include "occipital/occipitalsensor.h"
-
+#include "faceCommon/objectdetection/detector.h"
+#include "faceSensors/isensor.h"
 #include "faceExtras/gui/glwidget.h"
 #include "winscans.h"
-#include "faceSensors/isensor.h"
+#include "faceCommon/linalg/loader.h"
+
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    Face::Settings::instance().settingsMap[Face::Settings::DebugKey] = Poco::DynamicAny(app.arguments().contains("debug"));
+
+	Face::Sensors::SensorLoader loader;
+    std::vector<std::string> sensorNames = loader.getSensorNames();
+
+    if (sensorNames.empty()) {
+        std::cout << "No sensor plugin found" << std::endl;
+        return 1;
+    }
+
     Face::Sensors::ISensor::Ptr sensor;
 
     bool ok;
-    QStringList sensorNames; sensorNames << "occipital" << "softKinetic" << "kinect";
-    QString selection = QInputDialog::getItem(0, "Select sensor", "Sensor:", sensorNames, 0, false, &ok);
+    QStringList choices;
+    for (const auto &c : sensorNames) choices << QString::fromStdString(c);
+    QString selection = QInputDialog::getItem(0, "Select sensor", "Sensor:", choices, 0, false, &ok);
     if (!ok) return 0;
+    sensor = loader.getSensor(selection.toStdString());
 
-    Face::Sensors::SoftKinetic::DS325SensorFactory ds325factory;
-
-    if (selection == "softKinetic")
-    {
-        sensor = ds325factory.create("haar-face.xml");
-    }
-    else if (selection == "kinect")
-    {
-        sensor = new Face::Sensors::Kinect::KinectSensorPlugin("haar-face.xml");
-    }
-    else if (selection == "occipital")
-    {
-        sensor = new Face::Sensors::Occipital::OccipitalSensor();
-    }
-
-    Face::FaceData::FaceAligner::Ptr aligner =
-            new Face::FaceData::FaceAligner(Face::FaceData::Mesh::fromFile("meanForAlign.obj"), "preAlignTemplate.yml");
-    Face::Sensors::WinScans win(sensor, aligner);
+    Face::Sensors::WinScans win(sensor);
     win.show();
     return app.exec();
 }
-

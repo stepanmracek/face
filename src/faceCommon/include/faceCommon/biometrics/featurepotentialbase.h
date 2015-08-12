@@ -6,7 +6,7 @@
 namespace Face {
 namespace Biometrics {
 
-class FeaturePotentialBase
+class FACECOMMON_EXPORTS FeaturePotentialBase
 {
 public:
     Face::LinAlg::Vector scores;

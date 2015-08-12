@@ -47,13 +47,13 @@ std::vector<std::vector<Template>> BioDataProcessing::divideTemplatesToClusters(
                 result.push_back(ts);
                 currentClusterIndex++;
 
-                // We can add current subject to new  cluster
+                // We can add curret subject to new  cluster
                 currentClusterClasses.insert(t.subjectID);
                 result[currentClusterIndex].push_back(t);
             }
             else
             {
-                // We can add current subject to current cluster
+                // We can add curret subject to current cluster
                 currentClusterClasses.insert(t.subjectID);
                 result[currentClusterIndex].push_back(t);
             }
@@ -117,14 +117,14 @@ void BioDataProcessing::divideVectorsToClusters(std::vector<Face::LinAlg::Vector
                 resultClasses.push_back(cs);
                 currentResultIndex++;
 
-                // We can add current subject to current cluster
+                // We can add curret subject to current cluster
                 currentClusterClasses.insert(c);
                 resultVectors[currentResultIndex].push_back(v);
                 resultClasses[currentResultIndex].push_back(c);
             }
             else
             {
-                // We can add current subject to current cluster
+                // We can add curret subject to current cluster
                 currentClusterClasses.insert(c);
                 resultVectors[currentResultIndex].push_back(v);
                 resultClasses[currentResultIndex].push_back(c);

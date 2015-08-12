@@ -1,17 +1,33 @@
 #include "softkinetic/ds325sensorbase.h"
 
-#include "softkinetic/guidrawer.h"
-#include "softkinetic/logger.h"
 #include <Poco/Exception.h>
+
+#include "faceCommon/facedata/landmarks.h"
+#include "softkinetic/logger.h"
 
 using namespace Face::Sensors::SoftKinetic;
 
-DS325SensorBase::DS325SensorBase(const Settings &settings, DepthSense::Context & c) :
-    faceDetectionRoi(25, 0, 110, 120),
-    settings(settings),
-    context(c),
-    contextThread("ds325.bg")
+DS325SensorBase::DS325SensorBase(const Settings &settings, const std::string &landmarkDetectorPath) :
+    context(DepthSense::Context::createStandalone()),
+    contextThread("ds325.bg"),
+    lmDetector(landmarkDetectorPath)
 {
+    init(settings);
+}
+
+DS325SensorBase::DS325SensorBase(const Settings &settings, const std::string &landmarkDetectorPath, DepthSense::Context & c) :
+    context(c),
+    contextThread("ds325.bg"),
+    lmDetector(landmarkDetectorPath)
+{
+    init(settings);
+}
+
+void DS325SensorBase::init(const Settings &settings)
+{
+    faceDetectionRoi = cv::Rect(25, 0, 110, 120);
+    this->settings = settings;
+
     depthMap.resize(DepthWidth*DepthHeight);
     pointCloud.resize(DepthWidth*DepthHeight);
     uvMap.resize(DepthWidth*DepthHeight);
@@ -19,14 +35,11 @@ DS325SensorBase::DS325SensorBase(const Settings &settings, DepthSense::Context &
     pointCloudAccumulator.resize(DepthWidth*DepthHeight);
 
     output.currentFrame = cv::Mat_<uchar>::zeros(ColorHeight, ColorWidth);
-
-    LOG_DEBUG("Creating context...");
-    //context = c;
 }
 
 void DS325SensorBase::doLoop()
 {
-	if (output.state == Waiting || output.state == Positioning || output.state == Capturing){
+    if (output.state == STATE_IDLE || output.state == STATE_POSITIONING || output.state == STATE_CAPTURING){
         if (!lastDepth.isNull() && lastDepth.value().elapsed() / 1000 > 500){
 			 LOG_ERROR("No depth buffer data in 500ms");
 			 throw Poco::Exception("No depth data");
@@ -36,16 +49,16 @@ void DS325SensorBase::doLoop()
 	output.previousState = output.state;
     switch (output.state)
     {
-    case Waiting:
+    case STATE_IDLE:
         doWaiting();
         break;
-    case Positioning:
+    case STATE_POSITIONING:
         doPositioning();
         break;
-    case Capturing:
+    case STATE_CAPTURING:
         doCapturing();
         break;
-    case CapturingDone:
+    case STATE_CAPTURING_DONE:
         doCapturingDone();
     }
 }
@@ -76,6 +89,13 @@ void DS325SensorBase::resetLastDepth() {
     lastDepth = Poco::Timestamp();
 }
 
+void DS325SensorBase::setEnableSmoothFilter(DepthSense::DepthNode& depthNode, bool enable) {
+#if DEPTHSENSE_VERSION_BUILD > 1477
+        depthNode.setEnableFilter3(enable);
+#else
+        depthNode.setEnableEparSmootherFilter(enable);
+#endif
+}
 
 DS325SensorBase::~DS325SensorBase()
 {
@@ -126,7 +146,7 @@ void DS325SensorBase::start()
 	if (contextThread.isRunning()) return;
 	LOG_DEBUG("start called real");
 	contextThread.start(*this);
-    setState(Waiting);
+    setState(STATE_IDLE);
 
     LOG_DEBUG("start called done");
 }
@@ -141,27 +161,9 @@ void DS325SensorBase::stop()
     LOG_DEBUG("stop called real");
     context.quit();
     contextThread.join();
-    output.state = Off;
+    output.state = STATE_OFF;
 
     LOG_DEBUG("stop called done");
-}
-
-void DS325SensorBase::scan()
-{
-    LOG_DEBUG("DS325Sensor2::scan()");
-    start();
-
-    while (output.state != Off)
-    {
-        if (cv::waitKey(output.state == Waiting ? 100 : 30) > 0 || output.stopGesture)
-        {
-            stop();
-        }
-
-        doLoop();
-        GUIDrawer::draw(getOutput());
-    }
-    LOG_DEBUG("DS325Sensor2::scan() ended");
 }
 
 void DS325SensorBase::configureColorNode(DepthSense::ColorNode node)
@@ -187,7 +189,7 @@ void DS325SensorBase::configureDepthNode(DepthSense::DepthNode node)
     config.mode = DepthSense::DepthNode::CAMERA_MODE_CLOSE_MODE;
     config.saturation = true;
 
-    node.setEnableEparSmootherFilter(false);
+    setEnableSmoothFilter(node, false);
     node.setConfidenceThreshold(DesiredConfidence);
     node.setConfiguration(config);
 }
@@ -195,7 +197,7 @@ void DS325SensorBase::configureDepthNode(DepthSense::DepthNode node)
 void DS325SensorBase::onNewDepthSample(DepthSense::DepthNode node, DepthSense::DepthNode::NewSampleReceivedData data)
 {
 	updateLastDepth();
-	LOG_TRACE("new depth sample");
+    //LOG_TRACE("new depth sample");
 
 	if (data.droppedSampleCount > 0) {
 		std::stringstream sstr;
@@ -310,7 +312,7 @@ void DS325SensorBase::doPositioning()
 
     if (tracker.getConsecutiveNonDetects() == settings.consecutiveNonDetectsToLeavePositioning)
     {
-        setState(Waiting);
+        setState(STATE_IDLE);
         return;
     }
 
@@ -324,13 +326,13 @@ void DS325SensorBase::doPositioning()
     //std::cout << "distance: " << distance << std::endl;
 
     output.faceRegion = cv::Rect();
-    if (distance != distance) output.positioningOutput = NoData;
-    else if (distance > settings.maximalDistance) output.positioningOutput = MoveCloser;
-    else if (distance < settings.minimalDistance) output.positioningOutput = MoveFar;
+    if (distance != distance) output.positioningOutput = POS_NONE;
+    else if (distance > settings.maximalDistance) output.positioningOutput = POS_MOVE_CLOSER;
+    else if (distance < settings.minimalDistance) output.positioningOutput = POS_MOVE_FAR;
     // else if (...) TODO: tilt;
     else
     {
-        output.positioningOutput = DontMove;
+        output.positioningOutput = POS_DONTMOVE;
         optimalDistanceCounter++;
         output.positioningProgress = optimalDistanceCounter*100/settings.consecutiveOptimalDistanceToStartCapturing;
         output.faceRegion = getFullFaceRegion();
@@ -338,7 +340,7 @@ void DS325SensorBase::doPositioning()
 
     if (optimalDistanceCounter == settings.consecutiveOptimalDistanceToStartCapturing)
     {
-        setState(Capturing);
+        setState(STATE_CAPTURING);
     }
 
     getCurrentGrayscaleFrame().copyTo(output.currentFrame);
@@ -362,44 +364,7 @@ void DS325SensorBase::doCapturing()
 
     if (capturingCounter == settings.captureFrames)
     {
-        LOG_DEBUG("creating model");
-
-        cv::Rect faceRegion = getFullFaceRegion();
-        Face::FaceData::VectorOfPoints points;
-        Face::FaceData::Mesh::Colors colorsVec;
-        ImageBGR &colorFrame = getCurrentColorFrame();
-        for (int i = 0; i < depthBufferSize; i++)
-        {
-            int count = vertexCounter[i];
-            if (count == 0) continue;
-
-            const DepthSense::UV & uv = uvMap[i];
-            if (uv.u == -FLT_MAX || uv.v == -FLT_MAX || depthMap[i] == -2.0)
-            {
-                continue;
-            }
-
-            int x = uv.u * ColorWidth;
-            int y = uv.v * ColorHeight;
-            if (!faceRegion.contains(cv::Point(x, y)))
-            {
-                continue;
-            }
-
-            const DepthSense::FPVertex &p = pointCloudAccumulator[i];
-            points.push_back(cv::Point3d((1000.0 * p.x) / count, (1000.0 * p.y) / count, (-1000.0 * p.z) / count));
-            //qDebug() << points.last().x << points.last().y << points.last().z;
-            colorsVec.push_back(colorFrame(y, x));
-        }
-
-        //qDebug() << "points:" << points.count();
-        //qDebug() << "colors:" << colorsVec.count();
-
-        faceMesh = Face::FaceData::Mesh::fromPointcloud(points, true, true);
-        faceMesh.colors = colorsVec;
-        faceMesh.printStats();
-
-        setState(CapturingDone);
+        setState(STATE_CAPTURING_DONE);
     }
 
     getCurrentGrayscaleFrame().copyTo(output.currentFrame);
@@ -407,5 +372,89 @@ void DS325SensorBase::doCapturing()
 
 void DS325SensorBase::doCapturingDone()
 {
-    setState(Off);
+    LOG_DEBUG("creating model");
+
+    int depthBufferSize = DepthWidth * DepthHeight;
+    cv::Rect faceRegion = getFullFaceRegion();
+    Face::FaceData::VectorOfPoints points;
+    Face::FaceData::Mesh::Colors colorsVec;
+    ImageBGR &colorFrame = getCurrentColorFrame();
+
+    std::map<int, int> invUvMap;
+    int depthCount = 0;
+    for (int depthIndex = 0; depthIndex < depthBufferSize; depthIndex++)
+    {
+        int count = vertexCounter[depthIndex];
+        if (count == 0) continue;
+
+        const DepthSense::UV & uv = uvMap[depthIndex];
+        if (uv.u == -FLT_MAX || uv.v == -FLT_MAX || depthMap[depthIndex] == -2.0)
+        {
+            continue;
+        }
+
+        int x = uv.u * ColorWidth;
+        int y = uv.v * ColorHeight;
+        int colorIndex = y*ColorWidth + x;
+        invUvMap[colorIndex] = depthIndex;
+        depthCount++;
+
+        if (!faceRegion.contains(cv::Point(x, y)))
+        {
+            continue;
+        }
+
+        const DepthSense::FPVertex &p = pointCloudAccumulator[depthIndex];
+        points.push_back(cv::Point3d((1000.0 * p.x) / count, (1000.0 * p.y) / count, (-1000.0 * p.z) / count));
+        //qDebug() << points.last().x << points.last().y << points.last().z;
+        colorsVec.push_back(colorFrame(y, x));
+    }
+
+    /*ImageGrayscale grayFrame = getCurrentGrayscaleFrame();
+    std::vector<cv::Point2d> landmarks2d = lmDetector.get(grayFrame, faceRegion);
+    if (landmarks2d.size() > 0)
+    {
+        LOG_TRACE("Detected " + std::to_string(landmarks2d.size()) + " landmarks");
+        LOG_TRACE("Inverse UV map has " + std::to_string(invUvMap.size()) + " values; depth has " + std::to_string(depthCount) + " values");
+        landmarks.points.clear();
+        for (const cv::Point2d &p2d : landmarks2d)
+        {
+            LOG_TRACE("Landmark " + std::to_string(p2d.x) + " " + std::to_string(p2d.y));
+            int colorIndex = p2d.y*640 + p2d.x;
+            if (invUvMap.count(colorIndex) == 0)
+            {
+                LOG_TRACE("  not corresponding depth in inverse UV map");
+                landmarks.points.push_back(cv::Point3d());
+                continue;
+            }
+            int depthIndex = invUvMap[colorIndex];
+            int count = vertexCounter[depthIndex];
+            if (depthIndex >= depthBufferSize || depthIndex < 0 || count == 0)
+            {
+                landmarks.points.push_back(cv::Point3d());
+                continue;
+            }
+
+            const DepthSense::FPVertex &p3d = pointCloudAccumulator[depthIndex];
+            landmarks.points.push_back(cv::Point3d((1000.0 * p3d.x) / count, (1000.0 * p3d.y) / count, (-1000.0 * p3d.z) / count));
+            cv::circle(grayFrame, p2d, 3, 255);
+        }
+        cv::imshow("lm preview", grayFrame);
+        cv::Mat_<float> depth(DepthHeight, DepthWidth, depthMap.data());
+        cv::imshow("depth preview", depth);
+        cv::waitKey();
+    }
+    else
+    {
+        landmarks = Face::FaceData::Landmarks();
+    }*/
+    landmarks.points.clear();
+
+    faceMesh = Face::FaceData::Mesh::fromPointcloud(points, false, true);
+    faceMesh.colors = colorsVec;
+    cv::Point3d centralizeShift = faceMesh.centralize();
+    landmarks.translate(centralizeShift);
+    faceMesh.printStats();
+
+    setState(STATE_OFF);
 }

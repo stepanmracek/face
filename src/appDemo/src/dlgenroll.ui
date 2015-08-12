@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>527</width>
-    <height>400</height>
+    <width>611</width>
+    <height>424</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,7 +34,7 @@
       <widget class="QGroupBox" name="groupBox">
        <property name="maximumSize">
         <size>
-         <width>200</width>
+         <width>250</width>
          <height>16777215</height>
         </size>
        </property>
@@ -63,12 +63,11 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string/>
+             <string>Scan</string>
             </property>
             <property name="icon">
-             <iconset theme="add">
-              <normaloff/>
-             </iconset>
+             <iconset resource="../resources/resources.qrc">
+              <normaloff>:/images/scan.png</normaloff>:/images/scan.png</iconset>
             </property>
            </widget>
           </item>
@@ -84,12 +83,11 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string/>
+             <string>Delete</string>
             </property>
             <property name="icon">
-             <iconset theme="remove">
-              <normaloff/>
-             </iconset>
+             <iconset resource="../resources/resources.qrc">
+              <normaloff>:/images/delete.png</normaloff>:/images/delete.png</iconset>
             </property>
            </widget>
           </item>
@@ -105,12 +103,11 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string/>
+             <string>Export</string>
             </property>
             <property name="icon">
-             <iconset theme="gtk-save">
-              <normaloff/>
-             </iconset>
+             <iconset resource="../resources/resources.qrc">
+              <normaloff>:/images/save.png</normaloff>:/images/save.png</iconset>
             </property>
            </widget>
           </item>
@@ -155,7 +152,9 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

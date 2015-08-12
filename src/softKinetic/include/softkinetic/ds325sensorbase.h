@@ -6,6 +6,8 @@
 #include "softkinetic/ds325sensorfactory.h"
 #include "softkinetic/settings.h"
 #include "faceCommon/objectdetection/tracker.h"
+#include "faceCommon/facedata/landmarkdetector.h"
+
 #include <Poco/Timestamp.h>
 #include <Poco/Nullable.h>
 
@@ -16,13 +18,17 @@ namespace SoftKinetic {
 class DS325SensorBase : public IDS325Sensor, protected Poco::Runnable
 {
 public:
-    DS325SensorBase(const Settings &settings, DepthSense::Context & c);
+    DS325SensorBase(const Settings &settings, const std::string &landmarkDetectorPath, DepthSense::Context & c);
+    DS325SensorBase(const Settings &settings, const std::string &landmarkDetectorPath);
 
     void doLoop();
+    void start();
+    void stop();
 
     virtual ~DS325SensorBase();
 
-    void scan();
+private:
+    void init(const Settings &settings);
 
 protected:
     const static int ColorWidth = 640;
@@ -32,8 +38,9 @@ protected:
     const static int DesiredConfidence = 200;
 
     Settings settings;
-    DepthSense::Context & context;
+    DepthSense::Context context;
     cv::Rect faceDetectionRoi;
+    Face::FaceData::LandmarkDetector lmDetector;
 
     std::vector<float> depthMap;
     std::vector<DepthSense::FPVertex> pointCloud;
@@ -59,9 +66,6 @@ protected:
     void doCapturing();
     void doCapturingDone();
 
-    void start();
-    virtual void stop();
-
     virtual Face::ObjectDetection::Tracker &getTracker() = 0;
     virtual void detectFace() = 0;
     virtual ImageGrayscale &getCurrentGrayscaleFrame() = 0;
@@ -73,10 +77,12 @@ protected:
 
     void updateLastDepth();
     void resetLastDepth();
-protected:
+
+    void setEnableSmoothFilter(DepthSense::DepthNode& depthNode, bool enable);
+
     Poco::Nullable<Poco::Timestamp> lastDepth;
     Poco::Thread contextThread;
-    std::vector < DepthSense::Device> usedDevices;
+    std::vector <DepthSense::Device> usedDevices;
 };
 
 }

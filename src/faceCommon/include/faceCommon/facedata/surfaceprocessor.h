@@ -1,5 +1,4 @@
-#ifndef SURFACEPROCESSOR_H
-#define SURFACEPROCESSOR_H
+#pragma once
 
 #include <opencv2/flann/flann.hpp>
 
@@ -11,6 +10,7 @@ namespace FaceData {
 
 class CurvatureStruct;
 class MapConverter;
+class Mesh;
 
 class FACECOMMON_EXPORTS SurfaceProcessor
 {
@@ -138,5 +138,3 @@ public:
 
 }
 }
-
-#endif // SURFACEPROCESSOR_H

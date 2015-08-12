@@ -1,5 +1,4 @@
-#ifndef FACEPROCESSOR_H
-#define FACEPROCESSOR_H
+#pragma once
 
 #include "facealigner.h"
 #include "mesh.h"
@@ -9,23 +8,19 @@ namespace Face
 namespace FaceData
 {
 
-class FaceProcessor
+class FACECOMMON_EXPORTS FaceProcessor
 {
 public:
     typedef cv::Ptr<FaceProcessor> Ptr;
 
-    FaceProcessor(FaceAligner::Ptr aligner, float smoothCoef = 0.01, int smoothIters = 10);
+    FaceProcessor(FaceAlignerLandmark::Ptr aligner, float smoothCoef = 0.01, int smoothIters = 10);
 
-    FaceAligner::Ptr aligner;
-    FaceAligner::PreAlignTransform prealign;
-    int icpIterations;
+    FaceAlignerLandmark::Ptr aligner;
     float smoothCoef;
     int smoothIters;
 
-    void process(Mesh &mesh);
+    void process(Mesh &mesh, Landmarks &lm);
 };
 
 }
 }
-
-#endif // FACEPROCESSOR_H

@@ -1,5 +1,4 @@
-#ifndef DATAVIZ_H
-#define DATAVIZ_H
+#pragma once
 
 #include "common.h"
 
@@ -14,5 +13,3 @@ public:
 
 }
 }
-
-#endif // DATAVIZ_H

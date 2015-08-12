@@ -7,7 +7,7 @@
 namespace Face {
 namespace Biometrics {
 
-class BioDataProcessing
+class FACECOMMON_EXPORTS BioDataProcessing
 {
 public:
     static std::vector<std::vector<Template>> divideTemplatesToClusters(const std::vector<Template> &templates, unsigned int subjectsInOneCluster);
@@ -43,13 +43,13 @@ public:
         // initialize resulting output
         int countPerCluster = classToVectors.size()/numberOfClusters;
         int currentCluster = 0;
-        /*for (int i = 0; i < numberOfClusters; i++)
+        for (int i = 0; i < numberOfClusters; i++)
         {
             std::vector<T> data;
             std::vector<int> classIds;
             resultVectors.push_back(data);
             resultClasses.push_back(classIds);
-        }*/
+        }
 
         // for each class
         for (const auto &c2vPair : classToVectors)

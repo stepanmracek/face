@@ -64,7 +64,7 @@ void TemplateMatchingTrainer::evaluate(const std::vector<Mesh> &alignedMeshes, c
 
 void TemplateMatchingTrainer::evaluateBaseline(const std::string &meanForAlign, const std::string &dataPath, const std::string &pcaDepthmapPath)
 {
-    FaceAligner aligner(Mesh::fromFile(meanForAlign), std::string());
+	FaceAlignerIcp aligner(Mesh::fromFile(meanForAlign), std::string());
     std::vector<std::string> fileNames = Face::LinAlg::Loader::listFiles(dataPath, "*.binz", Face::LinAlg::Loader::Filename);
     int n = fileNames.size();
     std::vector<int> ids = Face::Biometrics::BioDataProcessing::getIds(fileNames, "-");
@@ -81,7 +81,7 @@ void TemplateMatchingTrainer::evaluateBaseline(const std::string &meanForAlign, 
         SurfaceProcessor::mdenoising(m, 0.01, 10, 0.01);
 
         Poco::Timestamp before;
-        aligner.icpAlign(m, 50, FaceAligner::TemplateMatching);
+		aligner.align(m, 50, FaceAlignerIcp::TemplateMatching);
         times[i] = before.elapsed()/1000;
         meshes[i] = m;
     }
@@ -92,7 +92,7 @@ void TemplateMatchingTrainer::evaluateBaseline(const std::string &meanForAlign, 
 
 void TemplateMatchingTrainer::train(const std::string &meanForAlign, const std::string &dataPath, const std::string &pcaDepthmapPath)
 {
-    FaceAligner aligner(Mesh::fromFile(meanForAlign), std::string());
+	FaceAlignerIcp aligner(Mesh::fromFile(meanForAlign), std::string());
     std::vector<std::string> fileNames = Face::LinAlg::Loader::listFiles(dataPath, "*.binz", Face::LinAlg::Loader::BaseFilename);
     std::vector<int> ids = Face::Biometrics::BioDataProcessing::getIds(fileNames, "-");
     int n = fileNames.size();
@@ -108,26 +108,26 @@ void TemplateMatchingTrainer::train(const std::string &meanForAlign, const std::
     for (int method = cv::TM_CCOEFF_NORMED; method <= cv::TM_CCOEFF_NORMED; method++)
     {
         std::cout << "method" << method << std::endl;
-        for (int type = FaceAligner::CVTemplateMatchingSettings::Mean; type <= FaceAligner::CVTemplateMatchingSettings::Mean; type++)
+		for (int type = FaceAlignerIcp::CVTemplateMatchingSettings::Mean; type <= FaceAlignerIcp::CVTemplateMatchingSettings::Mean; type++)
         {
             switch (type)
             {
-            case FaceAligner::CVTemplateMatchingSettings::Texture:
+			case FaceAlignerIcp::CVTemplateMatchingSettings::Texture:
                 std::cout << "Texture" << std::endl;
                 break;
-            case FaceAligner::CVTemplateMatchingSettings::Depth:
+			case FaceAlignerIcp::CVTemplateMatchingSettings::Depth:
                 std::cout << "Depth" << std::endl;
                 break;
-            case FaceAligner::CVTemplateMatchingSettings::Mean:
+			case FaceAlignerIcp::CVTemplateMatchingSettings::Mean:
                 std::cout << "Mean" << std::endl;
                 break;
-            case FaceAligner::CVTemplateMatchingSettings::Gauss:
+			case FaceAlignerIcp::CVTemplateMatchingSettings::Gauss:
                 std::cout << "Gauss" << std::endl;
                 break;
-            case FaceAligner::CVTemplateMatchingSettings::Index:
+			case FaceAlignerIcp::CVTemplateMatchingSettings::Index:
                 std::cout << "Index" << std::endl;
                 break;
-            case FaceAligner::CVTemplateMatchingSettings::Eigen:
+			case FaceAlignerIcp::CVTemplateMatchingSettings::Eigen:
                 std::cout << "Eigen" << std::endl;
                 break;
             }
@@ -143,7 +143,7 @@ void TemplateMatchingTrainer::train(const std::string &meanForAlign, const std::
                 {
                     Mesh m = Mesh::fromFile(dataPath + Poco::Path::separator() + fileNames[i] + ".binz");
                     landmarks[i] = Landmarks(dataPath + Poco::Path::separator() + fileNames[i] + ".yml");
-                    m.translate(-landmarks[i].get(Landmarks::Nosetip));
+					m.translate(-landmarks[i].points[3]);; // Landmarks::Nosetip));
                     SurfaceProcessor::mdenoising(m, 0.01, 10, 0.01);
                     meshes[i] = m;
                 }
@@ -168,22 +168,22 @@ void TemplateMatchingTrainer::train(const std::string &meanForAlign, const std::
                     CurvatureStruct cs = SurfaceProcessor::calculateCurvatures(blurredDepth);
                     switch (type)
                     {
-                    case FaceAligner::CVTemplateMatchingSettings::Texture:
+                    case FaceAlignerIcp::CVTemplateMatchingSettings::Texture:
                         SurfaceProcessor::depthmap(meshes[i], mc, 1.0, SurfaceProcessor::Texture_I).toMatrix(0, 0, 255)(roi).convertTo(img, CV_32F);
                         break;
-                    case FaceAligner::CVTemplateMatchingSettings::Depth:
+					case FaceAlignerIcp::CVTemplateMatchingSettings::Depth:
                         depth.values(roi).convertTo(img, CV_32F);
                         break;
-                    case FaceAligner::CVTemplateMatchingSettings::Mean:
+					case FaceAlignerIcp::CVTemplateMatchingSettings::Mean:
                         img = cs.meanMatrix()(roi);
                         break;
-                    case FaceAligner::CVTemplateMatchingSettings::Gauss:
+					case FaceAlignerIcp::CVTemplateMatchingSettings::Gauss:
                         img = cs.gaussMatrix()(roi);
                         break;
-                    case FaceAligner::CVTemplateMatchingSettings::Index:
+					case FaceAlignerIcp::CVTemplateMatchingSettings::Index:
                         img = cs.indexMatrix()(roi);
                         break;
-                    case FaceAligner::CVTemplateMatchingSettings::Eigen:
+					case FaceAlignerIcp::CVTemplateMatchingSettings::Eigen:
                         img = cs.pclMatrix()(roi);
                         break;
                     }
@@ -198,7 +198,7 @@ void TemplateMatchingTrainer::train(const std::string &meanForAlign, const std::
                 aligner.cvTemplateMatchingSettings.center = templateCenters[templateIndex];
                 aligner.cvTemplateMatchingSettings.comparisonMethod = method;
                 aligner.cvTemplateMatchingSettings.templateImage = templateImg;
-                aligner.cvTemplateMatchingSettings.inputImageType = (FaceAligner::CVTemplateMatchingSettings::InputImageType)type;
+				aligner.cvTemplateMatchingSettings.inputImageType = (FaceAlignerIcp::CVTemplateMatchingSettings::InputImageType)type;
 
                 cv::FileStorage storage("../../test/preAlignTemplate.yml", cv::FileStorage::WRITE);
                 aligner.cvTemplateMatchingSettings.serialize(storage);
@@ -208,10 +208,10 @@ void TemplateMatchingTrainer::train(const std::string &meanForAlign, const std::
                 #pragma omp parallel for
                 for (int i = 0; i < n; i++)
                 {
-                    meshes[i].translate(landmarks[i].get(Landmarks::Nosetip));
+					meshes[i].translate(landmarks[i].points[3]); // .get(Landmarks::Nosetip));
 
                     Poco::Timestamp before;
-                    aligner.icpAlign(meshes[i], 50, FaceAligner::CVTemplateMatching);
+					aligner.align(meshes[i], 50, FaceAlignerIcp::CVTemplateMatching);
                     times[i] = before.elapsed()/1000;
                 }
 

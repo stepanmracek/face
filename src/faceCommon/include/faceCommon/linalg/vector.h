@@ -1,15 +1,14 @@
-#ifndef VECTORN_H
-#define VECTORN_H
+#pragma once
 
 #include <cmath>
-#include <opencv/cv.h>
 
 #include "common.h"
+#include "faceCommon/faceCommon.h"
 
 namespace Face {
 namespace LinAlg {
 
-class Vector : public Matrix
+class FACECOMMON_EXPORTS Vector : public Matrix
 {
 public:
 
@@ -26,6 +25,8 @@ public:
     Vector(const Vector &src);
 
     Vector(const std::vector<double> &vec);
+
+    Vector(const std::vector<cv::Point2d> &points);
 
     static Vector fromFile(const std::string &path);
 
@@ -84,5 +85,3 @@ public:
 
 }
 }
-
-#endif // VECTORN_H

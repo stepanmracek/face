@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   id="svg6867"
+   viewBox="0 0 35.256831 45.377992"
+   height="12.806678mm"
+   width="9.9502611mm">
+  <defs
+     id="defs6869" />
+  <metadata
+     id="metadata6872">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-244.54484,-457.72812)"
+     id="layer1">
+    <path
+       id="path6687"
+       d="m 256.82454,464.36177 c 3.88133,-1.68665 3.14225,-2.50742 4.18967,-4.60226 1.04742,-2.09483 1.96024,-1.90294 2.85803,-0.25699 0.89779,1.64594 0.87964,3.68632 3.72263,5.033"
+       style="fill:#ffffff;fill-opacity:0.75294118;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1" />
+    <path
+       id="path6691-9"
+       d="m 275.73354,478.10362 c 1.27222,-2.30052 4.53012,8.30639 3.29189,9.05269 -0.44889,1.27185 -2.69336,0.59852 -2.69336,0.59852"
+       style="fill:#ffffff;fill-opacity:0.75294118;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <path
+       id="path6691"
+       d="m 248.61297,477.99105 c -1.27221,-2.30052 -4.53011,8.30639 -3.29188,9.05269 0.44889,1.27185 2.69336,0.59852 2.69336,0.59852"
+       style="fill:#ffffff;fill-opacity:0.75294118;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <path
+       id="path6685"
+       d="m 264.06799,463.90032 c 0.86071,0.0796 1.69631,0.21419 2.47617,0.40349 1.55972,0.37859 2.8965,0.9762 3.76534,1.79156 5.02025,4.71123 5.3697,8.7898 5.83562,19.45205 0.70264,16.07958 -14.06534,17.05795 -14.06534,17.05795 0,0 -13.31717,-0.59852 -13.76607,-15.11274 -0.44889,-14.51423 2.12597,-17.00926 4.7882,-20.6491 0.69247,-0.94675 1.89696,-1.67072 3.3685,-2.17318 1.47154,-0.50245 2.36367,-0.73048 4.12429,-0.79116"
+       style="fill:#ffffff;fill-opacity:0.75294118;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1" />
+  </g>
+</svg>

@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
         Trainer::Settings settings(argc, argv, ok);
         if (!ok)
         {
-            Trainer::Settings::printHelp();
+            settings.printHelp();
             return 0;
         }
         settings.printSettings();
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
         Evaluator::Settings settings(argc, argv, ok);
         if (!ok)
         {
-            Evaluator::Settings::printHelp();
+            settings.printHelp();
             return 0;
         }
         settings.printSettings();
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
         evaluation.printStats();
         evaluation.outputResults(argv[2], 50);
     }
-    else if (argc >= 2 && std::string(argv[1]) == "--extract")
+    /*else if (argc >= 2 && std::string(argv[1]) == "--extract")
     {
         bool ok;
         TemplateExtractor::Settings settings(argc, argv, ok);
@@ -61,15 +61,15 @@ int main(int argc, char *argv[])
         settings.printSettings();
 
         Processor::process(settings);
-    }
+    }*/
     else
     {
         std::cout << "usage: " << argv[0] << " mode params" << std::endl;
         std::cout << "modes:" << std::endl;
         std::cout << "  --trainUnits resultClassifierPath" << std::endl;
         std::cout << "  --evaluate   serializedEvaluationPrefix" << std::endl;
-        std::cout << "  --extract" << std::endl;
-        std::cout << "  --process" << std::endl;
+        //std::cout << "  --extract" << std::endl;
+        //std::cout << "  --process" << std::endl;
     }
 
     return 0;

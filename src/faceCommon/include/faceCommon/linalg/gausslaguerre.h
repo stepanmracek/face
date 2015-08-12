@@ -1,12 +1,11 @@
-#ifndef GAUSSLAGUERRE_H
-#define GAUSSLAGUERRE_H
+#pragma once
 
 #include "filterbank.h"
 
 namespace Face {
 namespace LinAlg {
 
-class GaussLaguerre : public FilterBank
+class FACECOMMON_EXPORTS GaussLaguerre : public FilterBank
 {
 public:
     GaussLaguerre(int size);
@@ -20,5 +19,3 @@ private:
 
 }
 }
-
-#endif // GAUSSLAGUERRE_H

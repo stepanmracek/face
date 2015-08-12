@@ -3,6 +3,7 @@
 
 #include "faceCommon/biometrics/evaluation.h"
 #include "faceCommon/linalg/iserializable.h"
+#include "faceCommon/faceCommon.h"
 
 namespace Face {
 namespace Biometrics {
@@ -17,13 +18,13 @@ public:
     virtual std::string writeParams() const = 0;
 };
 
-class ScoreNormalizerFactory
+class FACECOMMON_EXPORTS ScoreNormalizerFactory
 {
 public:
     static ScoreNormalizerBase::Ptr create(const std::string &name);
 };
 
-class ScoreNormalizerPass : public ScoreNormalizerBase
+class FACECOMMON_EXPORTS ScoreNormalizerPass : public ScoreNormalizerBase
 {
 public:
     void learn(const std::vector<Face::Biometrics::Evaluation> &/*evaluations*/) {}
@@ -34,7 +35,7 @@ public:
     void deserialize(cv::FileStorage &/*storage*/) {}
 };
 
-class ScoreNormalizerMean : public ScoreNormalizerBase
+class FACECOMMON_EXPORTS ScoreNormalizerMean : public ScoreNormalizerBase
 {
 private:
     std::vector<double> impostorMeans;
@@ -50,7 +51,7 @@ public:
 };
 
 
-class ScoreNormalizerMedian : public ScoreNormalizerBase
+class FACECOMMON_EXPORTS ScoreNormalizerMedian : public ScoreNormalizerBase
 {
 private:
     std::vector<double> impostorMedians;
@@ -65,7 +66,7 @@ public:
     void deserialize(cv::FileStorage &storage);
 };
 
-class ScoreNormalizerZScore : public ScoreNormalizerBase
+class FACECOMMON_EXPORTS ScoreNormalizerZScore : public ScoreNormalizerBase
 {
 private:
     bool compensateGenImpCount;
@@ -83,7 +84,7 @@ public:
     void deserialize(cv::FileStorage &storage);
 };
 
-class ScoreNormalizerMAD : public ScoreNormalizerBase
+class FACECOMMON_EXPORTS ScoreNormalizerMAD : public ScoreNormalizerBase
 {
 private:
     bool compensateGenImpCount;
@@ -101,7 +102,7 @@ public:
     void deserialize(cv::FileStorage &storage);
 };
 
-class ScoreNormalizerTanh : public ScoreNormalizerBase
+class FACECOMMON_EXPORTS ScoreNormalizerTanh : public ScoreNormalizerBase
 {
 private:
     bool compensateGenImpCount;

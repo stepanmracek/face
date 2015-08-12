@@ -52,6 +52,16 @@ Vector::Vector(const std::vector<double> &vec) : Matrix(vec.size(), 1)
     }
 }
 
+Vector::Vector(const std::vector<cv::Point2d> &points) : Matrix(points.size() * 2, 1)
+{
+    int r = points.size();
+    for (int i = 0; i < r; i++)
+    {
+        (*this)(i) = points[i].x;
+        (*this)(r+i) = points[i].y;
+    }
+}
+
 Vector Vector::concatenate(const std::vector<Vector> &vectors)
 {
     std::vector<double> resultValues;

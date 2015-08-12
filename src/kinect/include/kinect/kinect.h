@@ -42,8 +42,6 @@ public:
 
     static Face::FaceData::Mesh *scanFace(int scanIterations, const std::string &faceHaarPath);
 
-    static Face::FaceData::Mesh *scanAndAlignFace(int scanIterations, int icpIterations, const std::string &alignReferenceOBJPath, const std::string &faceHaarPath);
-
     static bool isKinectPluggedIn(double *depthBuffer);
 
     static void stop();

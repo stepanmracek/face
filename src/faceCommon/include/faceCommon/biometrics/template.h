@@ -11,7 +11,7 @@ namespace Biometrics {
 
 class FeatureExtractor;
 
-class Template
+class FACECOMMON_EXPORTS Template
 {
 public:
     int subjectID;

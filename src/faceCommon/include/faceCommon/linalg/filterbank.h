@@ -1,5 +1,4 @@
-#ifndef FILTERBANK_H
-#define FILTERBANK_H
+#pragma once
 
 #include "common.h"
 
@@ -17,5 +16,3 @@ public:
 
 }
 }
-
-#endif // FILTERBANK_H

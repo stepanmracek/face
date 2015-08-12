@@ -1,5 +1,4 @@
-#ifndef NORMALIZATION_H
-#define NORMALIZATION_H
+#pragma once
 
 #include "common.h"
 #include "vector.h"
@@ -21,7 +20,7 @@ public:
     std::vector<double> means;
 };
 
-class ZScoreNormalizationResult : public ISerializable
+class FACECOMMON_EXPORTS ZScoreNormalizationResult : public ISerializable
 {
 public:
     std::vector<double> means;
@@ -51,5 +50,3 @@ public:
 
 }
 }
-
-#endif // NORMALIZATION_H

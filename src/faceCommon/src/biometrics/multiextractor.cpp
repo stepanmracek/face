@@ -53,6 +53,12 @@ MultiExtractor::ImageData::ImageData(const Face::FaceData::Mesh &mesh)
 
     this->largeDepth = FaceData::SurfaceProcessor::depthmap(mesh, this->depthConverter, 2.0,
                                                             FaceData::SurfaceProcessor::ZCoord);
+
+    /*for (const std::pair<std::string, Matrix> &kvp : typeDict)
+    {
+        cv::imshow(kvp.first, kvp.second);
+    }
+    cv::waitKey(0);*/
 }
 
 MultiExtractor::ImageData::ImageData(const ImageGrayscale &textureImage)
@@ -307,7 +313,7 @@ void MultiExtractor::serialize(std::string directoryPath) const
     Poco::File dir(directoryPath);
     if (!dir.exists())
     {
-        std::cout << "creating path" << dir.path() << std::endl;
+        std::cout << "creating path " << dir.path() << std::endl;
         dir.createDirectories();
     }   
 
@@ -344,6 +350,17 @@ MultiTemplate MultiExtractor::extract(const ImageData &data, int version, int id
             t.featureVectors.push_back(u->extract(data));
         }
     }
+
+    if (data.typeDict.find("depth") != data.typeDict.end())
+    {
+        const Matrix &depth = data.typeDict.at("depth");
+        t.depthCoverage = ((float)cv::countNonZero(depth)) / (depth.rows * depth.cols);
+    }
+    else
+    {
+        t.depthCoverage = 0.0;
+    }
+
     return t;
 }
 
@@ -359,6 +376,20 @@ MultiTemplate MultiExtractor::extract(const Face::FaceData::Mesh &mesh, int vers
         ImageData data(mesh);
         return extract(data, version, id);
     }
+}
+
+std::vector<MultiTemplate> MultiExtractor::extract(const std::vector<Face::FaceData::Mesh> &meshes,
+                                                   const std::vector<int> &ids, int version) const
+{
+    std::vector<Face::Biometrics::MultiTemplate> templates(meshes.size());
+
+    #pragma omp parallel for
+    for (int i = 0; i < ids.size(); i++)
+    {
+        templates[i] = extract(meshes[i], version, ids[i]);
+    }
+
+    return templates;
 }
 
 bool MultiExtractor::checkTemplate(const MultiTemplate &t)

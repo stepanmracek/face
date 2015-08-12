@@ -3,17 +3,25 @@
 
 #include "softkinetic/ds325sensorbase.h"
 #include "faceCommon/objectdetection/tracker.h"
+#include "faceCommon/settings/settings.h"
+#include "softKinetic.h"
 
 namespace Face {
 namespace Sensors {
 namespace SoftKinetic {
 
-class DS325Sensor : public DS325SensorBase
+class SOFTKINETIC_EXPORTS DS325Sensor : public DS325SensorBase
 {
 public:
-    DS325Sensor(const std::string &haarFaceDetectionPath, const Settings &settings /*= Settings()*/,  DepthSense::Context & c);
+    DS325Sensor(const std::string &haarFaceDetectionPath, const std::string &landmarkDetectorPath, const Settings &settings,  DepthSense::Context & c);
+    DS325Sensor(const std::string &haarFaceDetectionPath = Face::Settings::instance().settingsMap[Face::Settings::CascadeFaceDetectorPathKey],
+                const std::string &landmarkDetectorPath = Face::Settings::instance().settingsMap[Face::Settings::ShapePredictorPathKey],
+                const Settings &settings = Settings());
+
     virtual ~DS325Sensor();
 private:
+    void init(const std::string &haarFaceDetectionPath);
+
     DepthSense::Device device;
     DepthSense::ColorNode colorNode;
     DepthSense::DepthNode depthNode;

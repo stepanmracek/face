@@ -20,6 +20,19 @@
 
 using namespace Face::FaceData;
 
+void Mesh::clear()
+{
+	minx = 1e300;
+	maxx = -1e300;
+	miny = 1e300;
+	maxy = -1e300;
+	minz = 1e300;
+	maxz = -1e300;
+	pointsMat = Matrix::zeros(0, 3);
+	colors.clear();
+	triangles.clear();
+}
+
 void Mesh::recalculateMinMax()
 {
     cv::minMaxIdx(pointsMat.colRange(0,1), &minx, &maxx);
@@ -27,26 +40,31 @@ void Mesh::recalculateMinMax()
     cv::minMaxIdx(pointsMat.colRange(2,3), &minz, &maxz);
 }
 
-void Mesh::centralize()
+cv::Point3d Mesh::centralize()
 {
     int count = pointsMat.rows;
     double sumx = cv::sum(pointsMat.colRange(0,1))[0];
     double sumy = cv::sum(pointsMat.colRange(1,2))[0];
     double sumz = cv::sum(pointsMat.colRange(2,3))[0];
 
+	cv::Point3d result(-sumx / count, -sumy / count, -sumz / count);
+
     for (int i = 0; i < count; i++)
     {
-        pointsMat(i, 0) -= sumx/count;
-        pointsMat(i, 1) -= sumy/count;
-        pointsMat(i, 2) -= sumz/count;
+		pointsMat(i, 0) += result.x;
+		pointsMat(i, 1) += result.y;
+		pointsMat(i, 2) += result.z;
     }
 
-    minx -= sumx/count;
-    miny -= sumy/count;
-    maxx -= sumx/count;
-    maxy -= sumy/count;
-    minz -= sumz/count;
-    maxz -= sumz/count;
+	minx += result.x;
+	miny += result.y;
+	minz += result.z;
+
+	maxx += result.x;
+	maxy += result.y;
+	maxz += result.z;
+
+	return result;
 }
 
 void Mesh::translate(cv::Point3d translationVector)
@@ -107,14 +125,15 @@ Mesh Mesh::fromFile(const std::string &filename, bool centralizeLoadedMesh)
     Poco::Path path(filename);
     auto extension = path.getExtension();
 
+    //std::cout << "Loading " << filename << " of type " << extension << std::endl;
+
     if (extension.compare("xyz") == 0)       return Mesh::fromXYZ(filename, centralizeLoadedMesh);
     else if (extension.compare("abs") == 0)  return Mesh::fromABS(filename, std::string(), centralizeLoadedMesh);
     else if (extension.compare("obj") == 0)  return Mesh::fromOBJ(filename, centralizeLoadedMesh);
     else if (extension.compare("bin") == 0)  return Mesh::fromBIN(filename, centralizeLoadedMesh);
     else if (extension.compare("binz") == 0) return Mesh::fromBINZ(filename, centralizeLoadedMesh);
 
-    std::cerr << "unknown suffix: " << filename << std::endl;
-    return Mesh();
+    throw FACELIB_EXCEPTION("unknown suffix of " + filename);
 }
 
 Mesh Mesh::fromXYZ(const std::string &filename, bool centralizeLoadedMesh)
@@ -196,7 +215,7 @@ Mesh Mesh::fromABS(const std::string &filename, const std::string &texture, bool
     return mesh;
 }
 
-Mesh Mesh::fromPointcloud(VectorOfPoints &pointcloud, bool centralizeLoadedMesh, bool calculateTriangles)
+Mesh Mesh::fromPointcloud(const VectorOfPoints &pointcloud, bool centralizeLoadedMesh, bool calculateTriangles)
 {
     Mesh m;
 
@@ -217,7 +236,7 @@ Mesh Mesh::fromPointcloud(VectorOfPoints &pointcloud, bool centralizeLoadedMesh,
     return m;
 }
 
-Mesh Mesh::fromMap(Map &depth, Map &intensities, bool centralizeLoadedMesh)
+Mesh Mesh::fromMap(const Map &depth, const Map &intensities, bool centralizeLoadedMesh)
 {
     if ((depth.w != intensities.w) || (depth.h != intensities.h))
         throw FACELIB_EXCEPTION("incompatibile input map sizes");
@@ -272,9 +291,26 @@ Mesh Mesh::fromMap(Map &depth, Map &intensities, bool centralizeLoadedMesh)
     return mesh;
 }
 
+Mesh Mesh::fromMap(const Map &depth, const MapConverter &converter)
+{
+	int w = depth.w;
+	int h = depth.h;
+	VectorOfPoints points;
+	for (int y = 0; y < h; y++)
+	{
+		for (int x = 0; x < w; x++)
+		{
+			bool ok;
+			cv::Point3d p = converter.MapToMeshCoords(depth, cv::Point2d(x, y), &ok);
+			if (ok) points.push_back(p);
+		}
+	}
+
+	return Mesh::fromPointcloud(points);
+}
+
 Mesh Mesh::fromOBJ(const std::string &filename, bool centralizeLoadedMesh)
 {
-    std::cout << "loading " << filename << std::endl;
     std::ifstream in(filename);
     if (!in.is_open())
         throw FACELIB_EXCEPTION("Can't open file " + filename);
@@ -333,6 +369,27 @@ Mesh::Mesh(const Mesh &src)
     pointsMat = src.pointsMat.clone();
     triangles = src.triangles;
     colors = src.colors;
+	uvmap = src.uvmap;
+}
+
+Mesh & Mesh::operator =(const Mesh &src)
+{
+    if (this != &src) // protect against invalid self-assignment
+    {
+        minx = src.minx;
+        maxx = src.maxx;
+        miny = src.miny;
+        maxy = src.maxy;
+        minz = src.minz;
+        maxz = src.maxz;
+
+        pointsMat = src.pointsMat.clone();
+        triangles = src.triangles;
+        colors = src.colors;
+        uvmap = src.uvmap;
+    }
+
+    return *this;
 }
 
 bool Mesh::equals(const Mesh &other)
@@ -352,9 +409,15 @@ Mesh::~Mesh()
     return QString::number(n).replace('.', decimalPoint);
 }*/
 
-void Mesh::writeOBJ(const std::string &path)
+void Mesh::writeOBJ(const std::string &path, const std::string &textureName) const
 {
     std::ofstream outStream(path);
+	bool texture = !textureName.empty();
+
+	if (texture)
+	{
+		outStream << "mtllib " + textureName + ".mtl" << std::endl;
+	}
 
     for (int r = 0; r < pointsMat.rows; r++)
     {
@@ -362,12 +425,36 @@ void Mesh::writeOBJ(const std::string &path)
                   << " " << pointsMat(r, 1)
                   << " " << pointsMat(r, 2) << std::endl;
     }
+	if (texture)
+	{
+		for (const auto &uv : uvmap)
+		{
+			outStream << "vt " << uv[0] << " " << -uv[1] << std::endl;
+		}
+
+		outStream << "usemtl material0" << std::endl;
+
+		auto mtlPath = path.substr(0, path.find_last_of('.')) + ".mtl";
+		std::ofstream mtlStream(mtlPath);
+		mtlStream << "newmtl material0" << std::endl;
+		mtlStream << "Ka 1.000000 1.000000 1.000000" << std::endl;
+		mtlStream << "Kd 1.000000 1.000000 1.000000" << std::endl;
+		mtlStream << "Ks 0.000000 0.000000 0.000000" << std::endl;
+		mtlStream << "Tr 1.000000" << std::endl;
+		mtlStream << "illum 1" << std::endl;
+		mtlStream << "Ns 0.000000" << std::endl;
+		mtlStream << "map_Kd " + textureName + ".png" << std::endl;
+	}
 
     int tCount = triangles.size();
     for (int i = 0; i < tCount; i++)
     {
-        cv::Vec3i &t = triangles[i];
-        outStream << "f " << (t[0]+1) << " " << (t[1]+1) << " " << (t[2]+1) << std::endl;
+        const cv::Vec3i &t = triangles[i];
+
+		if (texture)
+			outStream << "f " << (t[0] + 1) << "/" << (t[0] + 1) << " " << (t[1] + 1) << "/" << (t[1] + 1) << " " << (t[2] + 1) << "/" << (t[2] + 1) << std::endl;
+		else
+			outStream << "f " << (t[0] + 1) << " " << (t[1] + 1) << " " << (t[2] + 1) << std::endl;
     }
 }
 
@@ -394,9 +481,10 @@ void Mesh::writeOBJ(const std::string &path)
     }
 }*/
 
-void Mesh::writeToDataStream(Poco::BinaryWriter &stream)
+void Mesh::writeToDataStream(Poco::BinaryWriter &stream) const
 {
-    stream << pointsMat.rows;
+	int rowCount = pointsMat.rows;
+    stream << rowCount;
     for (int r = 0; r < pointsMat.rows; r++)
     {
         stream << pointsMat(r, 0);
@@ -419,22 +507,31 @@ void Mesh::writeToDataStream(Poco::BinaryWriter &stream)
         stream << c[1];
         stream << c[2];
     }
+
+	stream << (int)uvmap.size();
+	for (const auto &uv : uvmap)
+	{
+		stream << uv[0];
+		stream << uv[1];
+	}
+	stream.flush();
 }
 
-void Mesh::writeBIN(const std::string &path)
+void Mesh::writeBIN(const std::string &path) const
 {
     std::ofstream ofstream(path, std::ios::binary);
     Poco::BinaryWriter writer(ofstream, Poco::BinaryWriter::BIG_ENDIAN_BYTE_ORDER);
     writeToDataStream(writer);
 }
 
-void Mesh::writeBINZ(const std::string &path)
+void Mesh::writeBINZ(const std::string &path) const
 {
     // Calculate input buffer size
-    size_t size = 3*sizeof(int)                   // # of points, triangles, and colors
-            + sizeof(double) * 3 * pointsMat.rows // points
-            + sizeof(int) * 3 * triangles.size()  // triangles
-            + sizeof(uchar) * 3 * colors.size();  // colors
+	size_t size = 3 * sizeof(int)           // # of points, triangles, colors and uvmap
+		+sizeof(double)* 3 * pointsMat.rows // points
+		+ sizeof(int)* 3 * triangles.size() // triangles
+		+ sizeof(uchar)* 3 * colors.size()  // colors
+		+ sizeof(double)* 2 * uvmap.size(); // uvmap
     char *buffer = new char[size];
     //std::cout << "calculated size: " << size << std::endl;
 
@@ -497,6 +594,23 @@ void Mesh::fromDataStream(Poco::BinaryReader &stream, Mesh &mesh)
         stream >> r; stream >> g; stream >> b;
         mesh.colors[i] = cv::Vec3b(r, g, b);
     }
+
+	if (!stream.eof())
+	{
+		int uvCount;
+		stream >> uvCount;
+        if (uvCount != pCount) return;
+
+        //std::cout << "UV map " << uvCount << std::endl;
+
+		mesh.uvmap = UVMap(uvCount);
+		for (int i = 0; i < uvCount; i++)
+		{
+			double u, v;
+			stream >> u; stream >> v;
+			mesh.uvmap[i] = cv::Vec2d(u, v);
+		}
+	}
 }
 
 Mesh Mesh::fromBIN(const std::string &filename, bool centralizeLoadedMesh)
@@ -557,6 +671,8 @@ void Mesh::printStats() const
     std::cout << "z-range: " << minz << " " << maxz << std::endl;
     std::cout << "points: " << pointsMat.rows << std::endl;
     std::cout << "triangles: " << triangles.size() << std::endl;
+	if (colors.size() > 0)
+		std::cout << "colors: " << colors.size() << std::endl;
 }
 
 void Mesh::trainPointIndex(cv::flann::Index &index, cv::Mat &features, const cv::flann::IndexParams &params) const
@@ -594,6 +710,7 @@ void Mesh::getNearestPoints(const Matrix &input, Matrix output) const
 
 Mesh Mesh::zLevelSelect(double zValue) const
 {
+	UVMap newUvMap;
     VectorOfPoints newPoints;
     Colors newColors;
     for (int r = 0; r < pointsMat.rows; r++)
@@ -602,14 +719,15 @@ Mesh Mesh::zLevelSelect(double zValue) const
         {
             newPoints.push_back(cv::Point3d(pointsMat(r, 0), pointsMat(r, 1), pointsMat(r, 2)));
             if (colors.size() > 0)
-            {
-                newColors.push_back(colors[r]);
-            }
+				newColors.push_back(colors[r]);
+			if (uvmap.size() > 0)
+				newUvMap.push_back(uvmap[r]);
         }
     }
 
     Mesh result = Mesh::fromPointcloud(newPoints, false, true);
     result.colors = newColors;
+	result.uvmap = newUvMap;
     return result;
 }
 
@@ -617,6 +735,7 @@ Mesh Mesh::radiusSelect(double radius, cv::Point3d center) const
 {
     VectorOfPoints newPoints;
     Colors newColors;
+	UVMap newUvMap;
     for (int r = 0; r < pointsMat.rows; r++)
     {
         cv::Point3d p(pointsMat(r, 0), pointsMat(r, 1), pointsMat(r, 2));
@@ -624,14 +743,15 @@ Mesh Mesh::radiusSelect(double radius, cv::Point3d center) const
         {
             newPoints.push_back(p);
             if (colors.size() > 0)
-            {
-                newColors.push_back(colors[r]);
-            }
+				newColors.push_back(colors[r]);
+			if (uvmap.size() > 0)
+				newUvMap.push_back(uvmap[r]);
         }
     }
 
     Mesh result = Mesh::fromPointcloud(newPoints, false, true);
     result.colors = newColors;
+	result.uvmap = newUvMap;
     return result;
 }
 
@@ -639,6 +759,7 @@ Mesh Mesh::bandPassSelect(double minX, double maxX, double minY, double maxY, do
 {
     VectorOfPoints newPoints;
     Colors newColors;
+	UVMap newUvMap;
     for (int r = 0; r < pointsMat.rows; r++)
     {
         cv::Point3d p(pointsMat(r, 0), pointsMat(r, 1), pointsMat(r, 2));
@@ -647,25 +768,27 @@ Mesh Mesh::bandPassSelect(double minX, double maxX, double minY, double maxY, do
             p.z >= minZ && p.z <= maxZ)
         {
             newPoints.push_back(p);
-            if (colors.size() > 0)
-            {
-                newColors.push_back(colors[r]);
-            }
+			if (colors.size() > 0)
+				newColors.push_back(colors[r]);
+			if (uvmap.size() > 0)
+				newUvMap.push_back(uvmap[r]);
         }
     }
 
     Mesh result = Mesh::fromPointcloud(newPoints, false, true);
     result.colors = newColors;
+	result.uvmap = newUvMap;
     return result;
 }
 
-ImageGrayscale Mesh::preview() const
+ImageGrayscale Mesh::preview(bool rotate) const
 {
     Mesh mesh = Mesh(*this);
     mesh.centralize();
     mesh = mesh.radiusSelect(150, cv::Point3d((mesh.minx + mesh.maxx)/2, (mesh.miny + mesh.maxy)/2, mesh.maxz));
     mesh.centralize();
-    mesh.rotate(0.3, -0.5, 0);
+    if (rotate)
+        mesh.rotate(0.3, -0.5, 0);
 
     Face::FaceData::MapConverter c;
     Face::FaceData::Map texture =

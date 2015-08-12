@@ -213,6 +213,15 @@ void GLWidget::paintGL()
             glVertex3f(p.x, p.y, p.z+10);
         }
         glEnd();
+
+		/*glLineWidth(2);
+		glBegin(GL_LINES);
+		for (int i = 0; i < l->points.size() - 1; i++)
+		{
+			glVertex3f(l->points[i].x, l->points[i].y, l->points[i].z + 5);
+			glVertex3f(l->points[i + 1].x, l->points[i + 1].y, l->points[i + 1].z + 5);
+		}
+		glEnd();*/
     }
 
     if (curves.size() > 0)

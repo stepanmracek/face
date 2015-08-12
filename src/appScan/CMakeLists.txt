@@ -3,20 +3,26 @@ project(F3D.appScan)
 
 find_package(Qt5Widgets)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
 
 file(GLOB_RECURSE ${PROJECT_NAME}.Sources "src/*.cpp")
-add_executable (${PROJECT_NAME} ${${PROJECT_NAME}.Sources})
+file(GLOB_RECURSE ${PROJECT_NAME}.Headers "src/*.h")
+file(GLOB_RECURSE ${PROJECT_NAME}.UI "src/*.ui")
+file(GLOB_RECURSE ${PROJECT_NAME}.Resources "resources/*.qrc")
 
-if (3DFACE_OPENMP)
-	SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-fopenmp")
-	SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-fopenmp")
-endif()
+qt5_wrap_ui(${PROJECT_NAME}.UI.Headers ${${PROJECT_NAME}.UI})
+qt5_wrap_cpp(${PROJECT_NAME}.Headers.MOC ${${PROJECT_NAME}.Headers})
+qt5_add_resources(${PROJECT_NAME}.Resources.cpp ${${PROJECT_NAME}.Resources})
+
+add_executable (${PROJECT_NAME}
+	${${PROJECT_NAME}.Sources}
+	${${PROJECT_NAME}.Headers}
+	${${PROJECT_NAME}.Headers.MOC}
+	${${PROJECT_NAME}.UI.Headers}
+	${${PROJECT_NAME}.Resources.cpp}
+)
 
 target_link_libraries(${PROJECT_NAME}
 	F3D.faceExtras
-	F3D.softKinetic
-	F3D.occipital
-	F3D.kinect
+	F3D.faceSensors
+	${dlib}
 )

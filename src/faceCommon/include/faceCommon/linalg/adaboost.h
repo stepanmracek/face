@@ -1,5 +1,4 @@
-#ifndef ADABOOST_H
-#define ADABOOST_H
+#pragma once
 
 #include "common.h"
 #include "vector.h"
@@ -57,5 +56,3 @@ private:
 
 }
 }
-
-#endif // ADABOOST_H

@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="posImages">
+    <file>down.svg</file>
+    <file>head-side.svg</file>
+    <file>head-top.svg</file>
+    <file>left.svg</file>
+    <file>right.svg</file>
+    <file>rotate.svg</file>
+    <file>up.svg</file>
+  </qresource>
+</RCC>

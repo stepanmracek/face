@@ -1,5 +1,4 @@
-#ifndef PCA_H
-#define PCA_H
+#pragma once
 
 #include <opencv/cv.h>
 
@@ -11,7 +10,7 @@
 namespace Face {
 namespace LinAlg {
 
-class PCA : public ProjectionBase, public ISerializable
+class FACECOMMON_EXPORTS PCA : public ProjectionBase, public ISerializable
 {
 public:
     cv::PCA cvPca;
@@ -55,5 +54,3 @@ public:
 
 }
 }
-
-#endif // PCA_H

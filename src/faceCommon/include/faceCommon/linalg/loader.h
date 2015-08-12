@@ -1,5 +1,4 @@
-#ifndef LOADER_H
-#define LOADER_H
+#pragma once
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
@@ -8,10 +7,20 @@
 #include "matrixconverter.h"
 
 namespace Face {
+
+namespace FaceData {
+class FaceAlignerIcp;
+class FaceAlignerLandmark;
+class Mesh;
+}
+
 namespace LinAlg {
 
-class Loader
+class FACECOMMON_EXPORTS Loader
 {
+private:
+    static void loadMeshesAllocate(const std::string &dir, std::vector<int> &ids, std::vector<Face::FaceData::Mesh> &meshes, std::vector<std::string> &fileNames);
+
 public:
     enum PathType { AbsoluteFull, Filename, BaseFilename };
 
@@ -34,6 +43,18 @@ public:
                              const std::string &classSeparator = "-", const std::string &nameFilter = "*",
                              int maxCount = -1, const std::string &storageKey = "m");
 
+    static void loadMeshes(const std::string &dir,
+                           std::vector<int> &ids, std::vector<Face::FaceData::Mesh> &meshes,
+                           int smoothIterations, float smoothCoef, const std::string &idSeparator);
+
+	static void loadMeshes(const std::string &dir, const Face::FaceData::FaceAlignerIcp &aligner,
+                           std::vector<int> &ids, std::vector<Face::FaceData::Mesh> &meshes, int icpIterations,
+                           int smoothIterations, float smoothCoef, const std::string &idSeparator);
+
+    static void loadMeshes(const std::string &dir, const Face::FaceData::FaceAlignerLandmark &aligner,
+                           std::vector<int> &ids, std::vector<Face::FaceData::Mesh> &meshes,
+                           int smoothIterations, float smoothCoef, const std::string &idSeparator);
+
     static std::vector<std::string> listFiles(const std::string &path, const std::string &filter, PathType pathType);
     static std::vector<std::string> listFiles(const std::string &path, const std::vector<std::string> &filters, PathType pathType);
 
@@ -42,5 +63,3 @@ public:
 
 }
 }
-
-#endif // LOADER_H

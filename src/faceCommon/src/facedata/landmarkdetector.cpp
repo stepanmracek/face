@@ -1,17 +1,48 @@
-#include <opencv/cv.h>
+#include "faceCommon/facedata/landmarkdetector.h"
+
+#include <dlib/image_processing/frontal_face_detector.h>
+#include <dlib/image_processing/shape_predictor.h>
+#include <dlib/image_processing/full_object_detection.h>
+#include <dlib/opencv.h>
+
+/*#include <opencv/cv.h>
 #include <opencv/cvaux.h>
 #include <opencv/highgui.h>
 
-#include "faceCommon/facedata/landmarkdetector.h"
 #include "faceCommon/facedata/util.h"
 #include "faceCommon/facedata/map.h"
 #include "faceCommon/facedata/maskedvector.h"
 #include "faceCommon/linalg/vector.h"
-#include "faceCommon/linalg/kernelgenerator.h"
+#include "faceCommon/linalg/kernelgenerator.h"*/
 
 using namespace Face::FaceData;
 
-LandmarkDetector::LandmarkDetector(Mesh &mesh) : mesh(mesh)
+LandmarkDetector::LandmarkDetector(const std::string &shapePredictorPath)
+{
+    shapePredictor = new dlib::shape_predictor();
+    dlib::deserialize(shapePredictorPath) >> (*shapePredictor);
+}
+
+std::vector<cv::Point2d> LandmarkDetector::get(ImageGrayscale &img, cv::Rect &roi)
+{
+    std::vector<cv::Point2d> result;
+
+    dlib::rectangle rect(dlib::point(roi.tl().x, roi.tl().y), dlib::point(roi.br().x, roi.br().y));
+    dlib::cv_image<unsigned char> dlibImg(img);
+    dlib::full_object_detection detection = (*shapePredictor)(dlibImg, rect);
+    unsigned long n = detection.num_parts();
+    if (n <= 48) return result;
+
+    for (unsigned long i = 27; i < 48; i++)
+    {
+        const dlib::point &p = detection.part(i);
+        result.push_back(cv::Point2d(p.x(), p.y()));
+    }
+
+    return result;
+}
+
+/*LandmarkDetector::LandmarkDetector(Mesh &mesh) : mesh(mesh)
 {
     stripeWidth = 50; //100;
     depthGaussSize = 7;
@@ -163,4 +194,4 @@ void LandmarkDetector::innerEyeCorners(Landmarks &l)
         l.set(Landmarks::RightInnerEye,
               converter.MapToMeshCoords(depth, cv::Point2d(rightEye2dX + cropStartX, eyes2dY + cropStartY)));
     }
-}
+}*/

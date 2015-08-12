@@ -1,4 +1,5 @@
 #include "faceCommon/biometrics/filterfeatureextractor.h"
+#include "faceCommon/linalg/vector.h"
 
 using namespace Face::Biometrics;
 

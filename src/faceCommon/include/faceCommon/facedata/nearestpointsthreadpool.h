@@ -1,5 +1,4 @@
-#ifndef NEARESTPOINTSTHREADPOOL_H
-#define NEARESTPOINTSTHREADPOOL_H
+#pragma once
 
 #include <Poco/ThreadPool.h>
 #include <opencv2/flann/flann.hpp>
@@ -36,5 +35,3 @@ public:
 
 }
 }
-
-#endif // NEARESTPOINTSTHREADPOOL_H

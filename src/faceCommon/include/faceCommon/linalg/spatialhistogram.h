@@ -1,5 +1,4 @@
-#ifndef SPATIALHISTOGRAM_H
-#define SPATIALHISTOGRAM_H
+#pragma once
 
 #include <opencv2/opencv.hpp>
 
@@ -12,7 +11,7 @@ namespace LinAlg {
 
 typedef cv::Mat_<unsigned char> SpatialHistogramMat;
 
-class SpatialHistogram : public ImageFilter
+class FACECOMMON_EXPORTS SpatialHistogram : public ImageFilter
 {
 public:
     int histLen;
@@ -29,7 +28,7 @@ public:
     inline Matrix process(const Matrix &input) const { return calculateMatrix(input); }
 };
 
-class SpatialHistogramWLD : public SpatialHistogram
+class FACECOMMON_EXPORTS SpatialHistogramWLD : public SpatialHistogram
 {
 public:
 
@@ -60,5 +59,3 @@ public:
 
 }
 }
-
-#endif // SPATIALHISTOGRAM_H

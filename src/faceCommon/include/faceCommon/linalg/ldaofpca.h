@@ -1,5 +1,4 @@
-#ifndef LDAOFPCA_H
-#define LDAOFPCA_H
+#pragma once
 
 #include "pca.h"
 #include "lda.h"
@@ -31,5 +30,3 @@ public:
 
 }
 }
-
-#endif // LDAOFPCA_H

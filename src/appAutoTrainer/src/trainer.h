@@ -3,6 +3,7 @@
 
 #include "faceCommon/biometrics/multibiomertricsautotuner.h"
 #include "faceCommon/facedata/facealigner.h"
+#include "settingsbase.h"
 
 namespace Face {
 namespace AutoTrainer {
@@ -10,24 +11,20 @@ namespace AutoTrainer {
 class Trainer
 {
 public:
-    class Settings
+    class Settings : public SettingsBase
     {
     public:
         Settings() {}
         Settings(int argc, char *argv[], bool &ok);
 
-        std::string meanFaceForAlign;
-        std::string preAlignTemplate;
         std::string unitsFile;
         std::string fusionName;
         std::string frgcDir;
         std::string trainDir;
+        bool noWrapper;
         int frgcSamples;
-        int ICPiters;
-        float smoothCoef;
-        int smoothIters;
 
-        static void printHelp();
+        void printHelp();
         void printSettings();
     };
 
