@@ -1,5 +1,4 @@
-#ifndef SVD_H
-#define SVD_H
+#pragma once
 
 #include <opencv/cv.h>
 
@@ -24,4 +23,3 @@ public:
 }
 }
 
-#endif // SVD_H

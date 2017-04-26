@@ -20,7 +20,7 @@ class WinScans : public QMainWindow
     Q_OBJECT
     
 public:
-    explicit WinScans(Face::Sensors::ISensor::Ptr sensor, Face::FaceData::FaceAligner::Ptr aligner, QWidget *parent = 0);
+    explicit WinScans(Face::Sensors::ISensor::Ptr sensor, QWidget *parent = 0);
     ~WinScans();
     
 private slots:
@@ -40,19 +40,23 @@ private slots:
 
     void on_btnRemoveTexture_clicked();
 
-    void on_btnAlign_clicked();
+    void on_btnIcpAlign_clicked();
 
-    void on_btnCrop_clicked();
+	void on_btnLmAlign_clicked();
+
+	void on_btnInfo_clicked();
+
+    void on_btnRename_clicked();
 
 private:
-    void addFace(const QString &scanName, const Face::FaceData::Mesh &mesh);
+	void addScan(const QString &scanName, const Scan &scan);
 
     Ui::WinScans *ui;
     int lastId;
     Face::Sensors::ISensor::Ptr sensor;
-    Face::FaceData::FaceAligner::Ptr aligner;
-    QMap<QString, Face::FaceData::Mesh> meshes;
-    QMap<QString, Face::FaceData::Landmarks> landmarks;
+    Face::FaceData::FaceAlignerIcp::Ptr icpAligner;
+	Face::FaceData::FaceAlignerLandmark::Ptr landmarkAligner;
+    QMap<QString, Scan> scans;
 };
 
 }

@@ -7,6 +7,10 @@
 #include <Poco/StringTokenizer.h>
 #include <Poco/NumberParser.h>
 
+#include <faceCommon/facedata/mesh.h>
+#include <faceCommon/facedata/facealigner.h>
+#include <faceCommon/facedata/surfaceprocessor.h>
+
 using namespace Face::LinAlg;
 
 std::vector<Vector> Loader::loadShapes(const std::string &dirPath)
@@ -179,6 +183,7 @@ std::vector<std::string> Loader::listFiles(const std::string &path, const std::s
         }
     }
 
+    std::sort(result.begin(), result.end());
     return result;
 }
 
@@ -205,4 +210,96 @@ std::vector<int> Loader::getClasses(const std::vector<std::string> &fileNames, c
         result.push_back(Poco::NumberParser::parse(tokenizer[0]));
     }
     return result;
+}
+
+void Loader::loadMeshesAllocate(const std::string &dir, std::vector<int> &ids, std::vector<Face::FaceData::Mesh> &meshes, std::vector<std::string> &fileNames)
+{
+    std::vector<std::string> filters;
+    filters.push_back("*.binz");
+    filters.push_back("*.bin");
+    filters.push_back("*.obj");
+
+    fileNames = listFiles(dir, filters, Filename);
+    int n = fileNames.size();
+    ids.resize(n);
+    meshes.resize(n);
+}
+
+void Loader::loadMeshes(const std::string &dir, std::vector<int> &ids, std::vector<Face::FaceData::Mesh> &meshes,
+                        int smoothIterations, float smoothCoef, const std::string &idSeparator)
+{
+    std::vector<std::string> fileNames;
+    loadMeshesAllocate(dir, ids, meshes, fileNames);
+    int n = fileNames.size();
+
+    #pragma omp parallel for
+    for (int i = 0; i < n; i++)
+    {
+        Face::FaceData::Mesh m = Face::FaceData::Mesh::fromFile(dir + Poco::Path::separator() + fileNames[i]);
+
+        if (smoothIterations > 0)
+        {
+            Face::FaceData::SurfaceProcessor::mdenoising(m, smoothCoef, smoothIterations, smoothIterations);
+        }
+
+        ids[i] = Poco::NumberParser::parse(Poco::StringTokenizer(fileNames[i], idSeparator)[0]);
+        meshes[i] = m;
+    }
+}
+
+void Loader::loadMeshes(const std::string &dir, const Face::FaceData::FaceAlignerIcp &aligner, std::vector<int> &ids,
+                        std::vector<Face::FaceData::Mesh> &meshes, int icpIterations, int smoothIterations,
+                        float smoothCoef, const std::string &idSeparator)
+{
+    std::vector<std::string> fileNames;
+    loadMeshesAllocate(dir, ids, meshes, fileNames);
+    int n = fileNames.size();
+
+    #pragma omp parallel for
+    for (int i = 0; i < n; i++)
+    {
+        Face::FaceData::Mesh m = Face::FaceData::Mesh::fromFile(dir + Poco::Path::separator() + fileNames[i]);
+
+        if (smoothIterations > 0)
+        {
+            Face::FaceData::SurfaceProcessor::mdenoising(m, smoothCoef, smoothIterations, smoothIterations);
+        }
+
+        if (icpIterations > 0)
+        {
+			aligner.align(m, icpIterations, Face::FaceData::FaceAlignerIcp::CVTemplateMatching);
+        }
+
+        ids[i] = Poco::NumberParser::parse(Poco::StringTokenizer(fileNames[i], idSeparator)[0]);
+        meshes[i] = m;
+    }
+}
+
+void Loader::loadMeshes(const std::string &dir, const Face::FaceData::FaceAlignerLandmark &aligner,
+                        std::vector<int> &ids, std::vector<Face::FaceData::Mesh> &meshes,
+                        int smoothIterations, float smoothCoef, const std::string &idSeparator)
+{
+    std::vector<std::string> fileNames;
+    loadMeshesAllocate(dir, ids, meshes, fileNames);
+    int n = fileNames.size();
+
+    #pragma omp parallel for
+    for (int i = 0; i < n; i++)
+    {
+        Poco::Path path(dir + Poco::Path::separator() + fileNames[i]);
+        Face::FaceData::Mesh m = Face::FaceData::Mesh::fromFile(path.toString());
+
+        std::string lmPath = dir + Poco::Path::separator() + path.getBaseName() + "-landmarks.yml";
+        Face::FaceData::Landmarks lm(lmPath);
+
+        if (smoothIterations > 0)
+        {
+            Face::FaceData::SurfaceProcessor::mdenoising(m, smoothCoef, smoothIterations, smoothIterations);
+        }
+
+        aligner.align(m, lm);
+
+        ids[i] = Poco::NumberParser::parse(Poco::StringTokenizer(fileNames[i], idSeparator)[0]);
+        meshes[i] = m;
+    }
 }

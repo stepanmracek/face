@@ -4,6 +4,7 @@
 #include <map>
 
 #include "faceCommon/linalg/metrics.h"
+#include "faceCommon/faceCommon.h"
 
 namespace Face {
 namespace Biometrics {
@@ -13,7 +14,7 @@ class BatchEvaluationResult;
 class FeatureExtractor;
 class Template;
 
-class Evaluation
+class FACECOMMON_EXPORTS Evaluation
 {
 private:
     void commonEvaluation();

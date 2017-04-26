@@ -3,9 +3,9 @@
 #include <Poco/Path.h>
 #include <Poco/File.h>
 
-#include "common.h"
 #include "faceCommon/facedata/mesh.h"
 #include "faceCommon/facedata/facealigner.h"
+#include "faceCommon/linalg/loader.h"
 #include "faceCommon/helpers/cmdlineargsparser.h"
 
 using namespace Face::AutoTrainer;
@@ -33,7 +33,7 @@ Processor::Settings::Settings(int argc, char *argv[], bool &ok)
 
 void Processor::Settings::printHelp()
 {
-    std::cout << "usage: appAutoTrainer --process" << std::endl;
+    std::cout << "usage: tbs-face3d --process" << std::endl;
     std::cout << " mandatory parameters:" << std::endl;
     std::cout << "  --meanFaceForAlign model.obj" << std::endl;
     std::cout << "  --preAlignTemplate template.yml" << std::endl;
@@ -59,12 +59,12 @@ void Processor::Settings::printSettings()
 
 void Processor::process(const Settings &settings)
 {
-    Face::FaceData::FaceAligner aligner(
+	Face::FaceData::FaceAlignerIcp aligner(
                 Face::FaceData::Mesh::fromFile(settings.meanFaceForAlign), settings.preAlignTemplate);
 
     std::vector<int> ids;
     std::vector<Face::FaceData::Mesh> meshes;
-    Common::loadMeshes(settings.inputDir, aligner, ids, meshes, settings.ICPiters,
+    Face::LinAlg::Loader::loadMeshes(settings.inputDir, aligner, ids, meshes, settings.ICPiters,
                        settings.smoothIters, settings.smoothCoef, "-");
 
     // create directory if it doesn't exist

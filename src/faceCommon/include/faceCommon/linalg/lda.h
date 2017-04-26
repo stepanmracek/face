@@ -1,5 +1,4 @@
-#ifndef LDA_H
-#define LDA_H
+#pragma once
 
 #include <opencv/cv.h>
 
@@ -32,5 +31,3 @@ public:
 
 }
 }
-
-#endif // LDA_H

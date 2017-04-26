@@ -1,5 +1,4 @@
-#ifndef RANDOM_H
-#define RANDOM_H
+#pragma once
 
 #include "common.h"
 #include "vector.h"
@@ -15,5 +14,3 @@ public:
 
 }
 }
-
-#endif // RANDOM_H

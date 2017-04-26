@@ -7,15 +7,16 @@
 namespace Face {
 namespace Biometrics {
 
-class MultiTemplate : public Face::LinAlg::ISerializable
+class FACECOMMON_EXPORTS MultiTemplate : public Face::LinAlg::ISerializable
 {
 public:
     int version;
     int id;
     std::vector<Face::LinAlg::Vector> featureVectors;
+    float depthCoverage;
 
     MultiTemplate();
-    MultiTemplate(int version, int id, const std::vector<Face::LinAlg::Vector> &featureVectors);
+    MultiTemplate(int version, int id, const std::vector<Face::LinAlg::Vector> &featureVectors, float depthCoverage = 1);
     MultiTemplate(const std::string &path);
     MultiTemplate(cv::FileStorage &storage);
 

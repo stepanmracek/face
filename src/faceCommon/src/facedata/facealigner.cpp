@@ -1,12 +1,15 @@
 #include "faceCommon/facedata/facealigner.h"
 
+#include "faceCommon/facedata/mesh.h"
 #include "faceCommon/facedata/landmarkdetector.h"
 #include "faceCommon/linalg/procrustes.h"
 #include "faceCommon/linalg/kernelgenerator.h"
+#include "faceCommon/facedata/surfaceprocessor.h"
+#include "faceCommon/facedata/nearestpointsthreadpool.h"
 
 using namespace Face::FaceData;
 
-void FaceAligner::CVTemplateMatchingSettings::serialize(cv::FileStorage &storage) const
+void FaceAlignerIcp::CVTemplateMatchingSettings::serialize(cv::FileStorage &storage) const
 {
     storage << "comparisonMethod" << comparisonMethod;
     storage << "inputImageType" << inputImageType;
@@ -14,7 +17,7 @@ void FaceAligner::CVTemplateMatchingSettings::serialize(cv::FileStorage &storage
     storage << "center" << center;
 }
 
-void FaceAligner::CVTemplateMatchingSettings::deserialize(cv::FileStorage &storage)
+void FaceAlignerIcp::CVTemplateMatchingSettings::deserialize(cv::FileStorage &storage)
 {
     if (!storage.isOpened())
     {
@@ -32,8 +35,8 @@ void FaceAligner::CVTemplateMatchingSettings::deserialize(cv::FileStorage &stora
     //storage["center"] >> center;
 }
 
-FaceAligner::FaceAligner(const Mesh &referenceFace, const std::string &templateMatchingFilePath) :
-												threadPool(0), referenceFace(referenceFace)
+FaceAlignerIcp::FaceAlignerIcp(const Mesh &referenceFace, const std::string &templateMatchingFilePath) :
+	threadPool(0), referenceFace(referenceFace)
 {
     if (!templateMatchingFilePath.empty())
     {
@@ -42,17 +45,17 @@ FaceAligner::FaceAligner(const Mesh &referenceFace, const std::string &templateM
     }
 }
 
-FaceAligner::~FaceAligner()
+FaceAlignerIcp::~FaceAlignerIcp()
 {
     if (threadPool) delete threadPool;
 }
 
-void FaceAligner::alignCentralize(Mesh &face) const
+void FaceAlignerIcp::alignCentralize(Mesh &face) const
 {
     face.centralize();
 }
 
-void FaceAligner::alignMaxZ(Mesh &face) const
+void FaceAlignerIcp::alignMaxZ(Mesh &face) const
 {
     double maxZ = -1e300;
     double index = 0;
@@ -71,7 +74,7 @@ void FaceAligner::alignMaxZ(Mesh &face) const
     face.translate(-translate);
 }
 
-void FaceAligner::alignNoseTip(Mesh &face) const
+/*void FaceAligner::alignNoseTip(Mesh &face) const
 {
     LandmarkDetector lmDetector(face);
     Landmarks lm = lmDetector.detect();
@@ -83,9 +86,9 @@ void FaceAligner::alignNoseTip(Mesh &face) const
     {
         alignMaxZ(face);
     }
-}
+}*/
 
-void FaceAligner::alignTemplateMatching(Mesh &face) const
+void FaceAlignerIcp::alignTemplateMatching(Mesh &face) const
 {
     MapConverter refConverter;
     Map refDepth = SurfaceProcessor::depthmap(referenceFace, refConverter, 1.0, SurfaceProcessor::ZCoord);
@@ -159,7 +162,7 @@ void FaceAligner::alignTemplateMatching(Mesh &face) const
     }
 }
 
-void FaceAligner::alignCVTemplateMatching(Mesh &face) const
+void FaceAlignerIcp::alignCVTemplateMatching(Mesh &face) const
 {
     double min, max;
     //Matrix input;
@@ -224,7 +227,7 @@ VectorOfPoints getPointCloudFromMatrix(const Matrix &points)
     return result;
 }
 
-void FaceAligner::preAlign(Mesh &face, PreAlignTransform preAlignTransform) const
+void FaceAlignerIcp::preAlign(Mesh &face, PreAlignTransform preAlignTransform) const
 {
     switch (preAlignTransform)
     {
@@ -236,9 +239,9 @@ void FaceAligner::preAlign(Mesh &face, PreAlignTransform preAlignTransform) cons
     case MaxZ:
         alignMaxZ(face);
         break;
-    case NoseTipDetection:
+    /*case NoseTipDetection:
         alignNoseTip(face);
-        break;
+        break;*/
     case TemplateMatching:
         alignTemplateMatching(face);
         break;
@@ -248,13 +251,13 @@ void FaceAligner::preAlign(Mesh &face, PreAlignTransform preAlignTransform) cons
     }
 }
 
-void FaceAligner::setEnableThreadPool(bool enable)
+void FaceAlignerIcp::setEnableThreadPool(bool enable)
 {
     if (!enable && threadPool) delete threadPool;
     if (enable && !threadPool) threadPool = new NearestPointsThreadPool();
 }
 
-void FaceAligner::icpAlign(Mesh &face, int maxIterations, PreAlignTransform preAlignTransform) const
+void FaceAlignerIcp::align(Mesh &face, int maxIterations, PreAlignTransform preAlignTransform) const
 {
     preAlign(face, preAlignTransform);
 
@@ -304,4 +307,68 @@ void FaceAligner::icpAlign(Mesh &face, int maxIterations, PreAlignTransform preA
         face.translate(-centralizeReferences);
         progress.postTranslations.push_back(-centralizeReferences);
     }
+}
+
+namespace
+{
+	void filterPoints(Face::FaceData::Landmarks::Points &in, Face::FaceData::Landmarks::Points &reference)
+	{
+		auto inCopy = in; in.clear();
+		auto referenceCopy = reference; reference.clear();
+		auto n = referenceCopy.size();
+		for (decltype(n) i = 0; i < n; i++)
+		{
+			const auto &p = inCopy[i];
+			if (p.x != 0 && p.y != 0 && p.z != 0)
+			{
+				in.push_back(p);
+				reference.push_back(referenceCopy[i]);
+			}
+			else
+			{
+                //std::cout << "filter points: removing point " << i << std::endl;
+			}
+		}
+	}
+}
+
+FaceAlignerLandmark::FaceAlignerLandmark(const Landmarks &referenceLandmarks) :
+	referenceLandmarks(referenceLandmarks)
+{
+
+}
+
+void FaceAlignerLandmark::align(Mesh &face, Landmarks &landmarks) const
+{
+	// Check that the number of landmarks match the reference point count
+	if (referenceLandmarks.points.size() != landmarks.points.size()) {
+		std::string msg = "Landmarks size mismatch: reference " + std::to_string(referenceLandmarks.points.size()) + "; input: " + std::to_string(landmarks.points.size());
+		std::cerr << msg << std::endl;
+		FACELIB_EXCEPTION(msg);
+	}
+
+	// Filter-out landmarks with zero coords
+	auto referencePoints = referenceLandmarks.points;
+	auto filteredLandmarks = landmarks.points;
+	filterPoints(filteredLandmarks, referencePoints);
+
+	// Move reference to [0,0,0]
+	auto centralizeReference = Face::LinAlg::Procrustes3D::centralizedTranslation(referencePoints);
+	Face::LinAlg::Procrustes3D::translate(referencePoints, centralizeReference);
+
+	// Move landmarks to the reference
+	auto translation = Face::LinAlg::Procrustes3D::getOptimalTranslation(filteredLandmarks, referencePoints);
+	Face::LinAlg::Procrustes3D::translate(filteredLandmarks, translation);
+	Face::LinAlg::Procrustes3D::translate(landmarks.points, translation);
+	face.translate(translation);
+	
+	// Rotate landmarks
+	auto rotation = Face::LinAlg::Procrustes3D::getOptimalRotation(filteredLandmarks, referencePoints);
+	//Face::LinAlg::Procrustes3D::transform(filteredLandmarks, rotation);
+	Face::LinAlg::Procrustes3D::transform(landmarks.points, rotation);
+	face.transform(rotation);
+
+	// Move landmarks to the point where the reference was
+	Face::LinAlg::Procrustes3D::translate(landmarks.points, -centralizeReference);
+	face.translate(-centralizeReference);
 }

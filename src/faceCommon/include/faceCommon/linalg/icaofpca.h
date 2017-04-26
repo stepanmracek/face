@@ -1,5 +1,4 @@
-#ifndef ICAOFPCA_H
-#define ICAOFPCA_H
+#pragma once
 
 #include "ica.h"
 #include "pca.h"
@@ -9,7 +8,7 @@
 namespace Face {
 namespace LinAlg {
 
-class ICAofPCA : public ProjectionBase
+class FACECOMMON_EXPORTS ICAofPCA : public ProjectionBase
 {
 public:
     ICA ica;
@@ -43,5 +42,3 @@ public:
 
 }
 }
-
-#endif // ICAOFPCA_H

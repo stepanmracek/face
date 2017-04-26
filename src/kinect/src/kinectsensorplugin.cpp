@@ -1,5 +1,7 @@
 #include "kinect/kinectsensorplugin.h"
 
+#include <Poco/ClassLibrary.h>
+
 #include "kinect/kinect.h"
 #include "faceCommon/linalg/vector.h"
 #include "faceCommon/linalg/matrixconverter.h"
@@ -8,7 +10,7 @@
 using namespace Face::Sensors::Kinect;
 
 KinectSensorPlugin::KinectSensorPlugin(const std::string &faceDetectorPath) :
-    detector(faceDetectorPath),
+    detector(new Face::ObjectDetection::OpenCVDetector(faceDetectorPath)),
     rotRect(cv::Point2f(320, 240), cv::Size2f(120, 160), 0),
     rect(320 - 60, 240 - 80, 120, 160),
     state(Waiting),
@@ -108,7 +110,7 @@ void KinectSensorPlugin::drawGUI()
     cv::ellipse(img, rotRect, 255, 1, CV_AA);
 }
 
-void KinectSensorPlugin::go()
+void KinectSensorPlugin::doLoop()
 {
     //qDebug() << "go()";
     switch (state)
@@ -240,7 +242,7 @@ void KinectSensorPlugin::scan()
 
     while (!_mesh)
     {
-        go();
+        doLoop();
         cv::imshow("KinectSensorPlugin", img);
         char key = cv::waitKey(30);
         if (key != -1 || isPositionInterupted())
@@ -260,3 +262,6 @@ void KinectSensorPlugin::scan()
     cv::destroyWindow("KinectSensorPlugin");
 }
 
+POCO_BEGIN_MANIFEST(Face::Sensors::ISensor)
+    POCO_EXPORT_CLASS(Face::Sensors::Kinect::KinectSensorPlugin)
+POCO_END_MANIFEST

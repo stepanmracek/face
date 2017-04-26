@@ -287,18 +287,9 @@ ImageGrayscale Kinect::RGBToGrayscale(unsigned char *rgb)
     return result;
 }
 
-Face::FaceData::Mesh *Kinect::scanAndAlignFace(int scanIterations, int icpIterations, const std::string &alignReferenceOBJPath, const std::string &faceHaarPath)
-{
-    Face::FaceData::Mesh *m = Kinect::scanFace(scanIterations, faceHaarPath);
-    Face::FaceData::Mesh mean = Face::FaceData::Mesh::fromOBJ(alignReferenceOBJPath);
-    Face::FaceData::FaceAligner aligner(mean, "");
-    aligner.icpAlign(*m, icpIterations, Face::FaceData::FaceAligner::NoseTipDetection);
-    return m;
-}
-
 Face::FaceData::Mesh *Kinect::scanFace(int scanIterations, const std::string &faceHaarPath)
 {
-    Face::ObjectDetection::Tracker rtTrack(faceHaarPath);
+    Face::ObjectDetection::Tracker rtTrack(new Face::ObjectDetection::OpenCVDetector(faceHaarPath));
     int minDistanceFromSensor = 200;
     int maxDistanceFromSensor = 800;
 

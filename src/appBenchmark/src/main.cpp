@@ -5,36 +5,36 @@
 #include "faceCommon/facedata/surfaceprocessor.h"
 #include "faceCommon/biometrics/multiextractor.h"
 
-void printHelpAndExit()
+void printHelpAndExit(char *appName)
 {
-    std::cout << "usage: appBenchmark" << std::endl;
+    std::cout << "usage: " << appName << std::endl;
     std::cout << "  --extractor path/to/extractor" << std::endl;
-    std::cout << "  --meanFaceForAlign path/to/meanFace/For/Align" << std::endl;
-    std::cout << "  --preAlignTemplate path/to/template.yml" << std::endl;
     std::cout << "  --inputMesh path/to/test/input/mesh" << std::endl;
+    std::cout << "  --landmarks path/to/landmarks" << std::endl;
+    std::cout << "  --landmarksModel path/to/landmarksModel" << std::endl;
     std::cout << "  [--threadPool]" << std::endl;
     exit(0);
 }
 
 int main(int argc, char *argv[])
 {
-    Face::Helpers::CmdLineArgsParser cmdLineParser(argc, argv);
+	Face::Helpers::CmdLineArgsParser cmdLineParser(argc, argv);
 
     bool ok;
     std::string extractorPath = cmdLineParser.getParamValue("--extractor", ok);
-    if (!ok) printHelpAndExit();
-    std::string meanFaceForAlignPath = cmdLineParser.getParamValue("--meanFaceForAlign", ok);
-    if (!ok) printHelpAndExit();
-    std::string preAlignTemplate = cmdLineParser.getParamValue("--preAlignTemplate", ok);
-    if (!ok) printHelpAndExit();
+    if (!ok) printHelpAndExit(argv[0]);
+    std::string landmarksPath = cmdLineParser.getParamValue("--landmarks", ok);
+	if (!ok) printHelpAndExit(argv[0]);
+    std::string landmarksModelPath = cmdLineParser.getParamValue("--landmarksModel", ok);
+	if (!ok) printHelpAndExit(argv[0]);
     std::string inputMeshPath = cmdLineParser.getParamValue("--inputMesh", ok);
-    if (!ok) printHelpAndExit();
+	if (!ok) printHelpAndExit(argv[0]);
 
     bool threadPool = cmdLineParser.hasParam("--threadPool");
+	if (threadPool) std::cout << "Using thread pool" << std::endl;
 
     float smoothCoef = 0.01;
     int smoothIterations = 10;
-    int icpIterations = 50;
 
     Poco::Timestamp start;
     Face::Biometrics::MultiExtractor extractor(extractorPath);
@@ -42,12 +42,12 @@ int main(int argc, char *argv[])
     int64 timeExtractorLoading = start.elapsed()/1000;
 
     start.update();
-    Face::FaceData::FaceAligner aligner(Face::FaceData::Mesh::fromFile(meanFaceForAlignPath), preAlignTemplate);
-    aligner.setEnableThreadPool(threadPool);
+    Face::FaceData::FaceAlignerLandmark aligner(landmarksModelPath);
     int64 timeAlignerLoading = start.elapsed()/1000;
 
     start.update();
     Face::FaceData::Mesh inputMesh = Face::FaceData::Mesh::fromFile(inputMeshPath);
+    Face::FaceData::Landmarks landmarks(landmarksPath);
     int64 timeMeshLoading = start.elapsed()/1000;
 
     start.update();
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     int64 timeMeshSmoothing = start.elapsed()/1000;
 
     start.update();
-    aligner.icpAlign(inputMesh, icpIterations, Face::FaceData::FaceAligner::CVTemplateMatching);
+    aligner.align(inputMesh, landmarks);
     int64 timeMeshAligning = start.elapsed()/1000;
 
     start.update();

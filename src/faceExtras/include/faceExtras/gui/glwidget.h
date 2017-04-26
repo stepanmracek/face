@@ -5,6 +5,7 @@
 
 #include "faceCommon/facedata/mesh.h"
 #include "faceCommon/facedata/landmarks.h"
+#include "faceExtras/faceExtras.h"
 
 namespace Face {
 namespace GUI {
@@ -12,7 +13,7 @@ namespace GUI {
 /**
  * Class form painting 3D model of the face
  */
-class GLWidget : public QGLWidget
+class FACEEXTRAS_EXPORTS GLWidget : public QGLWidget
 {
     Q_OBJECT
 

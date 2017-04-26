@@ -12,19 +12,18 @@
 #include "faceCommon/objectdetection/tracker.h"
 #include "softkinetic/settings.h"
 #include "softkinetic/ds325sensorbase.h"
+#include "softKinetic.h"
 
 namespace Face {
 namespace Sensors {
 namespace SoftKinetic {
 
-class DS325Sensor2 : public DS325SensorBase
+class SOFTKINETIC_EXPORTS DS325Sensor2 : public DS325SensorBase
 {
 public:
-    DS325Sensor2(const std::string &haarFaceDetectionPath, const Settings &settings /*= Settings()*/,  DepthSense::Context & c);
+    DS325Sensor2(const std::string &haarFaceDetectionPath, const std::string &landmarkDetectorPath, const Settings &settings /*= Settings()*/,  DepthSense::Context & c);
     virtual ~DS325Sensor2();
 
-protected:
-    virtual void stop();
     virtual void start();
 
 private:

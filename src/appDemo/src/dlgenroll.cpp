@@ -29,8 +29,9 @@ DlgEnroll::~DlgEnroll()
 void DlgEnroll::on_btnAdd_clicked()
 {
     sensor->scan();
-    Face::FaceData::Mesh mesh = sensor->mesh();
-    processor->process(mesh);
+	auto sensorData = sensor->sensorData();
+    auto mesh = sensorData.processedScan.mesh;
+    processor->process(mesh, sensorData.processedScan.landmarks);
     scans << new Face::FaceData::Mesh(mesh);
 
     ui->listScans->addItem(QString::number(ui->listScans->count()+1));
@@ -152,8 +153,8 @@ void DlgEnroll::on_btnExport_clicked()
     if (selection.count() < 1) return;
     int index = selection[0].row();
 
-    QString path = QFileDialog::getSaveFileName(this, QString(), QString(), "*.obj");
+    QString path = QFileDialog::getSaveFileName(this, QString(), QString(), "*.binz");
     if (path.isEmpty() || path.isNull()) return;
 
-    scans[index]->writeOBJ(path.toStdString());
+    scans[index]->writeBINZ(path.toStdString());
 }

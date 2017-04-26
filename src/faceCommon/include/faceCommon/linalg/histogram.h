@@ -1,12 +1,12 @@
-#ifndef HISTOGRAM_H
-#define HISTOGRAM_H
+#pragma once
 
 #include "common.h"
+#include "faceCommon/faceCommon.h"
 
 namespace Face {
 namespace LinAlg {
 
-class Histogram
+class FACECOMMON_EXPORTS Histogram
 {
 public:
     double minValue;
@@ -25,5 +25,3 @@ public:
 
 }
 }
-
-#endif // HISTOGRAM_H

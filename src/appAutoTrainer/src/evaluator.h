@@ -4,6 +4,7 @@
 #include <string>
 
 #include "faceCommon/biometrics/evaluation.h"
+#include "settingsbase.h"
 
 namespace Face {
 namespace AutoTrainer {
@@ -11,22 +12,16 @@ namespace AutoTrainer {
 class Evaluator
 {
 public:
-    class Settings
+    class Settings : public SettingsBase
     {
     public:
         Settings() {}
         Settings(int argc, char *argv[], bool &ok);
 
         std::string extractor;
-        std::string meanFaceForAlign;
-        std::string preAlignTemplate;
         std::string evalDir;
-        int frgcSamples;
-        int ICPiters;
-        float smoothCoef;
-        int smoothIters;
 
-        static void printHelp();
+        void printHelp();
         void printSettings();
     };
 

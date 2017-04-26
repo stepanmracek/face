@@ -6,7 +6,7 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QFileDialog>
-#include <qwt/qwt_slider.h>
+#include <qwt_slider.h>
 
 #include "dlgreferenceproperties.h"
 #include "dlgidentifyresult.h"
@@ -20,24 +20,22 @@ FrmKinectMain::FrmKinectMain(QWidget *parent) :
     QMainWindow(parent)
 {
     ui->setupUi(this);
-    //importDirectory("/mnt/data/face/softkinetic/epar/templates");
-
 
     DlgLaunchProperties launchProps;
     if (launchProps.exec() == QDialog::Accepted)
     {
         sensor = launchProps.getSensor();
-        extractor = new Face::Biometrics::MultiExtractor(launchProps.getMultiExtractorPath().toStdString());
-        aligner = new Face::FaceData::FaceAligner(Face::FaceData::Mesh::fromFile(launchProps.getAlignerPath().toStdString()),
-                                                  launchProps.getPreAlignTemplatePath().toStdString());
-        processor = new Face::FaceData::FaceProcessor(aligner, 0, 0);
-    }
+        extractor = new Face::Biometrics::MultiExtractor(Face::Settings::instance().settingsMap[Face::Settings::MultiExtractorPathKey].convert<std::string>());
+		aligner = new Face::FaceData::FaceAlignerLandmark();
+		processor = new Face::FaceData::FaceProcessor(aligner, 0, 0);
+	}
     else
     {
         exit(0);
     }
 
     ui->sliderRaw->setValue(0);
+	//importDirectory("C:\\data\\face\\realsense\\eval");
 }
 
 FrmKinectMain::~FrmKinectMain()
@@ -47,9 +45,9 @@ FrmKinectMain::~FrmKinectMain()
 
 void FrmKinectMain::importDirectory(const QString &dirPath)
 {
-    QDir dir(dirPath);
+    /*QDir dir(dirPath);
     QFileInfoList filenames = dir.entryInfoList(QStringList(), QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
-    foreach (const QFileInfo &fInfo, filenames)
+    for (const QFileInfo &fInfo : filenames)
     {
         qDebug() << fInfo.absoluteFilePath();
 
@@ -59,7 +57,24 @@ void FrmKinectMain::importDirectory(const QString &dirPath)
         database.mapNameToId[name] = id;
 
         database.scans[id].push_back(Face::Biometrics::MultiTemplate(fInfo.absoluteFilePath().toStdString()));
-    }
+    }*/
+
+	std::cout << "Importing from " << dirPath.toStdString() << std::endl;
+	std::vector<Face::FaceData::Mesh> meshes;
+	std::vector<int> ids;
+	Face::LinAlg::Loader::loadMeshes(dirPath.toStdString(), *aligner, ids, meshes, 10, 0.01, "-");
+	auto templates = extractor->extract(meshes, ids, 0);
+	int n = templates.size();
+	for (int i = 0; i < n; i++)
+	{
+		std::cout << ids[i] << std::endl;
+		int id = ids[i];
+		QString name = QString::number(id);
+		
+		database.mapIdToName[id] = name;
+		database.mapNameToId[name] = id;
+		database.scans[id].push_back(templates[i]);
+	}
     refreshList();
 }
 
@@ -106,8 +121,10 @@ void FrmKinectMain::on_btnDelete_clicked()
 void FrmKinectMain::on_btnIdentify_clicked()
 {
     sensor->scan();
-    Face::FaceData::Mesh m = sensor->mesh();
-    processor->process(m);
+	auto sensorData = sensor->sensorData();
+	Face::FaceData::Mesh m = sensorData.processedScan.mesh;
+	processor->process(m, sensorData.processedScan.landmarks);
+
     Face::Biometrics::MultiTemplate probe = extractor->extract(m, 0, 0);
 
     QMap<int, Face::Biometrics::MultiExtractor::ComparisonResult> result;
@@ -133,9 +150,11 @@ void FrmKinectMain::on_btnVerify_clicked()
     if (!ok) return;
 
     sensor->scan();
-    Face::FaceData::Mesh m = sensor->mesh();
-    processor->process(m);
-    Face::Biometrics::MultiTemplate probe = extractor->extract(m, 0, 0);
+	auto sensorData = sensor->sensorData();
+	auto mesh = sensorData.processedScan.mesh;
+	processor->process(mesh, sensorData.processedScan.landmarks);
+
+    Face::Biometrics::MultiTemplate probe = extractor->extract(mesh, 0, 0);
 
     int id = database.mapNameToId[name];
 

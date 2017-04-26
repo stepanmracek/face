@@ -1,5 +1,4 @@
-#ifndef KERNELGENERATOR_H
-#define KERNELGENERATOR_H
+#pragma once
 
 #include "common.h"
 
@@ -14,5 +13,3 @@ public:
 
 }
 }
-
-#endif // KERNELGENERATOR_H

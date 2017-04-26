@@ -100,9 +100,9 @@ ScoreLevelFusionWrapper::Result ScoreLevelFusionWrapper::trainClassifier(const s
     {
         std::cout << "final result {";
         for (int c : result.selectedComponents)
-            std::cout << c << " " << "} ";
+            std::cout << c << " ";
 
-        std::cout << " EER: " << bestEER << std::endl;
+        std::cout << "} EER: " << bestEER << std::endl;
     }
 
     return result;

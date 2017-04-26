@@ -1,5 +1,4 @@
-#ifndef GABOR_H
-#define GABOR_H
+#pragma once
 
 #include "common.h"
 #include "kernelgenerator.h"
@@ -8,7 +7,7 @@
 namespace Face {
 namespace LinAlg {
 
-class Gabor : public FilterBank
+class FACECOMMON_EXPORTS Gabor : public FilterBank
 {
 public:
     Gabor();
@@ -20,5 +19,3 @@ private:
 
 }
 }
-
-#endif // GABOR_H

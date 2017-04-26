@@ -1,5 +1,7 @@
 #include "faceCommon/biometrics/geneticweightoptimization.h"
 
+#include <ctime>
+
 #include "faceCommon/biometrics/template.h"
 #include "faceCommon/biometrics/evaluation.h"
 

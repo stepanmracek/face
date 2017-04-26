@@ -5,8 +5,8 @@
 
 using namespace Face::Sensors::SoftKinetic;
 
-DS325Sensor2::DS325Sensor2(const std::string &haarFaceDetectionPath, const Settings &settings,  DepthSense::Context & c) :
-    DS325SensorBase(settings, c)
+DS325Sensor2::DS325Sensor2(const std::string &haarFaceDetectionPath, const std::string &landmarkDetectorPath, const Settings &settings,  DepthSense::Context & c) :
+    DS325SensorBase(settings, landmarkDetectorPath, c)
 {
 	////qDebug() << "Getting devices...";
     std::vector<DepthSense::Device> devices = context.getDevices();
@@ -43,9 +43,14 @@ DS325Sensor2::DS325Sensor2(const std::string &haarFaceDetectionPath, const Setti
         smallFrames[serial] = cv::Mat_<uchar>(ColorHeight/4, ColorWidth/4);
         roiFrames[serial] = cv::Mat_<uchar>(faceDetectionRoi.height, faceDetectionRoi.width);
 
-        trackers[serial] = Face::ObjectDetection::Tracker(haarFaceDetectionPath);
+        trackers[serial] = Face::ObjectDetection::Tracker(new Face::ObjectDetection::OpenCVDetector(haarFaceDetectionPath));
     }
+
+    Poco::Thread::sleep(250);
+
     context.startNodes();
+
+	Poco::Thread::sleep(250);
 }
 
 DS325Sensor2::~DS325Sensor2(){
@@ -55,15 +60,13 @@ DS325Sensor2::~DS325Sensor2(){
 void DS325Sensor2::start() {
 	DS325SensorBase::start();
 
+	Poco::Thread::sleep(500);
+
 	for (const std::string &serial : serials)
 	{
 		colorNodes[serial].setEnableColorMap(true);
 		registerIfNotExists(colorNodes[serial]);
 	}
-}
-
-void DS325Sensor2::stop() {
-	DS325SensorBase::stop();
 }
 
 void DS325Sensor2::convertColorData(const std::string &serial, const DepthSense::ColorNode::NewSampleReceivedData &data)
@@ -140,7 +143,7 @@ void DS325Sensor2::doWaiting()
             currentSensor = serials[1];
         }
 
-        setState(Positioning);
+        setState(STATE_POSITIONING);
     }
 }
 
@@ -178,13 +181,13 @@ void DS325Sensor2::setState(DS325Sensor2::State newState)
 
     switch (newState)
     {
-    case Off:
+    case STATE_OFF:
     	LOG_DEBUG("Entering Off state");
 
         stop();
         break;
 
-    case Waiting:
+    case STATE_IDLE:
     	LOG_DEBUG("Entering Waiting state");
 
         trackers.at(serials[0]).init();
@@ -222,7 +225,7 @@ void DS325Sensor2::setState(DS325Sensor2::State newState)
 
         break;
 
-    case Positioning:
+    case STATE_POSITIONING:
     	LOG_DEBUG("Entering Positioning state");
         optimalDistanceCounter = 0;
         output.positioningProgress = 0;
@@ -257,7 +260,7 @@ void DS325Sensor2::setState(DS325Sensor2::State newState)
 
         break;
 
-    case Capturing:
+    case STATE_CAPTURING:
     	LOG_DEBUG("Entering Capturing state");
         capturingCounter = 0;
         output.capturingProgress = 0;
@@ -265,12 +268,12 @@ void DS325Sensor2::setState(DS325Sensor2::State newState)
         std::fill(vertexCounter.begin(), vertexCounter.end(), 0);
         std::fill(pointCloudAccumulator.begin(), pointCloudAccumulator.end(), DepthSense::FPVertex(0,0,0));
 
-        depthNodes.at(currentSensor).setEnableEparSmootherFilter(true);
+        setEnableSmoothFilter(depthNodes.at(currentSensor), true);
         break;
 
-    case CapturingDone:
+    case STATE_CAPTURING_DONE:
     	LOG_DEBUG("Entering CapturingDone state");
-        depthNodes.at(currentSensor).setEnableEparSmootherFilter(false);
+        setEnableSmoothFilter(depthNodes.at(currentSensor), false);
     }
 }
 

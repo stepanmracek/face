@@ -50,7 +50,7 @@ private:
 
     Face::Sensors::ISensor::Ptr sensor;
     Face::Biometrics::MultiExtractor::Ptr extractor;
-    Face::FaceData::FaceAligner::Ptr aligner;
+    Face::FaceData::FaceAlignerLandmark::Ptr aligner;
     Face::FaceData::FaceProcessor::Ptr processor;
     Database database;
 

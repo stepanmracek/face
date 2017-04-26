@@ -1,8 +1,9 @@
-#ifndef TEMPLATEMATCHINGTRAINER_H
-#define TEMPLATEMATCHINGTRAINER_H
+#pragma once
 
 #include <vector>
 #include <string>
+
+#include "faceCommon/faceCommon.h"
 
 namespace Face
 {
@@ -11,7 +12,7 @@ namespace FaceData
 
 class Mesh;
 
-class TemplateMatchingTrainer
+class FACECOMMON_EXPORTS TemplateMatchingTrainer
 {
 private:
     static void evaluate(const std::vector<Mesh> &alignedMeshes, const std::vector<int> &ids, const std::string &pcaDepthmapPath);
@@ -23,5 +24,3 @@ public:
 
 }
 }
-
-#endif // TEMPLATEMATCHINGTRAINER_H

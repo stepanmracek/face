@@ -1,6 +1,8 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#include "softKinetic.h"
+
 namespace Face
 {
 namespace Sensors
@@ -8,7 +10,7 @@ namespace Sensors
 namespace SoftKinetic
 {
 
-struct Settings
+struct SOFTKINETIC_EXPORTS Settings
 {
     Settings() :
         consecutiveDetectsToStartPositioning(5),

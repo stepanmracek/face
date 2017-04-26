@@ -14,7 +14,7 @@
 namespace Face {
 namespace Biometrics {
 
-class ScoreLevelFusionBase
+class FACECOMMON_EXPORTS ScoreLevelFusionBase
 {
 protected:
     std::vector<Evaluation> components;
@@ -61,13 +61,13 @@ public:
     virtual std::string writeName() const = 0;
 };
 
-class ScoreLevelFusionFactory
+class FACECOMMON_EXPORTS ScoreLevelFusionFactory
 {
 public:
     static ScoreLevelFusionBase::Ptr create(const std::string &name);
 };
 
-class ScoreLDAFusion : public ScoreLevelFusionBase
+class FACECOMMON_EXPORTS ScoreLDAFusion : public ScoreLevelFusionBase
 {
 private:
     /*double maxScore;
@@ -86,7 +86,7 @@ public:
     std::string writeName() const { return name() + "-" + scoreNormalizer->writeParams(); }
 };
 
-class ScoreLogisticRegressionFusion : public ScoreLevelFusionBase
+class FACECOMMON_EXPORTS ScoreLogisticRegressionFusion : public ScoreLevelFusionBase
 {
 private:
     Face::LinAlg::LogisticRegression logR;
@@ -101,7 +101,7 @@ public:
     std::string writeName() const { return name() + "-" + scoreNormalizer->writeParams(); }
 };
 
-class ScoreWeightedSumFusion : public ScoreLevelFusionBase
+class FACECOMMON_EXPORTS ScoreWeightedSumFusion : public ScoreLevelFusionBase
 {
 private:
     std::vector<double> eer;
@@ -118,7 +118,7 @@ public:
     std::string writeName() const { return name() + "-" + scoreNormalizer->writeParams(); }
 };
 
-class ScoreSumFusion : public ScoreLevelFusionBase
+class FACECOMMON_EXPORTS ScoreSumFusion : public ScoreLevelFusionBase
 {
 public:
     void learnImplementation();
@@ -132,7 +132,7 @@ public:
 
 };
 
-class ScoreProductFusion : public ScoreLevelFusionBase
+class FACECOMMON_EXPORTS ScoreProductFusion : public ScoreLevelFusionBase
 {
 public:
     void learnImplementation();
@@ -144,7 +144,7 @@ public:
     std::string writeName() const { return name() + "-" + scoreNormalizer->writeParams(); }
 };
 
-class ScoreSVMFusion : public ScoreLevelFusionBase
+class FACECOMMON_EXPORTS ScoreSVMFusion : public ScoreLevelFusionBase
 {
 private:
     cv::Ptr<cv::SVM> svm;
@@ -168,7 +168,7 @@ public:
     std::string writeName() const { return name() + "-" + scoreNormalizer->writeParams(); }
 };
 
-class ScoreGMMFusion : public ScoreLevelFusionBase
+class FACECOMMON_EXPORTS ScoreGMMFusion : public ScoreLevelFusionBase
 {
 private:
     cv::Ptr<cv::EM> impostorScoresModel;

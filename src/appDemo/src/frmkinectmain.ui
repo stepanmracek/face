@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>823</width>
-    <height>426</height>
+    <width>800</width>
+    <height>536</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>3D Face Demo</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout_5">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
@@ -29,6 +29,46 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../resources/resources.qrc">:/images/logo.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QPushButton" name="btnIdentify">
@@ -160,19 +200,6 @@
         </layout>
        </widget>
       </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
      </layout>
     </item>
     <item>
@@ -194,9 +221,8 @@
               <string>&amp;Enroll</string>
              </property>
              <property name="icon">
-              <iconset theme="add">
-               <normaloff/>
-              </iconset>
+              <iconset resource="../resources/resources.qrc">
+               <normaloff>:/images/add.png</normaloff>:/images/add.png</iconset>
              </property>
              <property name="toolButtonStyle">
               <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -212,9 +238,8 @@
               <string>&amp;Remove</string>
              </property>
              <property name="icon">
-              <iconset theme="remove">
-               <normaloff/>
-              </iconset>
+              <iconset resource="../resources/resources.qrc">
+               <normaloff>:/images/delete.png</normaloff>:/images/delete.png</iconset>
              </property>
              <property name="toolButtonStyle">
               <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -230,9 +255,8 @@
               <string>&amp;Properties</string>
              </property>
              <property name="icon">
-              <iconset theme="document-properties">
-               <normaloff/>
-              </iconset>
+              <iconset resource="../resources/resources.qrc">
+               <normaloff>:/images/properties.png</normaloff>:/images/properties.png</iconset>
              </property>
              <property name="toolButtonStyle">
               <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -248,9 +272,8 @@
               <string>&amp;Export all templates</string>
              </property>
              <property name="icon">
-              <iconset theme="gtk-save">
-               <normaloff/>
-              </iconset>
+              <iconset resource="../resources/resources.qrc">
+               <normaloff>:/images/export.png</normaloff>:/images/export.png</iconset>
              </property>
              <property name="toolButtonStyle">
               <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -263,9 +286,8 @@
               <string>&amp;Import</string>
              </property>
              <property name="icon">
-              <iconset theme="gtk-open">
-               <normaloff/>
-              </iconset>
+              <iconset resource="../resources/resources.qrc">
+               <normaloff>:/images/import.png</normaloff>:/images/import.png</iconset>
              </property>
              <property name="toolButtonStyle">
               <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -302,6 +324,8 @@
    <header>qwt_slider.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

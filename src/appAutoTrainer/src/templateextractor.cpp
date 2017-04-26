@@ -3,10 +3,10 @@
 #include <Poco/File.h>
 #include <Poco/Path.h>
 
-#include "common.h"
 #include "faceCommon/helpers/cmdlineargsparser.h"
 #include "faceCommon/biometrics/multiextractor.h"
 #include "faceCommon/facedata/facealigner.h"
+#include "faceCommon/linalg/loader.h"
 
 using namespace Face::AutoTrainer;
 
@@ -37,7 +37,7 @@ TemplateExtractor::Settings::Settings(int argc, char *argv[], bool &ok)
 
 void TemplateExtractor::Settings::printHelp()
 {
-    std::cout << "usage: appAutoTrainer --extract" << std::endl;
+    std::cout << "usage: tbs-face3d --extract" << std::endl;
     std::cout << " mandatory parameters:" << std::endl;
     std::cout << "  --extractor path/to/extractor" << std::endl;
     std::cout << "  --inputPath path/to/input/meshes" << std::endl;
@@ -68,12 +68,12 @@ void TemplateExtractor::Settings::printSettings()
 void TemplateExtractor::extract(const Settings &settings)
 {
     Face::Biometrics::MultiExtractor extractor(settings.extractorPath);
-    Face::FaceData::FaceAligner aligner(
+	Face::FaceData::FaceAlignerIcp aligner(
                 Face::FaceData::Mesh::fromFile(settings.meanFaceForAlign), settings.preAlignTemplate);
 
     std::vector<int> ids;
     std::vector<Face::FaceData::Mesh> meshes;
-    Common::loadMeshes(settings.inputPath, aligner, ids, meshes, settings.ICPiters,
+    Face::LinAlg::Loader::loadMeshes(settings.inputPath, aligner, ids, meshes, settings.ICPiters,
                        settings.smoothIters, settings.smoothCoef,  "-");
 
     // create directory if it doesn't exist

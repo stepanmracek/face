@@ -1,5 +1,4 @@
-#ifndef ICA_H
-#define ICA_H
+#pragma once
 
 #include "common.h"
 #include "projectionbase.h"
@@ -45,5 +44,3 @@ public:
 
 }
 }
-
-#endif // ICA_H

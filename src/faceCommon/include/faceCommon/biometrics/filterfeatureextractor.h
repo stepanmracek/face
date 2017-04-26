@@ -2,9 +2,13 @@
 #define FILTERBANKFEATUREEXTRACTOR_H
 
 #include "faceCommon/linalg/common.h"
-#include "faceCommon/linalg/vector.h"
 
 namespace Face {
+
+namespace LinAlg {
+	class Vector;
+}
+
 namespace Biometrics {
 
 class FilterFeatureExtractor

@@ -5,6 +5,7 @@
 #include "faceCommon/facedata/mesh.h"
 #include "faceCommon/facedata/facealigner.h"
 #include "faceSensors/isensor.h"
+#include "faceCommon/settings/settings.h"
 
 namespace Face {
 namespace Sensors {
@@ -45,13 +46,21 @@ private:
 public:
     ImageGrayscale img;
 
-    KinectSensorPlugin(const std::string &faceDetectorPath);
+    KinectSensorPlugin(const std::string &faceDetectorPath = Face::Settings::instance().settingsMap[Face::Settings::CascadeFaceDetectorPathKey]);
     ~KinectSensorPlugin();
 
     void scan();
-    Face::FaceData::Mesh &mesh() { return *_mesh; }
+    virtual SensorData sensorData()
+    {
+        SensorData d;
+        d.processedScan.mesh = *_mesh;
+        d.rawScan.mesh = *_mesh;
+        return d;
+    }
 
-    void go();
+    void doLoop();
+    void start() {} //TODO
+    void stop() {} //TODO
     void off() {}
     void wait();
     void position();

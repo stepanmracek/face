@@ -3,9 +3,10 @@
 
 #include <QWidget>
 #include <QMap>
-#include <qwt/qwt_plot_marker.h>
+#include <qwt_plot_marker.h>
 
 #include "faceCommon/biometrics/evaluation.h"
+#include "faceExtras/faceExtras.h"
 
 namespace Ui {
 class WidgetEvaluation;
@@ -14,13 +15,15 @@ class WidgetEvaluation;
 namespace Face {
 namespace GUI {
 
-class WidgetEvaluation : public QWidget
+class FACEEXTRAS_EXPORTS WidgetEvaluation : public QWidget
 {
     Q_OBJECT
 
 public:
     explicit WidgetEvaluation(QWidget *parent = 0);
     ~WidgetEvaluation();
+
+    void addEvaluation(const QString &key, const Biometrics::Evaluation &newEvaluation);
 
 private slots:
     void on_btnAdd_clicked();
@@ -39,7 +42,6 @@ private:
 
     void setupSliderFMRScale();
     void calculateFRTable();
-    void addEvaluation(const QString &key, const Biometrics::Evaluation &newEvaluation);
     void prepareDETPlot();
     void createDETCurves();
     void prepareScoresPlot();

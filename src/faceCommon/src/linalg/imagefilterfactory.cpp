@@ -88,9 +88,20 @@ ImageFilter::Ptr ImageFilterFactory::create(const std::string &params)
         int gridSizeY = Poco::NumberParser::parse(paramsList[2]);
         return new HistogramFilter(gridSizeX, gridSizeY);
     }
+    else if (filterName == HistogramBinsFilter::name())
+    {
+        int gridSizeX = Poco::NumberParser::parse(paramsList[1]);
+        int gridSizeY = Poco::NumberParser::parse(paramsList[2]);
+        int binsCount = Poco::NumberParser::parse(paramsList[3]);
+        return new HistogramBinsFilter(gridSizeX, gridSizeY, binsCount);
+    }
     else if (filterName == ContrastEqualizationFilter::name())
     {
         return new ContrastEqualizationFilter();
+    }
+    else if (filterName == OrientedGradientsFilter::name())
+    {
+        return new OrientedGradientsFilter();
     }
 
     throw FACELIB_EXCEPTION("unknown filter " + filterName);

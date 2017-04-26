@@ -1,16 +1,18 @@
-#ifndef MAP_H
-#define MAP_H
+#pragma once
 
 #include <cmath>
 #include <opencv/cv.h>
 
 #include "maskedvector.h"
 #include "faceCommon/linalg/common.h"
+#include "faceCommon/faceCommon.h"
 
 namespace Face {
 namespace FaceData {
 
-class Map
+class MaskedVector;
+class FACECOMMON_EXPORTS Map;
+class FACECOMMON_EXPORTS Map
 {
 public:
 
@@ -24,27 +26,14 @@ public:
     Map(int w, int h);
     Map(const Map &src);
     Map(const std::string &path);
-    //virtual ~Map();
 
     std::vector<double> getUsedValues() const;
-
-    /*int coordToIndex(int x, int y) const
-    {
-        return y*w + x;
-    }*/
 
     void set(int x, int y, double v)
     {
         flags(y,x) = 1;
         values(y,x) = v;
     }
-
-    /*void set(int i, double v)
-    {
-
-        flags[i] = true;
-        values[i] = v;
-    }*/
 
     void setAll(double v);
 
@@ -53,12 +42,6 @@ public:
         flags(y, x) = 0;
         values(y, x) = 0.0;
     }
-
-    /*void unset(int i)
-    {
-        flags[i] = false;
-        values[i] = 0.0;
-    }*/
 
     void unsetAll();
 
@@ -92,9 +75,6 @@ public:
 
     bool has8neigbours(int x, int y) const
     {
-        /*int x = i % w;
-        int y = i / w;*/
-
         if (x == 0 || x >= (w-1) || y == 0 || y >= (h-1)) return false;
 
         if (!flags(y  ,x-1)) return false;
@@ -121,10 +101,6 @@ public:
     void bandPass(double minValue, double maxValue, bool unsetBelowMin, bool unsetAboveMax);
 
     void erode(int kernelSize);
-
-    //double minValue() const;
-
-    //double maxValue() const;
 
     void minMax(double &min, double &max) const;
 
@@ -165,5 +141,3 @@ public:
 
 }
 }
-
-#endif // MAP_H

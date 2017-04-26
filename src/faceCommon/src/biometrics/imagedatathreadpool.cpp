@@ -2,7 +2,7 @@
 
 using namespace Face::Biometrics;
 
-void ImageDataThreadPool::TextureThread::setUp(const FaceData::Mesh *mesh)
+void ImageDataThreadPool::TextureThread::setUp(const Face::FaceData::Mesh *mesh)
 {
     this->mesh = mesh;
 }
@@ -11,9 +11,9 @@ void ImageDataThreadPool::TextureThread::run()
 {
     cv::Rect roi(25, 15, 100, 90);
     FaceData::MapConverter converter;
-    FaceData::Map textureMap = FaceData::SurfaceProcessor::depthmap(*mesh, converter, cv::Point2d(-75, -75),
+    FaceData::Map textureMap = Face::FaceData::SurfaceProcessor::depthmap(*mesh, converter, cv::Point2d(-75, -75),
                                                                     cv::Point2d(75, 75), 1,
-                                                                    FaceData::SurfaceProcessor::Texture_I);
+                                                                    Face::FaceData::SurfaceProcessor::Texture_I);
     result = textureMap.toMatrix(0, 0, 255)(roi);
 }
 
@@ -25,17 +25,17 @@ void ImageDataThreadPool::DepthAndCurvatureThread::setUp(const Face::FaceData::M
 void ImageDataThreadPool::DepthAndCurvatureThread::run()
 {
     cv::Rect roi(25, 15, 100, 90);
-    FaceData::MapConverter converter;
+    Face::FaceData::MapConverter converter;
 
-    FaceData::Map depthmap = FaceData::SurfaceProcessor::depthmap(*mesh, converter, cv::Point2d(-75, -75),
+    Face::FaceData::Map depthmap = FaceData::SurfaceProcessor::depthmap(*mesh, converter, cv::Point2d(-75, -75),
                                                                   cv::Point2d(75, 75), 1,
-                                                                  FaceData::SurfaceProcessor::ZCoord);
+                                                                  Face::FaceData::SurfaceProcessor::ZCoord);
     depthmap.bandPass(-70, 10, false, false);
     depth = depthmap.toMatrix(0, -70, 10)(roi);
 
-    FaceData::Map smoothedDepthmap = depthmap;
+    Face::FaceData::Map smoothedDepthmap = depthmap;
     smoothedDepthmap.applyCvGaussBlur(7, 3);
-    FaceData::CurvatureStruct cs = FaceData::SurfaceProcessor::calculateCurvatures(smoothedDepthmap);
+    Face::FaceData::CurvatureStruct cs = Face::FaceData::SurfaceProcessor::calculateCurvatures(smoothedDepthmap);
 
     cs.curvatureMean.bandPass(-0.1, 0.1, false, false);
     mean = cs.meanMatrix()(roi);
@@ -50,14 +50,14 @@ void ImageDataThreadPool::DepthAndCurvatureThread::run()
     eigencur = cs.pclMatrix()(roi);
 }
 
-void ImageDataThreadPool::LargeDepthThread::setUp(const FaceData::Mesh *mesh)
+void ImageDataThreadPool::LargeDepthThread::setUp(const Face::FaceData::Mesh *mesh)
 {
     this->mesh = mesh;
 }
 
 void ImageDataThreadPool::LargeDepthThread::run()
 {
-    result = FaceData::SurfaceProcessor::depthmap(*mesh, converter, 2.0, FaceData::SurfaceProcessor::ZCoord);
+    result = Face::FaceData::SurfaceProcessor::depthmap(*mesh, converter, 2.0, Face::FaceData::SurfaceProcessor::ZCoord);
 }
 
 MultiExtractor::ImageData ImageDataThreadPool::process(const Face::FaceData::Mesh *mesh)

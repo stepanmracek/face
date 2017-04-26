@@ -1,21 +1,27 @@
 #include "faceCommon/facedata/landmarks.h"
+#include "faceCommon/linalg/procrustes.h"
 
 using namespace Face::FaceData;
 
 Landmarks::Landmarks(const std::string &path)
 {
     cv::FileStorage readStorage(path, cv::FileStorage::READ);
+    if (!readStorage.isOpened())
+    {
+        throw FACELIB_EXCEPTION("Can't read landmarks from " + path);
+    }
+
     cv::FileNode landmarksNode = readStorage["landmarks"];
     for (cv::FileNodeIterator it = landmarksNode.begin(); it != landmarksNode.end(); ++it)
     {
         std::vector<double> tmp;
         (*it) >> tmp;
-        cv::Point3d p(tmp[0], tmp[1], tmp[2]);
+        Point p(tmp[0], tmp[1], tmp[2]);
         points.push_back(p);
     }
 }
 
-void Landmarks::serialize(const std::string &path)
+void Landmarks::serialize(const std::string &path) const
 {
     cv::FileStorage writeStorage(path, cv::FileStorage::WRITE);
     writeStorage << "landmarks" << "[";
@@ -27,60 +33,28 @@ void Landmarks::serialize(const std::string &path)
     writeStorage.release();
 }
 
-bool Landmarks::check()
+void Landmarks::translate(cv::Point3d shift)
 {
-    if (points.size() != 9)
+    int n = points.size();
+    for (int i = 0; i < n; i++)
     {
-        std::cerr << "  didn't pass count check" << std::endl;
-        return false;
-    }
-
-    // check x-coordinates of the eye-line
-    for (int i = 0; i <= 3; i++)
-    {
-        if (points[i].x >= points[i+1].x)
+        cv::Point3d &p = points[i];
+        if (p.x != 0 && p.y != 0 && p.z != 0)
         {
-            std::cerr << "  didn't pass eye-line check" << std::endl;
-            return false;
+            points[i] += shift;
         }
     }
+}
 
-    // check x-coordinated of nose-line
-    for (int i = 5; i <= 6; i++)
+void Landmarks::transform(Matrix &m)
+{
+    int n = points.size();
+    for (int i = 0; i < n; i++)
     {
-        if (points[i].x >= points[i+1].x)
+        cv::Point3d &p = points[i];
+        if (p.x != 0 && p.y != 0 && p.z != 0)
         {
-            std::cerr << "  didn't pass nose-line check" << std::endl;
-            return false;
+            Face::LinAlg::Procrustes3D::transform(p, m);
         }
     }
-
-    // chek that nose-line is below eye-line
-    for (int eyeIndex = 0; eyeIndex <= 4; eyeIndex++)
-    {
-        for (int noseIndex = 5; noseIndex <= 8; noseIndex++)
-        {
-            if (points[noseIndex].y >= points[eyeIndex].y)
-            {
-                std::cerr << "  didn't pass nose-line below eyes-line check" << std::endl;
-                return false;
-            }
-        }
-    }
-
-    // check that below-nose is under nose-tip
-    if (points[LowerNose].y >= points[Nosetip].y)
-    {
-        std::cerr << "  didn't pass nose-tip above lower-nose" << std::endl;
-        return false;
-    }
-
-    // check that nose is in the front
-    if ((points[Nosetip].z <= points[LeftOuterNose].z) || (points[Nosetip].z <= points[RightOuterNose].z))
-    {
-        std::cerr << "  didn't pass nose in front check" << std::endl;
-        return false;
-    }
-
-    return true;
 }

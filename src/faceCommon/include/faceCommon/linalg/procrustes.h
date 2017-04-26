@@ -1,5 +1,4 @@
-#ifndef PROCRUSTES_H
-#define PROCRUSTES_H
+#pragma once
 
 #include <opencv/cv.h>
 #include <climits>
@@ -76,7 +75,7 @@ public:
 
     static void translate(Vector &vector, TranslationCoefs &coefs);
 
-    static TranslationCoefs centralizedTranslation(Vector &vector);
+    static TranslationCoefs centralizedTranslation(const Vector &vector);
 
     static void centralize(Vector &vector);
 
@@ -85,7 +84,7 @@ public:
     static Vector getMeanShape(std::vector<Vector> &vectors);
 };
 
-class Procrustes3D
+class FACECOMMON_EXPORTS Procrustes3D
 {
 public:
     static cv::Point3d centralizedTranslation(const std::vector<cv::Point3d> &points);
@@ -137,5 +136,3 @@ public:
 
 }
 }
-
-#endif // PROCRUSTES_H

@@ -46,12 +46,12 @@ void WidgetMeshSelect::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
     std::string fullPath = item->data(1).toString().toStdString();
 
     Face::FaceData::Mesh mesh = Face::FaceData::Mesh::fromOBJ(fullPath);
-    Face::FaceData::LandmarkDetector detector(mesh);
-    Face::FaceData::Landmarks landmarks = detector.detect();
+    //Face::FaceData::LandmarkDetector detector(mesh);
+    //Face::FaceData::Landmarks landmarks = detector.detect();
 
     GLWidget *w = new GLWidget();
     w->addFace(&mesh);
-    w->addLandmarks(&landmarks);
+    //w->addLandmarks(&landmarks);
 
     QDialog dlg;
     dlg.setFixedSize(240, 320);

@@ -1,5 +1,4 @@
-#ifndef DELAUNAY_H
-#define DELAUNAY_H
+#pragma once
 
 #include <opencv2/opencv.hpp>
 
@@ -16,5 +15,3 @@ public:
 
 }
 }
-
-#endif // DELAUNAY_H

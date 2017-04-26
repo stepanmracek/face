@@ -10,7 +10,7 @@ namespace Biometrics {
 
 class Template;
 
-class DiscriminativePotential : public FeaturePotentialBase
+class FACECOMMON_EXPORTS DiscriminativePotential : public FeaturePotentialBase
 {
 public:
     DiscriminativePotential(const std::vector<Template> &templates);

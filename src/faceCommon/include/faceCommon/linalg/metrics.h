@@ -1,8 +1,6 @@
-#ifndef METRICS_H
-#define METRICS_H
+#pragma once
 
 #include <cmath>
-#include <opencv/cv.h>
 
 #include "vector.h"
 
@@ -456,5 +454,3 @@ public:
 
 }
 }
-
-#endif // METRICS_H

@@ -1,9 +1,22 @@
 #include "softkinetic/ds325sensor.h"
 
+#include <Poco/ClassLibrary.h>
+
 using namespace Face::Sensors::SoftKinetic;
 
-DS325Sensor::DS325Sensor(const std::string &haarFaceDetectionPath, const Settings &settings, DepthSense::Context & c) :
-    DS325SensorBase(settings, c)
+DS325Sensor::DS325Sensor(const std::string &haarFaceDetectionPath, const std::string &landmarkDetectorPath, const Settings &settings) :
+    DS325SensorBase(settings, landmarkDetectorPath)
+{
+    init(haarFaceDetectionPath);
+}
+
+DS325Sensor::DS325Sensor(const std::string &haarFaceDetectionPath, const std::string &landmarkDetectorPath, const Settings &settings, DepthSense::Context & c) :
+    DS325SensorBase(settings, landmarkDetectorPath, c)
+{
+    init(haarFaceDetectionPath);
+}
+
+void DS325Sensor::init(const std::string &haarFaceDetectionPath)
 {
     ////qDebug() << "Getting devices...";
     std::vector<DepthSense::Device> devices = context.getDevices();
@@ -37,7 +50,7 @@ DS325Sensor::DS325Sensor(const std::string &haarFaceDetectionPath, const Setting
     smallFrame = cv::Mat_<uchar>(ColorHeight/4, ColorWidth/4);
     roiFrame = cv::Mat_<uchar>(faceDetectionRoi.height, faceDetectionRoi.width);
 
-    tracker = Face::ObjectDetection::Tracker(haarFaceDetectionPath);
+    tracker = Face::ObjectDetection::Tracker(new Face::ObjectDetection::OpenCVDetector(haarFaceDetectionPath));
     context.startNodes();
 
     colorNode.setEnableColorMap(true);
@@ -61,12 +74,12 @@ void DS325Sensor::setState(IDS325Sensor::State newState)
 
     switch (newState)
     {
-    case Off:
+    case STATE_OFF:
     	////qDebug() << "Entering Off state";
         stop();
         break;
 
-    case Waiting:
+    case STATE_IDLE:
     	////qDebug() << "Entering Waiting state";
 
         tracker.init();
@@ -74,26 +87,25 @@ void DS325Sensor::setState(IDS325Sensor::State newState)
         ////qDebug() << "registered";
         break;
 
-    case Positioning:
+    case STATE_POSITIONING:
     	////qDebug() << "Entering Positioning state";
         optimalDistanceCounter = 0;
         output.positioningProgress = 0;
         break;
 
-    case Capturing:
+    case STATE_CAPTURING:
     	////qDebug() << "Entering Capturing state";
         capturingCounter = 0;
         output.capturingProgress = 0;
 
         std::fill(vertexCounter.begin(), vertexCounter.end(), 0);
         std::fill(pointCloudAccumulator.begin(), pointCloudAccumulator.end(), DepthSense::FPVertex(0,0,0));
-
-        depthNode.setEnableEparSmootherFilter(true);
+        setEnableSmoothFilter(depthNode, true);
         break;
 
-    case CapturingDone:
+    case STATE_CAPTURING_DONE:
     	////qDebug() << "Entering CapturingDone state";
-        depthNode.setEnableEparSmootherFilter(false);
+        setEnableSmoothFilter(depthNode, false);
     }
 }
 
@@ -123,7 +135,7 @@ void DS325Sensor::doWaiting()
     if ((tracker.getConsecutiveDetects() >= settings.consecutiveDetectsToStartPositioning) &&
         (tracker.getLastRegion().area() >= settings.minimalFaceAreaToStartPositioning))
     {
-        setState(Positioning);
+        setState(STATE_POSITIONING);
     }
 }
 
@@ -133,3 +145,7 @@ void DS325Sensor::detectFace()
     roiFrame = smallFrame(faceDetectionRoi);
     tracker.detect(roiFrame);
 }
+
+POCO_BEGIN_MANIFEST(Face::Sensors::ISensor)
+    POCO_EXPORT_CLASS(Face::Sensors::SoftKinetic::DS325Sensor)
+POCO_END_MANIFEST
