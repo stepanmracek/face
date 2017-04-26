@@ -147,7 +147,7 @@ public:
 class FACECOMMON_EXPORTS ScoreSVMFusion : public ScoreLevelFusionBase
 {
 private:
-    cv::Ptr<cv::SVM> svm;
+    cv::Ptr<cv::ml::SVM> svm;
 
     cv::Mat colVectorsToFPMatrix(std::vector<Face::LinAlg::Vector> &vectors) const;
     cv::Mat colVectorToColFPMatrix(std::vector<int> &vector) const;
@@ -171,8 +171,8 @@ public:
 class FACECOMMON_EXPORTS ScoreGMMFusion : public ScoreLevelFusionBase
 {
 private:
-    cv::Ptr<cv::EM> impostorScoresModel;
-    cv::Ptr<cv::EM> genuineScoresModel;
+    cv::Ptr<cv::ml::EM> impostorScoresModel;
+    cv::Ptr<cv::ml::EM> genuineScoresModel;
 
     void init();
 public:

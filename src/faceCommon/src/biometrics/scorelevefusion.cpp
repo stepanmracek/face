@@ -402,7 +402,7 @@ void ScoreProductFusion::deserialize(const std::string &path)
 
 void ScoreSVMFusion::init()
 {
-    svm = new cv::SVM();
+    svm = cv::ml::SVM::create();
 }
 
 ScoreSVMFusion::ScoreSVMFusion()
@@ -412,7 +412,7 @@ ScoreSVMFusion::ScoreSVMFusion()
 
 void ScoreSVMFusion::serialize(const std::string &path) const
 {
-    svm->save(path.c_str(), "svm");
+    svm->save(path);
 
     cv::FileStorage storage(path, cv::FileStorage::APPEND);
     scoreNormalizer->serialize(storage);
@@ -420,7 +420,7 @@ void ScoreSVMFusion::serialize(const std::string &path) const
 
 void ScoreSVMFusion::deserialize(const std::string &path)
 {
-    svm->load(path.c_str(), "svm");
+    svm->load(path);
 
     cv::FileStorage storage(path, cv::FileStorage::READ);
     if (!storage.isOpened())
@@ -442,11 +442,11 @@ void ScoreSVMFusion::learnImplementation()
     cv::Mat data = colVectorsToFPMatrix(scores).t();
     cv::Mat labels = colVectorToColFPMatrix(classes);
 
-    cv::SVMParams params;
-    params.svm_type = cv::SVM::C_SVC;
-    params.kernel_type = cv::SVM::LINEAR;
-    params.term_crit   = cv::TermCriteria(CV_TERMCRIT_ITER, 1000, 1e-6);
-    svm->train(data, labels, cv::Mat(), cv::Mat(), params);
+    cv::Ptr<cv::ml::SVM> params = cv::ml::SVM::create();
+    params->setType(cv::ml::SVM::C_SVC);
+    params->setKernel(cv::ml::SVM::LINEAR);
+    params->setTermCriteria(cv::TermCriteria(CV_TERMCRIT_ITER, 1000, 1e-6));
+    params->train(data, cv::ml::ROW_SAMPLE, labels);
 }
 
 ScoreLevelFusionBase::Result ScoreSVMFusion::fuse(const std::vector<double> &scores) const
@@ -456,7 +456,7 @@ ScoreLevelFusionBase::Result ScoreSVMFusion::fuse(const std::vector<double> &sco
     result.normalized = scoreNormalizer->normalize(scores);
 
     cv::Mat score = colVectorToColFPMatrix(result.normalized);
-    result.score = svm->predict(score, true);
+    result.score = svm->predict(score);
     return result;
 }
 
@@ -506,8 +506,8 @@ cv::Mat ScoreSVMFusion::colVectorsToFPMatrix(std::vector<Face::LinAlg::Vector> &
 
 void ScoreGMMFusion::init()
 {
-    impostorScoresModel = new cv::EM();
-    genuineScoresModel = new cv::EM();
+    impostorScoresModel = cv::ml::EM::create();
+    genuineScoresModel = cv::ml::EM::create();
 }
 
 ScoreGMMFusion::ScoreGMMFusion()
@@ -564,8 +564,8 @@ void ScoreGMMFusion::learnImplementation()
         }
     }
 
-    impostorScoresModel->train(impScores);
-    genuineScoresModel->train(genScores);
+    impostorScoresModel->trainEM(impScores);
+    genuineScoresModel->trainEM(genScores);
 }
 
 ScoreLevelFusionBase::Result ScoreGMMFusion::fuse(const std::vector<double> &scores) const
@@ -575,8 +575,8 @@ ScoreLevelFusionBase::Result ScoreGMMFusion::fuse(const std::vector<double> &sco
     result.normalized = scoreNormalizer->normalize(scores);
 
     Matrix m = Face::LinAlg::Vector(scores).t();
-    double i = impostorScoresModel->predict(m)[0];
-    double g = genuineScoresModel->predict(m)[0];
+    double i = impostorScoresModel->predict(m, cv::noArray(), 0);
+    double g = genuineScoresModel->predict(m, cv::noArray(), 0);
     result.score = i - g;
     return result;
 }

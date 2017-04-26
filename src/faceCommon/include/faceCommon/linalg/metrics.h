@@ -333,7 +333,7 @@ public:
         int n = v1.rows;
         if (n != v2.rows) throw FACELIB_EXCEPTION("input vector sizes mismatch");
 
-        return cv::Mahalonobis(v1, v2, invCov);
+        return cv::Mahalanobis(v1, v2, invCov);
     }
 
     double distance(const Vector &v)
@@ -365,7 +365,7 @@ public:
         if (n != v2.rows) throw FACELIB_EXCEPTION("input vector sizes mismatch");
         if (w.rows < n) throw FACELIB_EXCEPTION("weights size mismatch");
 
-        return cv::Mahalonobis(v1.mul(w), v2.mul(w), invCov);
+        return cv::Mahalanobis(v1.mul(w), v2.mul(w), invCov);
     }
 
     double distance(Vector &v)
