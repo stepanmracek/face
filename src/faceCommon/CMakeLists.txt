@@ -14,11 +14,6 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME}
-	PocoFoundation
-	opencv_core
-	opencv_flann
-	opencv_highgui
-	opencv_imgproc
-	opencv_ml
-	opencv_objdetect
+	${POCOFOUNDATION_LIBS}
+	${OpenCV_LIBS}
 )
