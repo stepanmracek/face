@@ -11,18 +11,18 @@ target_include_directories(${PROJECT_NAME}
 	PUBLIC ${POCO_ROOT}/include
 	PUBLIC ${ZLIB_ROOT}/include
 	PUBLIC ${DLIB_ROOT}/include
+	PUBLIC ${DLIB_INCLUDE_PATH}
 	PRIVATE src
 )
 
 target_link_libraries(${PROJECT_NAME}
 	PUBLIC ${OpenCV_LIBS}
-	PUBLIC ${PocoFoundation}
-	${POCOFOUNDATION_LIBS}
+	PUBLIC ${POCOFOUNDATION_LIBS}
 	PUBLIC ${zlib}
 	PRIVATE ${dlib}
 )
 
-if (NOT 3DFACE_TOPLEVEL)
+if (NOT 3DFACE_TOPLEVEL AND COMMAND installDefault)
 	installDefault(${PROJECT_NAME} lib lib)
 endif()
 
