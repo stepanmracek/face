@@ -15,6 +15,6 @@ target_link_libraries(${PROJECT_NAME}
 	F3D.faceCommon
 )
 
-if (NOT 3DFACE_TOPLEVEL)
+if (NOT 3DFACE_TOPLEVEL AND COMMAND installDefault)
 	installDefault(${PROJECT_NAME} lib lib)
 endif()

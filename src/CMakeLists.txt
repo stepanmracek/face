@@ -47,6 +47,19 @@ if(MSVC)
 else()
 	set(PocoFoundation PocoFoundation)
 	set(zlib z)
+
+	find_path(POCOFOUNDATION_INCLUDE_PATH Poco/Foundation.h)
+	find_library(POCOFOUNDATION_LIBS PocoFoundation)
+
+	if (NOT POCOFOUNDATION_INCLUDE_PATH)
+		message(SEND_ERROR "Poco headers not found.")
+	endif ()
+	if (NOT POCOFOUNDATION_LIBS)
+		message(SEND_ERROR "Poco Foundation library was not found.")
+	endif ()
+
+
+	include_directories(${POCOFOUNDATION_INCLUDE_PATH})
 endif()
 
 add_subdirectory(faceCommon)
@@ -79,3 +92,5 @@ if (3DFACE_EXTRAS)
 	add_subdirectory(appScan)
 	add_subdirectory(appDemo)
 endif()
+
+

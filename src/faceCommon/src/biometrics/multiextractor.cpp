@@ -219,7 +219,7 @@ Face::LinAlg::Vector MultiExtractor::CurveUnit::extract(const ImageData &data) c
     return featureExtractor->extract(rawVec);
 }
 
-MultiExtractor::MultiExtractor() : extractorThreadPool(0), imageDataThreadPool(0), fusion(0)
+MultiExtractor::MultiExtractor() : extractorThreadPool(0), imageDataThreadPool(0), fusion()
 {
 }
 

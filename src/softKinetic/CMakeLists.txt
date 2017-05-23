@@ -32,22 +32,27 @@ message(STATUS "LIB_DS: ${LIB_DS}")
 target_link_libraries(${PROJECT_NAME}
 	F3D.faceCommon
 	F3D.faceSensors
-	${LIB_DS}
 	${dlib}
 )
 
-if(NOT MSVC)
+if (${LIB_DS})
 	target_link_libraries(${PROJECT_NAME}
-		${LIB_DS_PLUGINS}
-		${LIB_DS_TURBOJPEG}
+		${LIB_DS}
 	)
+
+	if(NOT MSVC AND ${LIB_DS_PLUGINS} AND ${LIB_DS_TURBOJPEG})
+		target_link_libraries(${PROJECT_NAME}
+			${LIB_DS_PLUGINS}
+			${LIB_DS_TURBOJPEG}
+		)
+	endif()
 endif()
 
-if(${TargetDevice} STREQUAL "lindevice")
+if(${TargetDevice} AND ${TargetDevice} STREQUAL "lindevice")
 	target_link_libraries(${PROJECT_NAME}
 		TBS)
 endif()
 
-if (NOT 3DFACE_TOPLEVEL)
+if (NOT 3DFACE_TOPLEVEL AND COMMAND installDefault)
 	installDefault(${PROJECT_NAME} lib lib)
 endif()
